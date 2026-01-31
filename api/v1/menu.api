@@ -1,0 +1,6 @@
+syntax := "v1"
+
+@service (
+    prefix: "/v1"   // 路由前缀
+    jwt: Auth   //当前服务接口需要jwt鉴权，格式为“jwt: <jwt_key>”
+    
