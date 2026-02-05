@@ -1,5 +1,11 @@
 syntax = "v1"
 
+info (
+	title: "test"
+	desc: "接口"
+	author: "happy"
+)
+
 type Request {
 	Name string `path:"name,options=you|me"`
 }

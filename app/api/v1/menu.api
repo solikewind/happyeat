@@ -1,0 +1,60 @@
+syntax = "v1"
+
+info (
+    title: "HappyEat菜单服务API"
+    description: "HappyEat菜单服务相关接口"
+    author: "Goxny"
+    version: "v1.0.0"
+)
+
+import "menu_types.proto"
+
+@server (
+    jwt: Auth
+    prefix: /central/v1
+    group: menu
+    timeout: 5s
+)
+
+service MenuService { 
+    @doc "列出菜单"
+    @handler ListMenus
+    get /menus (ListMenusReq) returns (ListMenusReply)
+    
+    @doc "获取菜单"
+    @handler GetMenu
+    get /menus/{id} (GetMenuReq) returns (GetMenuReply)
+
+    @doc "创建菜单"
+    @handler CreateMenu
+    post /menus (CreateMenuReq) returns (CreateMenuReply)
+
+    @doc "更新菜单"
+    @handler UpdateMenu
+    put /menus/{id} (UpdateMenuReq) returns (UpdateMenuReply)
+
+    @doc "删除菜单"
+    @handler DeleteMenu
+    delete /menus/{id} (DeleteMenuReq) returns (DeleteMenuReply)
+
+    @doc "列出菜单类型"
+    @handler ListMenuTypes
+    get /menu-types (ListMenuTypesReq) returns (ListMenuTypesReply)
+    
+    @doc "获取菜单类型"
+    @handler GetMenuType
+    get /menu-types/{id} (GetMenuTypeReq) returns (GetMenuTypeReply)
+
+    @doc "创建菜单类型"
+    @handler CreateMenuType
+    post /menu-types (CreateMenuTypeReq) returns (CreateMenuTypeReply)
+    
+    @doc "更新菜单类型"
+    @handler UpdateMenuType
+    put /menu-types/{id} (UpdateMenuTypeReq) returns (UpdateMenuTypeReply)
+    
+    @doc "删除菜单类型"
+    @handler DeleteMenuType
+    delete /menu-types/{id} (DeleteMenuTypeReq) returns (DeleteMenuTypeReply)
+
+}

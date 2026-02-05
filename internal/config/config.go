@@ -10,3 +10,7 @@ import (
 type Config struct {
 	rest.RestConf
 }
+
+func (c *Config) Validate() error {
+	return nil
+}

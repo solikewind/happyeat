@@ -1,7 +1,8 @@
 Name: happyeat-api
 Host: 0.0.0.0
 Port: 8888
+Timeout: 5000ms
 
 Log:
   ServiceName: happyeat-api
-  
+  Mode: dev
