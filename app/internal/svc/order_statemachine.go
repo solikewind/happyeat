@@ -7,10 +7,10 @@ type OrderStateMachine struct {
 	sm *stateless.StateMachine
 }
 
-func NewOrderStateMachine(currentStatus string, order OrderModel) *OrderStateMachine {
-	sm := stateless.NewStateMachine(currentStatus)
-	// 初始化状态机
-	return &OrderStateMachine{
-		sm: sm,
-	}
-}
+// func NewOrderStateMachine(currentStatus string, order OrderModel) *OrderStateMachine {
+// 	sm := stateless.NewStateMachine(currentStatus)
+// 	// 初始化状态机
+// 	return &OrderStateMachine{
+// 		sm: sm,
+// 	}
+// }
