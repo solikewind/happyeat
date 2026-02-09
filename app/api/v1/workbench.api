@@ -7,3 +7,15 @@ info (
     author: "Goxny"
     version: "v1.0.0"
 )
+
+@server (
+	jwt:     Auth
+	prefix:  /central/v1
+	group:   workbench
+	timeout: 5s
+)
+
+service WorkbenchService (
+    @doc "列出工作台"
+    @doc "创建工作台"
+)

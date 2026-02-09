@@ -29,6 +29,8 @@ func NewCreateMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 
 func (l *CreateMenuCategoryLogic) CreateMenuCategory(req *types.CreateMenuCategoryReq) (resp *types.CreateMenuCategoryReply, err error) {
 	// todo: add your logic here and delete this line
-
+	// 1. Validate the request
+	// 2. Create a new menu category in the database
+	// 3. Return the created menu category information
 	return
 }
