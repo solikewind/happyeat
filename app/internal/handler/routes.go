@@ -9,6 +9,8 @@ import (
 
 	menu "github.com/solikewind/happyeat/app/internal/handler/menu"
 	menutype "github.com/solikewind/happyeat/app/internal/handler/menutype"
+	table "github.com/solikewind/happyeat/app/internal/handler/table"
+	tablecategory "github.com/solikewind/happyeat/app/internal/handler/tablecategory"
 	"github.com/solikewind/happyeat/app/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -18,7 +20,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				// 获取菜单
+				// 获取单个菜单
 				Method:  http.MethodGet,
 				Path:    "/menu/:id",
 				Handler: menu.GetMenuHandler(serverCtx),
@@ -84,6 +86,82 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodDelete,
 				Path:    "/menu/category/:id",
 				Handler: menutype.DeleteMenuCategoryHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 获取单个餐桌
+				Method:  http.MethodGet,
+				Path:    "/table/:id",
+				Handler: table.GetTableHandler(serverCtx),
+			},
+			{
+				// 更新餐桌
+				Method:  http.MethodPut,
+				Path:    "/table/:id",
+				Handler: table.UpdateTableHandler(serverCtx),
+			},
+			{
+				// 删除餐桌
+				Method:  http.MethodDelete,
+				Path:    "/table/:id",
+				Handler: table.DeleteTableHandler(serverCtx),
+			},
+			{
+				// 列出餐桌
+				Method:  http.MethodGet,
+				Path:    "/tables",
+				Handler: table.ListTablesHandler(serverCtx),
+			},
+			{
+				// 创建餐桌
+				Method:  http.MethodPost,
+				Path:    "/tables",
+				Handler: table.CreateTableHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 列出餐桌类别
+				Method:  http.MethodGet,
+				Path:    "/table/categories",
+				Handler: tablecategory.ListTableCategoriesHandler(serverCtx),
+			},
+			{
+				// 创建餐桌类别
+				Method:  http.MethodPost,
+				Path:    "/table/category",
+				Handler: tablecategory.CreateTableCategoryHandler(serverCtx),
+			},
+			{
+				// 获取餐桌类别
+				Method:  http.MethodGet,
+				Path:    "/table/category/:id",
+				Handler: tablecategory.GetTableCategoryHandler(serverCtx),
+			},
+			{
+				// 更新餐桌类别
+				Method:  http.MethodPut,
+				Path:    "/table/category/:id",
+				Handler: tablecategory.UpdateTableCategoryHandler(serverCtx),
+			},
+			{
+				// 删除餐桌类别
+				Method:  http.MethodDelete,
+				Path:    "/table/category/:id",
+				Handler: tablecategory.DeleteTableCategoryHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),

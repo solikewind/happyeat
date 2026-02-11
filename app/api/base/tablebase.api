@@ -1,0 +1,18 @@
+syntax = "v1"
+
+type Table {
+	Id         uint64 `json:"id"`          // 餐桌id
+	Code       string `json:"code"`         // 桌号
+	Status     string `json:"status"`      // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
+	Capacity   int    `json:"capacity"`    // 可坐人数
+	CategoryId uint64 `json:"category_id"` // 餐桌分类id
+	QrCode     string `json:"qr_code,optional"` // 二维码
+	CreateAt   int64  `json:"create_at"`   // 创建时间
+	UpdateAt   int64  `json:"update_at"`   // 更新时间
+}
+
+type TableCategory {
+	Id          uint64 `json:"id"`          // 分类id
+	Name        string `json:"name"`        // 分类名称
+	Description string `json:"description,optional"` // 描述
+}

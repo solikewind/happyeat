@@ -9,14 +9,11 @@ info (
 
 import "../base/menubase.api"
 
-
-
 type ListMenusReq {
-    Current uint64 `json:"current"`
+    Current  uint64 `json:"current"`
     PageSize uint64 `json:"pageSize"`
-    Name string `json:"name,optional"`
-    Category string `json:"category,optional"`
-    Spec string `json:"spec,optional"`
+    Name     string `json:"name,optional"`
+    Category string `json:"category,optional"` // 按分类名字筛选
  }
  type ListMenusReply {
     Menus []Menu `json:"menus"`
@@ -24,7 +21,7 @@ type ListMenusReq {
  }
 
  type GetMenuReq {
-    Id uint64 `json:"id"`
+    Id uint64 `path:"id"`
  }
  type GetMenuReply {
     Menu Menu `json:"menu"`
@@ -36,12 +33,13 @@ type ListMenusReq {
  type CreateMenuReply {}
 
  type UpdateMenuReq {
-    Menu Menu `json:"menu"`
+    Id   uint64 `path:"id"`
+    Menu Menu   `json:"menu"`
  }
  type UpdateMenuReply {}
 
  type DeleteMenuReq {
-    Id uint64 `json:"id"`
+    Id uint64 `path:"id"`
  }
  type DeleteMenuReply {}
 
@@ -56,7 +54,7 @@ type ListMenusReq {
  }
 
  type GetMenuCategoryReq {
-    Id uint64 `json:"id"`
+    Id uint64 `path:"id"`
  }
  type GetMenuCategoryReply {
     MenuCategory MenuCategory `json:"category"`
@@ -68,11 +66,12 @@ type ListMenusReq {
  type CreateMenuCategoryReply {}
 
  type UpdateMenuCategoryReq {
-    MenuCategory MenuCategory `json:"category"`
+    Id           uint64        `path:"id"`
+    MenuCategory MenuCategory  `json:"category"`
  }
  type UpdateMenuCategoryReply {}
 
  type DeleteMenuCategoryReq {
-    Id uint64 `json:"id"`
+    Id uint64 `path:"id"`
  }
  type DeleteMenuCategoryReply {}

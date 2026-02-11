@@ -6,6 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
 	"github.com/solikewind/happyeat/app/internal/config"
 	"github.com/solikewind/happyeat/app/internal/handler"
@@ -15,7 +16,7 @@ import (
 	"github.com/zeromicro/go-zero/rest"
 )
 
-var configFile = flag.String("f", "etc/menuservice.yaml", "the config file")
+var configFile = flag.String("f", "etc/happyeatservice.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -26,7 +27,12 @@ func main() {
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 
-	ctx := svc.NewServiceContext(c)
+	ctx, err := svc.NewServiceContext(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ctx.DB.Close()
+
 	handler.RegisterHandlers(server, ctx)
 	svc.NewCasbinEnforcer(ctx.Config.Casbin.Model, "待传入的csv")
 

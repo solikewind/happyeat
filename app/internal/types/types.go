@@ -17,18 +17,46 @@ type CreateMenuReq struct {
 	Menu Menu `json:"menu"`
 }
 
+type CreateTableCategoryReply struct {
+}
+
+type CreateTableCategoryReq struct {
+	TableCategory TableCategory `json:"category"`
+}
+
+type CreateTableReply struct {
+}
+
+type CreateTableReq struct {
+	Table Table `json:"table"`
+}
+
 type DeleteMenuCategoryReply struct {
 }
 
 type DeleteMenuCategoryReq struct {
-	Id uint64 `json:"id"`
+	Id uint64 `path:"id"`
 }
 
 type DeleteMenuReply struct {
 }
 
 type DeleteMenuReq struct {
-	Id uint64 `json:"id"`
+	Id uint64 `path:"id"`
+}
+
+type DeleteTableCategoryReply struct {
+}
+
+type DeleteTableCategoryReq struct {
+	Id uint64 `path:"id"`
+}
+
+type DeleteTableReply struct {
+}
+
+type DeleteTableReq struct {
+	Id uint64 `path:"id"`
 }
 
 type GetMenuCategoryReply struct {
@@ -36,7 +64,7 @@ type GetMenuCategoryReply struct {
 }
 
 type GetMenuCategoryReq struct {
-	Id uint64 `json:"id"`
+	Id uint64 `path:"id"`
 }
 
 type GetMenuReply struct {
@@ -44,7 +72,23 @@ type GetMenuReply struct {
 }
 
 type GetMenuReq struct {
-	Id uint64 `json:"id"`
+	Id uint64 `path:"id"`
+}
+
+type GetTableCategoryReply struct {
+	TableCategory TableCategory `json:"category"`
+}
+
+type GetTableCategoryReq struct {
+	Id uint64 `path:"id"`
+}
+
+type GetTableReply struct {
+	Table Table `json:"table"`
+}
+
+type GetTableReq struct {
+	Id uint64 `path:"id"`
 }
 
 type ListMenusCategoriesReply struct {
@@ -67,30 +111,79 @@ type ListMenusReq struct {
 	Current  uint64 `json:"current"`
 	PageSize uint64 `json:"pageSize"`
 	Name     string `json:"name,optional"`
-	Category string `json:"category,optional"`
-	Spec     string `json:"spec,optional"`
+	Category string `json:"category,optional"` // 按分类名字筛选
+}
+
+type ListTableCategoriesReply struct {
+	Categories []TableCategory `json:"categories"`
+	Total      uint64          `json:"total"`
+}
+
+type ListTableCategoriesReq struct {
+	Current  uint64 `json:"current"`
+	PageSize uint64 `json:"pageSize"`
+	Name     string `json:"name,optional"`
+}
+
+type ListTablesReply struct {
+	Tables []Table `json:"tables"`
+	Total  uint64  `json:"total"`
+}
+
+type ListTablesReq struct {
+	Current  uint64 `json:"current"`
+	PageSize uint64 `json:"pageSize"`
+	Code     string `json:"code,optional"`
+	Status   string `json:"status,optional"`
+	Category string `json:"category,optional"` // 按分类名字筛选
 }
 
 type Menu struct {
-	Id          uint64  `json:"id"`          // 菜单id
-	Name        string  `json:"name"`        // 菜单名称
-	Description string  `json:"description"` // 菜单描述
-	Price       float64 `json:"price"`       // 菜单价格
-	Category    string  `json:"category"`    // 菜单分类
-	Spec        string  `json:"spec"`        // 菜单规格
-	Create_at   int64   `json:"create_at"`   // 创建时间
+	Id          uint64     `json:"id"`                   // 菜单id
+	Name        string     `json:"name"`                 // 菜单名称
+	Description string     `json:"description,optional"` // 菜单描述
+	Image       string     `json:"image,optional"`       // 菜单图片
+	Price       float64    `json:"price"`                // 菜单价格
+	CategoryId  uint64     `json:"category_id"`          // 菜单分类id
+	Specs       []MenuSpec `json:"specs,optional"`       // 规格列表
+	CreateAt    int64      `json:"create_at"`            // 创建时间
+	UpdateAt    int64      `json:"update_at"`            // 更新时间
 }
 
 type MenuCategory struct {
-	Id          uint64 `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Id          uint64 `json:"id"`                   // 分类id
+	Name        string `json:"name"`                 // 分类名称
+	Description string `json:"description,optional"` // 描述
+}
+
+type MenuSpec struct {
+	SpecType   string  `json:"spec_type"`   // 规格类型（如辣度、容量）
+	SpecValue  string  `json:"spec_value"`  // 该类型下的一个选项（如微辣、大瓶）
+	PriceDelta float64 `json:"price_delta"` // 加价
+}
+
+type Table struct {
+	Id         uint64 `json:"id"`               // 餐桌id
+	Code       string `json:"code"`             // 桌号
+	Status     string `json:"status"`           // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
+	Capacity   int    `json:"capacity"`         // 可坐人数
+	CategoryId uint64 `json:"category_id"`      // 餐桌分类id
+	QrCode     string `json:"qr_code,optional"` // 二维码
+	CreateAt   int64  `json:"create_at"`        // 创建时间
+	UpdateAt   int64  `json:"update_at"`        // 更新时间
+}
+
+type TableCategory struct {
+	Id          uint64 `json:"id"`                   // 分类id
+	Name        string `json:"name"`                 // 分类名称
+	Description string `json:"description,optional"` // 描述
 }
 
 type UpdateMenuCategoryReply struct {
 }
 
 type UpdateMenuCategoryReq struct {
+	Id           uint64       `path:"id"`
 	MenuCategory MenuCategory `json:"category"`
 }
 
@@ -98,5 +191,22 @@ type UpdateMenuReply struct {
 }
 
 type UpdateMenuReq struct {
-	Menu Menu `json:"menu"`
+	Id   uint64 `path:"id"`
+	Menu Menu   `json:"menu"`
+}
+
+type UpdateTableCategoryReply struct {
+}
+
+type UpdateTableCategoryReq struct {
+	Id            uint64        `path:"id"`
+	TableCategory TableCategory `json:"category"`
+}
+
+type UpdateTableReply struct {
+}
+
+type UpdateTableReq struct {
+	Id    uint64 `path:"id"`
+	Table Table  `json:"table"`
 }

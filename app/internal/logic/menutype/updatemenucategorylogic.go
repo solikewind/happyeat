@@ -8,6 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/dal/model/menu/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,8 +28,16 @@ func NewUpdateMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-func (l *UpdateMenuCategoryLogic) UpdateMenuCategory(req *types.UpdateMenuCategoryReq) (resp *types.UpdateMenuCategoryReply, err error) {
-	// todo: add your logic here and delete this line
+func (l *UpdateMenuCategoryLogic) UpdateMenuCategory(req *types.UpdateMenuCategoryReq) (*types.UpdateMenuCategoryReply, error) {
+	c := req.MenuCategory
 
-	return
+	err := l.svcCtx.MenuType.Update(l.ctx, int(req.Id), c.Name, c.Description)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, err
+		}
+		return nil, err
+	}
+
+	return &types.UpdateMenuCategoryReply{}, nil
 }

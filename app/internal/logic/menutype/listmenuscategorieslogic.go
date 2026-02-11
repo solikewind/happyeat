@@ -8,6 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	menudata "github.com/solikewind/happyeat/dal/model/menu"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,8 +28,33 @@ func NewListMenusCategoriesLogic(ctx context.Context, svcCtx *svc.ServiceContext
 	}
 }
 
-func (l *ListMenusCategoriesLogic) ListMenusCategories(req *types.ListMenusCategoriesReq) (resp *types.ListMenusCategoriesReply, err error) {
-	// todo: add your logic here and delete this line
+func (l *ListMenusCategoriesLogic) ListMenusCategories(req *types.ListMenusCategoriesReq) (*types.ListMenusCategoriesReply, error) {
+	pageSize := int(req.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	current := int(req.Current)
+	if current <= 0 {
+		current = 1
+	}
+	offset := (current - 1) * pageSize
 
-	return
+	list, total, err := l.svcCtx.MenuType.List(l.ctx, menudata.ListMenuCategoriesFilter{
+		Name:   req.Name,
+		Offset: offset,
+		Limit:  pageSize,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	categories := make([]types.MenuCategory, 0, len(list))
+	for _, e := range list {
+		categories = append(categories, entCategoryToType(e))
+	}
+
+	return &types.ListMenusCategoriesReply{
+		Categories: categories,
+		Total:      uint64(total),
+	}, nil
 }

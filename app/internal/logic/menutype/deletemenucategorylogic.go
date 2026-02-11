@@ -5,9 +5,11 @@ package menutype
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/dal/model/menu/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,8 +29,22 @@ func NewDeleteMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-func (l *DeleteMenuCategoryLogic) DeleteMenuCategory(req *types.DeleteMenuCategoryReq) (resp *types.DeleteMenuCategoryReply, err error) {
-	// todo: add your logic here and delete this line
+func (l *DeleteMenuCategoryLogic) DeleteMenuCategory(req *types.DeleteMenuCategoryReq) (*types.DeleteMenuCategoryReply, error) {
+	count, err := l.svcCtx.MenuType.CountMenusByCategoryID(l.ctx, int(req.Id))
+	if err != nil {
+		return nil, err
+	}
+	if count > 0 {
+		return nil, errors.New("该分类下仍有菜单，无法删除")
+	}
 
-	return
+	err = l.svcCtx.MenuType.Delete(l.ctx, int(req.Id))
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, err
+		}
+		return nil, err
+	}
+
+	return &types.DeleteMenuCategoryReply{}, nil
 }

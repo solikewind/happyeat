@@ -1,0 +1,125 @@
+syntax = "v1"
+
+info (
+	title:       "HappyEat服务API"
+	description: "HappyEat菜单、餐桌等服务统一入口"
+	usage:       "一次 goctl 生成所有 types、handler、logic"
+	author:      "Goxny"
+	version:     "v1.0.0"
+)
+
+import "menutypes.api"
+import "tabletypes.api"
+
+@server (
+	jwt:     Auth
+	prefix:  /central/v1
+	group:   menu
+	timeout: 5s
+)
+service HappyEatService {
+	@doc "列出菜单"
+	@handler ListMenus
+	get /menus (ListMenusReq) returns (ListMenusReply)
+
+	@doc "获取单个菜单"
+	@handler GetMenu
+	get /menu/:id (GetMenuReq) returns (GetMenuReply)
+
+	@doc "创建菜单"
+	@handler CreateMenu
+	post /menus (CreateMenuReq) returns (CreateMenuReply)
+
+	@doc "更新菜单"
+	@handler UpdateMenu
+	put /menu/:id (UpdateMenuReq) returns (UpdateMenuReply)
+
+	@doc "删除菜单"
+	@handler DeleteMenu
+	delete /menu/:id (DeleteMenuReq) returns (DeleteMenuReply)
+}
+
+@server (
+	jwt:     Auth
+	prefix:  /central/v1
+	group:   menutype
+	timeout: 5s
+)
+service HappyEatService {
+	@doc "列出菜单种类"
+	@handler ListMenusCategories
+	get /menu/categories (ListMenusCategoriesReq) returns (ListMenusCategoriesReply)
+
+	@doc "获取菜单种类"
+	@handler GetMenuCategory
+	get /menu/category/:id (GetMenuCategoryReq) returns (GetMenuCategoryReply)
+
+	@doc "创建菜单种类"
+	@handler CreateMenuCategory
+	post /menu/category (CreateMenuCategoryReq) returns (CreateMenuCategoryReply)
+
+	@doc "更新菜单种类"
+	@handler UpdateMenuCategory
+	put /menu/category/:id (UpdateMenuCategoryReq) returns (UpdateMenuCategoryReply)
+
+	@doc "删除菜单种类"
+	@handler DeleteMenuCategory
+	delete /menu/category/:id (DeleteMenuCategoryReq) returns (DeleteMenuCategoryReply)
+}
+
+@server (
+	jwt:     Auth
+	prefix:  /central/v1
+	group:   table
+	timeout: 5s
+)
+service HappyEatService {
+	@doc "列出餐桌"
+	@handler ListTables
+	get /tables (ListTablesReq) returns (ListTablesReply)
+
+	@doc "获取单个餐桌"
+	@handler GetTable
+	get /table/:id (GetTableReq) returns (GetTableReply)
+
+	@doc "创建餐桌"
+	@handler CreateTable
+	post /tables (CreateTableReq) returns (CreateTableReply)
+
+	@doc "更新餐桌"
+	@handler UpdateTable
+	put /table/:id (UpdateTableReq) returns (UpdateTableReply)
+
+	@doc "删除餐桌"
+	@handler DeleteTable
+	delete /table/:id (DeleteTableReq) returns (DeleteTableReply)
+}
+
+@server (
+	jwt:     Auth
+	prefix:  /central/v1
+	group:   tablecategory
+	timeout: 5s
+)
+service HappyEatService {
+	@doc "列出餐桌类别"
+	@handler ListTableCategories
+	get /table/categories (ListTableCategoriesReq) returns (ListTableCategoriesReply)
+
+	@doc "获取餐桌类别"
+	@handler GetTableCategory
+	get /table/category/:id (GetTableCategoryReq) returns (GetTableCategoryReply)
+
+	@doc "创建餐桌类别"
+	@handler CreateTableCategory
+	post /table/category (CreateTableCategoryReq) returns (CreateTableCategoryReply)
+
+	@doc "更新餐桌类别"
+	@handler UpdateTableCategory
+	put /table/category/:id (UpdateTableCategoryReq) returns (UpdateTableCategoryReply)
+
+	@doc "删除餐桌类别"
+	@handler DeleteTableCategory
+	delete /table/category/:id (DeleteTableCategoryReq) returns (DeleteTableCategoryReply)
+}
+

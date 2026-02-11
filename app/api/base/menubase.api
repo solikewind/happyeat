@@ -1,18 +1,26 @@
 syntax = "v1"
 
+// MenuSpec 表示一个可选规格项；同类型可有多条（如辣度：微辣/中辣/麻辣 各一条）
+type MenuSpec {
+	SpecType   string  `json:"spec_type"`   // 规格类型（如辣度、容量）
+	SpecValue  string  `json:"spec_value"`  // 该类型下的一个选项（如微辣、大瓶）
+	PriceDelta float64 `json:"price_delta"` // 加价
+}
+
 type Menu {
-    Id uint64   `json:"id"` // 菜单id
-    Name string  `json:"name"`  // 菜单名称
-    Image string `json:"image"` // 菜单图片
-    Price float64 `json:"price"`    // 菜单价格
-    Category string `json:"category"`   // 菜单分类
-    Spec    string `json:"spec"` // 菜单规格
-    description string `json:"description"` // 菜单描述
-    Create_at int64 `json:"create_at"`      // 创建时间
+	Id          uint64      `json:"id"`           // 菜单id
+	Name        string      `json:"name"`         // 菜单名称
+	Description string      `json:"description,optional"` // 菜单描述
+	Image       string      `json:"image,optional"`      // 菜单图片
+	Price       float64     `json:"price"`         // 菜单价格
+	CategoryId  uint64      `json:"category_id"`   // 菜单分类id
+	Specs       []MenuSpec  `json:"specs,optional"` // 规格列表
+	CreateAt    int64       `json:"create_at"`    // 创建时间
+	UpdateAt    int64       `json:"update_at"`    // 更新时间
 }
 
 type MenuCategory {
-    Id uint64 `json:"id"`
-    Name string `json:"name"`
-    Description string `json:"description"`
+	Id          uint64 `json:"id"`          // 分类id
+	Name        string `json:"name"`        // 分类名称
+	Description string `json:"description,optional"` // 描述
 }

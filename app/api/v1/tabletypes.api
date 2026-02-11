@@ -1,0 +1,78 @@
+syntax = "v1"
+
+info (
+	title:       "HappyEat餐桌服务APITypes"
+	description: "HappyEat餐桌服务相关接口参数"
+	author:      "Goxny"
+	version:     "v1.0.0"
+)
+
+import "../base/tablebase.api"
+
+type ListTablesReq {
+	Current  uint64 `json:"current"`
+	PageSize uint64 `json:"pageSize"`
+	Code     string `json:"code,optional"`
+	Status   string `json:"status,optional"`
+	Category string `json:"category,optional"` // 按分类名字筛选
+}
+type ListTablesReply {
+	Tables []Table `json:"tables"`
+	Total  uint64  `json:"total"`
+}
+
+type GetTableReq {
+	Id uint64 `path:"id"`
+}
+type GetTableReply {
+	Table Table `json:"table"`
+}
+
+type CreateTableReq {
+	Table Table `json:"table"`
+}
+type CreateTableReply {}
+
+type UpdateTableReq {
+	Id    uint64 `path:"id"`
+	Table Table  `json:"table"`
+}
+type UpdateTableReply {}
+
+type DeleteTableReq {
+	Id uint64 `path:"id"`
+}
+type DeleteTableReply {}
+
+type ListTableCategoriesReq {
+	Current  uint64 `json:"current"`
+	PageSize uint64 `json:"pageSize"`
+	Name     string `json:"name,optional"`
+}
+type ListTableCategoriesReply {
+	Categories []TableCategory `json:"categories"`
+	Total      uint64          `json:"total"`
+}
+
+type GetTableCategoryReq {
+	Id uint64 `path:"id"`
+}
+type GetTableCategoryReply {
+	TableCategory TableCategory `json:"category"`
+}
+
+type CreateTableCategoryReq {
+	TableCategory TableCategory `json:"category"`
+}
+type CreateTableCategoryReply {}
+
+type UpdateTableCategoryReq {
+	Id            uint64        `path:"id"`
+	TableCategory TableCategory `json:"category"`
+}
+type UpdateTableCategoryReply {}
+
+type DeleteTableCategoryReq {
+	Id uint64 `path:"id"`
+}
+type DeleteTableCategoryReply {}

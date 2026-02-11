@@ -9,6 +9,7 @@ alwaysApply: true
 - **框架**：go-zero（zeromicro/go-zero），HTTP 使用 `rest`，代码生成使用 goctl。
 - **配置**：YAML（`app/etc/*.yaml`、根目录 `etc/`）。
 - **权限**：JWT（Auth）+ Casbin（RBAC）。
+- **数据层**：使用 ent，按**业务模块**各自放在 `dal/model/<模块名>/` 下（见下）。
 
 ## 模块与目录
 - **根模块**：`github.com/solikewind/happyeat`（见 `go.mod`）。
@@ -16,10 +17,20 @@ alwaysApply: true
 - **API 定义**：`app/api/`（`base/`、`v1/`），`.api` 使用 go-zero api 语法。
 - **内部包**：`app/internal/`（config、handler、logic、svc、types、constants）；**禁止**使用短路径 `happyeat/internal/...`。
 
+## DAL / model：按业务模块分目录
+- **菜单业务模块**：`dal/model/menu/`
+  - `ent/`：本模块的 ent schema（`ent/schema/`）与生成代码（与 schema 同级）；仅含菜单、分类、规格等与本模块相关的实体。
+  - `menu.go`、`menutype.go`：本模块的 data 逻辑（封装 ent，供 logic 调用）。
+- **餐桌业务模块**：`dal/model/table/`
+  - `ent/`：本模块的 ent schema 与生成代码；仅含餐桌、餐桌类别等与本模块相关的实体。
+  - `table.go`、`tabletype.go`：本模块的 data 逻辑。
+- 其他业务模块（如订单）同理：`dal/model/<模块名>/` 下放该模块的 `ent/` 与 data 层 go 文件；**不要**把多个业务模块的 schema 混在同一个 ent 里。
+
 ## 导入路径规则
-- 正确：`github.com/solikewind/happyeat/app/internal/config`、`.../app/internal/svc` 等。
-- 错误：`happyeat/internal/config`（会报 no required module provides package）。
+- 正确：`github.com/solikewind/happyeat/app/internal/config`、`github.com/solikewind/happyeat/dal/model/menu`、`github.com/solikewind/happyeat/dal/model/table` 等。
+- 错误：`happyeat/internal/...`（会报 no required module provides package）。
 
 ## 代码风格
 - Handler：解析请求、调 Logic、写响应；业务在 `logic/`。
 - Logic：使用 `*svc.ServiceContext`；新增 API 先改 `.api` 再用 goctl 生成。
+- 函数内按业务步骤分块，逻辑块之间加空行。

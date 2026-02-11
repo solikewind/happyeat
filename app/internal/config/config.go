@@ -7,8 +7,12 @@ import "github.com/zeromicro/go-zero/rest"
 
 type Config struct {
 	rest.RestConf
-	Auth
-	Casbin
+	SqlConfig SqlConfig
+	Auth      Auth
+	Casbin    Casbin
+}
+type SqlConfig struct {
+	DataSource string
 }
 
 type Auth struct {
