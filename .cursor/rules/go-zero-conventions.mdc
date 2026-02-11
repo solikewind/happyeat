@@ -1,0 +1,28 @@
+---
+description: go-zero 与 goctl 使用约定，编辑或生成与 API/服务相关的代码时应用
+globs: ["**/*.go", "**/*.api", "app/**"]
+---
+# go-zero 约定
+
+## 服务与入口
+- 每个 HTTP 服务在 `app/` 下：入口如 `app/menuservice.go`，配置 `app/etc/menuservice.yaml`。
+- 入口中注册路由在 `app/internal/handler/routes.go`，使用 `rest.MustNewServer(c.RestConf, rest.WithRouter(...))` 等。
+
+## API 定义（.api）
+- 语法：`syntax = "v1"`，`info(...)`，`import "xxx.api"`，`@server(...)`，`service XxxService(...)`。
+- `@server` 常用：`jwt: Auth`、`prefix: /central/v1`、`group: table`、`timeout: 5s`。
+- 类型定义可放在单独 `.api`（如 `tabletypes.api`）再 `import`。
+
+## 生成与手写
+- 用 goctl 生成代码后可在生成文件上直接编辑（文件头注释 "Safe to edit"）。
+- 新增接口：先改/增 `.api`，再在项目根目录执行 goctl 生成，避免手写与生成不一致。
+- 生成路径以 `goctl.yaml` 和命令行参数为准；本项目中 handler/logic/types 均在 `app/internal/` 下。
+
+## 包与导入
+- 所有对 `config`、`handler`、`logic`、`svc`、`types` 的引用必须使用完整模块路径：`github.com/solikewind/happyeat/app/internal/...`。
+- 不要使用 `happyeat` 或 `happyeat/internal` 等短路径。
+
+## Handler / Logic 模式
+- Handler：`httpx.Parse` 请求 → 构造对应 Logic → 调用 Logic 方法 → `httpx.OkJsonCtx` / `httpx.ErrorCtx`。
+- Logic：构造函数 `NewXxxLogic(ctx, svcCtx *svc.ServiceContext)`，业务方法返回 `(resp, error)`。
+- 错误统一在 Handler 用 `httpx.ErrorCtx(r.Context(), w, err)` 返回。

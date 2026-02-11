@@ -1,0 +1,25 @@
+---
+alwaysApply: true
+---
+# 项目约定
+
+## 项目与技术栈
+- **项目**：HappyEat，餐饮相关后端服务（餐桌、菜单、订单、工作台等）。
+- **语言**：Go。
+- **框架**：go-zero（zeromicro/go-zero），HTTP 使用 `rest`，代码生成使用 goctl。
+- **配置**：YAML（`app/etc/*.yaml`、根目录 `etc/`）。
+- **权限**：JWT（Auth）+ Casbin（RBAC）。
+
+## 模块与目录
+- **根模块**：`github.com/solikewind/happyeat`（见 `go.mod`）。
+- **服务入口**：每个服务在 `app/` 下，如 `app/menuservice.go`；配置在 `app/etc/`。
+- **API 定义**：`app/api/`（`base/`、`v1/`），`.api` 使用 go-zero api 语法。
+- **内部包**：`app/internal/`（config、handler、logic、svc、types、constants）；**禁止**使用短路径 `happyeat/internal/...`。
+
+## 导入路径规则
+- 正确：`github.com/solikewind/happyeat/app/internal/config`、`.../app/internal/svc` 等。
+- 错误：`happyeat/internal/config`（会报 no required module provides package）。
+
+## 代码风格
+- Handler：解析请求、调 Logic、写响应；业务在 `logic/`。
+- Logic：使用 `*svc.ServiceContext`；新增 API 先改 `.api` 再用 goctl 生成。
