@@ -10,7 +10,7 @@ import (
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	menudata "github.com/solikewind/happyeat/dal/model/menu"
-	"github.com/solikewind/happyeat/dal/model/menu/ent"
+	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

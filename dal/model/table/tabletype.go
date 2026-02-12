@@ -4,9 +4,9 @@ package table
 import (
 	"context"
 
-	"github.com/solikewind/happyeat/dal/model/table/ent"
-	enttable "github.com/solikewind/happyeat/dal/model/table/ent/table"
-	"github.com/solikewind/happyeat/dal/model/table/ent/tablecategory"
+	"github.com/solikewind/happyeat/dal/model/ent"
+	enttable "github.com/solikewind/happyeat/dal/model/ent/table"
+	"github.com/solikewind/happyeat/dal/model/ent/tablecategory"
 	"entgo.io/ent/dialect/sql"
 )
 

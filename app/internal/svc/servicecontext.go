@@ -7,10 +7,9 @@ import (
 	"database/sql"
 
 	"github.com/solikewind/happyeat/app/internal/config"
+	"github.com/solikewind/happyeat/dal/model/ent"
 	"github.com/solikewind/happyeat/dal/model/menu"
-	entmenu "github.com/solikewind/happyeat/dal/model/menu/ent"
 	"github.com/solikewind/happyeat/dal/model/table"
-	enttable "github.com/solikewind/happyeat/dal/model/table/ent"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -33,18 +32,16 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		return nil, err
 	}
 
-	drvMenu := entsql.OpenDB(dialect.Postgres, db)
-	drvTable := entsql.OpenDB(dialect.Postgres, db)
-	clientMenu := entmenu.NewClient(entmenu.Driver(drvMenu))
-	clientTable := enttable.NewClient(enttable.Driver(drvTable))
+	drv := entsql.OpenDB(dialect.Postgres, db)
+	client := ent.NewClient(ent.Driver(drv))
 
 	return &ServiceContext{
 		Config: c,
 		DB:     db,
 
-		Menu:      menu.NewMenu(clientMenu),
-		MenuType:  menu.NewMenuType(clientMenu),
-		Table:     table.NewTable(clientTable),
-		TableType: table.NewTableType(clientTable),
+		Menu:      menu.NewMenu(client),
+		MenuType:  menu.NewMenuType(client),
+		Table:     table.NewTable(client),
+		TableType: table.NewTableType(client),
 	}, nil
 }

@@ -4,10 +4,10 @@ package menu
 import (
 	"context"
 
-	"github.com/solikewind/happyeat/dal/model/menu/ent"
-	entmenu "github.com/solikewind/happyeat/dal/model/menu/ent/menu"
-	"github.com/solikewind/happyeat/dal/model/menu/ent/menucategory"
-	"github.com/solikewind/happyeat/dal/model/menu/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent"
+	entmenu "github.com/solikewind/happyeat/dal/model/ent/menu"
+	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
+	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"entgo.io/ent/dialect/sql"
 )
 
