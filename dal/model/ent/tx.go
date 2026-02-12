@@ -18,6 +18,10 @@ type Tx struct {
 	MenuCategory *MenuCategoryClient
 	// MenuSpec is the client for interacting with the MenuSpec builders.
 	MenuSpec *MenuSpecClient
+	// Order is the client for interacting with the Order builders.
+	Order *OrderClient
+	// OrderItem is the client for interacting with the OrderItem builders.
+	OrderItem *OrderItemClient
 	// Table is the client for interacting with the Table builders.
 	Table *TableClient
 	// TableCategory is the client for interacting with the TableCategory builders.
@@ -156,6 +160,8 @@ func (tx *Tx) init() {
 	tx.Menu = NewMenuClient(tx.config)
 	tx.MenuCategory = NewMenuCategoryClient(tx.config)
 	tx.MenuSpec = NewMenuSpecClient(tx.config)
+	tx.Order = NewOrderClient(tx.config)
+	tx.OrderItem = NewOrderItemClient(tx.config)
 	tx.Table = NewTableClient(tx.config)
 	tx.TableCategory = NewTableCategoryClient(tx.config)
 }

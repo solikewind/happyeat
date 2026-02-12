@@ -15,19 +15,21 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
 )
 
 // MenuQuery is the builder for querying Menu entities.
 type MenuQuery struct {
 	config
-	ctx          *QueryContext
-	order        []menu.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Menu
-	withCategory *MenuCategoryQuery
-	withSpecs    *MenuSpecQuery
-	withFKs      bool
+	ctx            *QueryContext
+	order          []menu.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Menu
+	withCategory   *MenuCategoryQuery
+	withSpecs      *MenuSpecQuery
+	withOrderItems *OrderItemQuery
+	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,6 +103,28 @@ func (_q *MenuQuery) QuerySpecs() *MenuSpecQuery {
 			sqlgraph.From(menu.Table, menu.FieldID, selector),
 			sqlgraph.To(menuspec.Table, menuspec.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, menu.SpecsTable, menu.SpecsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOrderItems chains the current query on the "order_items" edge.
+func (_q *MenuQuery) QueryOrderItems() *OrderItemQuery {
+	query := (&OrderItemClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(menu.Table, menu.FieldID, selector),
+			sqlgraph.To(orderitem.Table, orderitem.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, menu.OrderItemsTable, menu.OrderItemsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -295,13 +319,14 @@ func (_q *MenuQuery) Clone() *MenuQuery {
 		return nil
 	}
 	return &MenuQuery{
-		config:       _q.config,
-		ctx:          _q.ctx.Clone(),
-		order:        append([]menu.OrderOption{}, _q.order...),
-		inters:       append([]Interceptor{}, _q.inters...),
-		predicates:   append([]predicate.Menu{}, _q.predicates...),
-		withCategory: _q.withCategory.Clone(),
-		withSpecs:    _q.withSpecs.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]menu.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.Menu{}, _q.predicates...),
+		withCategory:   _q.withCategory.Clone(),
+		withSpecs:      _q.withSpecs.Clone(),
+		withOrderItems: _q.withOrderItems.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -327,6 +352,17 @@ func (_q *MenuQuery) WithSpecs(opts ...func(*MenuSpecQuery)) *MenuQuery {
 		opt(query)
 	}
 	_q.withSpecs = query
+	return _q
+}
+
+// WithOrderItems tells the query-builder to eager-load the nodes that are connected to
+// the "order_items" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MenuQuery) WithOrderItems(opts ...func(*OrderItemQuery)) *MenuQuery {
+	query := (&OrderItemClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOrderItems = query
 	return _q
 }
 
@@ -409,9 +445,10 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 		nodes       = []*Menu{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withCategory != nil,
 			_q.withSpecs != nil,
+			_q.withOrderItems != nil,
 		}
 	)
 	if _q.withCategory != nil {
@@ -448,6 +485,13 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 		if err := _q.loadSpecs(ctx, query, nodes,
 			func(n *Menu) { n.Edges.Specs = []*MenuSpec{} },
 			func(n *Menu, e *MenuSpec) { n.Edges.Specs = append(n.Edges.Specs, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withOrderItems; query != nil {
+		if err := _q.loadOrderItems(ctx, query, nodes,
+			func(n *Menu) { n.Edges.OrderItems = []*OrderItem{} },
+			func(n *Menu, e *OrderItem) { n.Edges.OrderItems = append(n.Edges.OrderItems, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -512,6 +556,37 @@ func (_q *MenuQuery) loadSpecs(ctx context.Context, query *MenuSpecQuery, nodes 
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "menu_specs" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *MenuQuery) loadOrderItems(ctx context.Context, query *OrderItemQuery, nodes []*Menu, init func(*Menu), assign func(*Menu, *OrderItem)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Menu)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.OrderItem(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(menu.OrderItemsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.menu_order_items
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "menu_order_items" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "menu_order_items" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

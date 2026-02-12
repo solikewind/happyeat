@@ -34,7 +34,6 @@ func main() {
 	defer ctx.DB.Close()
 
 	handler.RegisterHandlers(server, ctx)
-	svc.NewCasbinEnforcer(ctx.Config.Casbin.Model, "待传入的csv")
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()

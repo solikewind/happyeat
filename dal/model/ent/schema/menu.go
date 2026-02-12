@@ -54,5 +54,6 @@ func (Menu) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("category", MenuCategory.Type).Ref("menus").Unique().Required(),
 		edge.To("specs", MenuSpec.Type),
+		edge.To("order_items", OrderItem.Type).Comment("被订单项引用，可选"),
 	}
 }

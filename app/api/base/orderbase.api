@@ -1,0 +1,22 @@
+syntax = "v1"
+
+type OrderItem {
+	MenuName  string  `json:"menu_name"`   // 菜品名称快照
+	Quantity  int     `json:"quantity"`   // 数量
+	UnitPrice float64 `json:"unit_price"` // 单价
+	Amount    float64 `json:"amount"`     // 小计
+	SpecInfo  string  `json:"spec_info,optional"` // 规格描述快照
+}
+
+type Order {
+	Id          uint64     `json:"id"`           // 订单id
+	OrderNo     string     `json:"order_no"`     // 订单号
+	OrderType   string     `json:"order_type"`   // dine_in=堂食 takeaway=打包外带
+	Status      string     `json:"status"`      // created/paid/preparing/completed/cancelled
+	TotalAmount float64    `json:"total_amount"` // 总金额
+	TableId     uint64     `json:"table_id,optional"` // 堂食时关联餐桌id，外带为0
+	Remark      string     `json:"remark,optional"`   // 备注
+	Items       []OrderItem `json:"items,optional"`  // 订单明细
+	CreateAt    int64      `json:"create_at"`   // 创建时间
+	UpdateAt    int64      `json:"update_at"`   // 更新时间
+}

@@ -55,5 +55,6 @@ func (Table) Fields() []ent.Field {
 func (Table) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("category", TableCategory.Type).Ref("tables").Unique().Required(),
+		edge.To("orders", Order.Type).Comment("堂食订单关联"),
 	}
 }

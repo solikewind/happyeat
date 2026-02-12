@@ -43,9 +43,11 @@ type MenuEdges struct {
 	Category *MenuCategory `json:"category,omitempty"`
 	// Specs holds the value of the specs edge.
 	Specs []*MenuSpec `json:"specs,omitempty"`
+	// 被订单项引用，可选
+	OrderItems []*OrderItem `json:"order_items,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -66,6 +68,15 @@ func (e MenuEdges) SpecsOrErr() ([]*MenuSpec, error) {
 		return e.Specs, nil
 	}
 	return nil, &NotLoadedError{edge: "specs"}
+}
+
+// OrderItemsOrErr returns the OrderItems value or an error if the edge
+// was not loaded in eager-loading.
+func (e MenuEdges) OrderItemsOrErr() ([]*OrderItem, error) {
+	if e.loadedTypes[2] {
+		return e.OrderItems, nil
+	}
+	return nil, &NotLoadedError{edge: "order_items"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -170,6 +181,11 @@ func (_m *Menu) QueryCategory() *MenuCategoryQuery {
 // QuerySpecs queries the "specs" edge of the Menu entity.
 func (_m *Menu) QuerySpecs() *MenuSpecQuery {
 	return NewMenuClient(_m.config).QuerySpecs(_m)
+}
+
+// QueryOrderItems queries the "order_items" edge of the Menu entity.
+func (_m *Menu) QueryOrderItems() *OrderItemQuery {
+	return NewMenuClient(_m.config).QueryOrderItems(_m)
 }
 
 // Update returns a builder for updating this Menu.

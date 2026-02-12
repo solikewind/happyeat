@@ -17,6 +17,25 @@ type CreateMenuReq struct {
 	Menu Menu `json:"menu"`
 }
 
+type CreateOrderItemReq struct {
+	MenuName  string  `json:"menu_name"`
+	Quantity  int     `json:"quantity"`
+	UnitPrice float64 `json:"unit_price"`
+	SpecInfo  string  `json:"spec_info,optional"`
+}
+
+type CreateOrderReply struct {
+	Order Order `json:"order"`
+}
+
+type CreateOrderReq struct {
+	OrderType   string               `json:"order_type"`        // dine_in | takeaway
+	TableId     uint64               `json:"table_id,optional"` // 堂食必填
+	Items       []CreateOrderItemReq `json:"items"`
+	TotalAmount float64              `json:"total_amount"`
+	Remark      string               `json:"remark,optional"`
+}
+
 type CreateTableCategoryReply struct {
 }
 
@@ -75,6 +94,14 @@ type GetMenuReq struct {
 	Id uint64 `path:"id"`
 }
 
+type GetOrderReply struct {
+	Order Order `json:"order"`
+}
+
+type GetOrderReq struct {
+	Id uint64 `path:"id"`
+}
+
 type GetTableCategoryReply struct {
 	TableCategory TableCategory `json:"category"`
 }
@@ -114,6 +141,19 @@ type ListMenusReq struct {
 	Category string `json:"category,optional"` // 按分类名字筛选
 }
 
+type ListOrdersReply struct {
+	Orders []Order `json:"orders"`
+	Total  uint64  `json:"total"`
+}
+
+type ListOrdersReq struct {
+	Current   uint64 `json:"current"`
+	PageSize  uint64 `json:"pageSize"`
+	Status    string `json:"status,optional"`
+	OrderType string `json:"order_type,optional"` // dine_in | takeaway
+	TableId   uint64 `json:"table_id,optional"`   // 按餐桌筛选
+}
+
 type ListTableCategoriesReply struct {
 	Categories []TableCategory `json:"categories"`
 	Total      uint64          `json:"total"`
@@ -138,6 +178,17 @@ type ListTablesReq struct {
 	Category string `json:"category,optional"` // 按分类名字筛选
 }
 
+type ListWorkbenchOrdersReply struct {
+	Orders []Order `json:"orders"`
+	Total  uint64  `json:"total"`
+}
+
+type ListWorkbenchOrdersReq struct {
+	Current  uint64 `json:"current"`
+	PageSize uint64 `json:"pageSize"`
+	Status   string `json:"status,optional"` // 不传则默认查 created,paid,preparing
+}
+
 type Menu struct {
 	Id          uint64     `json:"id"`                   // 菜单id
 	Name        string     `json:"name"`                 // 菜单名称
@@ -160,6 +211,27 @@ type MenuSpec struct {
 	SpecType   string  `json:"spec_type"`   // 规格类型（如辣度、容量）
 	SpecValue  string  `json:"spec_value"`  // 该类型下的一个选项（如微辣、大瓶）
 	PriceDelta float64 `json:"price_delta"` // 加价
+}
+
+type Order struct {
+	Id          uint64      `json:"id"`                // 订单id
+	OrderNo     string      `json:"order_no"`          // 订单号
+	OrderType   string      `json:"order_type"`        // dine_in=堂食 takeaway=打包外带
+	Status      string      `json:"status"`            // created/paid/preparing/completed/cancelled
+	TotalAmount float64     `json:"total_amount"`      // 总金额
+	TableId     uint64      `json:"table_id,optional"` // 堂食时关联餐桌id，外带为0
+	Remark      string      `json:"remark,optional"`   // 备注
+	Items       []OrderItem `json:"items,optional"`    // 订单明细
+	CreateAt    int64       `json:"create_at"`         // 创建时间
+	UpdateAt    int64       `json:"update_at"`         // 更新时间
+}
+
+type OrderItem struct {
+	MenuName  string  `json:"menu_name"`          // 菜品名称快照
+	Quantity  int     `json:"quantity"`           // 数量
+	UnitPrice float64 `json:"unit_price"`         // 单价
+	Amount    float64 `json:"amount"`             // 小计
+	SpecInfo  string  `json:"spec_info,optional"` // 规格描述快照
 }
 
 type Table struct {
@@ -193,6 +265,14 @@ type UpdateMenuReply struct {
 type UpdateMenuReq struct {
 	Id   uint64 `path:"id"`
 	Menu Menu   `json:"menu"`
+}
+
+type UpdateOrderStatusReply struct {
+}
+
+type UpdateOrderStatusReq struct {
+	Id     uint64 `path:"id"`
+	Status string `json:"status"` // paid/preparing/completed/cancelled
 }
 
 type UpdateTableCategoryReply struct {

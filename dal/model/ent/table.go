@@ -41,9 +41,11 @@ type Table struct {
 type TableEdges struct {
 	// Category holds the value of the category edge.
 	Category *TableCategory `json:"category,omitempty"`
+	// 堂食订单关联
+	Orders []*Order `json:"orders,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -55,6 +57,15 @@ func (e TableEdges) CategoryOrErr() (*TableCategory, error) {
 		return nil, &NotFoundError{label: tablecategory.Label}
 	}
 	return nil, &NotLoadedError{edge: "category"}
+}
+
+// OrdersOrErr returns the Orders value or an error if the edge
+// was not loaded in eager-loading.
+func (e TableEdges) OrdersOrErr() ([]*Order, error) {
+	if e.loadedTypes[1] {
+		return e.Orders, nil
+	}
+	return nil, &NotLoadedError{edge: "orders"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -151,6 +162,11 @@ func (_m *Table) Value(name string) (ent.Value, error) {
 // QueryCategory queries the "category" edge of the Table entity.
 func (_m *Table) QueryCategory() *TableCategoryQuery {
 	return NewTableClient(_m.config).QueryCategory(_m)
+}
+
+// QueryOrders queries the "orders" edge of the Table entity.
+func (_m *Table) QueryOrders() *OrderQuery {
+	return NewTableClient(_m.config).QueryOrders(_m)
 }
 
 // Update returns a builder for updating this Table.

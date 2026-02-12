@@ -10,6 +10,8 @@ info (
 
 import "menutypes.api"
 import "tabletypes.api"
+import "ordertypes.api"
+import "workbenchtypes.api"
 
 @server (
 	jwt:     Auth
@@ -121,5 +123,41 @@ service HappyEatService {
 	@doc "删除餐桌类别"
 	@handler DeleteTableCategory
 	delete /table/category/:id (DeleteTableCategoryReq) returns (DeleteTableCategoryReply)
+}
+
+@server (
+	jwt:     Auth
+	prefix:  /central/v1
+	group:   order
+	timeout: 5s
+)
+service HappyEatService {
+	@doc "列出订单"
+	@handler ListOrders
+	get /orders (ListOrdersReq) returns (ListOrdersReply)
+
+	@doc "获取单个订单"
+	@handler GetOrder
+	get /order/:id (GetOrderReq) returns (GetOrderReply)
+
+	@doc "创建订单"
+	@handler CreateOrder
+	post /orders (CreateOrderReq) returns (CreateOrderReply)
+
+	@doc "更新订单状态"
+	@handler UpdateOrderStatus
+	put /order/:id/status (UpdateOrderStatusReq) returns (UpdateOrderStatusReply)
+}
+
+@server (
+	jwt:     Auth
+	prefix:  /central/v1
+	group:   workbench
+	timeout: 5s
+)
+service HappyEatService {
+	@doc "工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed"
+	@handler ListWorkbenchOrders
+	get /workbench/orders (ListWorkbenchOrdersReq) returns (ListWorkbenchOrdersReply)
 }
 

@@ -24,7 +24,8 @@ alwaysApply: true
 - **data 层按业务小块分目录**（共用同一 `*ent.Client`）：
   - `dal/model/menu/menu.go`、`menutype.go`：菜单、菜单分类的 data 逻辑。
   - `dal/model/table/table.go`、`tabletype.go`：餐桌、餐桌分类的 data 逻辑。
-  - 后续订单、工作台等同理，在 `dal/model/<名>/` 下写 data 层，注入 `*ent.Client`。
+  - `dal/model/order/order.go`：订单及订单明细的 data 逻辑（堂食关联餐桌，外带无桌台）。
+  - 后续工作台等同理，在 `dal/model/<名>/` 下写 data 层，注入 `*ent.Client`。
 - User/权限 若独立，可单独一模块（如 `dal/model/user`）或独立服务。
 
 ## 导入路径规则

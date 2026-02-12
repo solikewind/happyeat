@@ -30,6 +30,8 @@ const (
 	EdgeCategory = "category"
 	// EdgeSpecs holds the string denoting the specs edge name in mutations.
 	EdgeSpecs = "specs"
+	// EdgeOrderItems holds the string denoting the order_items edge name in mutations.
+	EdgeOrderItems = "order_items"
 	// Table holds the table name of the menu in the database.
 	Table = "menus"
 	// CategoryTable is the table that holds the category relation/edge.
@@ -46,6 +48,13 @@ const (
 	SpecsInverseTable = "menu_specs"
 	// SpecsColumn is the table column denoting the specs relation/edge.
 	SpecsColumn = "menu_specs"
+	// OrderItemsTable is the table that holds the order_items relation/edge.
+	OrderItemsTable = "order_items"
+	// OrderItemsInverseTable is the table name for the OrderItem entity.
+	// It exists in this package in order to avoid circular dependency with the "orderitem" package.
+	OrderItemsInverseTable = "order_items"
+	// OrderItemsColumn is the table column denoting the order_items relation/edge.
+	OrderItemsColumn = "menu_order_items"
 )
 
 // Columns holds all SQL columns for menu fields.
@@ -151,6 +160,20 @@ func BySpecs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSpecsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByOrderItemsCount orders the results by order_items count.
+func ByOrderItemsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOrderItemsStep(), opts...)
+	}
+}
+
+// ByOrderItems orders the results by order_items terms.
+func ByOrderItems(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOrderItemsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -163,5 +186,12 @@ func newSpecsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SpecsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SpecsTable, SpecsColumn),
+	)
+}
+func newOrderItemsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OrderItemsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OrderItemsTable, OrderItemsColumn),
 	)
 }

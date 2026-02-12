@@ -13,6 +13,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 )
 
 // MenuCreate is the builder for creating a Menu entity.
@@ -114,6 +115,21 @@ func (_c *MenuCreate) AddSpecs(v ...*MenuSpec) *MenuCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddSpecIDs(ids...)
+}
+
+// AddOrderItemIDs adds the "order_items" edge to the OrderItem entity by IDs.
+func (_c *MenuCreate) AddOrderItemIDs(ids ...int) *MenuCreate {
+	_c.mutation.AddOrderItemIDs(ids...)
+	return _c
+}
+
+// AddOrderItems adds the "order_items" edges to the OrderItem entity.
+func (_c *MenuCreate) AddOrderItems(v ...*OrderItem) *MenuCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddOrderItemIDs(ids...)
 }
 
 // Mutation returns the MenuMutation object of the builder.
@@ -264,6 +280,22 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OrderItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   menu.OrderItemsTable,
+			Columns: []string{menu.OrderItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

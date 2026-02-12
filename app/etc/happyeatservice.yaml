@@ -2,6 +2,10 @@ Name: HappyEatService
 Host: 0.0.0.0
 Port: 8888
 
+Auth:
+  AccessSecret: "your-secret-key"
+  AccessExpire: 86400
+
 SqlConfig: 
   DataSource: "postgres://postgres:123456@localhost:5432/happyeat?sslmode=disable"
 

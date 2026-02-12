@@ -4,11 +4,11 @@ package menu
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	entmenu "github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
-	"entgo.io/ent/dialect/sql"
 )
 
 // Menu 菜单数据访问。

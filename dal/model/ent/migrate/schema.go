@@ -74,6 +74,66 @@ var (
 			},
 		},
 	}
+	// OrdersColumns holds the columns for the "orders" table.
+	OrdersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "order_no", Type: field.TypeString, Unique: true, Size: 64, Comment: "订单号"},
+		{Name: "order_type", Type: field.TypeString, Size: 32, Comment: "dine_in=堂食 takeaway=打包外带", Default: "dine_in"},
+		{Name: "status", Type: field.TypeString, Size: 32, Comment: "created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消", Default: "created"},
+		{Name: "total_amount", Type: field.TypeFloat64, Comment: "订单总金额", Default: 0},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "table_orders", Type: field.TypeInt, Nullable: true},
+	}
+	// OrdersTable holds the schema information for the "orders" table.
+	OrdersTable = &schema.Table{
+		Name:       "orders",
+		Comment:    "订单",
+		Columns:    OrdersColumns,
+		PrimaryKey: []*schema.Column{OrdersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "orders_tables_orders",
+				Columns:    []*schema.Column{OrdersColumns[8]},
+				RefColumns: []*schema.Column{TablesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// OrderItemsColumns holds the columns for the "order_items" table.
+	OrderItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "menu_name", Type: field.TypeString, Size: 128, Comment: "菜品名称快照"},
+		{Name: "quantity", Type: field.TypeInt, Comment: "数量", Default: 1},
+		{Name: "unit_price", Type: field.TypeFloat64, Comment: "单价（含规格加价）"},
+		{Name: "amount", Type: field.TypeFloat64, Comment: "小计金额"},
+		{Name: "spec_info", Type: field.TypeString, Nullable: true, Size: 256, Comment: "规格描述快照，如 大份,中辣"},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
+		{Name: "menu_order_items", Type: field.TypeInt, Nullable: true},
+		{Name: "order_items", Type: field.TypeInt},
+	}
+	// OrderItemsTable holds the schema information for the "order_items" table.
+	OrderItemsTable = &schema.Table{
+		Name:       "order_items",
+		Comment:    "订单明细",
+		Columns:    OrderItemsColumns,
+		PrimaryKey: []*schema.Column{OrderItemsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "order_items_menus_order_items",
+				Columns:    []*schema.Column{OrderItemsColumns[7]},
+				RefColumns: []*schema.Column{MenusColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "order_items_orders_items",
+				Columns:    []*schema.Column{OrderItemsColumns[8]},
+				RefColumns: []*schema.Column{OrdersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// TablesColumns holds the columns for the "tables" table.
 	TablesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -120,6 +180,8 @@ var (
 		MenusTable,
 		MenuCategoriesTable,
 		MenuSpecsTable,
+		OrdersTable,
+		OrderItemsTable,
 		TablesTable,
 		TableCategoriesTable,
 	}
@@ -136,6 +198,15 @@ func init() {
 	MenuSpecsTable.ForeignKeys[0].RefTable = MenusTable
 	MenuSpecsTable.Annotation = &entsql.Annotation{
 		Table: "menu_specs",
+	}
+	OrdersTable.ForeignKeys[0].RefTable = TablesTable
+	OrdersTable.Annotation = &entsql.Annotation{
+		Table: "orders",
+	}
+	OrderItemsTable.ForeignKeys[0].RefTable = MenusTable
+	OrderItemsTable.ForeignKeys[1].RefTable = OrdersTable
+	OrderItemsTable.Annotation = &entsql.Annotation{
+		Table: "order_items",
 	}
 	TablesTable.ForeignKeys[0].RefTable = TableCategoriesTable
 	TablesTable.Annotation = &entsql.Annotation{

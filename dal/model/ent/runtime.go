@@ -8,6 +8,8 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/order"
+	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/schema"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 	"github.com/solikewind/happyeat/dal/model/ent/tablecategory"
@@ -71,6 +73,60 @@ func init() {
 	menuspecDescSort := menuspecFields[3].Descriptor()
 	// menuspec.DefaultSort holds the default value on creation for the sort field.
 	menuspec.DefaultSort = menuspecDescSort.Default.(int)
+	orderFields := schema.Order{}.Fields()
+	_ = orderFields
+	// orderDescOrderNo is the schema descriptor for order_no field.
+	orderDescOrderNo := orderFields[0].Descriptor()
+	// order.OrderNoValidator is a validator for the "order_no" field. It is called by the builders before save.
+	order.OrderNoValidator = orderDescOrderNo.Validators[0].(func(string) error)
+	// orderDescOrderType is the schema descriptor for order_type field.
+	orderDescOrderType := orderFields[1].Descriptor()
+	// order.DefaultOrderType holds the default value on creation for the order_type field.
+	order.DefaultOrderType = orderDescOrderType.Default.(string)
+	// order.OrderTypeValidator is a validator for the "order_type" field. It is called by the builders before save.
+	order.OrderTypeValidator = orderDescOrderType.Validators[0].(func(string) error)
+	// orderDescStatus is the schema descriptor for status field.
+	orderDescStatus := orderFields[2].Descriptor()
+	// order.DefaultStatus holds the default value on creation for the status field.
+	order.DefaultStatus = orderDescStatus.Default.(string)
+	// order.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	order.StatusValidator = orderDescStatus.Validators[0].(func(string) error)
+	// orderDescTotalAmount is the schema descriptor for total_amount field.
+	orderDescTotalAmount := orderFields[3].Descriptor()
+	// order.DefaultTotalAmount holds the default value on creation for the total_amount field.
+	order.DefaultTotalAmount = orderDescTotalAmount.Default.(float64)
+	// orderDescRemark is the schema descriptor for remark field.
+	orderDescRemark := orderFields[4].Descriptor()
+	// order.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	order.RemarkValidator = orderDescRemark.Validators[0].(func(string) error)
+	// orderDescCreatedAt is the schema descriptor for created_at field.
+	orderDescCreatedAt := orderFields[5].Descriptor()
+	// order.DefaultCreatedAt holds the default value on creation for the created_at field.
+	order.DefaultCreatedAt = orderDescCreatedAt.Default.(func() time.Time)
+	// orderDescUpdatedAt is the schema descriptor for updated_at field.
+	orderDescUpdatedAt := orderFields[6].Descriptor()
+	// order.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	order.DefaultUpdatedAt = orderDescUpdatedAt.Default.(func() time.Time)
+	// order.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	order.UpdateDefaultUpdatedAt = orderDescUpdatedAt.UpdateDefault.(func() time.Time)
+	orderitemFields := schema.OrderItem{}.Fields()
+	_ = orderitemFields
+	// orderitemDescMenuName is the schema descriptor for menu_name field.
+	orderitemDescMenuName := orderitemFields[0].Descriptor()
+	// orderitem.MenuNameValidator is a validator for the "menu_name" field. It is called by the builders before save.
+	orderitem.MenuNameValidator = orderitemDescMenuName.Validators[0].(func(string) error)
+	// orderitemDescQuantity is the schema descriptor for quantity field.
+	orderitemDescQuantity := orderitemFields[1].Descriptor()
+	// orderitem.DefaultQuantity holds the default value on creation for the quantity field.
+	orderitem.DefaultQuantity = orderitemDescQuantity.Default.(int)
+	// orderitemDescSpecInfo is the schema descriptor for spec_info field.
+	orderitemDescSpecInfo := orderitemFields[4].Descriptor()
+	// orderitem.SpecInfoValidator is a validator for the "spec_info" field. It is called by the builders before save.
+	orderitem.SpecInfoValidator = orderitemDescSpecInfo.Validators[0].(func(string) error)
+	// orderitemDescSort is the schema descriptor for sort field.
+	orderitemDescSort := orderitemFields[5].Descriptor()
+	// orderitem.DefaultSort holds the default value on creation for the sort field.
+	orderitem.DefaultSort = orderitemDescSort.Default.(int)
 	tableFields := schema.Table{}.Fields()
 	_ = tableFields
 	// tableDescCode is the schema descriptor for code field.

@@ -9,8 +9,10 @@ import (
 
 	menu "github.com/solikewind/happyeat/app/internal/handler/menu"
 	menutype "github.com/solikewind/happyeat/app/internal/handler/menutype"
+	order "github.com/solikewind/happyeat/app/internal/handler/order"
 	table "github.com/solikewind/happyeat/app/internal/handler/table"
 	tablecategory "github.com/solikewind/happyeat/app/internal/handler/tablecategory"
+	workbench "github.com/solikewind/happyeat/app/internal/handler/workbench"
 	"github.com/solikewind/happyeat/app/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -96,6 +98,38 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 获取单个订单
+				Method:  http.MethodGet,
+				Path:    "/order/:id",
+				Handler: order.GetOrderHandler(serverCtx),
+			},
+			{
+				// 更新订单状态
+				Method:  http.MethodPut,
+				Path:    "/order/:id/status",
+				Handler: order.UpdateOrderStatusHandler(serverCtx),
+			},
+			{
+				// 列出订单
+				Method:  http.MethodGet,
+				Path:    "/orders",
+				Handler: order.ListOrdersHandler(serverCtx),
+			},
+			{
+				// 创建订单
+				Method:  http.MethodPost,
+				Path:    "/orders",
+				Handler: order.CreateOrderHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
 				// 获取单个餐桌
 				Method:  http.MethodGet,
 				Path:    "/table/:id",
@@ -162,6 +196,20 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodDelete,
 				Path:    "/table/category/:id",
 				Handler: tablecategory.DeleteTableCategoryHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed
+				Method:  http.MethodGet,
+				Path:    "/workbench/orders",
+				Handler: workbench.ListWorkbenchOrdersHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
