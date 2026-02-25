@@ -197,7 +197,7 @@ type ListWorkbenchOrdersReply struct {
 type ListWorkbenchOrdersReq struct {
 	Current  int64  `json:"current,optional" form:"current,optional"`
 	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
-	Status   string `json:"status,optional" form:"status"` // 不传则默认查 created,paid,preparing
+	Status   string `json:"status,optional" form:"status,optional"` // 不传则默认查 created,paid,preparing
 }
 
 type LoginReply struct {
@@ -235,16 +235,18 @@ type MenuSpec struct {
 }
 
 type Order struct {
-	Id          uint64      `json:"id"`                // 订单id
-	OrderNo     string      `json:"order_no"`          // 订单号
-	OrderType   string      `json:"order_type"`        // dine_in=堂食 takeaway=打包外带
-	Status      string      `json:"status"`            // created/paid/preparing/completed/cancelled
-	TotalAmount float64     `json:"total_amount"`      // 总金额
-	TableId     uint64      `json:"table_id,optional"` // 堂食时关联餐桌id，外带为0
-	Remark      string      `json:"remark,optional"`   // 备注
-	Items       []OrderItem `json:"items,optional"`    // 订单明细
-	CreateAt    int64       `json:"create_at"`         // 创建时间
-	UpdateAt    int64       `json:"update_at"`         // 更新时间
+	Id            uint64      `json:"id"`                      // 订单id
+	OrderNo       string      `json:"order_no"`                // 订单号
+	OrderType     string      `json:"order_type"`              // dine_in=堂食 takeaway=打包外带
+	Status        string      `json:"status"`                  // created/paid/preparing/completed/cancelled
+	TotalAmount   float64     `json:"total_amount"`            // 总金额
+	TableId       uint64      `json:"table_id,optional"`       // 堂食时关联餐桌id，外带为0
+	TableCode     string      `json:"table_code,optional"`     // 桌号（堂食时显示，外带为空）
+	TableCategory string      `json:"table_category,optional"` // 餐桌类别（如大厅、包间）
+	Remark        string      `json:"remark,optional"`         // 备注
+	Items         []OrderItem `json:"items,optional"`          // 订单明细
+	CreateAt      int64       `json:"create_at"`               // 创建时间
+	UpdateAt      int64       `json:"update_at"`               // 更新时间
 }
 
 type OrderItem struct {

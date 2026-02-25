@@ -14,7 +14,9 @@ type Order {
 	OrderType   string     `json:"order_type"`   // dine_in=堂食 takeaway=打包外带
 	Status      string     `json:"status"`      // created/paid/preparing/completed/cancelled
 	TotalAmount float64    `json:"total_amount"` // 总金额
-	TableId     uint64     `json:"table_id,optional"` // 堂食时关联餐桌id，外带为0
+	TableId       uint64     `json:"table_id,optional"`       // 堂食时关联餐桌id，外带为0
+	TableCode     string     `json:"table_code,optional"`     // 桌号（堂食时显示，外带为空）
+	TableCategory string     `json:"table_category,optional"` // 餐桌类别（如大厅、包间）
 	Remark      string     `json:"remark,optional"`   // 备注
 	Items       []OrderItem `json:"items,optional"`  // 订单明细
 	CreateAt    int64      `json:"create_at"`   // 创建时间

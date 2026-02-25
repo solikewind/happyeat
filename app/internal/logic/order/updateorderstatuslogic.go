@@ -7,8 +7,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/solikewind/happyeat/app/internal/constants"
-	"github.com/solikewind/happyeat/app/internal/svc"
+	"github.com/solikewind/happyeat/app/internal/pkg/constants"		
+	"github.com/solikewind/happyeat/app/internal/svc"	
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/dal/model/ent"
 

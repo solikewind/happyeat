@@ -71,6 +71,8 @@ export interface Order {
   status: string
   total_amount: number
   table_id?: number
+  table_code?: string // 桌号（堂食时显示，外带为空）
+  table_category?: string // 餐桌类别（如大厅、包间）
   remark?: string
   items?: OrderItem[]
   create_at: number

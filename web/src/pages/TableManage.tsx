@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Typography,
   Tabs,
@@ -39,7 +39,7 @@ function CategoryTab() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [form] = Form.useForm()
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const res = await listTableCategories({ current: page, pageSize: 10 })
@@ -50,11 +50,11 @@ function CategoryTab() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page])
 
   useEffect(() => {
     load()
-  }, [page])
+  }, [load])
 
   const openCreate = () => {
     setEditingId(null)
@@ -145,12 +145,12 @@ function TableListTab() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [form] = Form.useForm()
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     const res = await listTableCategories({ current: 1, pageSize: 200 })
     setCategories(res.categories)
-  }
+  }, [])
 
-  const loadTables = async () => {
+  const loadTables = useCallback(async () => {
     setLoading(true)
     try {
       const res = await listTables({ current: page, pageSize: 10, category: categoryFilter })
@@ -161,22 +161,24 @@ function TableListTab() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, categoryFilter])
 
   useEffect(() => {
     loadCategories()
-  }, [])
+  }, [loadCategories])
 
   useEffect(() => {
     loadTables()
-  }, [page, categoryFilter])
+  }, [loadTables])
 
   const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c.name]))
 
-  const openCreate = () => {
+  const openCreate = async () => {
     setEditingId(null)
     form.resetFields()
     form.setFieldsValue({ status: 'idle' })
+    // 打开弹窗时重新加载分类列表，确保显示最新分类
+    await loadCategories()
     setModalOpen(true)
   }
 

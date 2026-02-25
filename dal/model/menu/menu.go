@@ -3,6 +3,7 @@ package menu
 
 import (
 	"context"
+	"strings"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent"
@@ -99,29 +100,80 @@ type ListMenusFilter struct {
 }
 
 // List 分页列出菜单（含 category、specs），返回列表与总数。
+// 支持拼音搜索：如果搜索关键词包含中文或拼音，会在内存中匹配。
 func (m *Menu) List(ctx context.Context, f ListMenusFilter) ([]*ent.Menu, int64, error) {
 	q := m.c.Menu.Query().WithCategory().WithSpecs()
-	if f.Name != "" {
-		q = q.Where(entmenu.NameContains(f.Name))
-	}
+
+	// 分类筛选在数据库层面处理
 	if f.CategoryName != "" {
 		q = q.Where(entmenu.HasCategoryWith(menucategory.NameEQ(f.CategoryName)))
 	}
 
-	total, err := q.Clone().Count(ctx)
-	if err != nil {
-		return nil, 0, err
+	// 如果有关键词且包含中文，需要先查询所有数据，然后在内存中做拼音匹配
+	needPinyinMatch := f.Name != "" && (HasChinese(f.Name) || isPinyinOnly(f.Name))
+
+	var allList []*ent.Menu
+	var err error
+
+	if needPinyinMatch {
+		// 先查询所有符合分类条件的菜单（不分页）
+		allList, err = q.Order(entmenu.ByID(sql.OrderDesc())).All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		// 在内存中做拼音匹配
+		matchedList := make([]*ent.Menu, 0)
+		for _, menu := range allList {
+			if MatchPinyin(menu.Name, f.Name) {
+				matchedList = append(matchedList, menu)
+			}
+		}
+		allList = matchedList
+	} else {
+		// 普通搜索，在数据库层面处理
+		if f.Name != "" {
+			q = q.Where(entmenu.NameContains(f.Name))
+		}
+		allList, err = q.Order(entmenu.ByID(sql.OrderDesc())).All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
 	}
+
+	// 计算总数
+	total := int64(len(allList))
+
+	// 手动分页
 	if f.Limit <= 0 {
 		f.Limit = 10
 	}
 
-	list, err := q.Order(entmenu.ByID(sql.OrderDesc())).Limit(f.Limit).Offset(f.Offset).All(ctx)
-	if err != nil {
-		return nil, 0, err
+	start := f.Offset
+	end := start + f.Limit
+	if start > len(allList) {
+		start = len(allList)
+	}
+	if end > len(allList) {
+		end = len(allList)
 	}
 
-	return list, int64(total), nil
+	if start >= end {
+		return []*ent.Menu{}, total, nil
+	}
+
+	list := allList[start:end]
+	return list, total, nil
+}
+
+// isPinyinOnly 判断字符串是否只包含拼音字符（a-z）和空格
+func isPinyinOnly(text string) bool {
+	for _, r := range text {
+		if !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || r == ' ' || r == '\t') {
+			return false
+		}
+	}
+	return len(strings.TrimSpace(text)) > 0
 }
 
 // UpdateMenuInput 更新菜单入参。

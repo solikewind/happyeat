@@ -7,10 +7,10 @@ import (
 	"math/rand"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	entorder "github.com/solikewind/happyeat/dal/model/ent/order"
 	enttable "github.com/solikewind/happyeat/dal/model/ent/table"
-	"entgo.io/ent/dialect/sql"
 )
 
 // Order 订单数据访问。
@@ -33,11 +33,11 @@ type ItemInput struct {
 
 // CreateOrderInput 创建订单入参。
 type CreateOrderInput struct {
-	OrderType  string       // dine_in | takeaway
-	TableID    *int         // 堂食时必填，外带为 nil
-	Items      []ItemInput  // 至少一项
+	OrderType   string      // dine_in | takeaway
+	TableID     *int        // 堂食时必填，外带为 nil
+	Items       []ItemInput // 至少一项
 	TotalAmount float64
-	Remark     string
+	Remark      string
 }
 
 // genOrderNo 生成订单号（简单示例：ORD+毫秒时间戳+3位随机）
@@ -94,14 +94,18 @@ func (o *Order) Create(ctx context.Context, in CreateOrderInput) (*ent.Order, er
 		return nil, err
 	}
 
-	return o.c.Order.Query().Where(entorder.IDEQ(entOrder.ID)).WithTable().WithItems().Only(ctx)
+	return o.c.Order.Query().Where(entorder.IDEQ(entOrder.ID)).WithTable(func(q *ent.TableQuery) {
+		q.WithCategory()
+	}).WithItems().Only(ctx)
 }
 
 // GetByID 按 ID 获取订单（含 table、items）。
 func (o *Order) GetByID(ctx context.Context, id int) (*ent.Order, error) {
 	return o.c.Order.Query().
 		Where(entorder.IDEQ(id)).
-		WithTable().
+		WithTable(func(q *ent.TableQuery) {
+			q.WithCategory()
+		}).
 		WithItems().
 		Only(ctx)
 }
@@ -118,7 +122,9 @@ type ListOrdersFilter struct {
 
 // List 分页列出订单（含 table、items），返回列表与总数。
 func (o *Order) List(ctx context.Context, f ListOrdersFilter) ([]*ent.Order, int64, error) {
-	q := o.c.Order.Query().WithTable().WithItems()
+	q := o.c.Order.Query().WithTable(func(q *ent.TableQuery) {
+		q.WithCategory()
+	}).WithItems()
 	if len(f.Statuses) > 0 {
 		q = q.Where(entorder.StatusIn(f.Statuses...))
 	} else if f.Status != "" {

@@ -12,7 +12,7 @@ import {
   message,
   Popconfirm,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import type { MenuCategory, Menu, MenuSpec } from '../api/types'
 import {
   listMenuCategories,
@@ -171,6 +171,7 @@ function MenuListTab() {
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [categoryFilter, setCategoryFilter] = useState<string | undefined>(undefined)
+  const [nameSearch, setNameSearch] = useState<string | undefined>(undefined)
   const pageSize = 10
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -189,6 +190,7 @@ function MenuListTab() {
         current: page,
         pageSize,
         category: categoryFilter,
+        name: nameSearch,
       })
       setMenus(res.menus)
       setTotal(res.total)
@@ -205,14 +207,16 @@ function MenuListTab() {
 
   useEffect(() => {
     loadMenus()
-  }, [page, categoryFilter])
+  }, [page, categoryFilter, nameSearch])
 
   const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c.name]))
 
-  const openCreate = () => {
+  const openCreate = async () => {
     setEditingId(null)
     form.resetFields()
     form.setFieldValue('specs', [])
+    // 打开弹窗时重新加载分类列表，确保显示最新分类
+    await loadCategories()
     setModalOpen(true)
   }
 
@@ -286,18 +290,40 @@ function MenuListTab() {
     }
   }
 
+  const handleSearch = (value: string) => {
+    setNameSearch(value.trim() || undefined)
+    setPage(1) // 搜索时重置到第一页
+  }
+
   return (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-        <Space>
+        <Space wrap>
           <Typography.Text type="secondary">按分类筛选：</Typography.Text>
           <Select
             allowClear
             placeholder="全部"
             value={categoryFilter ?? undefined}
-            onChange={(v) => setCategoryFilter(v ?? undefined)}
+            onChange={(v) => {
+              setCategoryFilter(v ?? undefined)
+              setPage(1) // 切换分类时重置到第一页
+            }}
             style={{ minWidth: 120 }}
             options={categories.map((c) => ({ label: c.name, value: c.name }))}
+          />
+          <Typography.Text type="secondary" style={{ marginLeft: 8 }}>按名字搜索：</Typography.Text>
+          <Input.Search
+            placeholder="输入菜品名称"
+            allowClear
+            enterButton={<SearchOutlined />}
+            style={{ width: 200 }}
+            onSearch={handleSearch}
+            onChange={(e) => {
+              if (!e.target.value) {
+                setNameSearch(undefined)
+                setPage(1)
+              }
+            }}
           />
         </Space>
         <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>

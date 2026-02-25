@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
-import { Tabs, Card, Button, Radio, Form, message, Empty } from 'antd'
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { Tabs, Card, Button, Radio, Form, message, Empty, Space, Popover } from 'antd'
+import { PlusOutlined, MinusOutlined, AudioOutlined, SoundOutlined } from '@ant-design/icons'
 import type { Menu, MenuCategory, MenuSpec, Table as TableType } from '../api/types'
 import { listMenuCategories, listMenus } from '../api/menu'
 import { listTables } from '../api/table'
 import { createOrder } from '../api/order'
+import { useSTT } from '../hooks/useSTT'
+import { useTTS } from '../hooks/useTTS'
+import { matchMenuByText, parseOrderText } from '../utils/menuMatcher'
 
 interface CartItem {
   menuId: number
@@ -41,6 +44,14 @@ export default function OrderDesk() {
   const [submitting, setSubmitting] = useState(false)
   /** 每个菜品卡片上的数量与选中规格：menuId -> { quantity, selectedSpecs } */
   const [cardSelections, setCardSelections] = useState<Record<number, { quantity: number; selectedSpecs: MenuSpec[] }>>({})
+
+  // 语音识别和语音播报
+  const { isSupported: sttSupported, listening, transcript, start: startSTT, stop: stopSTT } = useSTT({
+    lang: 'zh-CN',
+    continuous: false,
+    interimResults: true,
+  })
+  const { speak, isSupported: ttsSupported } = useTTS({ lang: 'zh-CN', rate: 1.2 })
 
   const loadCategories = async () => {
     try {
@@ -129,8 +140,9 @@ export default function OrderDesk() {
     }))
   }
 
-  const addToCart = (menu: Menu) => {
+  const addToCart = (menu: Menu, customQuantity?: number) => {
     const { quantity, selectedSpecs } = getSelection(menu)
+    const finalQuantity = customQuantity ?? quantity
     const specInfo = selectedSpecs.length ? selectedSpecs.map((s) => `${s.spec_type}:${s.spec_value}`).join(' ') : undefined
     const unitPrice = menu.price + selectedSpecs.reduce((sum, s) => sum + (s.price_delta ?? 0), 0)
     const price = Math.round(unitPrice * 100) / 100
@@ -138,11 +150,69 @@ export default function OrderDesk() {
       const exist = prev.find((i) => i.menuId === menu.id && (i.specInfo ?? '') === (specInfo ?? ''))
       if (exist) {
         return prev.map((i) =>
-          i.menuId === menu.id && (i.specInfo ?? '') === (specInfo ?? '') ? { ...i, quantity: i.quantity + quantity } : i
+          i.menuId === menu.id && (i.specInfo ?? '') === (specInfo ?? '') ? { ...i, quantity: i.quantity + finalQuantity } : i
         )
       }
-      return [...prev, { menuId: menu.id, name: menu.name, price, quantity, specInfo }]
+      return [...prev, { menuId: menu.id, name: menu.name, price, quantity: finalQuantity, specInfo }]
     })
+
+    // 播报添加成功
+    if (ttsSupported) {
+      const priceText = `价格${price}元`
+      speak(`已添加${finalQuantity}份${menu.name}，${priceText}`)
+    }
+  }
+
+  // 处理语音识别结果
+  const processedTranscriptRef = useRef<string>('')
+  useEffect(() => {
+    if (!transcript || listening || menus.length === 0) return
+    // 避免重复处理同一个识别结果
+    if (processedTranscriptRef.current === transcript) return
+    processedTranscriptRef.current = transcript
+
+    // 识别完成，开始匹配菜单
+    const { quantity, menuName } = parseOrderText(transcript)
+    const matchedMenus = matchMenuByText(menuName, menus)
+
+    if (matchedMenus.length > 0) {
+      const matchedMenu = matchedMenus[0]
+      // 设置数量
+      setMenuQuantity(matchedMenu, quantity)
+      // 添加到购物车
+      const { selectedSpecs } = getSelection(matchedMenu)
+      const specInfo = selectedSpecs.length ? selectedSpecs.map((s) => `${s.spec_type}:${s.spec_value}`).join(' ') : undefined
+      const unitPrice = matchedMenu.price + selectedSpecs.reduce((sum, s) => sum + (s.price_delta ?? 0), 0)
+      const price = Math.round(unitPrice * 100) / 100
+      setCart((prev) => {
+        const exist = prev.find((i) => i.menuId === matchedMenu.id && (i.specInfo ?? '') === (specInfo ?? ''))
+        if (exist) {
+          return prev.map((i) =>
+            i.menuId === matchedMenu.id && (i.specInfo ?? '') === (specInfo ?? '') ? { ...i, quantity: i.quantity + quantity } : i
+          )
+        }
+        return [...prev, { menuId: matchedMenu.id, name: matchedMenu.name, price, quantity, specInfo }]
+      })
+      message.success(`已添加 ${quantity} 份 ${matchedMenu.name}`)
+      // 播报添加成功
+      if (ttsSupported) {
+        speak(`已添加${quantity}份${matchedMenu.name}，价格${price}元`)
+      }
+    } else {
+      message.warning(`未找到菜品：${menuName}`)
+      if (ttsSupported) {
+        speak(`抱歉，未找到${menuName}`)
+      }
+    }
+  }, [transcript, listening, menus, ttsSupported, speak])
+
+  // 播报菜单信息
+  const speakMenuInfo = (menu: Menu) => {
+    if (!ttsSupported) return
+    const { selectedSpecs } = getSelection(menu)
+    const unitPrice = menu.price + selectedSpecs.reduce((sum, s) => sum + (s.price_delta ?? 0), 0)
+    const specText = selectedSpecs.length > 0 ? `，规格${selectedSpecs.map((s) => s.spec_value).join('、')}` : ''
+    speak(`${menu.name}，价格${unitPrice.toFixed(2)}元${specText}`)
   }
 
   const updateCartQty = (menuId: number, specInfo: string | undefined, delta: number) => {
@@ -299,12 +369,52 @@ export default function OrderDesk() {
 
       {/* 右侧：分类 + 菜品 */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <Tabs
-          activeKey={activeCategory}
-          onChange={setActiveCategory}
-          items={tabItems}
-          style={{ marginBottom: 12, flexShrink: 0 }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <Tabs
+            activeKey={activeCategory}
+            onChange={setActiveCategory}
+            items={tabItems}
+            style={{ flex: 1 }}
+          />
+          {sttSupported && (
+            <Space>
+              {listening ? (
+                <Popover content={`正在识别：${transcript || '请说话...'}`} trigger="click">
+                  <Button
+                    type="primary"
+                    danger
+                    icon={<AudioOutlined />}
+                    onClick={stopSTT}
+                    style={{ borderRadius: '50%', width: 48, height: 48 }}
+                  >
+                    停止
+                  </Button>
+                </Popover>
+              ) : (
+                <Popover
+                  content={
+                    <div>
+                      <p>点击开始语音点菜</p>
+                      <p style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
+                        可以说："来两份宫保鸡丁"、"要一个红烧肉" 等
+                      </p>
+                    </div>
+                  }
+                  trigger="hover"
+                >
+                  <Button
+                    type="primary"
+                    icon={<AudioOutlined />}
+                    onClick={startSTT}
+                    style={{ borderRadius: '50%', width: 48, height: 48 }}
+                  >
+                    语音
+                  </Button>
+                </Popover>
+              )}
+            </Space>
+          )}
+        </div>
         <div style={{ flex: 1, overflow: 'auto' }}>
           {menus.length === 0 && !loading ? (
             <Empty description="暂无菜品" />
@@ -359,12 +469,23 @@ export default function OrderDesk() {
                   >
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
                       <span style={{ fontWeight: 600, fontSize: 15, flex: 1, minWidth: 0 }}>{menu.name}</span>
-                      <span style={{ color: '#f5222d', fontSize: 16, fontWeight: 600, flexShrink: 0 }}>
-                        ¥{unitPrice.toFixed(2)}
-                        {selectedSpecs.length > 0 && (
-                          <span style={{ fontSize: 11, color: '#888', fontWeight: 400 }}> 起</span>
+                      <Space>
+                        {ttsSupported && (
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<SoundOutlined />}
+                            onClick={() => speakMenuInfo(menu)}
+                            style={{ padding: '0 4px' }}
+                          />
                         )}
-                      </span>
+                        <span style={{ color: '#f5222d', fontSize: 16, fontWeight: 600, flexShrink: 0 }}>
+                          ¥{unitPrice.toFixed(2)}
+                          {selectedSpecs.length > 0 && (
+                            <span style={{ fontSize: 11, color: '#888', fontWeight: 400 }}> 起</span>
+                          )}
+                        </span>
+                      </Space>
                     </div>
                     {/* 数量：+- */}
                     <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>

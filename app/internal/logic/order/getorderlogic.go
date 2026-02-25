@@ -56,6 +56,11 @@ func EntOrderToType(e *ent.Order) types.Order {
 	tbl, _ := e.Edges.TableOrErr()
 	if tbl != nil {
 		out.TableId = uint64(tbl.ID)
+		out.TableCode = tbl.Code
+		cat, _ := tbl.Edges.CategoryOrErr()
+		if cat != nil {
+			out.TableCategory = cat.Name
+		}
 	}
 
 	items, _ := e.Edges.ItemsOrErr()

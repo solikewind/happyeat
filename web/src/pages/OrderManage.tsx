@@ -177,7 +177,16 @@ export default function OrderManage() {
           { title: '类型', dataIndex: 'order_type', width: 90, render: (t: string) => ORDER_TYPE_MAP[t] ?? t },
           { title: '状态', dataIndex: 'status', width: 90, render: (s: string) => <Tag>{STATUS_MAP[s] ?? s}</Tag> },
           { title: '金额', dataIndex: 'total_amount', width: 90, render: (v: number) => `¥${v?.toFixed(2) ?? '0.00'}` },
-          { title: '桌台', dataIndex: 'table_id', width: 70, render: (v: number) => (v ? `#${v}` : '-') },
+          {
+            title: '桌台',
+            dataIndex: 'table_code',
+            width: 100,
+            render: (code: string, record: Order) => {
+              if (!code) return '-'
+              const category = record.table_category
+              return category ? `${category}-${code}` : code
+            },
+          },
           { title: '备注', dataIndex: 'remark', ellipsis: true },
           {
             title: '操作',

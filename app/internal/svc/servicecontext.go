@@ -6,20 +6,23 @@ package svc
 import (
 	"database/sql"
 
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
+	"github.com/go-kratos/blades"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/solikewind/happyeat/app/internal/config"
+	"github.com/solikewind/happyeat/app/internal/pkg/agent"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	"github.com/solikewind/happyeat/dal/model/menu"
 	"github.com/solikewind/happyeat/dal/model/order"
 	"github.com/solikewind/happyeat/dal/model/table"
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type ServiceContext struct {
 	Config config.Config
-	DB     *sql.DB // 共享连接池，仅用于关闭
+	DB     *sql.DB         // 共享连接池，仅用于关闭
 	Casbin *CasbinEnforcer // 权限：model 来自配置内联，policy 来自 DB casbin_rule 表
+	Agent  *blades.Agent   // 智能体
 
 	Menu     *menu.Menu     // 菜单 data 层
 	MenuType *menu.MenuType // 分类 data 层
@@ -44,10 +47,17 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		return nil, err
 	}
 
+	// 初始化 Agent
+	bladesAgent, err := agent.NewAgent(c.Agent)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ServiceContext{
 		Config: c,
 		DB:     db,
 		Casbin: ce,
+		Agent:  bladesAgent,
 
 		Menu:      menu.NewMenu(client),
 		MenuType:  menu.NewMenuType(client),
