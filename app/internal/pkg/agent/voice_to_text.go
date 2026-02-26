@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"context"
-
 	"github.com/go-kratos/blades"
 	"github.com/go-kratos/blades/contrib/openai"
 )
@@ -30,11 +28,11 @@ func NewVoiceToTextAgent(c *Config) (*VoiceToTextAgent, error) {
 	}, nil
 }
 
-// Process 处理语音转文本
-func (a *VoiceToTextAgent) Process(ctx context.Context, input string) (string, error) {
-	response, err := a.Agent.Chat(ctx, input)
-	if err != nil {
-		return "", err
-	}
-	return response.Text, nil
-}
+// // Process 处理语音转文本
+// func (a *VoiceToTextAgent) Process(ctx context.Context, input string) (string, error) {
+// 	response, err := a.Agent.Chat(ctx, input)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return response.Text, nil
+// }

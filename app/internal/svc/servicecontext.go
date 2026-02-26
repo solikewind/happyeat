@@ -25,7 +25,7 @@ type ServiceContext struct {
 	Agent  *blades.Agent   // 智能体
 
 	Menu     *menu.Menu     // 菜单 data 层
-	MenuType *menu.MenuType // 分类 data 层
+	MenuType *menu.MenuType // 菜单分类 data 层
 
 	Table     *table.Table     // 餐桌 data 层
 	TableType *table.TableType // 餐桌分类 data 层
@@ -48,7 +48,11 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 	}
 
 	// 初始化 Agent
-	bladesAgent, err := agent.NewAgent(c.Agent)
+	llmConfig, err := agent.NewConfig(c.LLM)
+	if err != nil {
+		return nil, err
+	}
+	bladesAgent, err := agent.NewMenusTechAgent(llmConfig, menu.NewMenu(client))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +61,7 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		Config: c,
 		DB:     db,
 		Casbin: ce,
-		Agent:  bladesAgent,
+		Agent:  bladesAgent.Agent,
 
 		Menu:      menu.NewMenu(client),
 		MenuType:  menu.NewMenuType(client),
