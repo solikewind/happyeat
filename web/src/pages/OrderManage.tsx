@@ -174,18 +174,37 @@ export default function OrderManage() {
         columns={[
           { title: 'ID', dataIndex: 'id', width: 70 },
           { title: '订单号', dataIndex: 'order_no', width: 140, ellipsis: true },
-          { title: '类型', dataIndex: 'order_type', width: 90, render: (t: string) => ORDER_TYPE_MAP[t] ?? t },
+          {
+            title: '类型',
+            dataIndex: 'order_type',
+            width: 100,
+            render: (t: string) => {
+              const label = ORDER_TYPE_MAP[t] ?? t
+              const color = t === 'dine_in' ? 'blue' : t === 'takeaway' ? 'orange' : 'default'
+              return <Tag color={color}>{label}</Tag>
+            },
+          },
           { title: '状态', dataIndex: 'status', width: 90, render: (s: string) => <Tag>{STATUS_MAP[s] ?? s}</Tag> },
           { title: '金额', dataIndex: 'total_amount', width: 90, render: (v: number) => `¥${v?.toFixed(2) ?? '0.00'}` },
           {
             title: '桌台',
             dataIndex: 'table_code',
-            width: 100,
+            width: 120,
             render: (code: string, record: Order) => {
-              if (!code) return '-'
-              const category = record.table_category
-              return category ? `${category}-${code}` : code
+              if (!code) return <span style={{ color: '#bfbfbf' }}>—</span>
+              const text = record.table_category ? `${record.table_category}-${code}` : code
+              return (
+                <Tag color="cyan" style={{ margin: 0 }}>
+                  {text}
+                </Tag>
+              )
             },
+          },
+          {
+            title: '创建日期',
+            dataIndex: 'create_at',
+            width: 160,
+            render: (t: number) => (t ? new Date(t * 1000).toLocaleString('zh-CN') : '-'),
           },
           { title: '备注', dataIndex: 'remark', ellipsis: true },
           {
@@ -277,7 +296,11 @@ export default function OrderManage() {
           <>
             <Descriptions column={1} bordered size="small">
               <Descriptions.Item label="订单号">{detailOrder.order_no}</Descriptions.Item>
-              <Descriptions.Item label="类型">{ORDER_TYPE_MAP[detailOrder.order_type] ?? detailOrder.order_type}</Descriptions.Item>
+              <Descriptions.Item label="类型">
+                <Tag color={detailOrder.order_type === 'dine_in' ? 'blue' : detailOrder.order_type === 'takeaway' ? 'orange' : 'default'}>
+                  {ORDER_TYPE_MAP[detailOrder.order_type] ?? detailOrder.order_type}
+                </Tag>
+              </Descriptions.Item>
               <Descriptions.Item label="状态">
                 <Select
                   size="small"
@@ -288,7 +311,20 @@ export default function OrderManage() {
                 />
               </Descriptions.Item>
               <Descriptions.Item label="金额">¥{detailOrder.total_amount?.toFixed(2) ?? '0.00'}</Descriptions.Item>
-              <Descriptions.Item label="桌台">{detailOrder.table_id ? `#${detailOrder.table_id}` : '-'}</Descriptions.Item>
+              <Descriptions.Item label="桌台">
+                {detailOrder.table_code || detailOrder.table_id ? (
+                  <Tag color="cyan">
+                    {detailOrder.table_category && detailOrder.table_code
+                      ? `${detailOrder.table_category}-${detailOrder.table_code}`
+                      : detailOrder.table_code ?? `#${detailOrder.table_id}`}
+                  </Tag>
+                ) : (
+                  <span style={{ color: '#bfbfbf' }}>—</span>
+                )}
+              </Descriptions.Item>
+              <Descriptions.Item label="创建日期">
+                {detailOrder.create_at ? new Date(detailOrder.create_at * 1000).toLocaleString('zh-CN') : '-'}
+              </Descriptions.Item>
               <Descriptions.Item label="备注">{detailOrder.remark || '-'}</Descriptions.Item>
             </Descriptions>
             <Typography.Title level={5} style={{ marginTop: 16, marginBottom: 8 }}>订单明细</Typography.Title>

@@ -28,7 +28,29 @@ func NewGetTableLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetTable
 }
 
 func (l *GetTableLogic) GetTable(req *types.GetTableReq) (resp *types.GetTableReply, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	e, err := l.svcCtx.Table.GetByID(l.ctx, int(req.Id))
+	if err != nil {
+		l.Errorf("GetTable GetByID err: %v", err)
+		return nil, err
+	}
+	categoryID := uint64(0)
+	if e.Edges.Category != nil {
+		categoryID = uint64(e.Edges.Category.ID)
+	}
+	qrCode := ""
+	if e.QrCode != nil {
+		qrCode = *e.QrCode
+	}
+	return &types.GetTableReply{
+		Table: types.Table{
+			Id:         uint64(e.ID),
+			Code:       e.Code,
+			Status:     e.Status,
+			Capacity:   e.Capacity,
+			CategoryId: categoryID,
+			QrCode:     qrCode,
+			CreateAt:   e.CreatedAt.Unix(),
+			UpdateAt:   e.UpdatedAt.Unix(),
+		},
+	}, nil
 }
