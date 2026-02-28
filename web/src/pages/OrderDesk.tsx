@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Tabs, Card, Button, Radio, Form, message, Empty, Space, Popover } from 'antd'
 import { PlusOutlined, MinusOutlined, AudioOutlined, SoundOutlined } from '@ant-design/icons'
 import type { Menu, MenuCategory, MenuSpec, Table as TableType } from '../api/types'
@@ -8,14 +8,7 @@ import { createOrder } from '../api/order'
 import { useSTT } from '../hooks/useSTT'
 import { useTTS } from '../hooks/useTTS'
 import { matchMenuByText, parseOrderText } from '../utils/menuMatcher'
-
-interface CartItem {
-  menuId: number
-  name: string
-  price: number
-  quantity: number
-  specInfo?: string
-}
+import { useOrderCart } from '../contexts/OrderCartContext'
 
 /** 按 spec_type 分组，每组取第一个作为默认 */
 function defaultSpecs(specs: MenuSpec[]): MenuSpec[] {
@@ -32,11 +25,11 @@ const ORDER_TYPE_OPTIONS = [
 ]
 
 export default function OrderDesk() {
+  const { cart, setCart, updateCartQty, cartTotal, clearCart } = useOrderCart()
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menus, setMenus] = useState<Menu[]>([])
   const [loading, setLoading] = useState(false)
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [cart, setCart] = useState<CartItem[]>([])
   const [tables, setTables] = useState<TableType[]>([])
   const [tablesLoading, setTablesLoading] = useState(false)
   const [orderType, setOrderType] = useState<string>('dine_in')
@@ -153,7 +146,7 @@ export default function OrderDesk() {
           i.menuId === menu.id && (i.specInfo ?? '') === (specInfo ?? '') ? { ...i, quantity: i.quantity + finalQuantity } : i
         )
       }
-      return [...prev, { menuId: menu.id, name: menu.name, price, quantity: finalQuantity, specInfo }]
+      return [...prev, { menuId: menu.id, name: menu.name, price, quantity: finalQuantity, specInfo, image: menu.image }]
     })
 
     // 播报添加成功
@@ -191,7 +184,7 @@ export default function OrderDesk() {
             i.menuId === matchedMenu.id && (i.specInfo ?? '') === (specInfo ?? '') ? { ...i, quantity: i.quantity + quantity } : i
           )
         }
-        return [...prev, { menuId: matchedMenu.id, name: matchedMenu.name, price, quantity, specInfo }]
+        return [...prev, { menuId: matchedMenu.id, name: matchedMenu.name, price, quantity, specInfo, image: matchedMenu.image }]
       })
       message.success(`已添加 ${quantity} 份 ${matchedMenu.name}`)
       // 播报添加成功
@@ -215,18 +208,6 @@ export default function OrderDesk() {
     speak(`${menu.name}，价格${unitPrice.toFixed(2)}元${specText}`)
   }
 
-  const updateCartQty = (menuId: number, specInfo: string | undefined, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((i) =>
-          i.menuId === menuId && (i.specInfo ?? '') === (specInfo ?? '') ? { ...i, quantity: i.quantity + delta } : i
-        )
-        .filter((i) => i.quantity > 0)
-    )
-  }
-
-  const cartTotal = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
-
   const handleSubmit = async () => {
     if (cart.length === 0) {
       message.warning('请先添加菜品')
@@ -246,7 +227,7 @@ export default function OrderDesk() {
         total_amount: Math.round(cartTotal * 100) / 100,
       })
       message.success('下单成功')
-      setCart([])
+      clearCart()
     } catch {
       message.error('下单失败')
     } finally {
@@ -288,13 +269,29 @@ export default function OrderDesk() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
+                    gap: 10,
                     padding: 10,
                     background: '#fff',
                     borderRadius: 8,
                     boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                   }}
                 >
+                  <div style={{ width: 56, height: 56, flexShrink: 0, borderRadius: 8, overflow: 'hidden', background: '#f5f5f5' }}>
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 10 }}>
+                        无图
+                      </div>
+                    )}
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 500 }}>{item.name}</div>
                     {item.specInfo ? (

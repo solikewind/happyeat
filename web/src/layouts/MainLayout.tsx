@@ -10,6 +10,7 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons'
 import { useAuth } from '../contexts/AuthContext'
+import { OrderCartProvider } from '../contexts/OrderCartContext'
 
 const { Header, Sider, Content } = Layout
 
@@ -37,8 +38,9 @@ export default function MainLayout() {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider theme="dark" breakpoint="lg" collapsedWidth="0">
+    <OrderCartProvider>
+      <Layout style={{ minHeight: '100vh' }}>
+        <Sider theme="dark" breakpoint="lg" collapsedWidth="0">
         <div style={{ height: 32, margin: 16, color: '#fff', fontSize: 18 }}>
           HappyEat
         </div>
@@ -65,6 +67,7 @@ export default function MainLayout() {
           <Outlet />
         </Content>
       </Layout>
-    </Layout>
+      </Layout>
+    </OrderCartProvider>
   )
 }
