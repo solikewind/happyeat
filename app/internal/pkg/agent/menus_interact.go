@@ -46,47 +46,6 @@ func NewMenusTechAgent(c *Config, menuData *menu.Menu) (*MenusTechAgent, error) 
 	}, nil
 }
 
-// SearchMenus 搜索菜单（支持拼音搜索）
-// 1. 按拼音搜索菜单
-// 2. 返回匹配的菜单列表
-func (a *MenusTechAgent) SearchMenus(ctx context.Context, keyword string) ([]string, error) {
-	if keyword == "" {
-		return nil, fmt.Errorf("搜索关键词不能为空")
-	}
-
-	// 调用菜单查询接口，支持拼音搜索
-	// 查询所有匹配的菜单（不分页，用于 agent 处理）
-	list, _, err := a.Menu.List(ctx, menu.ListMenusFilter{
-		Name:         keyword,
-		CategoryName: "", // 不限制分类
-		Offset:       0,
-		Limit:        100, // 最多返回100条
-	})
-	if err != nil {
-		return nil, fmt.Errorf("查询菜单失败: %w", err)
-	}
-
-	// 格式化菜单信息
-	results := make([]string, 0, len(list))
-	for _, m := range list {
-		var parts []string
-		parts = append(parts, fmt.Sprintf("ID: %d", m.ID))
-		parts = append(parts, fmt.Sprintf("名称: %s", m.Name))
-		if m.Price > 0 {
-			parts = append(parts, fmt.Sprintf("价格: ¥%.2f", m.Price))
-		}
-		if m.Description != nil && *m.Description != "" {
-			parts = append(parts, fmt.Sprintf("描述: %s", *m.Description))
-		}
-		if m.Edges.Category != nil {
-			parts = append(parts, fmt.Sprintf("分类: %s", m.Edges.Category.Name))
-		}
-		results = append(results, strings.Join(parts, ", "))
-	}
-
-	return results, nil
-}
-
 // ParseOrderPrompt 从提示词中提取所有菜单及其份数
 // 例如："我要两份宫保鸡丁，一个红烧肉，三份麻婆豆腐"
 // 返回：[]MenuItem，包含每个菜单的匹配结果和数量
