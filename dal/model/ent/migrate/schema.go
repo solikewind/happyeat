@@ -12,6 +12,9 @@ var (
 	// MenusColumns holds the columns for the "menus" table.
 	MenusColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Nullable: true, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 128, Comment: "菜名"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 		{Name: "image", Type: field.TypeString, Nullable: true, Size: 512, Comment: "图片URL"},
@@ -27,7 +30,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "menus_menu_categories_menus",
-				Columns:    []*schema.Column{MenusColumns[5]},
+				Columns:    []*schema.Column{MenusColumns[8]},
 				RefColumns: []*schema.Column{MenuCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

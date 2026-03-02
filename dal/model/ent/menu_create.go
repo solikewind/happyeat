@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -20,6 +21,48 @@ type MenuCreate struct {
 	config
 	mutation *MenuMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *MenuCreate) SetCreatedAt(v time.Time) *MenuCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *MenuCreate) SetNillableCreatedAt(v *time.Time) *MenuCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *MenuCreate) SetUpdatedAt(v time.Time) *MenuCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *MenuCreate) SetNillableUpdatedAt(v *time.Time) *MenuCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_c *MenuCreate) SetDeleteTs(v int64) *MenuCreate {
+	_c.mutation.SetDeleteTs(v)
+	return _c
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_c *MenuCreate) SetNillableDeleteTs(v *int64) *MenuCreate {
+	if v != nil {
+		_c.SetDeleteTs(*v)
+	}
+	return _c
 }
 
 // SetName sets the "name" field.
@@ -110,6 +153,9 @@ func (_c *MenuCreate) Mutation() *MenuMutation {
 
 // Save creates the Menu in the database.
 func (_c *MenuCreate) Save(ctx context.Context) (*Menu, error) {
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -135,8 +181,37 @@ func (_c *MenuCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (_c *MenuCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if menu.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menu.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
+		v := menu.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if menu.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menu.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := menu.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		v := menu.DefaultDeleteTs
+		_c.mutation.SetDeleteTs(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (_c *MenuCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Menu.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Menu.updated_at"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Menu.name"`)}
 	}
@@ -182,6 +257,18 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 		_node = &Menu{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(menu.Table, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(menu.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeleteTs(); ok {
+		_spec.SetField(menu.FieldDeleteTs, field.TypeInt64, value)
+		_node.DeleteTs = value
+	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(menu.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -268,6 +355,7 @@ func (_c *MenuCreateBulk) Save(ctx context.Context) ([]*Menu, error) {
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MenuMutation)
 				if !ok {

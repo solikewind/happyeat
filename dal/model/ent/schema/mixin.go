@@ -15,6 +15,12 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/intercept"
 )
 
+var CST = time.FixedZone("CST", 8*3600)
+
+func CSTNow() time.Time {
+	return time.Now().In(CST)
+}
+
 type TimeMixin struct {
 	mixin.Schema
 }
@@ -46,10 +52,9 @@ type SoftDeleteMixin struct {
 // Fields of the SoftDeleteMixin.
 func (SoftDeleteMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("delete_ts").
-			Optional().
-			Default(time.Time{}).
-			Comment("删除时间"),
+		field.Int64("delete_ts").
+			Default(0).
+			Comment("删除时间戳"),
 	}
 }
 
@@ -74,7 +79,7 @@ func (d SoftDeleteMixin) Interceptors() []ent.Interceptor {
 	}
 }
 
-// Hooks of the SoftDeleteMixin.
+// Hooks of the SoftDelete.
 func (d SoftDeleteMixin) Hooks() []ent.Hook {
 	return []ent.Hook{
 		hook.On(
@@ -87,7 +92,7 @@ func (d SoftDeleteMixin) Hooks() []ent.Hook {
 					mx, ok := m.(interface {
 						SetOp(ent.Op)
 						Client() *gen.Client
-						SetDeleteTime(time.Time)
+						SetDeletedTs(int64)
 						WhereP(...func(*sql.Selector))
 					})
 					if !ok {
@@ -95,7 +100,7 @@ func (d SoftDeleteMixin) Hooks() []ent.Hook {
 					}
 					d.P(mx)
 					mx.SetOp(ent.OpUpdate)
-					mx.SetDeleteTime(time.Now())
+					mx.SetDeletedTs(time.Now().In(CST).Unix())
 					return mx.Client().Mutate(ctx, m)
 				})
 			},
@@ -107,6 +112,6 @@ func (d SoftDeleteMixin) Hooks() []ent.Hook {
 // P adds a storage-level predicate to the queries and mutations.
 func (d SoftDeleteMixin) P(w interface{ WhereP(...func(*sql.Selector)) }) {
 	w.WhereP(
-		sql.FieldIsNull(d.Fields()[0].Descriptor().Name),
+		sql.FieldEQ(d.Fields()[0].Descriptor().Name, int64(0)),
 	)
 }

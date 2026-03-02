@@ -1,7 +1,6 @@
 package schema
 
 import (
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
@@ -12,6 +11,13 @@ import (
 // Menu holds the schema definition for the Menu entity.
 type Menu struct {
 	ent.Schema
+}
+
+func (Menu) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+		SoftDeleteMixin{},
+	}
 }
 
 func (Menu) Annotations() []schema.Annotation {

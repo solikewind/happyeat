@@ -413,12 +413,14 @@ func (c *MenuClient) QueryOrderItems(_m *Menu) *OrderItemQuery {
 
 // Hooks returns the client hooks.
 func (c *MenuClient) Hooks() []Hook {
-	return c.hooks.Menu
+	hooks := c.hooks.Menu
+	return append(hooks[:len(hooks):len(hooks)], menu.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *MenuClient) Interceptors() []Interceptor {
-	return c.inters.Menu
+	inters := c.inters.Menu
+	return append(inters[:len(inters):len(inters)], menu.Interceptors[:]...)
 }
 
 func (c *MenuClient) mutate(ctx context.Context, m *MenuMutation) (Value, error) {

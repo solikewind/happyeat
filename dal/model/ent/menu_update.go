@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,6 +28,39 @@ type MenuUpdate struct {
 // Where appends a list predicates to the MenuUpdate builder.
 func (_u *MenuUpdate) Where(ps ...predicate.Menu) *MenuUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *MenuUpdate) SetUpdatedAt(v time.Time) *MenuUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *MenuUpdate) SetDeleteTs(v int64) *MenuUpdate {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *MenuUpdate) SetNillableDeleteTs(v *int64) *MenuUpdate {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *MenuUpdate) AddDeleteTs(v int64) *MenuUpdate {
+	_u.mutation.AddDeleteTs(v)
+	return _u
+}
+
+// ClearDeleteTs clears the value of the "delete_ts" field.
+func (_u *MenuUpdate) ClearDeleteTs() *MenuUpdate {
+	_u.mutation.ClearDeleteTs()
 	return _u
 }
 
@@ -201,6 +235,9 @@ func (_u *MenuUpdate) RemoveOrderItems(v ...*OrderItem) *MenuUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *MenuUpdate) Save(ctx context.Context) (int, error) {
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -224,6 +261,18 @@ func (_u *MenuUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *MenuUpdate) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if menu.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menu.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := menu.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -255,6 +304,18 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(menu.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(menu.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if _u.mutation.DeleteTsCleared() {
+		_spec.ClearField(menu.FieldDeleteTs, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(menu.FieldName, field.TypeString, value)
@@ -414,6 +475,39 @@ type MenuUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *MenuMutation
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *MenuUpdateOne) SetUpdatedAt(v time.Time) *MenuUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *MenuUpdateOne) SetDeleteTs(v int64) *MenuUpdateOne {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *MenuUpdateOne) SetNillableDeleteTs(v *int64) *MenuUpdateOne {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *MenuUpdateOne) AddDeleteTs(v int64) *MenuUpdateOne {
+	_u.mutation.AddDeleteTs(v)
+	return _u
+}
+
+// ClearDeleteTs clears the value of the "delete_ts" field.
+func (_u *MenuUpdateOne) ClearDeleteTs() *MenuUpdateOne {
+	_u.mutation.ClearDeleteTs()
+	return _u
 }
 
 // SetName sets the "name" field.
@@ -600,6 +694,9 @@ func (_u *MenuUpdateOne) Select(field string, fields ...string) *MenuUpdateOne {
 
 // Save executes the query and returns the updated Menu entity.
 func (_u *MenuUpdateOne) Save(ctx context.Context) (*Menu, error) {
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -623,6 +720,18 @@ func (_u *MenuUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *MenuUpdateOne) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if menu.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menu.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := menu.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -671,6 +780,18 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(menu.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(menu.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if _u.mutation.DeleteTsCleared() {
+		_spec.ClearField(menu.FieldDeleteTs, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(menu.FieldName, field.TypeString, value)

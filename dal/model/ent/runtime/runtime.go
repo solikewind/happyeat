@@ -2,7 +2,151 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/solikewind/happyeat/dal/model/ent/runtime.go
+import (
+	"time"
+
+	"github.com/solikewind/happyeat/dal/model/ent/menu"
+	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
+	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/order"
+	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
+	"github.com/solikewind/happyeat/dal/model/ent/schema"
+	"github.com/solikewind/happyeat/dal/model/ent/table"
+	"github.com/solikewind/happyeat/dal/model/ent/tablecategory"
+)
+
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
+// to their package variables.
+func init() {
+	menuMixin := schema.Menu{}.Mixin()
+	menuMixinHooks1 := menuMixin[1].Hooks()
+	menu.Hooks[0] = menuMixinHooks1[0]
+	menuMixinInters1 := menuMixin[1].Interceptors()
+	menu.Interceptors[0] = menuMixinInters1[0]
+	menuMixinFields0 := menuMixin[0].Fields()
+	_ = menuMixinFields0
+	menuMixinFields1 := menuMixin[1].Fields()
+	_ = menuMixinFields1
+	menuFields := schema.Menu{}.Fields()
+	_ = menuFields
+	// menuDescCreatedAt is the schema descriptor for created_at field.
+	menuDescCreatedAt := menuMixinFields0[0].Descriptor()
+	// menu.DefaultCreatedAt holds the default value on creation for the created_at field.
+	menu.DefaultCreatedAt = menuDescCreatedAt.Default.(func() time.Time)
+	// menuDescUpdatedAt is the schema descriptor for updated_at field.
+	menuDescUpdatedAt := menuMixinFields0[1].Descriptor()
+	// menu.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	menu.DefaultUpdatedAt = menuDescUpdatedAt.Default.(func() time.Time)
+	// menu.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	menu.UpdateDefaultUpdatedAt = menuDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// menuDescDeleteTs is the schema descriptor for delete_ts field.
+	menuDescDeleteTs := menuMixinFields1[0].Descriptor()
+	// menu.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	menu.DefaultDeleteTs = menuDescDeleteTs.Default.(int64)
+	// menuDescName is the schema descriptor for name field.
+	menuDescName := menuFields[0].Descriptor()
+	// menu.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	menu.NameValidator = menuDescName.Validators[0].(func(string) error)
+	// menuDescImage is the schema descriptor for image field.
+	menuDescImage := menuFields[2].Descriptor()
+	// menu.ImageValidator is a validator for the "image" field. It is called by the builders before save.
+	menu.ImageValidator = menuDescImage.Validators[0].(func(string) error)
+	menucategoryFields := schema.MenuCategory{}.Fields()
+	_ = menucategoryFields
+	// menucategoryDescName is the schema descriptor for name field.
+	menucategoryDescName := menucategoryFields[0].Descriptor()
+	// menucategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	menucategory.NameValidator = menucategoryDescName.Validators[0].(func(string) error)
+	menuspecFields := schema.MenuSpec{}.Fields()
+	_ = menuspecFields
+	// menuspecDescSpecType is the schema descriptor for spec_type field.
+	menuspecDescSpecType := menuspecFields[0].Descriptor()
+	// menuspec.SpecTypeValidator is a validator for the "spec_type" field. It is called by the builders before save.
+	menuspec.SpecTypeValidator = menuspecDescSpecType.Validators[0].(func(string) error)
+	// menuspecDescSpecValue is the schema descriptor for spec_value field.
+	menuspecDescSpecValue := menuspecFields[1].Descriptor()
+	// menuspec.SpecValueValidator is a validator for the "spec_value" field. It is called by the builders before save.
+	menuspec.SpecValueValidator = menuspecDescSpecValue.Validators[0].(func(string) error)
+	// menuspecDescPriceDelta is the schema descriptor for price_delta field.
+	menuspecDescPriceDelta := menuspecFields[2].Descriptor()
+	// menuspec.DefaultPriceDelta holds the default value on creation for the price_delta field.
+	menuspec.DefaultPriceDelta = menuspecDescPriceDelta.Default.(float64)
+	// menuspecDescSort is the schema descriptor for sort field.
+	menuspecDescSort := menuspecFields[3].Descriptor()
+	// menuspec.DefaultSort holds the default value on creation for the sort field.
+	menuspec.DefaultSort = menuspecDescSort.Default.(int)
+	orderFields := schema.Order{}.Fields()
+	_ = orderFields
+	// orderDescOrderNo is the schema descriptor for order_no field.
+	orderDescOrderNo := orderFields[0].Descriptor()
+	// order.OrderNoValidator is a validator for the "order_no" field. It is called by the builders before save.
+	order.OrderNoValidator = orderDescOrderNo.Validators[0].(func(string) error)
+	// orderDescOrderType is the schema descriptor for order_type field.
+	orderDescOrderType := orderFields[1].Descriptor()
+	// order.DefaultOrderType holds the default value on creation for the order_type field.
+	order.DefaultOrderType = orderDescOrderType.Default.(string)
+	// order.OrderTypeValidator is a validator for the "order_type" field. It is called by the builders before save.
+	order.OrderTypeValidator = orderDescOrderType.Validators[0].(func(string) error)
+	// orderDescStatus is the schema descriptor for status field.
+	orderDescStatus := orderFields[2].Descriptor()
+	// order.DefaultStatus holds the default value on creation for the status field.
+	order.DefaultStatus = orderDescStatus.Default.(string)
+	// order.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	order.StatusValidator = orderDescStatus.Validators[0].(func(string) error)
+	// orderDescTotalAmount is the schema descriptor for total_amount field.
+	orderDescTotalAmount := orderFields[3].Descriptor()
+	// order.DefaultTotalAmount holds the default value on creation for the total_amount field.
+	order.DefaultTotalAmount = orderDescTotalAmount.Default.(float64)
+	// orderDescRemark is the schema descriptor for remark field.
+	orderDescRemark := orderFields[4].Descriptor()
+	// order.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	order.RemarkValidator = orderDescRemark.Validators[0].(func(string) error)
+	orderitemFields := schema.OrderItem{}.Fields()
+	_ = orderitemFields
+	// orderitemDescMenuName is the schema descriptor for menu_name field.
+	orderitemDescMenuName := orderitemFields[0].Descriptor()
+	// orderitem.MenuNameValidator is a validator for the "menu_name" field. It is called by the builders before save.
+	orderitem.MenuNameValidator = orderitemDescMenuName.Validators[0].(func(string) error)
+	// orderitemDescQuantity is the schema descriptor for quantity field.
+	orderitemDescQuantity := orderitemFields[1].Descriptor()
+	// orderitem.DefaultQuantity holds the default value on creation for the quantity field.
+	orderitem.DefaultQuantity = orderitemDescQuantity.Default.(int)
+	// orderitemDescSpecInfo is the schema descriptor for spec_info field.
+	orderitemDescSpecInfo := orderitemFields[4].Descriptor()
+	// orderitem.SpecInfoValidator is a validator for the "spec_info" field. It is called by the builders before save.
+	orderitem.SpecInfoValidator = orderitemDescSpecInfo.Validators[0].(func(string) error)
+	// orderitemDescSort is the schema descriptor for sort field.
+	orderitemDescSort := orderitemFields[5].Descriptor()
+	// orderitem.DefaultSort holds the default value on creation for the sort field.
+	orderitem.DefaultSort = orderitemDescSort.Default.(int)
+	tableFields := schema.Table{}.Fields()
+	_ = tableFields
+	// tableDescCode is the schema descriptor for code field.
+	tableDescCode := tableFields[0].Descriptor()
+	// table.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	table.CodeValidator = tableDescCode.Validators[0].(func(string) error)
+	// tableDescStatus is the schema descriptor for status field.
+	tableDescStatus := tableFields[1].Descriptor()
+	// table.DefaultStatus holds the default value on creation for the status field.
+	table.DefaultStatus = tableDescStatus.Default.(string)
+	// table.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	table.StatusValidator = tableDescStatus.Validators[0].(func(string) error)
+	// tableDescCapacity is the schema descriptor for capacity field.
+	tableDescCapacity := tableFields[2].Descriptor()
+	// table.DefaultCapacity holds the default value on creation for the capacity field.
+	table.DefaultCapacity = tableDescCapacity.Default.(int)
+	// tableDescQrCode is the schema descriptor for qr_code field.
+	tableDescQrCode := tableFields[3].Descriptor()
+	// table.QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
+	table.QrCodeValidator = tableDescQrCode.Validators[0].(func(string) error)
+	tablecategoryFields := schema.TableCategory{}.Fields()
+	_ = tablecategoryFields
+	// tablecategoryDescName is the schema descriptor for name field.
+	tablecategoryDescName := tablecategoryFields[0].Descriptor()
+	// tablecategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	tablecategory.NameValidator = tablecategoryDescName.Validators[0].(func(string) error)
+}
 
 const (
 	Version = "v0.14.5"                                         // Version of ent codegen.

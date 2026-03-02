@@ -10,7 +10,7 @@ migrate:
 # 数据库生成（ent 会生成 dal/model/ent 下的 client、hook、intercept 等；--feature intercept 启用拦截器）
 # 生成后 runtime.go 会被覆盖，需执行 make fix-runtime 打破 import cycle，否则 intercept 会报 missing metadata
 generate:
-	cd dal/model/ent && go run entgo.io/ent/cmd/ent generate --feature intercept ./schema
+	cd dal/model/ent && go run entgo.io/ent/cmd/ent generate --feature intercept,schema/snapshot ./schema
 #cd dal/model/ent && go run -mod=mod entgo.io/ent/cmd/ent generate --feature intercept ./schema
 
 # 生成后执行：用存根覆盖 runtime.go，打破 import cycle（无 cp 时请手动把 runtime_stub.go 复制为 runtime.go）
