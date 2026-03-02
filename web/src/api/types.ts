@@ -15,6 +15,7 @@ export interface MenuCategory {
   id: number
   name: string
   description?: string
+  create_at?: number
 }
 
 /** 兼容旧名 */
@@ -43,6 +44,7 @@ export interface TableCategory {
   id: number
   name: string
   description?: string
+  create_at?: number
 }
 
 export interface Table {

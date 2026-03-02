@@ -79,6 +79,12 @@ export default function Workbench() {
           { title: '类型', dataIndex: 'order_type', width: 70, render: (t: string) => ORDER_TYPE_MAP[t] ?? t },
           { title: '状态', dataIndex: 'status', width: 90, render: (s: string) => <Tag>{STATUS_MAP[s] ?? s}</Tag> },
           {
+            title: '创建日期',
+            dataIndex: 'create_at',
+            width: 160,
+            render: (ts: number | undefined) => (ts ? new Date(ts * 1000).toLocaleString('zh-CN') : '-'),
+          },
+          {
             title: '桌号',
             dataIndex: 'table_code',
             width: 120,

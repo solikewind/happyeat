@@ -40,7 +40,7 @@ func (l *GetMenuCategoryLogic) GetMenuCategory(req *types.GetMenuCategoryReq) (*
 }
 
 func entCategoryToType(e *ent.MenuCategory) types.MenuCategory {
-	out := types.MenuCategory{Id: uint64(e.ID), Name: e.Name}
+	out := types.MenuCategory{Id: uint64(e.ID), Name: e.Name, CreateAt: e.CreatedAt.Unix()}
 
 	if e.Description != nil {
 		out.Description = *e.Description

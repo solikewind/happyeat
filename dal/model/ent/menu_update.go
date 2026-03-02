@@ -112,6 +112,26 @@ func (_u *MenuUpdate) SetUpdatedAt(v time.Time) *MenuUpdate {
 	return _u
 }
 
+// SetDeletedTs sets the "deleted_ts" field.
+func (_u *MenuUpdate) SetDeletedTs(v time.Time) *MenuUpdate {
+	_u.mutation.SetDeletedTs(v)
+	return _u
+}
+
+// SetNillableDeletedTs sets the "deleted_ts" field if the given value is not nil.
+func (_u *MenuUpdate) SetNillableDeletedTs(v *time.Time) *MenuUpdate {
+	if v != nil {
+		_u.SetDeletedTs(*v)
+	}
+	return _u
+}
+
+// ClearDeletedTs clears the value of the "deleted_ts" field.
+func (_u *MenuUpdate) ClearDeletedTs() *MenuUpdate {
+	_u.mutation.ClearDeletedTs()
+	return _u
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
 func (_u *MenuUpdate) SetCategoryID(id int) *MenuUpdate {
 	_u.mutation.SetCategoryID(id)
@@ -295,6 +315,12 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedTs(); ok {
+		_spec.SetField(menu.FieldDeletedTs, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedTsCleared() {
+		_spec.ClearField(menu.FieldDeletedTs, field.TypeTime)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -516,6 +542,26 @@ func (_u *MenuUpdateOne) SetUpdatedAt(v time.Time) *MenuUpdateOne {
 	return _u
 }
 
+// SetDeletedTs sets the "deleted_ts" field.
+func (_u *MenuUpdateOne) SetDeletedTs(v time.Time) *MenuUpdateOne {
+	_u.mutation.SetDeletedTs(v)
+	return _u
+}
+
+// SetNillableDeletedTs sets the "deleted_ts" field if the given value is not nil.
+func (_u *MenuUpdateOne) SetNillableDeletedTs(v *time.Time) *MenuUpdateOne {
+	if v != nil {
+		_u.SetDeletedTs(*v)
+	}
+	return _u
+}
+
+// ClearDeletedTs clears the value of the "deleted_ts" field.
+func (_u *MenuUpdateOne) ClearDeletedTs() *MenuUpdateOne {
+	_u.mutation.ClearDeletedTs()
+	return _u
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
 func (_u *MenuUpdateOne) SetCategoryID(id int) *MenuUpdateOne {
 	_u.mutation.SetCategoryID(id)
@@ -729,6 +775,12 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedTs(); ok {
+		_spec.SetField(menu.FieldDeletedTs, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedTsCleared() {
+		_spec.ClearField(menu.FieldDeletedTs, field.TypeTime)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

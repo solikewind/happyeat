@@ -16,8 +16,9 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 		{Name: "image", Type: field.TypeString, Nullable: true, Size: 512, Comment: "图片URL"},
 		{Name: "price", Type: field.TypeFloat64, Comment: "价格"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "deleted_ts", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 		{Name: "menu_category_menus", Type: field.TypeInt},
 	}
 	// MenusTable holds the schema information for the "menus" table.
@@ -29,7 +30,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "menus_menu_categories_menus",
-				Columns:    []*schema.Column{MenusColumns[7]},
+				Columns:    []*schema.Column{MenusColumns[8]},
 				RefColumns: []*schema.Column{MenuCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

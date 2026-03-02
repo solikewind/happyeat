@@ -110,6 +110,12 @@ function CategoryTab() {
           { title: '分类名称', dataIndex: 'name' },
           { title: '描述', dataIndex: 'description', ellipsis: true },
           {
+            title: '创建日期',
+            dataIndex: 'create_at',
+            width: 160,
+            render: (ts: number | undefined) => (ts ? new Date(ts * 1000).toLocaleString('zh-CN') : '-'),
+          },
+          {
             title: '操作',
             width: 120,
             render: (_, r) => (

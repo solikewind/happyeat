@@ -91,6 +91,20 @@ func (_c *MenuCreate) SetNillableUpdatedAt(v *time.Time) *MenuCreate {
 	return _c
 }
 
+// SetDeletedTs sets the "deleted_ts" field.
+func (_c *MenuCreate) SetDeletedTs(v time.Time) *MenuCreate {
+	_c.mutation.SetDeletedTs(v)
+	return _c
+}
+
+// SetNillableDeletedTs sets the "deleted_ts" field if the given value is not nil.
+func (_c *MenuCreate) SetNillableDeletedTs(v *time.Time) *MenuCreate {
+	if v != nil {
+		_c.SetDeletedTs(*v)
+	}
+	return _c
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
 func (_c *MenuCreate) SetCategoryID(id int) *MenuCreate {
 	_c.mutation.SetCategoryID(id)
@@ -253,6 +267,10 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeletedTs(); ok {
+		_spec.SetField(menu.FieldDeletedTs, field.TypeTime, value)
+		_node.DeletedTs = &value
 	}
 	if nodes := _c.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -26,6 +26,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldDeletedTs holds the string denoting the deleted_ts field in the database.
+	FieldDeletedTs = "deleted_ts"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeSpecs holds the string denoting the specs edge name in mutations.
@@ -66,6 +68,7 @@ var Columns = []string{
 	FieldPrice,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldDeletedTs,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "menus"
@@ -138,6 +141,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByDeletedTs orders the results by the deleted_ts field.
+func ByDeletedTs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeletedTs, opts...).ToFunc()
 }
 
 // ByCategoryField orders the results by category field.

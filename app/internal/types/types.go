@@ -226,6 +226,7 @@ type MenuCategory struct {
 	Id          uint64 `json:"id"`                   // 分类id
 	Name        string `json:"name"`                 // 分类名称
 	Description string `json:"description,optional"` // 描述
+	CreateAt    int64  `json:"create_at,optional"`   // 创建时间（Unix 秒）
 }
 
 type MenuSpec struct {
@@ -272,6 +273,7 @@ type TableCategory struct {
 	Id          uint64 `json:"id"`                   // 分类id
 	Name        string `json:"name"`                 // 分类名称
 	Description string `json:"description,optional"` // 描述
+	CreateAt    int64  `json:"create_at,optional"`   // 创建时间（Unix 秒）
 }
 
 type UpdateMenuCategoryReply struct {

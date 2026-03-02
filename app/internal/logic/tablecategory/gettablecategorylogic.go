@@ -40,7 +40,7 @@ func (l *GetTableCategoryLogic) GetTableCategory(req *types.GetTableCategoryReq)
 }
 
 func entTableCategoryToType(e *ent.TableCategory) types.TableCategory {
-	out := types.TableCategory{Id: uint64(e.ID), Name: e.Name}
+	out := types.TableCategory{Id: uint64(e.ID), Name: e.Name, CreateAt: e.CreatedAt.Unix()}
 
 	if e.Description != nil {
 		out.Description = *e.Description

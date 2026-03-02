@@ -52,6 +52,7 @@ type MenuMutation struct {
 	addprice           *float64
 	created_at         *time.Time
 	updated_at         *time.Time
+	deleted_ts         *time.Time
 	clearedFields      map[string]struct{}
 	category           *int
 	clearedcategory    bool
@@ -426,6 +427,55 @@ func (m *MenuMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetDeletedTs sets the "deleted_ts" field.
+func (m *MenuMutation) SetDeletedTs(t time.Time) {
+	m.deleted_ts = &t
+}
+
+// DeletedTs returns the value of the "deleted_ts" field in the mutation.
+func (m *MenuMutation) DeletedTs() (r time.Time, exists bool) {
+	v := m.deleted_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedTs returns the old "deleted_ts" field's value of the Menu entity.
+// If the Menu object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuMutation) OldDeletedTs(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedTs: %w", err)
+	}
+	return oldValue.DeletedTs, nil
+}
+
+// ClearDeletedTs clears the value of the "deleted_ts" field.
+func (m *MenuMutation) ClearDeletedTs() {
+	m.deleted_ts = nil
+	m.clearedFields[menu.FieldDeletedTs] = struct{}{}
+}
+
+// DeletedTsCleared returns if the "deleted_ts" field was cleared in this mutation.
+func (m *MenuMutation) DeletedTsCleared() bool {
+	_, ok := m.clearedFields[menu.FieldDeletedTs]
+	return ok
+}
+
+// ResetDeletedTs resets all changes to the "deleted_ts" field.
+func (m *MenuMutation) ResetDeletedTs() {
+	m.deleted_ts = nil
+	delete(m.clearedFields, menu.FieldDeletedTs)
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by id.
 func (m *MenuMutation) SetCategoryID(id int) {
 	m.category = &id
@@ -607,7 +657,7 @@ func (m *MenuMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, menu.FieldName)
 	}
@@ -625,6 +675,9 @@ func (m *MenuMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, menu.FieldUpdatedAt)
+	}
+	if m.deleted_ts != nil {
+		fields = append(fields, menu.FieldDeletedTs)
 	}
 	return fields
 }
@@ -646,6 +699,8 @@ func (m *MenuMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case menu.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case menu.FieldDeletedTs:
+		return m.DeletedTs()
 	}
 	return nil, false
 }
@@ -667,6 +722,8 @@ func (m *MenuMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case menu.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case menu.FieldDeletedTs:
+		return m.OldDeletedTs(ctx)
 	}
 	return nil, fmt.Errorf("unknown Menu field %s", name)
 }
@@ -717,6 +774,13 @@ func (m *MenuMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case menu.FieldDeletedTs:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedTs(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Menu field %s", name)
@@ -769,6 +833,9 @@ func (m *MenuMutation) ClearedFields() []string {
 	if m.FieldCleared(menu.FieldImage) {
 		fields = append(fields, menu.FieldImage)
 	}
+	if m.FieldCleared(menu.FieldDeletedTs) {
+		fields = append(fields, menu.FieldDeletedTs)
+	}
 	return fields
 }
 
@@ -788,6 +855,9 @@ func (m *MenuMutation) ClearField(name string) error {
 		return nil
 	case menu.FieldImage:
 		m.ClearImage()
+		return nil
+	case menu.FieldDeletedTs:
+		m.ClearDeletedTs()
 		return nil
 	}
 	return fmt.Errorf("unknown Menu nullable field %s", name)
@@ -814,6 +884,9 @@ func (m *MenuMutation) ResetField(name string) error {
 		return nil
 	case menu.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case menu.FieldDeletedTs:
+		m.ResetDeletedTs()
 		return nil
 	}
 	return fmt.Errorf("unknown Menu field %s", name)

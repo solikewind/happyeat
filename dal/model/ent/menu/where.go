@@ -85,6 +85,11 @@ func UpdatedAt(v time.Time) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// DeletedTs applies equality check predicate on the "deleted_ts" field. It's identical to DeletedTsEQ.
+func DeletedTs(v time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldEQ(FieldDeletedTs, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldName, v))
@@ -418,6 +423,56 @@ func UpdatedAtLT(v time.Time) predicate.Menu {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.Menu {
 	return predicate.Menu(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// DeletedTsEQ applies the EQ predicate on the "deleted_ts" field.
+func DeletedTsEQ(v time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldEQ(FieldDeletedTs, v))
+}
+
+// DeletedTsNEQ applies the NEQ predicate on the "deleted_ts" field.
+func DeletedTsNEQ(v time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldNEQ(FieldDeletedTs, v))
+}
+
+// DeletedTsIn applies the In predicate on the "deleted_ts" field.
+func DeletedTsIn(vs ...time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldIn(FieldDeletedTs, vs...))
+}
+
+// DeletedTsNotIn applies the NotIn predicate on the "deleted_ts" field.
+func DeletedTsNotIn(vs ...time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldNotIn(FieldDeletedTs, vs...))
+}
+
+// DeletedTsGT applies the GT predicate on the "deleted_ts" field.
+func DeletedTsGT(v time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldGT(FieldDeletedTs, v))
+}
+
+// DeletedTsGTE applies the GTE predicate on the "deleted_ts" field.
+func DeletedTsGTE(v time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldGTE(FieldDeletedTs, v))
+}
+
+// DeletedTsLT applies the LT predicate on the "deleted_ts" field.
+func DeletedTsLT(v time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldLT(FieldDeletedTs, v))
+}
+
+// DeletedTsLTE applies the LTE predicate on the "deleted_ts" field.
+func DeletedTsLTE(v time.Time) predicate.Menu {
+	return predicate.Menu(sql.FieldLTE(FieldDeletedTs, v))
+}
+
+// DeletedTsIsNil applies the IsNil predicate on the "deleted_ts" field.
+func DeletedTsIsNil() predicate.Menu {
+	return predicate.Menu(sql.FieldIsNull(FieldDeletedTs))
+}
+
+// DeletedTsNotNil applies the NotNil predicate on the "deleted_ts" field.
+func DeletedTsNotNil() predicate.Menu {
+	return predicate.Menu(sql.FieldNotNull(FieldDeletedTs))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.
