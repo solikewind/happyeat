@@ -3,8 +3,6 @@
 package table
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -22,10 +20,6 @@ const (
 	FieldCapacity = "capacity"
 	// FieldQrCode holds the string denoting the qr_code field in the database.
 	FieldQrCode = "qr_code"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeOrders holds the string denoting the orders edge name in mutations.
@@ -55,8 +49,6 @@ var Columns = []string{
 	FieldStatus,
 	FieldCapacity,
 	FieldQrCode,
-	FieldCreatedAt,
-	FieldUpdatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "tables"
@@ -91,12 +83,6 @@ var (
 	DefaultCapacity int
 	// QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
 	QrCodeValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
 )
 
 // OrderOption defines the ordering options for the Table queries.
@@ -125,16 +111,6 @@ func ByCapacity(opts ...sql.OrderTermOption) OrderOption {
 // ByQrCode orders the results by the qr_code field.
 func ByQrCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQrCode, opts...).ToFunc()
-}
-
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
 // ByCategoryField orders the results by category field.

@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -41,34 +40,6 @@ func (_c *MenuCategoryCreate) SetNillableDescription(v *string) *MenuCategoryCre
 	return _c
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (_c *MenuCategoryCreate) SetCreatedAt(v time.Time) *MenuCategoryCreate {
-	_c.mutation.SetCreatedAt(v)
-	return _c
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *MenuCategoryCreate) SetNillableCreatedAt(v *time.Time) *MenuCategoryCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_c *MenuCategoryCreate) SetUpdatedAt(v time.Time) *MenuCategoryCreate {
-	_c.mutation.SetUpdatedAt(v)
-	return _c
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_c *MenuCategoryCreate) SetNillableUpdatedAt(v *time.Time) *MenuCategoryCreate {
-	if v != nil {
-		_c.SetUpdatedAt(*v)
-	}
-	return _c
-}
-
 // AddMenuIDs adds the "menus" edge to the Menu entity by IDs.
 func (_c *MenuCategoryCreate) AddMenuIDs(ids ...int) *MenuCategoryCreate {
 	_c.mutation.AddMenuIDs(ids...)
@@ -91,7 +62,6 @@ func (_c *MenuCategoryCreate) Mutation() *MenuCategoryMutation {
 
 // Save creates the MenuCategory in the database.
 func (_c *MenuCategoryCreate) Save(ctx context.Context) (*MenuCategory, error) {
-	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -117,18 +87,6 @@ func (_c *MenuCategoryCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (_c *MenuCategoryCreate) defaults() {
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		v := menucategory.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		v := menucategory.DefaultUpdatedAt()
-		_c.mutation.SetUpdatedAt(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (_c *MenuCategoryCreate) check() error {
 	if _, ok := _c.mutation.Name(); !ok {
@@ -138,12 +96,6 @@ func (_c *MenuCategoryCreate) check() error {
 		if err := menucategory.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MenuCategory.name": %w`, err)}
 		}
-	}
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MenuCategory.created_at"`)}
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "MenuCategory.updated_at"`)}
 	}
 	return nil
 }
@@ -178,14 +130,6 @@ func (_c *MenuCategoryCreate) createSpec() (*MenuCategory, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(menucategory.FieldDescription, field.TypeString, value)
 		_node.Description = &value
-	}
-	if value, ok := _c.mutation.CreatedAt(); ok {
-		_spec.SetField(menucategory.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(menucategory.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
 	}
 	if nodes := _c.mutation.MenusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -224,7 +168,6 @@ func (_c *MenuCategoryCreateBulk) Save(ctx context.Context) ([]*MenuCategory, er
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MenuCategoryMutation)
 				if !ok {

@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
@@ -32,14 +31,6 @@ func (MenuCategory) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("描述"),
-		field.Time("created_at").
-			Default(time.Now).
-			Immutable().
-			Comment("创建时间"),
-		field.Time("updated_at").
-			Default(time.Now).
-			UpdateDefault(time.Now).
-			Comment("更新时间"),
 	}
 }
 

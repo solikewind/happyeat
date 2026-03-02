@@ -46,8 +46,10 @@ type SoftDeleteMixin struct {
 // Fields of the SoftDeleteMixin.
 func (SoftDeleteMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("delete_time").
-			Optional(),
+		field.Time("delete_ts").
+			Optional().
+			Default(time.Time{}).
+			Comment("删除时间"),
 	}
 }
 

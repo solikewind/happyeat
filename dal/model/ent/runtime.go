@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"time"
-
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
@@ -29,32 +27,12 @@ func init() {
 	menuDescImage := menuFields[2].Descriptor()
 	// menu.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	menu.ImageValidator = menuDescImage.Validators[0].(func(string) error)
-	// menuDescCreatedAt is the schema descriptor for created_at field.
-	menuDescCreatedAt := menuFields[4].Descriptor()
-	// menu.DefaultCreatedAt holds the default value on creation for the created_at field.
-	menu.DefaultCreatedAt = menuDescCreatedAt.Default.(func() time.Time)
-	// menuDescUpdatedAt is the schema descriptor for updated_at field.
-	menuDescUpdatedAt := menuFields[5].Descriptor()
-	// menu.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	menu.DefaultUpdatedAt = menuDescUpdatedAt.Default.(func() time.Time)
-	// menu.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	menu.UpdateDefaultUpdatedAt = menuDescUpdatedAt.UpdateDefault.(func() time.Time)
 	menucategoryFields := schema.MenuCategory{}.Fields()
 	_ = menucategoryFields
 	// menucategoryDescName is the schema descriptor for name field.
 	menucategoryDescName := menucategoryFields[0].Descriptor()
 	// menucategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	menucategory.NameValidator = menucategoryDescName.Validators[0].(func(string) error)
-	// menucategoryDescCreatedAt is the schema descriptor for created_at field.
-	menucategoryDescCreatedAt := menucategoryFields[2].Descriptor()
-	// menucategory.DefaultCreatedAt holds the default value on creation for the created_at field.
-	menucategory.DefaultCreatedAt = menucategoryDescCreatedAt.Default.(func() time.Time)
-	// menucategoryDescUpdatedAt is the schema descriptor for updated_at field.
-	menucategoryDescUpdatedAt := menucategoryFields[3].Descriptor()
-	// menucategory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	menucategory.DefaultUpdatedAt = menucategoryDescUpdatedAt.Default.(func() time.Time)
-	// menucategory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	menucategory.UpdateDefaultUpdatedAt = menucategoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	menuspecFields := schema.MenuSpec{}.Fields()
 	_ = menuspecFields
 	// menuspecDescSpecType is the schema descriptor for spec_type field.
@@ -99,16 +77,6 @@ func init() {
 	orderDescRemark := orderFields[4].Descriptor()
 	// order.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
 	order.RemarkValidator = orderDescRemark.Validators[0].(func(string) error)
-	// orderDescCreatedAt is the schema descriptor for created_at field.
-	orderDescCreatedAt := orderFields[5].Descriptor()
-	// order.DefaultCreatedAt holds the default value on creation for the created_at field.
-	order.DefaultCreatedAt = orderDescCreatedAt.Default.(func() time.Time)
-	// orderDescUpdatedAt is the schema descriptor for updated_at field.
-	orderDescUpdatedAt := orderFields[6].Descriptor()
-	// order.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	order.DefaultUpdatedAt = orderDescUpdatedAt.Default.(func() time.Time)
-	// order.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	order.UpdateDefaultUpdatedAt = orderDescUpdatedAt.UpdateDefault.(func() time.Time)
 	orderitemFields := schema.OrderItem{}.Fields()
 	_ = orderitemFields
 	// orderitemDescMenuName is the schema descriptor for menu_name field.
@@ -147,30 +115,10 @@ func init() {
 	tableDescQrCode := tableFields[3].Descriptor()
 	// table.QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
 	table.QrCodeValidator = tableDescQrCode.Validators[0].(func(string) error)
-	// tableDescCreatedAt is the schema descriptor for created_at field.
-	tableDescCreatedAt := tableFields[4].Descriptor()
-	// table.DefaultCreatedAt holds the default value on creation for the created_at field.
-	table.DefaultCreatedAt = tableDescCreatedAt.Default.(func() time.Time)
-	// tableDescUpdatedAt is the schema descriptor for updated_at field.
-	tableDescUpdatedAt := tableFields[5].Descriptor()
-	// table.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	table.DefaultUpdatedAt = tableDescUpdatedAt.Default.(func() time.Time)
-	// table.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	table.UpdateDefaultUpdatedAt = tableDescUpdatedAt.UpdateDefault.(func() time.Time)
 	tablecategoryFields := schema.TableCategory{}.Fields()
 	_ = tablecategoryFields
 	// tablecategoryDescName is the schema descriptor for name field.
 	tablecategoryDescName := tablecategoryFields[0].Descriptor()
 	// tablecategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	tablecategory.NameValidator = tablecategoryDescName.Validators[0].(func(string) error)
-	// tablecategoryDescCreatedAt is the schema descriptor for created_at field.
-	tablecategoryDescCreatedAt := tablecategoryFields[2].Descriptor()
-	// tablecategory.DefaultCreatedAt holds the default value on creation for the created_at field.
-	tablecategory.DefaultCreatedAt = tablecategoryDescCreatedAt.Default.(func() time.Time)
-	// tablecategoryDescUpdatedAt is the schema descriptor for updated_at field.
-	tablecategoryDescUpdatedAt := tablecategoryFields[3].Descriptor()
-	// tablecategory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	tablecategory.DefaultUpdatedAt = tablecategoryDescUpdatedAt.Default.(func() time.Time)
-	// tablecategory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	tablecategory.UpdateDefaultUpdatedAt = tablecategoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

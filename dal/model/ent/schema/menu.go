@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
@@ -39,24 +38,6 @@ func (Menu) Fields() []ent.Field {
 			Comment("图片URL"),
 		field.Float("price").
 			Comment("价格"),
-		field.Time("created_at").
-			Default(time.Now).
-			Immutable().
-			SchemaType(map[string]string{
-				"postgres": "timestamptz",
-			}).
-			Comment("创建时间"),
-		field.Time("updated_at").
-			Default(time.Now).
-			UpdateDefault(time.Now).
-			SchemaType(map[string]string{
-				"postgres": "timestamptz",
-			}).
-			Comment("更新时间"),
-		field.Time("deleted_ts").
-			Optional().
-			Nillable().
-			Comment("删除时间"),
 	}
 }
 

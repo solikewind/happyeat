@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -113,12 +112,6 @@ func (_u *OrderUpdate) ClearRemark() *OrderUpdate {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *OrderUpdate) SetUpdatedAt(v time.Time) *OrderUpdate {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // SetTableID sets the "table" edge to the Table entity by ID.
 func (_u *OrderUpdate) SetTableID(id int) *OrderUpdate {
 	_u.mutation.SetTableID(id)
@@ -187,7 +180,6 @@ func (_u *OrderUpdate) RemoveItems(v ...*OrderItem) *OrderUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *OrderUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -210,14 +202,6 @@ func (_u *OrderUpdate) Exec(ctx context.Context) error {
 func (_u *OrderUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *OrderUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := order.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -278,9 +262,6 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.RemarkCleared() {
 		_spec.ClearField(order.FieldRemark, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.TableCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -459,12 +440,6 @@ func (_u *OrderUpdateOne) ClearRemark() *OrderUpdateOne {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *OrderUpdateOne) SetUpdatedAt(v time.Time) *OrderUpdateOne {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // SetTableID sets the "table" edge to the Table entity by ID.
 func (_u *OrderUpdateOne) SetTableID(id int) *OrderUpdateOne {
 	_u.mutation.SetTableID(id)
@@ -546,7 +521,6 @@ func (_u *OrderUpdateOne) Select(field string, fields ...string) *OrderUpdateOne
 
 // Save executes the query and returns the updated Order entity.
 func (_u *OrderUpdateOne) Save(ctx context.Context) (*Order, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -569,14 +543,6 @@ func (_u *OrderUpdateOne) Exec(ctx context.Context) error {
 func (_u *OrderUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *OrderUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := order.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -654,9 +620,6 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 	}
 	if _u.mutation.RemarkCleared() {
 		_spec.ClearField(order.FieldRemark, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.TableCleared() {
 		edge := &sqlgraph.EdgeSpec{

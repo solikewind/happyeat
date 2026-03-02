@@ -16,9 +16,6 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 		{Name: "image", Type: field.TypeString, Nullable: true, Size: 512, Comment: "图片URL"},
 		{Name: "price", Type: field.TypeFloat64, Comment: "价格"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "deleted_ts", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 		{Name: "menu_category_menus", Type: field.TypeInt},
 	}
 	// MenusTable holds the schema information for the "menus" table.
@@ -30,7 +27,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "menus_menu_categories_menus",
-				Columns:    []*schema.Column{MenusColumns[8]},
+				Columns:    []*schema.Column{MenusColumns[5]},
 				RefColumns: []*schema.Column{MenuCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -41,8 +38,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "分类名称"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
 	// MenuCategoriesTable holds the schema information for the "menu_categories" table.
 	MenuCategoriesTable = &schema.Table{
@@ -83,8 +78,6 @@ var (
 		{Name: "status", Type: field.TypeString, Size: 32, Comment: "created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消", Default: "created"},
 		{Name: "total_amount", Type: field.TypeFloat64, Comment: "订单总金额", Default: 0},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "table_orders", Type: field.TypeInt, Nullable: true},
 	}
 	// OrdersTable holds the schema information for the "orders" table.
@@ -96,7 +89,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "orders_tables_orders",
-				Columns:    []*schema.Column{OrdersColumns[8]},
+				Columns:    []*schema.Column{OrdersColumns[6]},
 				RefColumns: []*schema.Column{TablesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -142,8 +135,6 @@ var (
 		{Name: "status", Type: field.TypeString, Size: 32, Comment: "idle=空闲 using=使用中 reserved=预留 cleaning=清洁中", Default: "idle"},
 		{Name: "capacity", Type: field.TypeInt, Comment: "可坐人数", Default: 4},
 		{Name: "qr_code", Type: field.TypeString, Nullable: true, Size: 256, Comment: "二维码"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "table_category_tables", Type: field.TypeInt},
 	}
 	// TablesTable holds the schema information for the "tables" table.
@@ -155,7 +146,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tables_table_categories_tables",
-				Columns:    []*schema.Column{TablesColumns[7]},
+				Columns:    []*schema.Column{TablesColumns[5]},
 				RefColumns: []*schema.Column{TableCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -166,8 +157,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "类别名称"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
 	// TableCategoriesTable holds the schema information for the "table_categories" table.
 	TableCategoriesTable = &schema.Table{

@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -63,12 +62,6 @@ func (_u *TableCategoryUpdate) ClearDescription() *TableCategoryUpdate {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *TableCategoryUpdate) SetUpdatedAt(v time.Time) *TableCategoryUpdate {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // AddTableIDs adds the "tables" edge to the Table entity by IDs.
 func (_u *TableCategoryUpdate) AddTableIDs(ids ...int) *TableCategoryUpdate {
 	_u.mutation.AddTableIDs(ids...)
@@ -112,7 +105,6 @@ func (_u *TableCategoryUpdate) RemoveTables(v ...*Table) *TableCategoryUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *TableCategoryUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -135,14 +127,6 @@ func (_u *TableCategoryUpdate) Exec(ctx context.Context) error {
 func (_u *TableCategoryUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *TableCategoryUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := tablecategory.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -176,9 +160,6 @@ func (_u *TableCategoryUpdate) sqlSave(ctx context.Context) (_node int, err erro
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(tablecategory.FieldDescription, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(tablecategory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.TablesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -279,12 +260,6 @@ func (_u *TableCategoryUpdateOne) ClearDescription() *TableCategoryUpdateOne {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *TableCategoryUpdateOne) SetUpdatedAt(v time.Time) *TableCategoryUpdateOne {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // AddTableIDs adds the "tables" edge to the Table entity by IDs.
 func (_u *TableCategoryUpdateOne) AddTableIDs(ids ...int) *TableCategoryUpdateOne {
 	_u.mutation.AddTableIDs(ids...)
@@ -341,7 +316,6 @@ func (_u *TableCategoryUpdateOne) Select(field string, fields ...string) *TableC
 
 // Save executes the query and returns the updated TableCategory entity.
 func (_u *TableCategoryUpdateOne) Save(ctx context.Context) (*TableCategory, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -364,14 +338,6 @@ func (_u *TableCategoryUpdateOne) Exec(ctx context.Context) error {
 func (_u *TableCategoryUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *TableCategoryUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := tablecategory.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -422,9 +388,6 @@ func (_u *TableCategoryUpdateOne) sqlSave(ctx context.Context) (_node *TableCate
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(tablecategory.FieldDescription, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(tablecategory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.TablesCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -41,34 +40,6 @@ func (_c *TableCategoryCreate) SetNillableDescription(v *string) *TableCategoryC
 	return _c
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (_c *TableCategoryCreate) SetCreatedAt(v time.Time) *TableCategoryCreate {
-	_c.mutation.SetCreatedAt(v)
-	return _c
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *TableCategoryCreate) SetNillableCreatedAt(v *time.Time) *TableCategoryCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_c *TableCategoryCreate) SetUpdatedAt(v time.Time) *TableCategoryCreate {
-	_c.mutation.SetUpdatedAt(v)
-	return _c
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_c *TableCategoryCreate) SetNillableUpdatedAt(v *time.Time) *TableCategoryCreate {
-	if v != nil {
-		_c.SetUpdatedAt(*v)
-	}
-	return _c
-}
-
 // AddTableIDs adds the "tables" edge to the Table entity by IDs.
 func (_c *TableCategoryCreate) AddTableIDs(ids ...int) *TableCategoryCreate {
 	_c.mutation.AddTableIDs(ids...)
@@ -91,7 +62,6 @@ func (_c *TableCategoryCreate) Mutation() *TableCategoryMutation {
 
 // Save creates the TableCategory in the database.
 func (_c *TableCategoryCreate) Save(ctx context.Context) (*TableCategory, error) {
-	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -117,18 +87,6 @@ func (_c *TableCategoryCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (_c *TableCategoryCreate) defaults() {
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		v := tablecategory.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		v := tablecategory.DefaultUpdatedAt()
-		_c.mutation.SetUpdatedAt(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (_c *TableCategoryCreate) check() error {
 	if _, ok := _c.mutation.Name(); !ok {
@@ -138,12 +96,6 @@ func (_c *TableCategoryCreate) check() error {
 		if err := tablecategory.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "TableCategory.name": %w`, err)}
 		}
-	}
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "TableCategory.created_at"`)}
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "TableCategory.updated_at"`)}
 	}
 	return nil
 }
@@ -178,14 +130,6 @@ func (_c *TableCategoryCreate) createSpec() (*TableCategory, *sqlgraph.CreateSpe
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(tablecategory.FieldDescription, field.TypeString, value)
 		_node.Description = &value
-	}
-	if value, ok := _c.mutation.CreatedAt(); ok {
-		_spec.SetField(tablecategory.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(tablecategory.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
 	}
 	if nodes := _c.mutation.TablesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -224,7 +168,6 @@ func (_c *TableCategoryCreateBulk) Save(ctx context.Context) ([]*TableCategory, 
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TableCategoryMutation)
 				if !ok {

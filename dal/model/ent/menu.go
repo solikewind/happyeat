@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -26,12 +25,6 @@ type Menu struct {
 	Image *string `json:"image,omitempty"`
 	// 价格
 	Price float64 `json:"price,omitempty"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// 更新时间
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 删除时间
-	DeletedTs *time.Time `json:"deleted_ts,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuQuery when eager-loading is set.
 	Edges               MenuEdges `json:"edges"`
@@ -92,8 +85,6 @@ func (*Menu) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case menu.FieldName, menu.FieldDescription, menu.FieldImage:
 			values[i] = new(sql.NullString)
-		case menu.FieldCreatedAt, menu.FieldUpdatedAt, menu.FieldDeletedTs:
-			values[i] = new(sql.NullTime)
 		case menu.ForeignKeys[0]: // menu_category_menus
 			values[i] = new(sql.NullInt64)
 		default:
@@ -142,25 +133,6 @@ func (_m *Menu) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field price", values[i])
 			} else if value.Valid {
 				_m.Price = value.Float64
-			}
-		case menu.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				_m.CreatedAt = value.Time
-			}
-		case menu.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				_m.UpdatedAt = value.Time
-			}
-		case menu.FieldDeletedTs:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_ts", values[i])
-			} else if value.Valid {
-				_m.DeletedTs = new(time.Time)
-				*_m.DeletedTs = value.Time
 			}
 		case menu.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -235,17 +207,6 @@ func (_m *Menu) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Price))
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	if v := _m.DeletedTs; v != nil {
-		builder.WriteString("deleted_ts=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
 	builder.WriteByte(')')
 	return builder.String()
 }

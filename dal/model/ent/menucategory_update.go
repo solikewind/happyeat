@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -63,12 +62,6 @@ func (_u *MenuCategoryUpdate) ClearDescription() *MenuCategoryUpdate {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *MenuCategoryUpdate) SetUpdatedAt(v time.Time) *MenuCategoryUpdate {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // AddMenuIDs adds the "menus" edge to the Menu entity by IDs.
 func (_u *MenuCategoryUpdate) AddMenuIDs(ids ...int) *MenuCategoryUpdate {
 	_u.mutation.AddMenuIDs(ids...)
@@ -112,7 +105,6 @@ func (_u *MenuCategoryUpdate) RemoveMenus(v ...*Menu) *MenuCategoryUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *MenuCategoryUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -135,14 +127,6 @@ func (_u *MenuCategoryUpdate) Exec(ctx context.Context) error {
 func (_u *MenuCategoryUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *MenuCategoryUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := menucategory.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -176,9 +160,6 @@ func (_u *MenuCategoryUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(menucategory.FieldDescription, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(menucategory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.MenusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -279,12 +260,6 @@ func (_u *MenuCategoryUpdateOne) ClearDescription() *MenuCategoryUpdateOne {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *MenuCategoryUpdateOne) SetUpdatedAt(v time.Time) *MenuCategoryUpdateOne {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // AddMenuIDs adds the "menus" edge to the Menu entity by IDs.
 func (_u *MenuCategoryUpdateOne) AddMenuIDs(ids ...int) *MenuCategoryUpdateOne {
 	_u.mutation.AddMenuIDs(ids...)
@@ -341,7 +316,6 @@ func (_u *MenuCategoryUpdateOne) Select(field string, fields ...string) *MenuCat
 
 // Save executes the query and returns the updated MenuCategory entity.
 func (_u *MenuCategoryUpdateOne) Save(ctx context.Context) (*MenuCategory, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -364,14 +338,6 @@ func (_u *MenuCategoryUpdateOne) Exec(ctx context.Context) error {
 func (_u *MenuCategoryUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *MenuCategoryUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := menucategory.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -422,9 +388,6 @@ func (_u *MenuCategoryUpdateOne) sqlSave(ctx context.Context) (_node *MenuCatego
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(menucategory.FieldDescription, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(menucategory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.MenusCleared() {
 		edge := &sqlgraph.EdgeSpec{

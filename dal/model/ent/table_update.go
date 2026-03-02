@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -99,12 +98,6 @@ func (_u *TableUpdate) ClearQrCode() *TableUpdate {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *TableUpdate) SetUpdatedAt(v time.Time) *TableUpdate {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // SetCategoryID sets the "category" edge to the TableCategory entity by ID.
 func (_u *TableUpdate) SetCategoryID(id int) *TableUpdate {
 	_u.mutation.SetCategoryID(id)
@@ -165,7 +158,6 @@ func (_u *TableUpdate) RemoveOrders(v ...*Order) *TableUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *TableUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -188,14 +180,6 @@ func (_u *TableUpdate) Exec(ctx context.Context) error {
 func (_u *TableUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *TableUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := table.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -251,9 +235,6 @@ func (_u *TableUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.QrCodeCleared() {
 		_spec.ClearField(table.FieldQrCode, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(table.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -418,12 +399,6 @@ func (_u *TableUpdateOne) ClearQrCode() *TableUpdateOne {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *TableUpdateOne) SetUpdatedAt(v time.Time) *TableUpdateOne {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // SetCategoryID sets the "category" edge to the TableCategory entity by ID.
 func (_u *TableUpdateOne) SetCategoryID(id int) *TableUpdateOne {
 	_u.mutation.SetCategoryID(id)
@@ -497,7 +472,6 @@ func (_u *TableUpdateOne) Select(field string, fields ...string) *TableUpdateOne
 
 // Save executes the query and returns the updated Table entity.
 func (_u *TableUpdateOne) Save(ctx context.Context) (*Table, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -520,14 +494,6 @@ func (_u *TableUpdateOne) Exec(ctx context.Context) error {
 func (_u *TableUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *TableUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := table.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -600,9 +566,6 @@ func (_u *TableUpdateOne) sqlSave(ctx context.Context) (_node *Table, err error)
 	}
 	if _u.mutation.QrCodeCleared() {
 		_spec.ClearField(table.FieldQrCode, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(table.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

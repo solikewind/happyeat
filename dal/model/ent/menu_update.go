@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -106,32 +105,6 @@ func (_u *MenuUpdate) AddPrice(v float64) *MenuUpdate {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *MenuUpdate) SetUpdatedAt(v time.Time) *MenuUpdate {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// SetDeletedTs sets the "deleted_ts" field.
-func (_u *MenuUpdate) SetDeletedTs(v time.Time) *MenuUpdate {
-	_u.mutation.SetDeletedTs(v)
-	return _u
-}
-
-// SetNillableDeletedTs sets the "deleted_ts" field if the given value is not nil.
-func (_u *MenuUpdate) SetNillableDeletedTs(v *time.Time) *MenuUpdate {
-	if v != nil {
-		_u.SetDeletedTs(*v)
-	}
-	return _u
-}
-
-// ClearDeletedTs clears the value of the "deleted_ts" field.
-func (_u *MenuUpdate) ClearDeletedTs() *MenuUpdate {
-	_u.mutation.ClearDeletedTs()
-	return _u
-}
-
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
 func (_u *MenuUpdate) SetCategoryID(id int) *MenuUpdate {
 	_u.mutation.SetCategoryID(id)
@@ -228,7 +201,6 @@ func (_u *MenuUpdate) RemoveOrderItems(v ...*OrderItem) *MenuUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *MenuUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -251,14 +223,6 @@ func (_u *MenuUpdate) Exec(ctx context.Context) error {
 func (_u *MenuUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *MenuUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := menu.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -312,15 +276,6 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(menu.FieldPrice, field.TypeFloat64, value)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedTs(); ok {
-		_spec.SetField(menu.FieldDeletedTs, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedTsCleared() {
-		_spec.ClearField(menu.FieldDeletedTs, field.TypeTime)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -536,32 +491,6 @@ func (_u *MenuUpdateOne) AddPrice(v float64) *MenuUpdateOne {
 	return _u
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *MenuUpdateOne) SetUpdatedAt(v time.Time) *MenuUpdateOne {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// SetDeletedTs sets the "deleted_ts" field.
-func (_u *MenuUpdateOne) SetDeletedTs(v time.Time) *MenuUpdateOne {
-	_u.mutation.SetDeletedTs(v)
-	return _u
-}
-
-// SetNillableDeletedTs sets the "deleted_ts" field if the given value is not nil.
-func (_u *MenuUpdateOne) SetNillableDeletedTs(v *time.Time) *MenuUpdateOne {
-	if v != nil {
-		_u.SetDeletedTs(*v)
-	}
-	return _u
-}
-
-// ClearDeletedTs clears the value of the "deleted_ts" field.
-func (_u *MenuUpdateOne) ClearDeletedTs() *MenuUpdateOne {
-	_u.mutation.ClearDeletedTs()
-	return _u
-}
-
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
 func (_u *MenuUpdateOne) SetCategoryID(id int) *MenuUpdateOne {
 	_u.mutation.SetCategoryID(id)
@@ -671,7 +600,6 @@ func (_u *MenuUpdateOne) Select(field string, fields ...string) *MenuUpdateOne {
 
 // Save executes the query and returns the updated Menu entity.
 func (_u *MenuUpdateOne) Save(ctx context.Context) (*Menu, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -694,14 +622,6 @@ func (_u *MenuUpdateOne) Exec(ctx context.Context) error {
 func (_u *MenuUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *MenuUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := menu.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -772,15 +692,6 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 	}
 	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(menu.FieldPrice, field.TypeFloat64, value)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(menu.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedTs(); ok {
-		_spec.SetField(menu.FieldDeletedTs, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedTsCleared() {
-		_spec.ClearField(menu.FieldDeletedTs, field.TypeTime)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -50,9 +49,6 @@ type MenuMutation struct {
 	image              *string
 	price              *float64
 	addprice           *float64
-	created_at         *time.Time
-	updated_at         *time.Time
-	deleted_ts         *time.Time
 	clearedFields      map[string]struct{}
 	category           *int
 	clearedcategory    bool
@@ -355,127 +351,6 @@ func (m *MenuMutation) ResetPrice() {
 	m.addprice = nil
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *MenuMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *MenuMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the Menu entity.
-// If the Menu object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MenuMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *MenuMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *MenuMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *MenuMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the Menu entity.
-// If the Menu object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MenuMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *MenuMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
-// SetDeletedTs sets the "deleted_ts" field.
-func (m *MenuMutation) SetDeletedTs(t time.Time) {
-	m.deleted_ts = &t
-}
-
-// DeletedTs returns the value of the "deleted_ts" field in the mutation.
-func (m *MenuMutation) DeletedTs() (r time.Time, exists bool) {
-	v := m.deleted_ts
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedTs returns the old "deleted_ts" field's value of the Menu entity.
-// If the Menu object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MenuMutation) OldDeletedTs(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedTs is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedTs requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedTs: %w", err)
-	}
-	return oldValue.DeletedTs, nil
-}
-
-// ClearDeletedTs clears the value of the "deleted_ts" field.
-func (m *MenuMutation) ClearDeletedTs() {
-	m.deleted_ts = nil
-	m.clearedFields[menu.FieldDeletedTs] = struct{}{}
-}
-
-// DeletedTsCleared returns if the "deleted_ts" field was cleared in this mutation.
-func (m *MenuMutation) DeletedTsCleared() bool {
-	_, ok := m.clearedFields[menu.FieldDeletedTs]
-	return ok
-}
-
-// ResetDeletedTs resets all changes to the "deleted_ts" field.
-func (m *MenuMutation) ResetDeletedTs() {
-	m.deleted_ts = nil
-	delete(m.clearedFields, menu.FieldDeletedTs)
-}
-
 // SetCategoryID sets the "category" edge to the MenuCategory entity by id.
 func (m *MenuMutation) SetCategoryID(id int) {
 	m.category = &id
@@ -657,7 +532,7 @@ func (m *MenuMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 4)
 	if m.name != nil {
 		fields = append(fields, menu.FieldName)
 	}
@@ -669,15 +544,6 @@ func (m *MenuMutation) Fields() []string {
 	}
 	if m.price != nil {
 		fields = append(fields, menu.FieldPrice)
-	}
-	if m.created_at != nil {
-		fields = append(fields, menu.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, menu.FieldUpdatedAt)
-	}
-	if m.deleted_ts != nil {
-		fields = append(fields, menu.FieldDeletedTs)
 	}
 	return fields
 }
@@ -695,12 +561,6 @@ func (m *MenuMutation) Field(name string) (ent.Value, bool) {
 		return m.Image()
 	case menu.FieldPrice:
 		return m.Price()
-	case menu.FieldCreatedAt:
-		return m.CreatedAt()
-	case menu.FieldUpdatedAt:
-		return m.UpdatedAt()
-	case menu.FieldDeletedTs:
-		return m.DeletedTs()
 	}
 	return nil, false
 }
@@ -718,12 +578,6 @@ func (m *MenuMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldImage(ctx)
 	case menu.FieldPrice:
 		return m.OldPrice(ctx)
-	case menu.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case menu.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
-	case menu.FieldDeletedTs:
-		return m.OldDeletedTs(ctx)
 	}
 	return nil, fmt.Errorf("unknown Menu field %s", name)
 }
@@ -760,27 +614,6 @@ func (m *MenuMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPrice(v)
-		return nil
-	case menu.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case menu.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
-		return nil
-	case menu.FieldDeletedTs:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedTs(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Menu field %s", name)
@@ -833,9 +666,6 @@ func (m *MenuMutation) ClearedFields() []string {
 	if m.FieldCleared(menu.FieldImage) {
 		fields = append(fields, menu.FieldImage)
 	}
-	if m.FieldCleared(menu.FieldDeletedTs) {
-		fields = append(fields, menu.FieldDeletedTs)
-	}
 	return fields
 }
 
@@ -856,9 +686,6 @@ func (m *MenuMutation) ClearField(name string) error {
 	case menu.FieldImage:
 		m.ClearImage()
 		return nil
-	case menu.FieldDeletedTs:
-		m.ClearDeletedTs()
-		return nil
 	}
 	return fmt.Errorf("unknown Menu nullable field %s", name)
 }
@@ -878,15 +705,6 @@ func (m *MenuMutation) ResetField(name string) error {
 		return nil
 	case menu.FieldPrice:
 		m.ResetPrice()
-		return nil
-	case menu.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case menu.FieldUpdatedAt:
-		m.ResetUpdatedAt()
-		return nil
-	case menu.FieldDeletedTs:
-		m.ResetDeletedTs()
 		return nil
 	}
 	return fmt.Errorf("unknown Menu field %s", name)
@@ -1028,8 +846,6 @@ type MenuCategoryMutation struct {
 	id            *int
 	name          *string
 	description   *string
-	created_at    *time.Time
-	updated_at    *time.Time
 	clearedFields map[string]struct{}
 	menus         map[int]struct{}
 	removedmenus  map[int]struct{}
@@ -1222,78 +1038,6 @@ func (m *MenuCategoryMutation) ResetDescription() {
 	delete(m.clearedFields, menucategory.FieldDescription)
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *MenuCategoryMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *MenuCategoryMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the MenuCategory entity.
-// If the MenuCategory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MenuCategoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *MenuCategoryMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *MenuCategoryMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *MenuCategoryMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the MenuCategory entity.
-// If the MenuCategory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MenuCategoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *MenuCategoryMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
 // AddMenuIDs adds the "menus" edge to the Menu entity by ids.
 func (m *MenuCategoryMutation) AddMenuIDs(ids ...int) {
 	if m.menus == nil {
@@ -1382,18 +1126,12 @@ func (m *MenuCategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuCategoryMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 2)
 	if m.name != nil {
 		fields = append(fields, menucategory.FieldName)
 	}
 	if m.description != nil {
 		fields = append(fields, menucategory.FieldDescription)
-	}
-	if m.created_at != nil {
-		fields = append(fields, menucategory.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, menucategory.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -1407,10 +1145,6 @@ func (m *MenuCategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case menucategory.FieldDescription:
 		return m.Description()
-	case menucategory.FieldCreatedAt:
-		return m.CreatedAt()
-	case menucategory.FieldUpdatedAt:
-		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -1424,10 +1158,6 @@ func (m *MenuCategoryMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldName(ctx)
 	case menucategory.FieldDescription:
 		return m.OldDescription(ctx)
-	case menucategory.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case menucategory.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown MenuCategory field %s", name)
 }
@@ -1450,20 +1180,6 @@ func (m *MenuCategoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
-		return nil
-	case menucategory.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case menucategory.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory field %s", name)
@@ -1528,12 +1244,6 @@ func (m *MenuCategoryMutation) ResetField(name string) error {
 		return nil
 	case menucategory.FieldDescription:
 		m.ResetDescription()
-		return nil
-	case menucategory.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case menucategory.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory field %s", name)
@@ -2259,8 +1969,6 @@ type OrderMutation struct {
 	total_amount    *float64
 	addtotal_amount *float64
 	remark          *string
-	created_at      *time.Time
-	updated_at      *time.Time
 	clearedFields   map[string]struct{}
 	table           *int
 	clearedtable    bool
@@ -2583,78 +2291,6 @@ func (m *OrderMutation) ResetRemark() {
 	delete(m.clearedFields, order.FieldRemark)
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *OrderMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *OrderMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the Order entity.
-// If the Order object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *OrderMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *OrderMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *OrderMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the Order entity.
-// If the Order object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *OrderMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
 // SetTableID sets the "table" edge to the Table entity by id.
 func (m *OrderMutation) SetTableID(id int) {
 	m.table = &id
@@ -2782,7 +2418,7 @@ func (m *OrderMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 5)
 	if m.order_no != nil {
 		fields = append(fields, order.FieldOrderNo)
 	}
@@ -2797,12 +2433,6 @@ func (m *OrderMutation) Fields() []string {
 	}
 	if m.remark != nil {
 		fields = append(fields, order.FieldRemark)
-	}
-	if m.created_at != nil {
-		fields = append(fields, order.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, order.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -2822,10 +2452,6 @@ func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 		return m.TotalAmount()
 	case order.FieldRemark:
 		return m.Remark()
-	case order.FieldCreatedAt:
-		return m.CreatedAt()
-	case order.FieldUpdatedAt:
-		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -2845,10 +2471,6 @@ func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldTotalAmount(ctx)
 	case order.FieldRemark:
 		return m.OldRemark(ctx)
-	case order.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case order.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Order field %s", name)
 }
@@ -2892,20 +2514,6 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRemark(v)
-		return nil
-	case order.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case order.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Order field %s", name)
@@ -2994,12 +2602,6 @@ func (m *OrderMutation) ResetField(name string) error {
 		return nil
 	case order.FieldRemark:
 		m.ResetRemark()
-		return nil
-	case order.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case order.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Order field %s", name)
@@ -3997,8 +3599,6 @@ type TableMutation struct {
 	capacity        *int
 	addcapacity     *int
 	qr_code         *string
-	created_at      *time.Time
-	updated_at      *time.Time
 	clearedFields   map[string]struct{}
 	category        *int
 	clearedcategory bool
@@ -4285,78 +3885,6 @@ func (m *TableMutation) ResetQrCode() {
 	delete(m.clearedFields, table.FieldQrCode)
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *TableMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *TableMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the Table entity.
-// If the Table object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TableMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *TableMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *TableMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *TableMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the Table entity.
-// If the Table object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TableMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *TableMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
 // SetCategoryID sets the "category" edge to the TableCategory entity by id.
 func (m *TableMutation) SetCategoryID(id int) {
 	m.category = &id
@@ -4484,7 +4012,7 @@ func (m *TableMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TableMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 4)
 	if m.code != nil {
 		fields = append(fields, table.FieldCode)
 	}
@@ -4496,12 +4024,6 @@ func (m *TableMutation) Fields() []string {
 	}
 	if m.qr_code != nil {
 		fields = append(fields, table.FieldQrCode)
-	}
-	if m.created_at != nil {
-		fields = append(fields, table.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, table.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -4519,10 +4041,6 @@ func (m *TableMutation) Field(name string) (ent.Value, bool) {
 		return m.Capacity()
 	case table.FieldQrCode:
 		return m.QrCode()
-	case table.FieldCreatedAt:
-		return m.CreatedAt()
-	case table.FieldUpdatedAt:
-		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -4540,10 +4058,6 @@ func (m *TableMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldCapacity(ctx)
 	case table.FieldQrCode:
 		return m.OldQrCode(ctx)
-	case table.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case table.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Table field %s", name)
 }
@@ -4580,20 +4094,6 @@ func (m *TableMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetQrCode(v)
-		return nil
-	case table.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case table.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Table field %s", name)
@@ -4679,12 +4179,6 @@ func (m *TableMutation) ResetField(name string) error {
 		return nil
 	case table.FieldQrCode:
 		m.ResetQrCode()
-		return nil
-	case table.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case table.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Table field %s", name)
@@ -4800,8 +4294,6 @@ type TableCategoryMutation struct {
 	id            *int
 	name          *string
 	description   *string
-	created_at    *time.Time
-	updated_at    *time.Time
 	clearedFields map[string]struct{}
 	tables        map[int]struct{}
 	removedtables map[int]struct{}
@@ -4994,78 +4486,6 @@ func (m *TableCategoryMutation) ResetDescription() {
 	delete(m.clearedFields, tablecategory.FieldDescription)
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *TableCategoryMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *TableCategoryMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the TableCategory entity.
-// If the TableCategory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TableCategoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *TableCategoryMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *TableCategoryMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *TableCategoryMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the TableCategory entity.
-// If the TableCategory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TableCategoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *TableCategoryMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
 // AddTableIDs adds the "tables" edge to the Table entity by ids.
 func (m *TableCategoryMutation) AddTableIDs(ids ...int) {
 	if m.tables == nil {
@@ -5154,18 +4574,12 @@ func (m *TableCategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TableCategoryMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 2)
 	if m.name != nil {
 		fields = append(fields, tablecategory.FieldName)
 	}
 	if m.description != nil {
 		fields = append(fields, tablecategory.FieldDescription)
-	}
-	if m.created_at != nil {
-		fields = append(fields, tablecategory.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, tablecategory.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -5179,10 +4593,6 @@ func (m *TableCategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case tablecategory.FieldDescription:
 		return m.Description()
-	case tablecategory.FieldCreatedAt:
-		return m.CreatedAt()
-	case tablecategory.FieldUpdatedAt:
-		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -5196,10 +4606,6 @@ func (m *TableCategoryMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldName(ctx)
 	case tablecategory.FieldDescription:
 		return m.OldDescription(ctx)
-	case tablecategory.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case tablecategory.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown TableCategory field %s", name)
 }
@@ -5222,20 +4628,6 @@ func (m *TableCategoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
-		return nil
-	case tablecategory.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case tablecategory.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown TableCategory field %s", name)
@@ -5300,12 +4692,6 @@ func (m *TableCategoryMutation) ResetField(name string) error {
 		return nil
 	case tablecategory.FieldDescription:
 		m.ResetDescription()
-		return nil
-	case tablecategory.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case tablecategory.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown TableCategory field %s", name)

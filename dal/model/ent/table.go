@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -26,10 +25,6 @@ type Table struct {
 	Capacity int `json:"capacity,omitempty"`
 	// 二维码
 	QrCode *string `json:"qr_code,omitempty"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// 更新时间
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TableQuery when eager-loading is set.
 	Edges                 TableEdges `json:"edges"`
@@ -77,8 +72,6 @@ func (*Table) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case table.FieldCode, table.FieldStatus, table.FieldQrCode:
 			values[i] = new(sql.NullString)
-		case table.FieldCreatedAt, table.FieldUpdatedAt:
-			values[i] = new(sql.NullTime)
 		case table.ForeignKeys[0]: // table_category_tables
 			values[i] = new(sql.NullInt64)
 		default:
@@ -126,18 +119,6 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.QrCode = new(string)
 				*_m.QrCode = value.String
-			}
-		case table.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				_m.CreatedAt = value.Time
-			}
-		case table.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				_m.UpdatedAt = value.Time
 			}
 		case table.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -205,12 +186,6 @@ func (_m *Table) String() string {
 		builder.WriteString("qr_code=")
 		builder.WriteString(*v)
 	}
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }
