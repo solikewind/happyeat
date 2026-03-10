@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,6 +19,48 @@ type MenuSpecCreate struct {
 	config
 	mutation *MenuSpecMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *MenuSpecCreate) SetCreatedAt(v time.Time) *MenuSpecCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *MenuSpecCreate) SetNillableCreatedAt(v *time.Time) *MenuSpecCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *MenuSpecCreate) SetUpdatedAt(v time.Time) *MenuSpecCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *MenuSpecCreate) SetNillableUpdatedAt(v *time.Time) *MenuSpecCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_c *MenuSpecCreate) SetDeleteTs(v int64) *MenuSpecCreate {
+	_c.mutation.SetDeleteTs(v)
+	return _c
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_c *MenuSpecCreate) SetNillableDeleteTs(v *int64) *MenuSpecCreate {
+	if v != nil {
+		_c.SetDeleteTs(*v)
+	}
+	return _c
 }
 
 // SetSpecType sets the "spec_type" field.
@@ -78,7 +121,9 @@ func (_c *MenuSpecCreate) Mutation() *MenuSpecMutation {
 
 // Save creates the MenuSpec in the database.
 func (_c *MenuSpecCreate) Save(ctx context.Context) (*MenuSpec, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -105,7 +150,25 @@ func (_c *MenuSpecCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *MenuSpecCreate) defaults() {
+func (_c *MenuSpecCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if menuspec.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menuspec.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
+		v := menuspec.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if menuspec.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menuspec.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := menuspec.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		v := menuspec.DefaultDeleteTs
+		_c.mutation.SetDeleteTs(v)
+	}
 	if _, ok := _c.mutation.PriceDelta(); !ok {
 		v := menuspec.DefaultPriceDelta
 		_c.mutation.SetPriceDelta(v)
@@ -114,10 +177,20 @@ func (_c *MenuSpecCreate) defaults() {
 		v := menuspec.DefaultSort
 		_c.mutation.SetSort(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *MenuSpecCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MenuSpec.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "MenuSpec.updated_at"`)}
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "MenuSpec.delete_ts"`)}
+	}
 	if _, ok := _c.mutation.SpecType(); !ok {
 		return &ValidationError{Name: "spec_type", err: errors.New(`ent: missing required field "MenuSpec.spec_type"`)}
 	}
@@ -169,6 +242,18 @@ func (_c *MenuSpecCreate) createSpec() (*MenuSpec, *sqlgraph.CreateSpec) {
 		_node = &MenuSpec{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(menuspec.Table, sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(menuspec.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(menuspec.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeleteTs(); ok {
+		_spec.SetField(menuspec.FieldDeleteTs, field.TypeInt64, value)
+		_node.DeleteTs = value
+	}
 	if value, ok := _c.mutation.SpecType(); ok {
 		_spec.SetField(menuspec.FieldSpecType, field.TypeString, value)
 		_node.SpecType = value

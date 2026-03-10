@@ -336,12 +336,12 @@ func (_q *OrderQuery) WithItems(opts ...func(*OrderItemQuery)) *OrderQuery {
 // Example:
 //
 //	var v []struct {
-//		OrderNo string `json:"order_no,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Order.Query().
-//		GroupBy(order.FieldOrderNo).
+//		GroupBy(order.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *OrderQuery) GroupBy(field string, fields ...string) *OrderGroupBy {
@@ -359,11 +359,11 @@ func (_q *OrderQuery) GroupBy(field string, fields ...string) *OrderGroupBy {
 // Example:
 //
 //	var v []struct {
-//		OrderNo string `json:"order_no,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Order.Query().
-//		Select(order.FieldOrderNo).
+//		Select(order.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (_q *OrderQuery) Select(fields ...string) *OrderSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

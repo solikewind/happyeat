@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -18,6 +19,12 @@ type OrderItem struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 删除时间戳
+	DeleteTs int64 `json:"delete_ts,omitempty"`
 	// 菜品名称快照
 	MenuName string `json:"menu_name,omitempty"`
 	// 数量
@@ -78,10 +85,12 @@ func (*OrderItem) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case orderitem.FieldUnitPrice, orderitem.FieldAmount:
 			values[i] = new(sql.NullFloat64)
-		case orderitem.FieldID, orderitem.FieldQuantity, orderitem.FieldSort:
+		case orderitem.FieldID, orderitem.FieldDeleteTs, orderitem.FieldQuantity, orderitem.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case orderitem.FieldMenuName, orderitem.FieldSpecInfo:
 			values[i] = new(sql.NullString)
+		case orderitem.FieldCreatedAt, orderitem.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case orderitem.ForeignKeys[0]: // menu_order_items
 			values[i] = new(sql.NullInt64)
 		case orderitem.ForeignKeys[1]: // order_items
@@ -107,6 +116,24 @@ func (_m *OrderItem) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int(value.Int64)
+		case orderitem.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				_m.CreatedAt = value.Time
+			}
+		case orderitem.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				_m.UpdatedAt = value.Time
+			}
+		case orderitem.FieldDeleteTs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field delete_ts", values[i])
+			} else if value.Valid {
+				_m.DeleteTs = value.Int64
+			}
 		case orderitem.FieldMenuName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field menu_name", values[i])
@@ -204,6 +231,15 @@ func (_m *OrderItem) String() string {
 	var builder strings.Builder
 	builder.WriteString("OrderItem(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("delete_ts=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
+	builder.WriteString(", ")
 	builder.WriteString("menu_name=")
 	builder.WriteString(_m.MenuName)
 	builder.WriteString(", ")

@@ -212,6 +212,9 @@ func (_c *MenuCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Menu.updated_at"`)}
 	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "Menu.delete_ts"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Menu.name"`)}
 	}

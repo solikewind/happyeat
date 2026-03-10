@@ -564,12 +564,14 @@ func (c *MenuCategoryClient) QueryMenus(_m *MenuCategory) *MenuQuery {
 
 // Hooks returns the client hooks.
 func (c *MenuCategoryClient) Hooks() []Hook {
-	return c.hooks.MenuCategory
+	hooks := c.hooks.MenuCategory
+	return append(hooks[:len(hooks):len(hooks)], menucategory.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *MenuCategoryClient) Interceptors() []Interceptor {
-	return c.inters.MenuCategory
+	inters := c.inters.MenuCategory
+	return append(inters[:len(inters):len(inters)], menucategory.Interceptors[:]...)
 }
 
 func (c *MenuCategoryClient) mutate(ctx context.Context, m *MenuCategoryMutation) (Value, error) {
@@ -713,12 +715,14 @@ func (c *MenuSpecClient) QueryMenu(_m *MenuSpec) *MenuQuery {
 
 // Hooks returns the client hooks.
 func (c *MenuSpecClient) Hooks() []Hook {
-	return c.hooks.MenuSpec
+	hooks := c.hooks.MenuSpec
+	return append(hooks[:len(hooks):len(hooks)], menuspec.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *MenuSpecClient) Interceptors() []Interceptor {
-	return c.inters.MenuSpec
+	inters := c.inters.MenuSpec
+	return append(inters[:len(inters):len(inters)], menuspec.Interceptors[:]...)
 }
 
 func (c *MenuSpecClient) mutate(ctx context.Context, m *MenuSpecMutation) (Value, error) {
@@ -878,12 +882,14 @@ func (c *OrderClient) QueryItems(_m *Order) *OrderItemQuery {
 
 // Hooks returns the client hooks.
 func (c *OrderClient) Hooks() []Hook {
-	return c.hooks.Order
+	hooks := c.hooks.Order
+	return append(hooks[:len(hooks):len(hooks)], order.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *OrderClient) Interceptors() []Interceptor {
-	return c.inters.Order
+	inters := c.inters.Order
+	return append(inters[:len(inters):len(inters)], order.Interceptors[:]...)
 }
 
 func (c *OrderClient) mutate(ctx context.Context, m *OrderMutation) (Value, error) {
@@ -1043,12 +1049,14 @@ func (c *OrderItemClient) QueryMenu(_m *OrderItem) *MenuQuery {
 
 // Hooks returns the client hooks.
 func (c *OrderItemClient) Hooks() []Hook {
-	return c.hooks.OrderItem
+	hooks := c.hooks.OrderItem
+	return append(hooks[:len(hooks):len(hooks)], orderitem.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *OrderItemClient) Interceptors() []Interceptor {
-	return c.inters.OrderItem
+	inters := c.inters.OrderItem
+	return append(inters[:len(inters):len(inters)], orderitem.Interceptors[:]...)
 }
 
 func (c *OrderItemClient) mutate(ctx context.Context, m *OrderItemMutation) (Value, error) {
@@ -1208,12 +1216,14 @@ func (c *TableClient) QueryOrders(_m *Table) *OrderQuery {
 
 // Hooks returns the client hooks.
 func (c *TableClient) Hooks() []Hook {
-	return c.hooks.Table
+	hooks := c.hooks.Table
+	return append(hooks[:len(hooks):len(hooks)], table.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *TableClient) Interceptors() []Interceptor {
-	return c.inters.Table
+	inters := c.inters.Table
+	return append(inters[:len(inters):len(inters)], table.Interceptors[:]...)
 }
 
 func (c *TableClient) mutate(ctx context.Context, m *TableMutation) (Value, error) {
@@ -1357,12 +1367,14 @@ func (c *TableCategoryClient) QueryTables(_m *TableCategory) *TableQuery {
 
 // Hooks returns the client hooks.
 func (c *TableCategoryClient) Hooks() []Hook {
-	return c.hooks.TableCategory
+	hooks := c.hooks.TableCategory
+	return append(hooks[:len(hooks):len(hooks)], tablecategory.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *TableCategoryClient) Interceptors() []Interceptor {
-	return c.inters.TableCategory
+	inters := c.inters.TableCategory
+	return append(inters[:len(inters):len(inters)], tablecategory.Interceptors[:]...)
 }
 
 func (c *TableCategoryClient) mutate(ctx context.Context, m *TableCategoryMutation) (Value, error) {

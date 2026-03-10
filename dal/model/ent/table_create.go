@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,6 +20,48 @@ type TableCreate struct {
 	config
 	mutation *TableMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *TableCreate) SetCreatedAt(v time.Time) *TableCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *TableCreate) SetNillableCreatedAt(v *time.Time) *TableCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *TableCreate) SetUpdatedAt(v time.Time) *TableCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *TableCreate) SetNillableUpdatedAt(v *time.Time) *TableCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_c *TableCreate) SetDeleteTs(v int64) *TableCreate {
+	_c.mutation.SetDeleteTs(v)
+	return _c
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_c *TableCreate) SetNillableDeleteTs(v *int64) *TableCreate {
+	if v != nil {
+		_c.SetDeleteTs(*v)
+	}
+	return _c
 }
 
 // SetCode sets the "code" field.
@@ -102,7 +145,9 @@ func (_c *TableCreate) Mutation() *TableMutation {
 
 // Save creates the Table in the database.
 func (_c *TableCreate) Save(ctx context.Context) (*Table, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -129,7 +174,25 @@ func (_c *TableCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *TableCreate) defaults() {
+func (_c *TableCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if table.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized table.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
+		v := table.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if table.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized table.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := table.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		v := table.DefaultDeleteTs
+		_c.mutation.SetDeleteTs(v)
+	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := table.DefaultStatus
 		_c.mutation.SetStatus(v)
@@ -138,10 +201,20 @@ func (_c *TableCreate) defaults() {
 		v := table.DefaultCapacity
 		_c.mutation.SetCapacity(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *TableCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Table.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Table.updated_at"`)}
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "Table.delete_ts"`)}
+	}
 	if _, ok := _c.mutation.Code(); !ok {
 		return &ValidationError{Name: "code", err: errors.New(`ent: missing required field "Table.code"`)}
 	}
@@ -195,6 +268,18 @@ func (_c *TableCreate) createSpec() (*Table, *sqlgraph.CreateSpec) {
 		_node = &Table{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(table.Table, sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(table.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(table.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeleteTs(); ok {
+		_spec.SetField(table.FieldDeleteTs, field.TypeInt64, value)
+		_node.DeleteTs = value
+	}
 	if value, ok := _c.mutation.Code(); ok {
 		_spec.SetField(table.FieldCode, field.TypeString, value)
 		_node.Code = value

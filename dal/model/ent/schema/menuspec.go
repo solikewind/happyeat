@@ -13,6 +13,13 @@ type MenuSpec struct {
 	ent.Schema
 }
 
+func (MenuSpec) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+		SoftDeleteMixin{},
+	}
+}
+
 func (MenuSpec) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),

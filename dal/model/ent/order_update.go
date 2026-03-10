@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -26,6 +27,33 @@ type OrderUpdate struct {
 // Where appends a list predicates to the OrderUpdate builder.
 func (_u *OrderUpdate) Where(ps ...predicate.Order) *OrderUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *OrderUpdate) SetUpdatedAt(v time.Time) *OrderUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *OrderUpdate) SetDeleteTs(v int64) *OrderUpdate {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *OrderUpdate) SetNillableDeleteTs(v *int64) *OrderUpdate {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *OrderUpdate) AddDeleteTs(v int64) *OrderUpdate {
+	_u.mutation.AddDeleteTs(v)
 	return _u
 }
 
@@ -180,6 +208,9 @@ func (_u *OrderUpdate) RemoveItems(v ...*OrderItem) *OrderUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *OrderUpdate) Save(ctx context.Context) (int, error) {
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -203,6 +234,18 @@ func (_u *OrderUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *OrderUpdate) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if order.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized order.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := order.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -241,6 +284,15 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(order.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(order.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.OrderNo(); ok {
 		_spec.SetField(order.FieldOrderNo, field.TypeString, value)
@@ -355,6 +407,33 @@ type OrderUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *OrderMutation
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *OrderUpdateOne) SetUpdatedAt(v time.Time) *OrderUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *OrderUpdateOne) SetDeleteTs(v int64) *OrderUpdateOne {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *OrderUpdateOne) SetNillableDeleteTs(v *int64) *OrderUpdateOne {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *OrderUpdateOne) AddDeleteTs(v int64) *OrderUpdateOne {
+	_u.mutation.AddDeleteTs(v)
+	return _u
 }
 
 // SetOrderNo sets the "order_no" field.
@@ -521,6 +600,9 @@ func (_u *OrderUpdateOne) Select(field string, fields ...string) *OrderUpdateOne
 
 // Save executes the query and returns the updated Order entity.
 func (_u *OrderUpdateOne) Save(ctx context.Context) (*Order, error) {
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -544,6 +626,18 @@ func (_u *OrderUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *OrderUpdateOne) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if order.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized order.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := order.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -599,6 +693,15 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(order.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(order.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.OrderNo(); ok {
 		_spec.SetField(order.FieldOrderNo, field.TypeString, value)

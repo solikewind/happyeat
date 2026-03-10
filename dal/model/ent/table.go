@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -17,6 +18,12 @@ type Table struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 删除时间戳
+	DeleteTs int64 `json:"delete_ts,omitempty"`
 	// 桌号
 	Code string `json:"code,omitempty"`
 	// idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
@@ -68,10 +75,12 @@ func (*Table) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case table.FieldID, table.FieldCapacity:
+		case table.FieldID, table.FieldDeleteTs, table.FieldCapacity:
 			values[i] = new(sql.NullInt64)
 		case table.FieldCode, table.FieldStatus, table.FieldQrCode:
 			values[i] = new(sql.NullString)
+		case table.FieldCreatedAt, table.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case table.ForeignKeys[0]: // table_category_tables
 			values[i] = new(sql.NullInt64)
 		default:
@@ -95,6 +104,24 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int(value.Int64)
+		case table.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				_m.CreatedAt = value.Time
+			}
+		case table.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				_m.UpdatedAt = value.Time
+			}
+		case table.FieldDeleteTs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field delete_ts", values[i])
+			} else if value.Valid {
+				_m.DeleteTs = value.Int64
+			}
 		case table.FieldCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field code", values[i])
@@ -173,6 +200,15 @@ func (_m *Table) String() string {
 	var builder strings.Builder
 	builder.WriteString("Table(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("delete_ts=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
+	builder.WriteString(", ")
 	builder.WriteString("code=")
 	builder.WriteString(_m.Code)
 	builder.WriteString(", ")

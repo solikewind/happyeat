@@ -58,12 +58,6 @@ func (_u *MenuUpdate) AddDeleteTs(v int64) *MenuUpdate {
 	return _u
 }
 
-// ClearDeleteTs clears the value of the "delete_ts" field.
-func (_u *MenuUpdate) ClearDeleteTs() *MenuUpdate {
-	_u.mutation.ClearDeleteTs()
-	return _u
-}
-
 // SetName sets the "name" field.
 func (_u *MenuUpdate) SetName(v string) *MenuUpdate {
 	_u.mutation.SetName(v)
@@ -314,9 +308,6 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.AddedDeleteTs(); ok {
 		_spec.AddField(menu.FieldDeleteTs, field.TypeInt64, value)
 	}
-	if _u.mutation.DeleteTsCleared() {
-		_spec.ClearField(menu.FieldDeleteTs, field.TypeInt64)
-	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(menu.FieldName, field.TypeString, value)
 	}
@@ -501,12 +492,6 @@ func (_u *MenuUpdateOne) SetNillableDeleteTs(v *int64) *MenuUpdateOne {
 // AddDeleteTs adds value to the "delete_ts" field.
 func (_u *MenuUpdateOne) AddDeleteTs(v int64) *MenuUpdateOne {
 	_u.mutation.AddDeleteTs(v)
-	return _u
-}
-
-// ClearDeleteTs clears the value of the "delete_ts" field.
-func (_u *MenuUpdateOne) ClearDeleteTs() *MenuUpdateOne {
-	_u.mutation.ClearDeleteTs()
 	return _u
 }
 
@@ -789,9 +774,6 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 	}
 	if value, ok := _u.mutation.AddedDeleteTs(); ok {
 		_spec.AddField(menu.FieldDeleteTs, field.TypeInt64, value)
-	}
-	if _u.mutation.DeleteTsCleared() {
-		_spec.ClearField(menu.FieldDeleteTs, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(menu.FieldName, field.TypeString, value)

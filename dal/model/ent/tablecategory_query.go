@@ -299,12 +299,12 @@ func (_q *TableCategoryQuery) WithTables(opts ...func(*TableQuery)) *TableCatego
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.TableCategory.Query().
-//		GroupBy(tablecategory.FieldName).
+//		GroupBy(tablecategory.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *TableCategoryQuery) GroupBy(field string, fields ...string) *TableCategoryGroupBy {
@@ -322,11 +322,11 @@ func (_q *TableCategoryQuery) GroupBy(field string, fields ...string) *TableCate
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.TableCategory.Query().
-//		Select(tablecategory.FieldName).
+//		Select(tablecategory.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (_q *TableCategoryQuery) Select(fields ...string) *TableCategorySelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

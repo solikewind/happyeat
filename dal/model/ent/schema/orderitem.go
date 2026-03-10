@@ -13,6 +13,13 @@ type OrderItem struct {
 	ent.Schema
 }
 
+func (OrderItem) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+		SoftDeleteMixin{},
+	}
+}
+
 func (OrderItem) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),

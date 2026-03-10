@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -17,6 +18,12 @@ type Order struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 删除时间戳
+	DeleteTs int64 `json:"delete_ts,omitempty"`
 	// 订单号
 	OrderNo string `json:"order_no,omitempty"`
 	// dine_in=堂食 takeaway=打包外带
@@ -72,10 +79,12 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case order.FieldTotalAmount:
 			values[i] = new(sql.NullFloat64)
-		case order.FieldID:
+		case order.FieldID, order.FieldDeleteTs:
 			values[i] = new(sql.NullInt64)
 		case order.FieldOrderNo, order.FieldOrderType, order.FieldStatus, order.FieldRemark:
 			values[i] = new(sql.NullString)
+		case order.FieldCreatedAt, order.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case order.ForeignKeys[0]: // table_orders
 			values[i] = new(sql.NullInt64)
 		default:
@@ -99,6 +108,24 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int(value.Int64)
+		case order.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				_m.CreatedAt = value.Time
+			}
+		case order.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				_m.UpdatedAt = value.Time
+			}
+		case order.FieldDeleteTs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field delete_ts", values[i])
+			} else if value.Valid {
+				_m.DeleteTs = value.Int64
+			}
 		case order.FieldOrderNo:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field order_no", values[i])
@@ -183,6 +210,15 @@ func (_m *Order) String() string {
 	var builder strings.Builder
 	builder.WriteString("Order(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("delete_ts=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
+	builder.WriteString(", ")
 	builder.WriteString("order_no=")
 	builder.WriteString(_m.OrderNo)
 	builder.WriteString(", ")

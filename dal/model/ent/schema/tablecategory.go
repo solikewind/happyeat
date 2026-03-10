@@ -13,6 +13,13 @@ type TableCategory struct {
 	ent.Schema
 }
 
+func (TableCategory) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+		SoftDeleteMixin{},
+	}
+}
+
 func (TableCategory) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),

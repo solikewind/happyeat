@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,6 +20,48 @@ type OrderCreate struct {
 	config
 	mutation *OrderMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *OrderCreate) SetCreatedAt(v time.Time) *OrderCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableCreatedAt(v *time.Time) *OrderCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *OrderCreate) SetUpdatedAt(v time.Time) *OrderCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableUpdatedAt(v *time.Time) *OrderCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_c *OrderCreate) SetDeleteTs(v int64) *OrderCreate {
+	_c.mutation.SetDeleteTs(v)
+	return _c
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableDeleteTs(v *int64) *OrderCreate {
+	if v != nil {
+		_c.SetDeleteTs(*v)
+	}
+	return _c
 }
 
 // SetOrderNo sets the "order_no" field.
@@ -124,7 +167,9 @@ func (_c *OrderCreate) Mutation() *OrderMutation {
 
 // Save creates the Order in the database.
 func (_c *OrderCreate) Save(ctx context.Context) (*Order, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -151,7 +196,25 @@ func (_c *OrderCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *OrderCreate) defaults() {
+func (_c *OrderCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if order.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized order.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
+		v := order.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if order.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized order.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := order.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		v := order.DefaultDeleteTs
+		_c.mutation.SetDeleteTs(v)
+	}
 	if _, ok := _c.mutation.OrderType(); !ok {
 		v := order.DefaultOrderType
 		_c.mutation.SetOrderType(v)
@@ -164,10 +227,20 @@ func (_c *OrderCreate) defaults() {
 		v := order.DefaultTotalAmount
 		_c.mutation.SetTotalAmount(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *OrderCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Order.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Order.updated_at"`)}
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "Order.delete_ts"`)}
+	}
 	if _, ok := _c.mutation.OrderNo(); !ok {
 		return &ValidationError{Name: "order_no", err: errors.New(`ent: missing required field "Order.order_no"`)}
 	}
@@ -226,6 +299,18 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_node = &Order{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(order.Table, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(order.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeleteTs(); ok {
+		_spec.SetField(order.FieldDeleteTs, field.TypeInt64, value)
+		_node.DeleteTs = value
+	}
 	if value, ok := _c.mutation.OrderNo(); ok {
 		_spec.SetField(order.FieldOrderNo, field.TypeString, value)
 		_node.OrderNo = value

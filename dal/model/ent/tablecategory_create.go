@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,6 +19,48 @@ type TableCategoryCreate struct {
 	config
 	mutation *TableCategoryMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *TableCategoryCreate) SetCreatedAt(v time.Time) *TableCategoryCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *TableCategoryCreate) SetNillableCreatedAt(v *time.Time) *TableCategoryCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *TableCategoryCreate) SetUpdatedAt(v time.Time) *TableCategoryCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *TableCategoryCreate) SetNillableUpdatedAt(v *time.Time) *TableCategoryCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_c *TableCategoryCreate) SetDeleteTs(v int64) *TableCategoryCreate {
+	_c.mutation.SetDeleteTs(v)
+	return _c
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_c *TableCategoryCreate) SetNillableDeleteTs(v *int64) *TableCategoryCreate {
+	if v != nil {
+		_c.SetDeleteTs(*v)
+	}
+	return _c
 }
 
 // SetName sets the "name" field.
@@ -62,6 +105,9 @@ func (_c *TableCategoryCreate) Mutation() *TableCategoryMutation {
 
 // Save creates the TableCategory in the database.
 func (_c *TableCategoryCreate) Save(ctx context.Context) (*TableCategory, error) {
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -87,8 +133,40 @@ func (_c *TableCategoryCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (_c *TableCategoryCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if tablecategory.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized tablecategory.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
+		v := tablecategory.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if tablecategory.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized tablecategory.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := tablecategory.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		v := tablecategory.DefaultDeleteTs
+		_c.mutation.SetDeleteTs(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (_c *TableCategoryCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "TableCategory.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "TableCategory.updated_at"`)}
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "TableCategory.delete_ts"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "TableCategory.name"`)}
 	}
@@ -123,6 +201,18 @@ func (_c *TableCategoryCreate) createSpec() (*TableCategory, *sqlgraph.CreateSpe
 		_node = &TableCategory{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(tablecategory.Table, sqlgraph.NewFieldSpec(tablecategory.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(tablecategory.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(tablecategory.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeleteTs(); ok {
+		_spec.SetField(tablecategory.FieldDeleteTs, field.TypeInt64, value)
+		_node.DeleteTs = value
+	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(tablecategory.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -168,6 +258,7 @@ func (_c *TableCategoryCreateBulk) Save(ctx context.Context) ([]*TableCategory, 
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TableCategoryMutation)
 				if !ok {

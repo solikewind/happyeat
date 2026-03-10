@@ -14,7 +14,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "delete_ts", Type: field.TypeInt64, Nullable: true, Comment: "删除时间戳", Default: 0},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 128, Comment: "菜名"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 		{Name: "image", Type: field.TypeString, Nullable: true, Size: 512, Comment: "图片URL"},
@@ -39,6 +39,9 @@ var (
 	// MenuCategoriesColumns holds the columns for the "menu_categories" table.
 	MenuCategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "分类名称"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 	}
@@ -52,6 +55,9 @@ var (
 	// MenuSpecsColumns holds the columns for the "menu_specs" table.
 	MenuSpecsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "spec_type", Type: field.TypeString, Size: 64, Comment: "规格类型（如口味、大小）"},
 		{Name: "spec_value", Type: field.TypeString, Size: 64, Comment: "规格值（如中辣、大份）"},
 		{Name: "price_delta", Type: field.TypeFloat64, Comment: "加价", Default: 0},
@@ -67,7 +73,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "menu_specs_menus_specs",
-				Columns:    []*schema.Column{MenuSpecsColumns[5]},
+				Columns:    []*schema.Column{MenuSpecsColumns[8]},
 				RefColumns: []*schema.Column{MenusColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -76,6 +82,9 @@ var (
 	// OrdersColumns holds the columns for the "orders" table.
 	OrdersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "order_no", Type: field.TypeString, Unique: true, Size: 64, Comment: "订单号"},
 		{Name: "order_type", Type: field.TypeString, Size: 32, Comment: "dine_in=堂食 takeaway=打包外带", Default: "dine_in"},
 		{Name: "status", Type: field.TypeString, Size: 32, Comment: "created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消", Default: "created"},
@@ -92,7 +101,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "orders_tables_orders",
-				Columns:    []*schema.Column{OrdersColumns[6]},
+				Columns:    []*schema.Column{OrdersColumns[9]},
 				RefColumns: []*schema.Column{TablesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -101,6 +110,9 @@ var (
 	// OrderItemsColumns holds the columns for the "order_items" table.
 	OrderItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "menu_name", Type: field.TypeString, Size: 128, Comment: "菜品名称快照"},
 		{Name: "quantity", Type: field.TypeInt, Comment: "数量", Default: 1},
 		{Name: "unit_price", Type: field.TypeFloat64, Comment: "单价（含规格加价）"},
@@ -119,13 +131,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "order_items_menus_order_items",
-				Columns:    []*schema.Column{OrderItemsColumns[7]},
+				Columns:    []*schema.Column{OrderItemsColumns[10]},
 				RefColumns: []*schema.Column{MenusColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "order_items_orders_items",
-				Columns:    []*schema.Column{OrderItemsColumns[8]},
+				Columns:    []*schema.Column{OrderItemsColumns[11]},
 				RefColumns: []*schema.Column{OrdersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -134,6 +146,9 @@ var (
 	// TablesColumns holds the columns for the "tables" table.
 	TablesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "code", Type: field.TypeString, Unique: true, Size: 32, Comment: "桌号"},
 		{Name: "status", Type: field.TypeString, Size: 32, Comment: "idle=空闲 using=使用中 reserved=预留 cleaning=清洁中", Default: "idle"},
 		{Name: "capacity", Type: field.TypeInt, Comment: "可坐人数", Default: 4},
@@ -149,7 +164,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tables_table_categories_tables",
-				Columns:    []*schema.Column{TablesColumns[5]},
+				Columns:    []*schema.Column{TablesColumns[8]},
 				RefColumns: []*schema.Column{TableCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -158,6 +173,9 @@ var (
 	// TableCategoriesColumns holds the columns for the "table_categories" table.
 	TableCategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "类别名称"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 	}

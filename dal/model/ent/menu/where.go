@@ -210,16 +210,6 @@ func DeleteTsLTE(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldLTE(FieldDeleteTs, v))
 }
 
-// DeleteTsIsNil applies the IsNil predicate on the "delete_ts" field.
-func DeleteTsIsNil() predicate.Menu {
-	return predicate.Menu(sql.FieldIsNull(FieldDeleteTs))
-}
-
-// DeleteTsNotNil applies the NotNil predicate on the "delete_ts" field.
-func DeleteTsNotNil() predicate.Menu {
-	return predicate.Menu(sql.FieldNotNull(FieldDeleteTs))
-}
-
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldName, v))

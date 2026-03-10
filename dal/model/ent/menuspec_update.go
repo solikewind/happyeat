@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -25,6 +26,33 @@ type MenuSpecUpdate struct {
 // Where appends a list predicates to the MenuSpecUpdate builder.
 func (_u *MenuSpecUpdate) Where(ps ...predicate.MenuSpec) *MenuSpecUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *MenuSpecUpdate) SetUpdatedAt(v time.Time) *MenuSpecUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *MenuSpecUpdate) SetDeleteTs(v int64) *MenuSpecUpdate {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *MenuSpecUpdate) SetNillableDeleteTs(v *int64) *MenuSpecUpdate {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *MenuSpecUpdate) AddDeleteTs(v int64) *MenuSpecUpdate {
+	_u.mutation.AddDeleteTs(v)
 	return _u
 }
 
@@ -122,6 +150,9 @@ func (_u *MenuSpecUpdate) ClearMenu() *MenuSpecUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *MenuSpecUpdate) Save(ctx context.Context) (int, error) {
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -145,6 +176,18 @@ func (_u *MenuSpecUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *MenuSpecUpdate) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if menuspec.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menuspec.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := menuspec.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -176,6 +219,15 @@ func (_u *MenuSpecUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(menuspec.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(menuspec.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(menuspec.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SpecType(); ok {
 		_spec.SetField(menuspec.FieldSpecType, field.TypeString, value)
@@ -242,6 +294,33 @@ type MenuSpecUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *MenuSpecMutation
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *MenuSpecUpdateOne) SetUpdatedAt(v time.Time) *MenuSpecUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *MenuSpecUpdateOne) SetDeleteTs(v int64) *MenuSpecUpdateOne {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *MenuSpecUpdateOne) SetNillableDeleteTs(v *int64) *MenuSpecUpdateOne {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *MenuSpecUpdateOne) AddDeleteTs(v int64) *MenuSpecUpdateOne {
+	_u.mutation.AddDeleteTs(v)
+	return _u
 }
 
 // SetSpecType sets the "spec_type" field.
@@ -351,6 +430,9 @@ func (_u *MenuSpecUpdateOne) Select(field string, fields ...string) *MenuSpecUpd
 
 // Save executes the query and returns the updated MenuSpec entity.
 func (_u *MenuSpecUpdateOne) Save(ctx context.Context) (*MenuSpec, error) {
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -374,6 +456,18 @@ func (_u *MenuSpecUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *MenuSpecUpdateOne) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if menuspec.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized menuspec.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := menuspec.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -422,6 +516,15 @@ func (_u *MenuSpecUpdateOne) sqlSave(ctx context.Context) (_node *MenuSpec, err 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(menuspec.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(menuspec.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(menuspec.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SpecType(); ok {
 		_spec.SetField(menuspec.FieldSpecType, field.TypeString, value)

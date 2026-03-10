@@ -335,12 +335,12 @@ func (_q *OrderItemQuery) WithMenu(opts ...func(*MenuQuery)) *OrderItemQuery {
 // Example:
 //
 //	var v []struct {
-//		MenuName string `json:"menu_name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.OrderItem.Query().
-//		GroupBy(orderitem.FieldMenuName).
+//		GroupBy(orderitem.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *OrderItemQuery) GroupBy(field string, fields ...string) *OrderItemGroupBy {
@@ -358,11 +358,11 @@ func (_q *OrderItemQuery) GroupBy(field string, fields ...string) *OrderItemGrou
 // Example:
 //
 //	var v []struct {
-//		MenuName string `json:"menu_name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.OrderItem.Query().
-//		Select(orderitem.FieldMenuName).
+//		Select(orderitem.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (_q *OrderItemQuery) Select(fields ...string) *OrderItemSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

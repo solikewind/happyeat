@@ -299,12 +299,12 @@ func (_q *MenuSpecQuery) WithMenu(opts ...func(*MenuQuery)) *MenuSpecQuery {
 // Example:
 //
 //	var v []struct {
-//		SpecType string `json:"spec_type,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MenuSpec.Query().
-//		GroupBy(menuspec.FieldSpecType).
+//		GroupBy(menuspec.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *MenuSpecQuery) GroupBy(field string, fields ...string) *MenuSpecGroupBy {
@@ -322,11 +322,11 @@ func (_q *MenuSpecQuery) GroupBy(field string, fields ...string) *MenuSpecGroupB
 // Example:
 //
 //	var v []struct {
-//		SpecType string `json:"spec_type,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.MenuSpec.Query().
-//		Select(menuspec.FieldSpecType).
+//		Select(menuspec.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (_q *MenuSpecQuery) Select(fields ...string) *MenuSpecSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

@@ -288,24 +288,10 @@ func (m *MenuMutation) AddedDeleteTs() (r int64, exists bool) {
 	return *v, true
 }
 
-// ClearDeleteTs clears the value of the "delete_ts" field.
-func (m *MenuMutation) ClearDeleteTs() {
-	m.delete_ts = nil
-	m.adddelete_ts = nil
-	m.clearedFields[menu.FieldDeleteTs] = struct{}{}
-}
-
-// DeleteTsCleared returns if the "delete_ts" field was cleared in this mutation.
-func (m *MenuMutation) DeleteTsCleared() bool {
-	_, ok := m.clearedFields[menu.FieldDeleteTs]
-	return ok
-}
-
 // ResetDeleteTs resets all changes to the "delete_ts" field.
 func (m *MenuMutation) ResetDeleteTs() {
 	m.delete_ts = nil
 	m.adddelete_ts = nil
-	delete(m.clearedFields, menu.FieldDeleteTs)
 }
 
 // SetName sets the "name" field.
@@ -861,9 +847,6 @@ func (m *MenuMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *MenuMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(menu.FieldDeleteTs) {
-		fields = append(fields, menu.FieldDeleteTs)
-	}
 	if m.FieldCleared(menu.FieldDescription) {
 		fields = append(fields, menu.FieldDescription)
 	}
@@ -884,9 +867,6 @@ func (m *MenuMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *MenuMutation) ClearField(name string) error {
 	switch name {
-	case menu.FieldDeleteTs:
-		m.ClearDeleteTs()
-		return nil
 	case menu.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -1060,6 +1040,10 @@ type MenuCategoryMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	delete_ts     *int64
+	adddelete_ts  *int64
 	name          *string
 	description   *string
 	clearedFields map[string]struct{}
@@ -1167,6 +1151,134 @@ func (m *MenuCategoryMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MenuCategoryMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MenuCategoryMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MenuCategory entity.
+// If the MenuCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuCategoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MenuCategoryMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *MenuCategoryMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *MenuCategoryMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the MenuCategory entity.
+// If the MenuCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuCategoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *MenuCategoryMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *MenuCategoryMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *MenuCategoryMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the MenuCategory entity.
+// If the MenuCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuCategoryMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *MenuCategoryMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *MenuCategoryMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *MenuCategoryMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
 }
 
 // SetName sets the "name" field.
@@ -1342,7 +1454,16 @@ func (m *MenuCategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuCategoryMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, menucategory.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, menucategory.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, menucategory.FieldDeleteTs)
+	}
 	if m.name != nil {
 		fields = append(fields, menucategory.FieldName)
 	}
@@ -1357,6 +1478,12 @@ func (m *MenuCategoryMutation) Fields() []string {
 // schema.
 func (m *MenuCategoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case menucategory.FieldCreatedAt:
+		return m.CreatedAt()
+	case menucategory.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case menucategory.FieldDeleteTs:
+		return m.DeleteTs()
 	case menucategory.FieldName:
 		return m.Name()
 	case menucategory.FieldDescription:
@@ -1370,6 +1497,12 @@ func (m *MenuCategoryMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MenuCategoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case menucategory.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case menucategory.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case menucategory.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
 	case menucategory.FieldName:
 		return m.OldName(ctx)
 	case menucategory.FieldDescription:
@@ -1383,6 +1516,27 @@ func (m *MenuCategoryMutation) OldField(ctx context.Context, name string) (ent.V
 // type.
 func (m *MenuCategoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case menucategory.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case menucategory.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case menucategory.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
 	case menucategory.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -1404,13 +1558,21 @@ func (m *MenuCategoryMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *MenuCategoryMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, menucategory.FieldDeleteTs)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *MenuCategoryMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case menucategory.FieldDeleteTs:
+		return m.AddedDeleteTs()
+	}
 	return nil, false
 }
 
@@ -1419,6 +1581,13 @@ func (m *MenuCategoryMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MenuCategoryMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case menucategory.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory numeric field %s", name)
 }
@@ -1455,6 +1624,15 @@ func (m *MenuCategoryMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MenuCategoryMutation) ResetField(name string) error {
 	switch name {
+	case menucategory.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case menucategory.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case menucategory.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
 	case menucategory.FieldName:
 		m.ResetName()
 		return nil
@@ -1555,6 +1733,10 @@ type MenuSpecMutation struct {
 	op             Op
 	typ            string
 	id             *int
+	created_at     *time.Time
+	updated_at     *time.Time
+	delete_ts      *int64
+	adddelete_ts   *int64
 	spec_type      *string
 	spec_value     *string
 	price_delta    *float64
@@ -1665,6 +1847,134 @@ func (m *MenuSpecMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MenuSpecMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MenuSpecMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MenuSpec entity.
+// If the MenuSpec object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuSpecMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MenuSpecMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *MenuSpecMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *MenuSpecMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the MenuSpec entity.
+// If the MenuSpec object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuSpecMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *MenuSpecMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *MenuSpecMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *MenuSpecMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the MenuSpec entity.
+// If the MenuSpec object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuSpecMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *MenuSpecMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *MenuSpecMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *MenuSpecMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
 }
 
 // SetSpecType sets the "spec_type" field.
@@ -1924,7 +2234,16 @@ func (m *MenuSpecMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuSpecMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, menuspec.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, menuspec.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, menuspec.FieldDeleteTs)
+	}
 	if m.spec_type != nil {
 		fields = append(fields, menuspec.FieldSpecType)
 	}
@@ -1945,6 +2264,12 @@ func (m *MenuSpecMutation) Fields() []string {
 // schema.
 func (m *MenuSpecMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case menuspec.FieldCreatedAt:
+		return m.CreatedAt()
+	case menuspec.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case menuspec.FieldDeleteTs:
+		return m.DeleteTs()
 	case menuspec.FieldSpecType:
 		return m.SpecType()
 	case menuspec.FieldSpecValue:
@@ -1962,6 +2287,12 @@ func (m *MenuSpecMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MenuSpecMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case menuspec.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case menuspec.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case menuspec.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
 	case menuspec.FieldSpecType:
 		return m.OldSpecType(ctx)
 	case menuspec.FieldSpecValue:
@@ -1979,6 +2310,27 @@ func (m *MenuSpecMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *MenuSpecMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case menuspec.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case menuspec.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case menuspec.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
 	case menuspec.FieldSpecType:
 		v, ok := value.(string)
 		if !ok {
@@ -2015,6 +2367,9 @@ func (m *MenuSpecMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MenuSpecMutation) AddedFields() []string {
 	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, menuspec.FieldDeleteTs)
+	}
 	if m.addprice_delta != nil {
 		fields = append(fields, menuspec.FieldPriceDelta)
 	}
@@ -2029,6 +2384,8 @@ func (m *MenuSpecMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MenuSpecMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case menuspec.FieldDeleteTs:
+		return m.AddedDeleteTs()
 	case menuspec.FieldPriceDelta:
 		return m.AddedPriceDelta()
 	case menuspec.FieldSort:
@@ -2042,6 +2399,13 @@ func (m *MenuSpecMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MenuSpecMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case menuspec.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
 	case menuspec.FieldPriceDelta:
 		v, ok := value.(float64)
 		if !ok {
@@ -2083,6 +2447,15 @@ func (m *MenuSpecMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MenuSpecMutation) ResetField(name string) error {
 	switch name {
+	case menuspec.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case menuspec.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case menuspec.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
 	case menuspec.FieldSpecType:
 		m.ResetSpecType()
 		return nil
@@ -2179,6 +2552,10 @@ type OrderMutation struct {
 	op              Op
 	typ             string
 	id              *int
+	created_at      *time.Time
+	updated_at      *time.Time
+	delete_ts       *int64
+	adddelete_ts    *int64
 	order_no        *string
 	order_type      *string
 	status          *string
@@ -2292,6 +2669,134 @@ func (m *OrderMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *OrderMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *OrderMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Order entity.
+// If the Order object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *OrderMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *OrderMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *OrderMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Order entity.
+// If the Order object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *OrderMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *OrderMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *OrderMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the Order entity.
+// If the Order object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *OrderMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *OrderMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *OrderMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
 }
 
 // SetOrderNo sets the "order_no" field.
@@ -2634,7 +3139,16 @@ func (m *OrderMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 8)
+	if m.created_at != nil {
+		fields = append(fields, order.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, order.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, order.FieldDeleteTs)
+	}
 	if m.order_no != nil {
 		fields = append(fields, order.FieldOrderNo)
 	}
@@ -2658,6 +3172,12 @@ func (m *OrderMutation) Fields() []string {
 // schema.
 func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case order.FieldCreatedAt:
+		return m.CreatedAt()
+	case order.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case order.FieldDeleteTs:
+		return m.DeleteTs()
 	case order.FieldOrderNo:
 		return m.OrderNo()
 	case order.FieldOrderType:
@@ -2677,6 +3197,12 @@ func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case order.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case order.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case order.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
 	case order.FieldOrderNo:
 		return m.OldOrderNo(ctx)
 	case order.FieldOrderType:
@@ -2696,6 +3222,27 @@ func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *OrderMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case order.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case order.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case order.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
 	case order.FieldOrderNo:
 		v, ok := value.(string)
 		if !ok {
@@ -2739,6 +3286,9 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *OrderMutation) AddedFields() []string {
 	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, order.FieldDeleteTs)
+	}
 	if m.addtotal_amount != nil {
 		fields = append(fields, order.FieldTotalAmount)
 	}
@@ -2750,6 +3300,8 @@ func (m *OrderMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *OrderMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case order.FieldDeleteTs:
+		return m.AddedDeleteTs()
 	case order.FieldTotalAmount:
 		return m.AddedTotalAmount()
 	}
@@ -2761,6 +3313,13 @@ func (m *OrderMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *OrderMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case order.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
 	case order.FieldTotalAmount:
 		v, ok := value.(float64)
 		if !ok {
@@ -2804,6 +3363,15 @@ func (m *OrderMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *OrderMutation) ResetField(name string) error {
 	switch name {
+	case order.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case order.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case order.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
 	case order.FieldOrderNo:
 		m.ResetOrderNo()
 		return nil
@@ -2931,6 +3499,10 @@ type OrderItemMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	delete_ts     *int64
+	adddelete_ts  *int64
 	menu_name     *string
 	quantity      *int
 	addquantity   *int
@@ -3047,6 +3619,134 @@ func (m *OrderItemMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *OrderItemMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *OrderItemMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the OrderItem entity.
+// If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderItemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *OrderItemMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *OrderItemMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *OrderItemMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the OrderItem entity.
+// If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderItemMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *OrderItemMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *OrderItemMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *OrderItemMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the OrderItem entity.
+// If the OrderItem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderItemMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *OrderItemMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *OrderItemMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *OrderItemMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
 }
 
 // SetMenuName sets the "menu_name" field.
@@ -3470,7 +4170,16 @@ func (m *OrderItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderItemMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 9)
+	if m.created_at != nil {
+		fields = append(fields, orderitem.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, orderitem.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, orderitem.FieldDeleteTs)
+	}
 	if m.menu_name != nil {
 		fields = append(fields, orderitem.FieldMenuName)
 	}
@@ -3497,6 +4206,12 @@ func (m *OrderItemMutation) Fields() []string {
 // schema.
 func (m *OrderItemMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case orderitem.FieldCreatedAt:
+		return m.CreatedAt()
+	case orderitem.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case orderitem.FieldDeleteTs:
+		return m.DeleteTs()
 	case orderitem.FieldMenuName:
 		return m.MenuName()
 	case orderitem.FieldQuantity:
@@ -3518,6 +4233,12 @@ func (m *OrderItemMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *OrderItemMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case orderitem.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case orderitem.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case orderitem.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
 	case orderitem.FieldMenuName:
 		return m.OldMenuName(ctx)
 	case orderitem.FieldQuantity:
@@ -3539,6 +4260,27 @@ func (m *OrderItemMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *OrderItemMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case orderitem.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case orderitem.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case orderitem.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
 	case orderitem.FieldMenuName:
 		v, ok := value.(string)
 		if !ok {
@@ -3589,6 +4331,9 @@ func (m *OrderItemMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *OrderItemMutation) AddedFields() []string {
 	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, orderitem.FieldDeleteTs)
+	}
 	if m.addquantity != nil {
 		fields = append(fields, orderitem.FieldQuantity)
 	}
@@ -3609,6 +4354,8 @@ func (m *OrderItemMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *OrderItemMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case orderitem.FieldDeleteTs:
+		return m.AddedDeleteTs()
 	case orderitem.FieldQuantity:
 		return m.AddedQuantity()
 	case orderitem.FieldUnitPrice:
@@ -3626,6 +4373,13 @@ func (m *OrderItemMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *OrderItemMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case orderitem.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
 	case orderitem.FieldQuantity:
 		v, ok := value.(int)
 		if !ok {
@@ -3690,6 +4444,15 @@ func (m *OrderItemMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *OrderItemMutation) ResetField(name string) error {
 	switch name {
+	case orderitem.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case orderitem.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case orderitem.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
 	case orderitem.FieldMenuName:
 		m.ResetMenuName()
 		return nil
@@ -3810,6 +4573,10 @@ type TableMutation struct {
 	op              Op
 	typ             string
 	id              *int
+	created_at      *time.Time
+	updated_at      *time.Time
+	delete_ts       *int64
+	adddelete_ts    *int64
 	code            *string
 	status          *string
 	capacity        *int
@@ -3922,6 +4689,134 @@ func (m *TableMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TableMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TableMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Table entity.
+// If the Table object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TableMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TableMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TableMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Table entity.
+// If the Table object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TableMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *TableMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *TableMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the Table entity.
+// If the Table object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *TableMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *TableMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *TableMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
 }
 
 // SetCode sets the "code" field.
@@ -4228,7 +5123,16 @@ func (m *TableMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TableMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, table.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, table.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, table.FieldDeleteTs)
+	}
 	if m.code != nil {
 		fields = append(fields, table.FieldCode)
 	}
@@ -4249,6 +5153,12 @@ func (m *TableMutation) Fields() []string {
 // schema.
 func (m *TableMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case table.FieldCreatedAt:
+		return m.CreatedAt()
+	case table.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case table.FieldDeleteTs:
+		return m.DeleteTs()
 	case table.FieldCode:
 		return m.Code()
 	case table.FieldStatus:
@@ -4266,6 +5176,12 @@ func (m *TableMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *TableMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case table.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case table.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case table.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
 	case table.FieldCode:
 		return m.OldCode(ctx)
 	case table.FieldStatus:
@@ -4283,6 +5199,27 @@ func (m *TableMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *TableMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case table.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case table.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case table.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
 	case table.FieldCode:
 		v, ok := value.(string)
 		if !ok {
@@ -4319,6 +5256,9 @@ func (m *TableMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *TableMutation) AddedFields() []string {
 	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, table.FieldDeleteTs)
+	}
 	if m.addcapacity != nil {
 		fields = append(fields, table.FieldCapacity)
 	}
@@ -4330,6 +5270,8 @@ func (m *TableMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *TableMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case table.FieldDeleteTs:
+		return m.AddedDeleteTs()
 	case table.FieldCapacity:
 		return m.AddedCapacity()
 	}
@@ -4341,6 +5283,13 @@ func (m *TableMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TableMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case table.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
 	case table.FieldCapacity:
 		v, ok := value.(int)
 		if !ok {
@@ -4384,6 +5333,15 @@ func (m *TableMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *TableMutation) ResetField(name string) error {
 	switch name {
+	case table.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case table.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case table.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
 	case table.FieldCode:
 		m.ResetCode()
 		return nil
@@ -4508,6 +5466,10 @@ type TableCategoryMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	delete_ts     *int64
+	adddelete_ts  *int64
 	name          *string
 	description   *string
 	clearedFields map[string]struct{}
@@ -4615,6 +5577,134 @@ func (m *TableCategoryMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TableCategoryMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TableCategoryMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the TableCategory entity.
+// If the TableCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableCategoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TableCategoryMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TableCategoryMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TableCategoryMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the TableCategory entity.
+// If the TableCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableCategoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TableCategoryMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *TableCategoryMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *TableCategoryMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the TableCategory entity.
+// If the TableCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableCategoryMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *TableCategoryMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *TableCategoryMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *TableCategoryMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
 }
 
 // SetName sets the "name" field.
@@ -4790,7 +5880,16 @@ func (m *TableCategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TableCategoryMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, tablecategory.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, tablecategory.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, tablecategory.FieldDeleteTs)
+	}
 	if m.name != nil {
 		fields = append(fields, tablecategory.FieldName)
 	}
@@ -4805,6 +5904,12 @@ func (m *TableCategoryMutation) Fields() []string {
 // schema.
 func (m *TableCategoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case tablecategory.FieldCreatedAt:
+		return m.CreatedAt()
+	case tablecategory.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case tablecategory.FieldDeleteTs:
+		return m.DeleteTs()
 	case tablecategory.FieldName:
 		return m.Name()
 	case tablecategory.FieldDescription:
@@ -4818,6 +5923,12 @@ func (m *TableCategoryMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *TableCategoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case tablecategory.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case tablecategory.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case tablecategory.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
 	case tablecategory.FieldName:
 		return m.OldName(ctx)
 	case tablecategory.FieldDescription:
@@ -4831,6 +5942,27 @@ func (m *TableCategoryMutation) OldField(ctx context.Context, name string) (ent.
 // type.
 func (m *TableCategoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case tablecategory.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case tablecategory.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case tablecategory.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
 	case tablecategory.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -4852,13 +5984,21 @@ func (m *TableCategoryMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *TableCategoryMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, tablecategory.FieldDeleteTs)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *TableCategoryMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case tablecategory.FieldDeleteTs:
+		return m.AddedDeleteTs()
+	}
 	return nil, false
 }
 
@@ -4867,6 +6007,13 @@ func (m *TableCategoryMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TableCategoryMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case tablecategory.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
 	}
 	return fmt.Errorf("unknown TableCategory numeric field %s", name)
 }
@@ -4903,6 +6050,15 @@ func (m *TableCategoryMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *TableCategoryMutation) ResetField(name string) error {
 	switch name {
+	case tablecategory.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case tablecategory.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case tablecategory.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
 	case tablecategory.FieldName:
 		m.ResetName()
 		return nil

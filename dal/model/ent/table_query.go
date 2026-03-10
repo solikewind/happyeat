@@ -336,12 +336,12 @@ func (_q *TableQuery) WithOrders(opts ...func(*OrderQuery)) *TableQuery {
 // Example:
 //
 //	var v []struct {
-//		Code string `json:"code,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Table.Query().
-//		GroupBy(table.FieldCode).
+//		GroupBy(table.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *TableQuery) GroupBy(field string, fields ...string) *TableGroupBy {
@@ -359,11 +359,11 @@ func (_q *TableQuery) GroupBy(field string, fields ...string) *TableGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Code string `json:"code,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Table.Query().
-//		Select(table.FieldCode).
+//		Select(table.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (_q *TableQuery) Select(fields ...string) *TableSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

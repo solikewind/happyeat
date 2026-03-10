@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -26,6 +27,33 @@ type TableUpdate struct {
 // Where appends a list predicates to the TableUpdate builder.
 func (_u *TableUpdate) Where(ps ...predicate.Table) *TableUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *TableUpdate) SetUpdatedAt(v time.Time) *TableUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *TableUpdate) SetDeleteTs(v int64) *TableUpdate {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *TableUpdate) SetNillableDeleteTs(v *int64) *TableUpdate {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *TableUpdate) AddDeleteTs(v int64) *TableUpdate {
+	_u.mutation.AddDeleteTs(v)
 	return _u
 }
 
@@ -158,6 +186,9 @@ func (_u *TableUpdate) RemoveOrders(v ...*Order) *TableUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *TableUpdate) Save(ctx context.Context) (int, error) {
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -181,6 +212,18 @@ func (_u *TableUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *TableUpdate) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if table.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized table.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := table.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -217,6 +260,15 @@ func (_u *TableUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(table.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(table.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(table.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Code(); ok {
 		_spec.SetField(table.FieldCode, field.TypeString, value)
@@ -328,6 +380,33 @@ type TableUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *TableMutation
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *TableUpdateOne) SetUpdatedAt(v time.Time) *TableUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_u *TableUpdateOne) SetDeleteTs(v int64) *TableUpdateOne {
+	_u.mutation.ResetDeleteTs()
+	_u.mutation.SetDeleteTs(v)
+	return _u
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_u *TableUpdateOne) SetNillableDeleteTs(v *int64) *TableUpdateOne {
+	if v != nil {
+		_u.SetDeleteTs(*v)
+	}
+	return _u
+}
+
+// AddDeleteTs adds value to the "delete_ts" field.
+func (_u *TableUpdateOne) AddDeleteTs(v int64) *TableUpdateOne {
+	_u.mutation.AddDeleteTs(v)
+	return _u
 }
 
 // SetCode sets the "code" field.
@@ -472,6 +551,9 @@ func (_u *TableUpdateOne) Select(field string, fields ...string) *TableUpdateOne
 
 // Save executes the query and returns the updated Table entity.
 func (_u *TableUpdateOne) Save(ctx context.Context) (*Table, error) {
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -495,6 +577,18 @@ func (_u *TableUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *TableUpdateOne) defaults() error {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if table.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized table.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := table.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -548,6 +642,15 @@ func (_u *TableUpdateOne) sqlSave(ctx context.Context) (_node *Table, err error)
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(table.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeleteTs(); ok {
+		_spec.SetField(table.FieldDeleteTs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeleteTs(); ok {
+		_spec.AddField(table.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Code(); ok {
 		_spec.SetField(table.FieldCode, field.TypeString, value)

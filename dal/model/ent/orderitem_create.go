@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,6 +20,48 @@ type OrderItemCreate struct {
 	config
 	mutation *OrderItemMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *OrderItemCreate) SetCreatedAt(v time.Time) *OrderItemCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *OrderItemCreate) SetNillableCreatedAt(v *time.Time) *OrderItemCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *OrderItemCreate) SetUpdatedAt(v time.Time) *OrderItemCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *OrderItemCreate) SetNillableUpdatedAt(v *time.Time) *OrderItemCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (_c *OrderItemCreate) SetDeleteTs(v int64) *OrderItemCreate {
+	_c.mutation.SetDeleteTs(v)
+	return _c
+}
+
+// SetNillableDeleteTs sets the "delete_ts" field if the given value is not nil.
+func (_c *OrderItemCreate) SetNillableDeleteTs(v *int64) *OrderItemCreate {
+	if v != nil {
+		_c.SetDeleteTs(*v)
+	}
+	return _c
 }
 
 // SetMenuName sets the "menu_name" field.
@@ -118,7 +161,9 @@ func (_c *OrderItemCreate) Mutation() *OrderItemMutation {
 
 // Save creates the OrderItem in the database.
 func (_c *OrderItemCreate) Save(ctx context.Context) (*OrderItem, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -145,7 +190,25 @@ func (_c *OrderItemCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *OrderItemCreate) defaults() {
+func (_c *OrderItemCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if orderitem.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized orderitem.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
+		v := orderitem.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if orderitem.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized orderitem.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := orderitem.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		v := orderitem.DefaultDeleteTs
+		_c.mutation.SetDeleteTs(v)
+	}
 	if _, ok := _c.mutation.Quantity(); !ok {
 		v := orderitem.DefaultQuantity
 		_c.mutation.SetQuantity(v)
@@ -154,10 +217,20 @@ func (_c *OrderItemCreate) defaults() {
 		v := orderitem.DefaultSort
 		_c.mutation.SetSort(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *OrderItemCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "OrderItem.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "OrderItem.updated_at"`)}
+	}
+	if _, ok := _c.mutation.DeleteTs(); !ok {
+		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "OrderItem.delete_ts"`)}
+	}
 	if _, ok := _c.mutation.MenuName(); !ok {
 		return &ValidationError{Name: "menu_name", err: errors.New(`ent: missing required field "OrderItem.menu_name"`)}
 	}
@@ -212,6 +285,18 @@ func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 		_node = &OrderItem{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(orderitem.Table, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(orderitem.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(orderitem.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeleteTs(); ok {
+		_spec.SetField(orderitem.FieldDeleteTs, field.TypeInt64, value)
+		_node.DeleteTs = value
+	}
 	if value, ok := _c.mutation.MenuName(); ok {
 		_spec.SetField(orderitem.FieldMenuName, field.TypeString, value)
 		_node.MenuName = value
