@@ -28,15 +28,15 @@ type TimeMixin struct {
 func (TimeMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("created_at").
-			Default(time.Now().In(CST)).
+			Default(CSTNow).
 			Immutable().
 			SchemaType(map[string]string{
 				dialect.Postgres: "timestamptz",
 			}).
 			Comment("创建时间"),
 		field.Time("updated_at").
-			Default(time.Now().In(CST)).
-			UpdateDefault(time.Now().In(CST)).
+			Default(CSTNow).
+			UpdateDefault(CSTNow).
 			SchemaType(map[string]string{
 				dialect.Postgres: "timestamptz",
 			}).

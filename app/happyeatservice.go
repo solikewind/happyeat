@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/solikewind/happyeat/app/internal/config"
 	"github.com/solikewind/happyeat/app/internal/handler"
@@ -38,11 +40,30 @@ func main() {
 		}, "*"))
 	defer server.Stop()
 
-	ctx, err := svc.NewServiceContext(c)
+	// 服务从 app 目录启动时，Swagger JSON 位于项目根目录。
+	openapiPath := filepath.Clean(filepath.Join("..", "happyeat.json"))
+
+	ctx, err := svc.NewServiceContext(c) // 创建相关的服务上下文（db、client）
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer ctx.DB.Close()
+
+	server.AddRoutes([]rest.Route{
+		{
+			Method: http.MethodGet,
+			Path:   "/openapi/happyeat.json",
+			Handler: func(w http.ResponseWriter, r *http.Request) {
+				if _, err := os.Stat(openapiPath); err != nil {
+					http.Error(w, "openapi file not found", http.StatusNotFound)
+					return
+				}
+
+				w.Header().Set("Content-Type", "application/json; charset=utf-8")
+				http.ServeFile(w, r, openapiPath)
+			},
+		},
+	})
 
 	handler.RegisterHandlers(server, ctx)
 

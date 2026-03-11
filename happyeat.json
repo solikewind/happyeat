@@ -88,15 +88,29 @@
         "operationId": "menutypeListMenusCategories",
         "parameters": [
           {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "required": [
-                "current",
-                "pageSize"
-              ],
               "properties": {
                 "current": {
                   "type": "integer"
@@ -175,9 +189,6 @@
             "required": true,
             "schema": {
               "type": "object",
-              "required": [
-                "name"
-              ],
               "properties": {
                 "description": {
                   "type": "string"
@@ -632,15 +643,36 @@
         "operationId": "menuListMenus",
         "parameters": [
           {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "description": "按分类名字筛选",
+            "name": "category",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "required": [
-                "current",
-                "pageSize"
-              ],
               "properties": {
                 "category": {
                   "description": "按分类名字筛选",
@@ -931,6 +963,14 @@
                       "description": "created/paid/preparing/completed/cancelled",
                       "type": "string"
                     },
+                    "table_category": {
+                      "description": "餐桌类别（如大厅、包间）",
+                      "type": "string"
+                    },
+                    "table_code": {
+                      "description": "桌号（堂食时显示，外带为空）",
+                      "type": "string"
+                    },
                     "table_id": {
                       "description": "堂食时关联餐桌id，外带为0",
                       "type": "integer"
@@ -1021,15 +1061,43 @@
         "operationId": "orderListOrders",
         "parameters": [
           {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "status",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "description": "dine_in | takeaway",
+            "name": "order_type",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "description": "按餐桌筛选",
+            "name": "table_id",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "required": [
-                "current",
-                "pageSize"
-              ],
               "properties": {
                 "current": {
                   "type": "integer"
@@ -1129,6 +1197,14 @@
                       },
                       "status": {
                         "description": "created/paid/preparing/completed/cancelled",
+                        "type": "string"
+                      },
+                      "table_category": {
+                        "description": "餐桌类别（如大厅、包间）",
+                        "type": "string"
+                      },
+                      "table_code": {
+                        "description": "桌号（堂食时显示，外带为空）",
                         "type": "string"
                       },
                       "table_id": {
@@ -1304,6 +1380,14 @@
                       "description": "created/paid/preparing/completed/cancelled",
                       "type": "string"
                     },
+                    "table_category": {
+                      "description": "餐桌类别（如大厅、包间）",
+                      "type": "string"
+                    },
+                    "table_code": {
+                      "description": "桌号（堂食时显示，外带为空）",
+                      "type": "string"
+                    },
                     "table_id": {
                       "description": "堂食时关联餐桌id，外带为0",
                       "type": "integer"
@@ -1341,15 +1425,29 @@
         "operationId": "tablecategoryListTableCategories",
         "parameters": [
           {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "required": [
-                "current",
-                "pageSize"
-              ],
               "properties": {
                 "current": {
                   "type": "integer"
@@ -1835,15 +1933,42 @@
         "operationId": "tableListTables",
         "parameters": [
           {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "code",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "status",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "description": "按分类名字筛选",
+            "name": "category",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "required": [
-                "current",
-                "pageSize"
-              ],
               "properties": {
                 "category": {
                   "description": "按分类名字筛选",
@@ -2005,15 +2130,30 @@
         "operationId": "workbenchListWorkbenchOrders",
         "parameters": [
           {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "description": "不传则默认查 created,paid,preparing",
+            "name": "status",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "required": [
-                "current",
-                "pageSize"
-              ],
               "properties": {
                 "current": {
                   "type": "integer"
@@ -2108,6 +2248,14 @@
                         "description": "created/paid/preparing/completed/cancelled",
                         "type": "string"
                       },
+                      "table_category": {
+                        "description": "餐桌类别（如大厅、包间）",
+                        "type": "string"
+                      },
+                      "table_code": {
+                        "description": "桌号（堂食时显示，外带为空）",
+                        "type": "string"
+                      },
                       "table_id": {
                         "description": "堂食时关联餐桌id，外带为0",
                         "type": "integer"
@@ -2140,7 +2288,7 @@
       "in": "header"
     }
   },
-  "x-date": "2026-02-12 15:54:45",
+  "x-date": "2026-03-11 20:17:35",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",
