@@ -13,6 +13,7 @@ import (
 	"github.com/solikewind/happyeat/app/internal/config"
 	"github.com/solikewind/happyeat/app/internal/pkg/agent"
 	"github.com/solikewind/happyeat/dal/model/ent"
+	_ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 	"github.com/solikewind/happyeat/dal/model/menu"
 	"github.com/solikewind/happyeat/dal/model/order"
 	"github.com/solikewind/happyeat/dal/model/table"
