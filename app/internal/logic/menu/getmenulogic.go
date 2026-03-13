@@ -6,9 +6,9 @@ package menu
 import (
 	"context"
 
-	"github.com/solikewind/happyeat/app/internal/pkg/util/timeutil"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/common/util/timeutil"
 	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
