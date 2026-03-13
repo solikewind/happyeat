@@ -100,7 +100,7 @@ func (d SoftDeleteMixin) Hooks() []ent.Hook {
 					}
 					d.P(mx)
 					mx.SetOp(ent.OpUpdate)
-					mx.SetDeletedTs(time.Now().In(CST).Unix())
+					mx.SetDeletedTs(CSTNow().Unix())
 					return mx.Client().Mutate(ctx, m)
 				})
 			},
