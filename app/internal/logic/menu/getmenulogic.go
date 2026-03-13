@@ -6,6 +6,7 @@ package menu
 import (
 	"context"
 
+	"github.com/solikewind/happyeat/app/internal/pkg/util/timeutil"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/dal/model/ent"
@@ -39,11 +40,11 @@ func (l *GetMenuLogic) GetMenu(req *types.GetMenuReq) (*types.GetMenuReply, erro
 
 func entMenuToType(e *ent.Menu) types.Menu {
 	out := types.Menu{
-		Id:       uint64(e.ID),
-		Name:     e.Name,
-		Price:    e.Price,
-		CreateAt: e.CreatedAt.Unix(),
-		UpdateAt: e.UpdatedAt.Unix(),
+		Id:        uint64(e.ID),
+		Name:      e.Name,
+		Price:     e.Price,
+		CreatedAt: timeutil.TimeToString(e.CreatedAt),
+		UpdatedAt: timeutil.TimeToString(e.UpdatedAt),
 	}
 
 	if e.Description != nil {

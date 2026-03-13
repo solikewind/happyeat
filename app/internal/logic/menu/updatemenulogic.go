@@ -63,7 +63,7 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 	})
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, err
+			return nil, errors.New("菜单不存在")
 		}
 		return nil, err
 	}

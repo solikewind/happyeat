@@ -5,6 +5,7 @@ package menu
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -32,7 +33,7 @@ func (l *DeleteMenuLogic) DeleteMenu(req *types.DeleteMenuReq) (*types.DeleteMen
 	err := l.svcCtx.Menu.Delete(l.ctx, int(req.Id))
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, err
+			return nil, errors.New("菜单不存在")
 		}
 		return nil, err
 	}
