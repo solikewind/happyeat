@@ -1,4 +1,4 @@
-.PHONY: api migrate run swagger swagger-serve
+.PHONY: api migrate run swagger swagger-serve air
 # 统一入口：一次生成 menu+table 的 types、handler、logic，避免相互覆盖
 api:
 	goctl api go --api app/api/v1/central.api --dir app
@@ -28,3 +28,7 @@ swagger:
 # 启动静态服务供 Swagger 预览：执行后浏览器打开 https://editor.swagger.io 并填入 http://localhost:3780/happyeat.json
 swagger-serve:
 	npx --yes http-server . -p 3780 -c-1 --cors 
+
+# 后端服务热加载air
+air:
+	air

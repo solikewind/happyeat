@@ -6,7 +6,6 @@ package menutype
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -15,13 +14,13 @@ import (
 )
 
 const (
-	errCategoryHasMenus      = "该分类下仍有菜单，无法删除"
-	errInvalidCategoryID     = "无效的分类ID"
+	errCategoryHasMenus  = "该分类下仍有菜单，无法删除"
+	errInvalidCategoryID = "无效的分类ID"
 )
 
 var (
-	ErrCategoryHasMenus      = errors.New(errCategoryHasMenus)
-	ErrInvalidCategoryID     = errors.New(errInvalidCategoryID)
+	ErrCategoryHasMenus  = errors.New(errCategoryHasMenus)
+	ErrInvalidCategoryID = errors.New(errInvalidCategoryID)
 )
 
 type DeleteMenuCategoryLogic struct {
@@ -54,7 +53,7 @@ func (l *DeleteMenuCategoryLogic) DeleteMenuCategory(req *types.DeleteMenuCatego
 	}
 
 	if count > 0 {
-		l.Warnf("无法删除菜单分类，该分类下仍有菜单，ID: %d, 菜单数: %d", req.Id, count)
+		l.Errorf("无法删除菜单分类，该分类下仍有菜单，ID: %d, 菜单数: %d", req.Id, count)
 		return nil, ErrCategoryHasMenus
 	}
 
