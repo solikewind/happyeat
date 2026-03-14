@@ -1,4 +1,32 @@
-# 忽略 Air 生成的临时目录
+# Air 生成的临时目录
 tmp/
-# 忽略所有的 exe 文件
+
+# 编译产物
 *.exe
+main
+bin
+dist
+build
+
+# 环境配置（敏感信息）
+.env
+.env.local
+.env.*.local
+
+# IDE 配置
+.idea
+.vscode
+*.iml
+.DS_Store
+
+# 日志
+*.log
+
+# 临时文件
+*.tmp
+*.swp
+*.swo
+*~
+
+# 系统文件
+Thumbs.db

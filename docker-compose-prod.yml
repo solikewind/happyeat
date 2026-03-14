@@ -7,19 +7,30 @@ services:
     container_name: happyeat-postgres
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-123456}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME:-happyeat}
-    ports:
-      - "${DB_PORT:-5432}:5432"
+      # 性能优化
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    # 生产环境不暴露数据库端口到主机
+    # ports:
+    #   - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # 备份目录
+      - postgres_backup:/backup
     networks:
       - happyeat-network
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # HappyEat API 服务
   happyeat-api:
@@ -34,16 +45,16 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-123456}
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME:-happyeat}
 
       # JWT 配置
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key}
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRE: ${JWT_EXPIRE:-86400}
 
       # LLM 配置
-      LLM_API_KEY: ${LLM_API_KEY:-}
-      LLM_BASE_URL: ${LLM_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      LLM_API_KEY: ${LLM_API_KEY}
+      LLM_BASE_URL: ${LLM_BASE_URL}
 
       # 时区
       TZ: Asia/Shanghai
@@ -59,9 +70,16 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   postgres_data:
+    driver: local
+  postgres_backup:
     driver: local
 
 networks:

@@ -52,6 +52,15 @@ func main() {
 	server.AddRoutes([]rest.Route{
 		{
 			Method: http.MethodGet,
+			Path:   "/health",
+			Handler: func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(`{"status":"ok","service":"happyeat-api"}`))
+			},
+		},
+		{
+			Method: http.MethodGet,
 			Path:   "/openapi/happyeat.json",
 			Handler: func(w http.ResponseWriter, r *http.Request) {
 				if _, err := os.Stat(openapiPath); err != nil {

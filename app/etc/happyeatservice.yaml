@@ -3,16 +3,16 @@ Host: 0.0.0.0
 Port: 8888
 
 Auth:
-  AccessSecret: "your-secret-key"
-  AccessExpire: 86400
+  AccessSecret: "${JWT_SECRET}"
+  AccessExpire: "${JWT_EXPIRE}"
 
-SqlConfig: 
-  DataSource: "postgres://postgres:123456@localhost:5432/happyeat?sslmode=disable"
+SqlConfig:
+  # 使用环境变量构建数据源
+  DataSource: "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
 
 casbin:
   model: "[request_definition]\nr = sub, obj, act\n[policy_definition]\np = sub, obj, act\n[role_definition]\ng = _, _\n[policy_effect]\ne = some(where (p.eft == allow))\n[matchers]\nm = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act"
 
 llm:
-  APIKey: "sk-582fe0130c5446a8972de15f278817cc"
-  BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
-
+  APIKey: "${LLM_API_KEY}"
+  BaseURL: "${LLM_BASE_URL}"

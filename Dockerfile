@@ -15,8 +15,8 @@ COPY . .
 
 # 编译优化：
 # CGO_ENABLED=0 确保静态链接，不需要依赖宿主机的 C 库
-# -ldflags="-s -w" 进一步压缩体积; "./app/internal"：main.go文件目录
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main ./app/internal
+# -ldflags="-s -w" 进一步压缩体积
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main ./app
 
 # 第二阶段：运行 (使用极简镜像)
 FROM alpine:3.20
@@ -33,12 +33,10 @@ WORKDIR /app
 
 # 拷贝二进制文件
 COPY --from=builder /project/happyeat/main .
-# 如果有配置目录，再单独考进来
-# COPY --from=builder /app/config ./config
 
-# 如果你的程序需要读取配置文件（如 config.yaml）
-# COPY config.yaml .
+# 拷贝配置文件
+COPY --from=builder /project/happyeat/app/etc ./app/etc
 
-EXPOSE 8080
+EXPOSE 8888
 
 CMD ["./main"]
