@@ -15,8 +15,8 @@ COPY . .
 
 # 编译优化：
 # CGO_ENABLED=0 确保静态链接，不需要依赖宿主机的 C 库
-# -ldflags="-s -w" 进一步压缩体积
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main .
+# -ldflags="-s -w" 进一步压缩体积; "./app/internal"：main.go文件目录
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main ./app/internal
 
 # 第二阶段：运行 (使用极简镜像)
 FROM alpine:3.20
