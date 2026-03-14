@@ -57,8 +57,7 @@ coverage.html
 .gitlab-ci.yml
 Jenkinsfile
 
-# 数据库迁移工具（生产不需要）
-app/cmd
+# 数据库迁移工具（保留 migrate）
 
 # 调试
 debug
