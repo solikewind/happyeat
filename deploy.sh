@@ -32,7 +32,7 @@ elif docker compose version &> /dev/null; then
 else
     echo -e "${RED}错误: Docker Compose 未安装${NC}"
     echo "请先安装 Docker Compose: https://docs.docker.com/compose/install/"
-    echo "或者安装 Docker Com Compose 插件:"
+    echo "或者安装 Docker Compose 插件:"
     echo "  sudo apt install -y docker-compose-plugin"
     exit 1
 fi
@@ -75,10 +75,49 @@ echo "启动服务..."
 $DOCKER_COMPOSE -f docker-compose-prod.yml up -d
 echo -e "${GREEN}✓ 服务已启动${NC}"
 
-# 等待服务就绪
+# 等待数据库就绪
 echo ""
-echo "等待服务就绪..."
-sleep 5
+echo "等待数据库就绪..."
+max_wait=30
+waited=0
+while ! docker exec happyeat-postgres pg_isready -U postgres > /dev/null 2>&1; do
+    if [ $waited -ge $max_wait ]; then
+        echo -e "${RED}错误: 数据库未就绪${NC}"
+        exit 1
+    fi
+    echo -n "."
+    sleep 1
+    waited=$((waited + 1))
+done
+echo ""
+echo -e "${GREEN}✓ 数据库已就绪${NC}"
+
+# 运行数据库迁移
+echo ""
+echo "运行数据库迁移..."
+if docker exec happyeat-api /app/migrate -f /app/etc/happyeatservice.yaml; then
+    echo -e "${GREEN}✓ 数据库迁移完成${NC}"
+else
+    echo -e "${YELLOW}注意: 数据库迁移失败或已存在${NC}"
+    echo -e "${YELLOW}查看日志以获取详细信息${NC}"
+fi
+
+# 等待 API 服务就绪
+echo ""
+echo "等待 API 服务就绪..."
+sleep 3
+max_wait=30
+waited=0
+until curl -s http://localhost:8888/health > /dev/null 2>&1; do
+    if [ $waited -ge $max_wait ]; then
+        echo -e "${YELLOW}警告: API 服务可能未完全就绪${NC}"
+        break
+    fi
+    echo -n "."
+    sleep 1
+    waited=$((waited + 1))
+done
+echo ""
 
 # 检查服务状态
 echo ""
@@ -94,6 +133,11 @@ echo ""
 echo "查看日志: $DOCKER_COMPOSE -f docker-compose-prod.yml logs -f"
 echo "停止服务: $DOCKER_COMPOSE -f docker-compose-prod.yml down"
 echo "重启服务: $DOCKER_COMPOSE -f docker-compose-prod.yml restart"
+echo ""
+echo "数据库相关:"
+echo "  查看表: docker exec happyeat-postgres psql -U postgres -d happyeat -c '\dt'"
+echo "  进入数据库: docker exec -it happyeat-postgres psql -U postgres -d happyeat"
+echo "  备份数据: docker exec happyeat-postgres pg_dump -U postgres happyeat > backup.sql"
 echo ""
 echo -e "${GREEN}服务访问地址: http://localhost:8888${NC}"
 echo -e "${GREEN}健康检查: http://localhost:8888/health${NC}"

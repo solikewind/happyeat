@@ -18,6 +18,9 @@ COPY . .
 # -ldflags="-s -w" 进一步压缩体积
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main ./app
 
+# 编译迁移工具
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o migrate ./app/cmd/migrate
+
 # 第二阶段：运行 (使用极简镜像)
 FROM alpine:3.20
 
@@ -34,8 +37,11 @@ WORKDIR /app
 # 拷贝二进制文件
 COPY --from=builder /project/happyeat/main .
 
-# 拷贝配置文件
-COPY --from=builder /project/happyeat/app/etc ./app/etc
+# 拷贝迁移工具
+COPY --from=builder /project/happyeat/migrate .
+
+# 拷贝配置文件（复制到 etc 目录，与程序默认路径匹配）
+COPY --from=builder /project/happyeat/app/etc ./etc
 
 EXPOSE 8888
 
