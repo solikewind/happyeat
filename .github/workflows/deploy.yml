@@ -1,4 +1,4 @@
-name: Deploy Backend
+﻿name: Deploy Backend
 
 on:
   push:
@@ -17,4 +17,5 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script_stop: true
           script: |
-            /home/ubuntu/deploy-happyeat.sh
+            /home/ubuntu/docker-ps/deploy-happyeat.sh
+
