@@ -33,17 +33,13 @@ services:
       dockerfile: Dockerfile
     image: happyeat-api:${APP_IMAGE_TAG:-latest}
     container_name: happyeat-api
-    command:
-      [
-        "/bin/sh",
-        "-c",
-        "if ./main -h 2>&1 | grep -q -- ' -rf '; then if [ -f /run/config/happyeatservice.remote.yaml ]; then exec ./main -f /app/etc/happyeatservice.yaml -rf /run/config/happyeatservice.remote.yaml; else exec ./main -f /app/etc/happyeatservice.yaml; fi; else exec ./main -f /app/etc/happyeatservice.yaml; fi"
-      ]
+    command: ["./main", "-f", "/run/config/happyeatservice.remote.yaml"]
     ports:
       - "${API_PORT:-8888}:8888"
     environment:
       TZ: ${TZ:-Asia/Shanghai}
     volumes:
+      # 2. 将宿主机的 etc 目录挂载到容器的 /run/config
       - ./app/etc:/run/config:ro
     depends_on:
       postgres:
