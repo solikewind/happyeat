@@ -98,24 +98,30 @@ fi
 echo "[7/7] Starting API service..."
 compose_cmd -f docker-compose-prod.yml up -d happyeat-api
 
-# 修改 deploy.sh 中的健康检查部分
-echo "Waiting for API health..."
-MAX_RETRIES=10
-COUNT=0
+# ... 前面是你的 docker compose up -d 等部署逻辑 ...
 
-while [ $COUNT -lt $MAX_RETRIES ]; do
-    # 检查 8888 端口是否在监听（比检查 Docker Health 标签更靠谱）
-    if docker exec happyeat-api netstat -an | grep :8888 | grep LISTEN > /dev/null; then
-        echo "✅ API is up and listening on 8888!"
-        exit 0
-    fi
-    echo "Retrying ($((COUNT+1))/$MAX_RETRIES)..."
-    sleep 5
-    COUNT=$((COUNT+1))
+echo "📊 当前容器状态:"
+docker compose -f docker-compose-prod.yml ps
+
+echo "⏳ 正在验证 API 响应状况 (最多等待 30 秒)..."
+
+SUCCESS=0
+# 循环 6 次，每次休眠 5 秒 = 30 秒
+for i in {1..6}; do
+  # 探测 localhost:8888。只要返回了 HTTP 状态码（无论是 200 还是 404），都说明 Web 服务活了
+  if curl -s --head --request GET http://localhost:8888 | grep "HTTP/" > /dev/null; then
+    echo "✅ API 已就绪，连接正常!"
+    SUCCESS=1
+    break
+  fi
+  echo "🔄 尝试中 ($i/6)... API 暂无响应"
+  sleep 5
 done
 
-echo "Error: API did not become healthy in time."
-exit 1
-
-echo "Service status:"
-compose_cmd -f docker-compose-prod.yml ps
+if [ $SUCCESS -eq 1 ]; then
+  echo "🚀 部署圆满成功！"
+  exit 0
+else
+  echo "❌ 错误: API 在启动后 30 秒内未能建立响应，请检查日志 (docker logs happyeat-api)"
+  exit 1
+fi
