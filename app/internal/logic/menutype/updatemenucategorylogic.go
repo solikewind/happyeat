@@ -5,6 +5,7 @@ package menutype
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -30,11 +31,14 @@ func NewUpdateMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 
 func (l *UpdateMenuCategoryLogic) UpdateMenuCategory(req *types.UpdateMenuCategoryReq) (*types.UpdateMenuCategoryReply, error) {
 	c := req.MenuCategory
+	if c.Name == "" {
+		return nil, errors.New("分类名称不能为空")
+	}
 
 	err := l.svcCtx.MenuType.Update(l.ctx, int(req.Id), c.Name, c.Description)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, err
+			return nil, errors.New("菜单分类不存在")
 		}
 		return nil, err
 	}

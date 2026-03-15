@@ -258,14 +258,14 @@ type OrderItem struct {
 }
 
 type Table struct {
-	Id         uint64 `json:"id"`               // 餐桌id
-	Code       string `json:"code"`             // 桌号
-	Status     string `json:"status"`           // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
-	Capacity   int    `json:"capacity"`         // 可坐人数
-	CategoryId uint64 `json:"category_id"`      // 餐桌分类id
-	QrCode     string `json:"qr_code,optional"` // 二维码
-	CreateAt   int64  `json:"create_at"`        // 创建时间
-	UpdateAt   int64  `json:"update_at"`        // 更新时间
+	Id         uint64 `json:"id"`                 // 餐桌id
+	Code       string `json:"code"`               // 桌号
+	Status     string `json:"status"`             // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
+	Capacity   int    `json:"capacity"`           // 可坐人数
+	CategoryId uint64 `json:"category_id"`        // 餐桌分类id
+	QrCode     string `json:"qr_code,optional"`   // 二维码
+	CreateAt   int64  `json:"create_at,optional"` // 创建时间
+	UpdateAt   int64  `json:"update_at,optional"` // 更新时间
 }
 
 type TableCategory struct {
@@ -277,9 +277,14 @@ type TableCategory struct {
 type UpdateMenuCategoryReply struct {
 }
 
+type UpdateMenuCategoryInput struct {
+	Name        string `json:"name"`
+	Description string `json:"description,optional"`
+}
+
 type UpdateMenuCategoryReq struct {
-	Id           uint64       `path:"id"`
-	MenuCategory MenuCategory `json:"category"`
+	Id           uint64                  `path:"id"`
+	MenuCategory UpdateMenuCategoryInput `json:"category"`
 }
 
 type UpdateMenuReply struct {
@@ -310,15 +315,28 @@ type UpdateOrderStatusReq struct {
 type UpdateTableCategoryReply struct {
 }
 
+type UpdateTableCategoryInput struct {
+	Name        string `json:"name"`
+	Description string `json:"description,optional"`
+}
+
 type UpdateTableCategoryReq struct {
-	Id            uint64        `path:"id"`
-	TableCategory TableCategory `json:"category"`
+	Id            uint64                   `path:"id"`
+	TableCategory UpdateTableCategoryInput `json:"category"`
 }
 
 type UpdateTableReply struct {
 }
 
+type UpdateTableInput struct {
+	Code       string `json:"code"`
+	Status     string `json:"status"`
+	Capacity   int    `json:"capacity"`
+	CategoryId uint64 `json:"category_id"`
+	QrCode     string `json:"qr_code,optional"`
+}
+
 type UpdateTableReq struct {
-	Id    uint64 `path:"id"`
-	Table Table  `json:"table"`
+	Id    uint64           `path:"id"`
+	Table UpdateTableInput `json:"table"`
 }

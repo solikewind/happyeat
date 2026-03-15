@@ -85,10 +85,15 @@ type ListMenusCategoriesReq {
     MenuCategory MenuCategory `json:"category"`
  }
 
+// 更新菜单分类仅允许可编辑字段
+type UpdateMenuCategoryInput {
+	Name        string `json:"name"`
+	Description string `json:"description,optional"`
+}
 
  type UpdateMenuCategoryReq {
-    Id           uint64        `path:"id"`
-    MenuCategory MenuCategory  `json:"category"`
+    Id           uint64                 `path:"id"`
+    MenuCategory UpdateMenuCategoryInput `json:"category"`
  }
  type UpdateMenuCategoryReply {}
 

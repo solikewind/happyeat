@@ -37,9 +37,18 @@ type CreateTableReq {
 }
 type CreateTableReply {}
 
+// 更新餐桌仅允许可编辑字段，create_at/update_at 由服务端维护
+type UpdateTableInput {
+	Code       string `json:"code"`
+	Status     string `json:"status"`
+	Capacity   int    `json:"capacity"`
+	CategoryId uint64 `json:"category_id"`
+	QrCode     string `json:"qr_code,optional"`
+}
+
 type UpdateTableReq {
-	Id    uint64 `path:"id"`
-	Table Table  `json:"table"`
+	Id    uint64           `path:"id"`
+	Table UpdateTableInput `json:"table"`
 }
 type UpdateTableReply {}
 
@@ -72,9 +81,15 @@ type CreateTableCategoryReq {
 }
 type CreateTableCategoryReply {}
 
+// 更新餐桌分类仅允许可编辑字段
+type UpdateTableCategoryInput {
+	Name        string `json:"name"`
+	Description string `json:"description,optional"`
+}
+
 type UpdateTableCategoryReq {
-	Id            uint64        `path:"id"`
-	TableCategory TableCategory `json:"category"`
+	Id            uint64                   `path:"id"`
+	TableCategory UpdateTableCategoryInput `json:"category"`
 }
 type UpdateTableCategoryReply {}
 

@@ -5,9 +5,11 @@ package tablecategory
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +30,18 @@ func NewUpdateTableCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext
 }
 
 func (l *UpdateTableCategoryLogic) UpdateTableCategory(req *types.UpdateTableCategoryReq) (resp *types.UpdateTableCategoryReply, err error) {
-	// todo: add your logic here and delete this line
+	c := req.TableCategory
+	if c.Name == "" {
+		return nil, errors.New("分类名称不能为空")
+	}
 
-	return
+	err = l.svcCtx.TableType.Update(l.ctx, int(req.Id), c.Name, c.Description)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("餐桌分类不存在")
+		}
+		return nil, err
+	}
+
+	return &types.UpdateTableCategoryReply{}, nil
 }

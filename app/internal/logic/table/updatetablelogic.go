@@ -5,9 +5,12 @@ package table
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/dal/model/ent"
+	daltable "github.com/solikewind/happyeat/dal/model/table"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +31,38 @@ func NewUpdateTableLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Updat
 }
 
 func (l *UpdateTableLogic) UpdateTable(req *types.UpdateTableReq) (resp *types.UpdateTableReply, err error) {
-	// todo: add your logic here and delete this line
+	t := req.Table
+	if t.Code == "" {
+		return nil, errors.New("餐桌编号不能为空")
+	}
+	if t.Status == "" {
+		return nil, errors.New("餐桌状态不能为空")
+	}
+	if t.Capacity <= 0 {
+		return nil, errors.New("餐桌容量不能小于等于0")
+	}
 
-	return
+	_, err = l.svcCtx.TableType.GetByID(l.ctx, t.CategoryId)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("餐桌分类不存在")
+		}
+		return nil, err
+	}
+
+	err = l.svcCtx.Table.Update(l.ctx, int(req.Id), daltable.UpdateTableInput{
+		Code:       t.Code,
+		Status:     t.Status,
+		Capacity:   t.Capacity,
+		CategoryID: int(t.CategoryId),
+		QRCode:     t.QrCode,
+	})
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("餐桌不存在")
+		}
+		return nil, err
+	}
+
+	return &types.UpdateTableReply{}, nil
 }
