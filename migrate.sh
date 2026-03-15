@@ -20,11 +20,21 @@ if [ ! -f app/etc/happyeatservice.remote.yaml ]; then
   exit 1
 fi
 
-if ! compose_cmd -f docker-compose-prod.yml ps -q happyeat-api | grep -q .; then
-  echo "Error: happyeat-api is not running. Deploy first."
+if ! compose_cmd -f docker-compose-prod.yml ps -q postgres | grep -q .; then
+  echo "Error: postgres is not running. Deploy first."
   exit 1
 fi
 
 echo "Running database migration..."
-docker exec happyeat-api /bin/sh -c 'if /app/migrate -h 2>&1 | grep -q -- " -rf "; then /app/migrate -f /app/etc/happyeatservice.yaml -rf /run/config/happyeatservice.remote.yaml; else /app/migrate -f /app/etc/happyeatservice.yaml; fi'
+compose_cmd -f docker-compose-prod.yml run --rm --no-deps happyeat-api /bin/sh -c '
+  if /app/migrate -h 2>&1 | grep -q -- " -rf "; then
+    if [ -f /run/config/happyeatservice.remote.yaml ]; then
+      /app/migrate -f /app/etc/happyeatservice.yaml -rf /run/config/happyeatservice.remote.yaml
+    else
+      /app/migrate -f /app/etc/happyeatservice.yaml
+    fi
+  else
+    /app/migrate -f /app/etc/happyeatservice.yaml
+  fi
+'
 echo "Migration finished."
