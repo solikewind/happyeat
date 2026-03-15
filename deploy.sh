@@ -75,7 +75,7 @@ for i in {1..60}; do
 done
 
 echo "[6/6] Running migration..."
-docker exec happyeat-api /bin/sh -c '/app/migrate -f /app/etc/happyeatservice.yaml -rf /run/config/happyeatservice.remote.yaml'
+docker exec happyeat-api /bin/sh -c 'if /app/migrate -h 2>&1 | grep -q -- " -rf "; then /app/migrate -f /app/etc/happyeatservice.yaml -rf /run/config/happyeatservice.remote.yaml; else /app/migrate -f /app/etc/happyeatservice.yaml; fi'
 
 echo "Service status:"
 compose_cmd -f docker-compose-prod.yml ps
