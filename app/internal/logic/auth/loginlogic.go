@@ -17,7 +17,7 @@ import (
 
 // 开发环境默认账号（仅用于 Swagger/联调，生产应改为真实登录或配置）
 const devUsername = "admin"
-const devPassword = "admin"
+const devPassword = "admin123"
 
 type LoginLogic struct {
 	logx.Logger
