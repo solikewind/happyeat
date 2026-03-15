@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "WebFetch(domain:go-zero.dev)"
+      "WebFetch(domain:go-zero.dev)",
+      "Bash(docker compose:*)"
     ]
   }
 }

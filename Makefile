@@ -20,6 +20,8 @@ fix-runtime:
 # 启动 HTTP 服务（需先执行 make migrate，可选执行 dal/casbin/init_policy.sql）
 run:
 	cd app && go run . -f etc/happyeatservice.yaml
+run-l:
+	cd app && go run . -f etc/happyeatservice.local.yaml
 
 # 根据 central.api 生成 Swagger 接口文档（JSON 默认生成到项目根目录 happyeat.json；需 goctl >= 1.8.2）
 swagger:

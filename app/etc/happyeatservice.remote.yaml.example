@@ -1,0 +1,13 @@
+# Production override config for Docker deployment.
+# Copy this file to happyeatservice.remote.yaml and fill actual values.
+
+Auth:
+  AccessSecret: "replace-with-strong-jwt-secret"
+  AccessExpire: 86400
+
+SqlConfig:
+  DataSource: "postgres://postgres:replace-db-password@postgres:5432/happyeat?sslmode=disable"
+
+llm:
+  APIKey: ""
+  BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"

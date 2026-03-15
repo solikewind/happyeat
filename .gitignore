@@ -12,6 +12,8 @@ build
 .env
 .env.local
 .env.*.local
+app/etc/happyeatservice.yaml
+app/etc/happyeatservice.remote.yaml
 
 # IDE 配置
 .idea

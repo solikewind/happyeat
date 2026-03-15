@@ -1,144 +1,83 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# HappyEat API 部署脚本
-# 使用方法: bash deploy.sh
+set -Eeuo pipefail
 
-set -e  # 遇到错误立即退出
+compose_cmd() {
+  if command -v docker-compose >/dev/null 2>&1; then
+    docker-compose "$@"
+  else
+    docker compose "$@"
+  fi
+}
 
 echo "=========================================="
-echo "  HappyEat API 部署脚本"
+echo "  HappyEat API Production Deploy"
 echo "=========================================="
 
-# 颜色定义
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-# 检查 Docker 是否安装
-if ! command -v docker &> /dev/null; then
-    echo -e "${RED}错误: Docker 未安装${NC}"
-    echo "请先安装 Docker: https://docs.docker.com/engine/install/"
-    exit 1
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Error: Docker is not installed."
+  exit 1
 fi
 
-# 检查 Docker Compose 是否安装（支持 docker-compose 或 docker compose）
-if command -v docker-compose &> /dev/null; then
-    DOCKER_COMPOSE="docker-compose"
-    echo -e "${GREEN}✓ 使用 docker-compose${NC}"
-elif docker compose version &> /dev/null; then
-    DOCKER_COMPOSE="docker compose"
-    echo -e "${GREEN}✓ 使用 docker compose（插件版本）${NC}"
-else
-    echo -e "${RED}错误: Docker Compose 未安装${NC}"
-    echo "请先安装 Docker Compose: https://docs.docker.com/compose/install/"
-    echo "或者安装 Docker Compose 插件:"
-    echo "  sudo apt install -y docker-compose-plugin"
-    exit 1
+if [ ! -f docker-compose-prod.yml ]; then
+  echo "Error: docker-compose-prod.yml not found."
+  exit 1
 fi
 
-# 检查 .env 文件是否存在
 if [ ! -f .env ]; then
-    echo -e "${YELLOW}警告: .env 文件不存在${NC}"
-    if [ -f .env.example ]; then
-        echo "从 .env.example 创建 .env 文件..."
-        cp .env.example .env
-        echo -e "${YELLOW}请编辑 .env 文件，填入正确的配置后重新运行部署脚本${NC}"
-        exit 1
-    else
-        echo -e "${RED}错误: .env.example 文件也不存在${NC}"
-        exit 1
-    fi
+  echo "Error: .env not found. Please copy from .env.example first."
+  exit 1
 fi
 
-echo -e "${GREEN}✓ 环境检查通过${NC}"
+# Export .env so shell checks use the same values as compose.
+set -a
+. ./.env
+set +a
 
-# 停止旧服务（如果存在）
-echo ""
-echo "停止旧服务..."
-if $DOCKER_COMPOSE -f docker-compose-prod.yml ps -q 2>/dev/null | grep -q .; then
-    $DOCKER_COMPOSE -f docker-compose-prod.yml down
-    echo -e "${GREEN}✓ 旧服务已停止${NC}"
-else
-    echo "没有运行中的服务"
+if [ ! -f app/etc/happyeatservice.remote.yaml ]; then
+  echo "Error: app/etc/happyeatservice.remote.yaml not found."
+  echo "Hint: cp app/etc/happyeatservice.remote.yaml.example app/etc/happyeatservice.remote.yaml"
+  exit 1
 fi
 
-# 构建新镜像
-echo ""
-echo "构建 Docker 镜像..."
-$DOCKER_COMPOSE -f docker-compose-prod.yml build --no-cache
-echo -e "${GREEN}✓ 镜像构建完成${NC}"
+if [ "${DB_PASSWORD:-}" = "change-this-password" ]; then
+  echo "Error: DB_PASSWORD is still placeholder in .env."
+  exit 1
+fi
 
-# 启动服务
-echo ""
-echo "启动服务..."
-$DOCKER_COMPOSE -f docker-compose-prod.yml up -d
-echo -e "${GREEN}✓ 服务已启动${NC}"
+if grep -q "replace-with-strong-jwt-secret\|replace-db-password" app/etc/happyeatservice.remote.yaml; then
+  echo "Error: app/etc/happyeatservice.remote.yaml still contains placeholder values."
+  exit 1
+fi
 
-# 等待数据库就绪
-echo ""
-echo "等待数据库就绪..."
-max_wait=30
-waited=0
-while ! docker exec happyeat-postgres pg_isready -U postgres > /dev/null 2>&1; do
-    if [ $waited -ge $max_wait ]; then
-        echo -e "${RED}错误: 数据库未就绪${NC}"
-        exit 1
-    fi
-    echo -n "."
-    sleep 1
-    waited=$((waited + 1))
+echo "[1/6] Checking compose file..."
+compose_cmd -f docker-compose-prod.yml config >/dev/null
+
+echo "[2/6] Stopping old services..."
+compose_cmd -f docker-compose-prod.yml down || true
+
+echo "[3/6] Building images..."
+compose_cmd -f docker-compose-prod.yml build --pull
+
+echo "[4/6] Starting services..."
+compose_cmd -f docker-compose-prod.yml up -d
+
+echo "[5/6] Waiting for database to be ready..."
+for i in {1..60}; do
+  if docker exec happyeat-postgres /bin/sh -c 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"' >/dev/null 2>&1; then
+    break
+  fi
+  if [ "$i" -eq 60 ]; then
+    echo "Error: database is not ready after 60 seconds."
+    exit 1
+  fi
+  sleep 1
 done
-echo ""
-echo -e "${GREEN}✓ 数据库已就绪${NC}"
 
-# 运行数据库迁移
-echo ""
-echo "运行数据库迁移..."
-if docker exec happyeat-api /app/migrate -f /app/etc/happyeatservice.yaml; then
-    echo -e "${GREEN}✓ 数据库迁移完成${NC}"
-else
-    echo -e "${YELLOW}注意: 数据库迁移失败或已存在${NC}"
-    echo -e "${YELLOW}查看日志以获取详细信息${NC}"
-fi
+echo "[6/6] Running migration..."
+docker exec happyeat-api /bin/sh -c '/app/migrate -f /app/etc/happyeatservice.yaml -rf /run/config/happyeatservice.remote.yaml'
 
-# 等待 API 服务就绪
-echo ""
-echo "等待 API 服务就绪..."
-sleep 3
-max_wait=30
-waited=0
-until curl -s http://localhost:8888/health > /dev/null 2>&1; do
-    if [ $waited -ge $max_wait ]; then
-        echo -e "${YELLOW}警告: API 服务可能未完全就绪${NC}"
-        break
-    fi
-    echo -n "."
-    sleep 1
-    waited=$((waited + 1))
-done
-echo ""
+echo "Service status:"
+compose_cmd -f docker-compose-prod.yml ps
 
-# 检查服务状态
-echo ""
-echo "检查服务状态..."
-$DOCKER_COMPOSE -f docker-compose-prod.yml ps
-
-# 显示日志
-echo ""
-echo "=========================================="
-echo "  部署完成！"
-echo "=========================================="
-echo ""
-echo "查看日志: $DOCKER_COMPOSE -f docker-compose-prod.yml logs -f"
-echo "停止服务: $DOCKER_COMPOSE -f docker-compose-prod.yml down"
-echo "重启服务: $DOCKER_COMPOSE -f docker-compose-prod.yml restart"
-echo ""
-echo "数据库相关:"
-echo "  查看表: docker exec happyeat-postgres psql -U postgres -d happyeat -c '\dt'"
-echo "  进入数据库: docker exec -it happyeat-postgres psql -U postgres -d happyeat"
-echo "  备份数据: docker exec happyeat-postgres pg_dump -U postgres happyeat > backup.sql"
-echo ""
-echo -e "${GREEN}服务访问地址: http://localhost:8888${NC}"
-echo -e "${GREEN}健康检查: http://localhost:8888/health${NC}"
-echo ""
+echo "Done. Health check: http://localhost:${API_PORT:-8888}/health"

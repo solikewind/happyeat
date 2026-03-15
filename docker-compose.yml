@@ -1,14 +1,14 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # PostgreSQL 数据库
   postgres:
-    image: postgres:16-alpine
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
     container_name: happyeat-postgres
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-123456}
       POSTGRES_DB: ${DB_NAME:-happyeat}
+      TZ: ${TZ:-Asia/Shanghai}
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
@@ -16,37 +16,29 @@ services:
     networks:
       - happyeat-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-happyeat}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # HappyEat API 服务
   happyeat-api:
     build:
       context: .
       dockerfile: Dockerfile
+    image: happyeat-api:${APP_IMAGE_TAG:-latest}
     container_name: happyeat-api
+    command:
+      [
+        "/bin/sh",
+        "-c",
+        "if [ -f /run/config/happyeatservice.remote.yaml ]; then exec ./main -f /app/etc/happyeatservice.yaml -rf /run/config/happyeatservice.remote.yaml; else exec ./main -f /app/etc/happyeatservice.yaml; fi"
+      ]
     ports:
       - "${API_PORT:-8888}:8888"
     environment:
-      # 数据库配置
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-123456}
-      DB_NAME: ${DB_NAME:-happyeat}
-
-      # JWT 配置
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key}
-      JWT_EXPIRE: ${JWT_EXPIRE:-86400}
-
-      # LLM 配置
-      LLM_API_KEY: ${LLM_API_KEY:-}
-      LLM_BASE_URL: ${LLM_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
-
-      # 时区
-      TZ: Asia/Shanghai
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ./app/etc:/run/config:ro
     depends_on:
       postgres:
         condition: service_healthy
