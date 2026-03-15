@@ -92,7 +92,7 @@ func (d SoftDeleteMixin) Hooks() []ent.Hook {
 					mx, ok := m.(interface {
 						SetOp(ent.Op)
 						Client() *gen.Client
-						SetDeletedTs(int64)
+						SetDeleteTs(int64)
 						WhereP(...func(*sql.Selector))
 					})
 					if !ok {
@@ -100,7 +100,7 @@ func (d SoftDeleteMixin) Hooks() []ent.Hook {
 					}
 					d.P(mx)
 					mx.SetOp(ent.OpUpdate)
-					mx.SetDeletedTs(CSTNow().Unix())
+					mx.SetDeleteTs(CSTNow().Unix())
 					return mx.Client().Mutate(ctx, m)
 				})
 			},

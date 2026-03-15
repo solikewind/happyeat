@@ -218,8 +218,8 @@ type Menu struct {
 	Price       float64    `json:"price"`                // 菜单价格
 	CategoryId  uint64     `json:"category_id"`          // 菜单分类id
 	Specs       []MenuSpec `json:"specs,optional"`       // 规格列表
-	CreatedAt   string     `json:"create_at"`            // 创建时间
-	UpdatedAt   string     `json:"update_at"`            // 更新时间
+	CreatedAt   string     `json:"create_at,optional"`   // 创建时间
+	UpdatedAt   string     `json:"update_at,optional"`   // 更新时间
 }
 
 type MenuCategory struct {
@@ -285,9 +285,18 @@ type UpdateMenuCategoryReq struct {
 type UpdateMenuReply struct {
 }
 
+type UpdateMenuInput struct {
+	Name        string     `json:"name"`
+	Description string     `json:"description,optional"`
+	Image       string     `json:"image,optional"`
+	Price       float64    `json:"price"`
+	CategoryId  uint64     `json:"category_id"`
+	Specs       []MenuSpec `json:"specs,optional"`
+}
+
 type UpdateMenuReq struct {
-	Id   uint64 `path:"id"`
-	Menu Menu   `json:"menu"`
+	Id   uint64          `path:"id"`
+	Menu UpdateMenuInput `json:"menu"`
 }
 
 type UpdateOrderStatusReply struct {

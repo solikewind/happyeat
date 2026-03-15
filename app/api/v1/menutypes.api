@@ -46,10 +46,19 @@ type ListMenusReq {
     Menu Menu `json:"menu"`
  }
 
+// 更新菜单仅允许可编辑字段，create_at/update_at 由服务端维护
+type UpdateMenuInput {
+	Name        string     `json:"name"`
+	Description string     `json:"description,optional"`
+	Image       string     `json:"image,optional"`
+	Price       float64    `json:"price"`
+	CategoryId  uint64     `json:"category_id"`
+	Specs       []MenuSpec `json:"specs,optional"`
+}
 
  type UpdateMenuReq {
     Id   uint64 `path:"id"`
-    Menu Menu   `json:"menu"`
+    Menu UpdateMenuInput   `json:"menu"`
  }
  type UpdateMenuReply {}
 
