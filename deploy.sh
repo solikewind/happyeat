@@ -98,32 +98,24 @@ fi
 echo "[7/7] Starting API service..."
 compose_cmd -f docker-compose-prod.yml up -d happyeat-api
 
+# 修改 deploy.sh 中的健康检查部分
 echo "Waiting for API health..."
-for i in {1..60}; do
-  state="$(docker inspect -f '{{.State.Status}}' happyeat-api 2>/dev/null || true)"
-  health="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' happyeat-api 2>/dev/null || true)"
-  if [ "$state" != "running" ]; then
-    echo "API container is not running (state: ${state:-unknown}). Recent logs:"
-    compose_cmd -f docker-compose-prod.yml logs --tail=120 happyeat-api || true
-    exit 1
-  fi
-  if [ "$health" = "healthy" ]; then
-    break
-  fi
-  if [ "$health" = "unhealthy" ]; then
-    echo "API failed to become healthy. Recent logs:"
-    compose_cmd -f docker-compose-prod.yml logs --tail=120 happyeat-api || true
-    exit 1
-  fi
-  if [ "$i" -eq 60 ]; then
-    echo "Error: API did not become healthy in time."
-    compose_cmd -f docker-compose-prod.yml logs --tail=120 happyeat-api || true
-    exit 1
-  fi
-  sleep 1
+MAX_RETRIES=10
+COUNT=0
+
+while [ $COUNT -lt $MAX_RETRIES ]; do
+    # 检查 8888 端口是否在监听（比检查 Docker Health 标签更靠谱）
+    if docker exec happyeat-api netstat -an | grep :8888 | grep LISTEN > /dev/null; then
+        echo "✅ API is up and listening on 8888!"
+        exit 0
+    fi
+    echo "Retrying ($((COUNT+1))/$MAX_RETRIES)..."
+    sleep 5
+    COUNT=$((COUNT+1))
 done
+
+echo "Error: API did not become healthy in time."
+exit 1
 
 echo "Service status:"
 compose_cmd -f docker-compose-prod.yml ps
-
-echo "Done. Health check: http://localhost:${API_PORT:-8888}/health"

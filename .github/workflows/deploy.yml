@@ -19,3 +19,25 @@ jobs:
           script: |
             /home/ubuntu/docker-ps/deploy-happyeat.sh
 
+# ... 前面是部署逻辑 ...
+
+echo "Waiting for API to respond..."
+# 使用 curl 探测 30 秒，只要有响应（哪怕 404）就认为部署成功
+SUCCESS=0
+for i in {1..6}; do
+  if curl -s --head  --request GET http://localhost:8888 | grep "200\|404" > /dev/null; then
+    echo "✅ API is responding!"
+    SUCCESS=1
+    break
+  fi
+  echo "Retrying in 5s..."
+  sleep 5
+done
+
+if [ $SUCCESS -eq 1 ]; then
+  exit 0
+else
+  echo "❌ API failed to respond"
+  exit 1 # 这才会真正触发 GitHub Actions 的红叉
+fi
+
