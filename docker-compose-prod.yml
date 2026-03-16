@@ -11,8 +11,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - postgres_backup:/backup
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     networks:
       - happyeat-network
     restart: unless-stopped
