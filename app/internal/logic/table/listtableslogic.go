@@ -8,6 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/common/util/timeutil"
 	daltable "github.com/solikewind/happyeat/dal/model/table"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -64,8 +65,8 @@ func (l *ListTablesLogic) ListTables(req *types.ListTablesReq) (resp *types.List
 			Capacity:   e.Capacity,
 			CategoryId: categoryID,
 			QrCode:     ptrToStr(e.QrCode),
-			CreateAt:   e.CreatedAt.Unix(),
-			UpdateAt:   e.UpdatedAt.Unix(),
+			CreatedAt:  timeutil.TimeToString(e.CreatedAt),
+			UpdatedAt:  timeutil.TimeToString(e.UpdatedAt),
 		})
 	}
 	return &types.ListTablesReply{Tables: tables, Total: total}, nil

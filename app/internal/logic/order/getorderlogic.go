@@ -8,6 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/common/util/timeutil"
 	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -45,8 +46,8 @@ func EntOrderToType(e *ent.Order) types.Order {
 		OrderType:   e.OrderType,
 		Status:      e.Status,
 		TotalAmount: e.TotalAmount,
-		CreateAt:    e.CreatedAt.Unix(),
-		UpdateAt:    e.UpdatedAt.Unix(),
+		CreatedAt:   timeutil.TimeToString(e.CreatedAt),
+		UpdatedAt:   timeutil.TimeToString(e.UpdatedAt),
 	}
 
 	if e.Remark != nil {

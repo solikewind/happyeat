@@ -245,8 +245,8 @@ type Order struct {
 	TableCategory string      `json:"table_category,optional"` // 餐桌类别（如大厅、包间）
 	Remark        string      `json:"remark,optional"`         // 备注
 	Items         []OrderItem `json:"items,optional"`          // 订单明细
-	CreateAt      int64       `json:"create_at"`               // 创建时间
-	UpdateAt      int64       `json:"update_at"`               // 更新时间
+	CreatedAt     string      `json:"create_at"`               // 创建时间
+	UpdatedAt     string      `json:"update_at"`               // 更新时间
 }
 
 type OrderItem struct {
@@ -258,14 +258,14 @@ type OrderItem struct {
 }
 
 type Table struct {
-	Id         uint64 `json:"id"`                 // 餐桌id
-	Code       string `json:"code"`               // 桌号
-	Status     string `json:"status"`             // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
-	Capacity   int    `json:"capacity"`           // 可坐人数
-	CategoryId uint64 `json:"category_id"`        // 餐桌分类id
-	QrCode     string `json:"qr_code,optional"`   // 二维码
-	CreateAt   int64  `json:"create_at,optional"` // 创建时间
-	UpdateAt   int64  `json:"update_at,optional"` // 更新时间
+	Id         uint64 `json:"id"`               // 餐桌id
+	Code       string `json:"code"`             // 桌号
+	Status     string `json:"status"`           // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
+	Capacity   int    `json:"capacity"`         // 可坐人数
+	CategoryId uint64 `json:"category_id"`      // 餐桌分类id
+	QrCode     string `json:"qr_code,optional"` // 二维码
+	CreatedAt  string `json:"create_at"`        // 创建时间
+	UpdatedAt  string `json:"update_at"`        // 更新时间
 }
 
 type TableCategory struct {

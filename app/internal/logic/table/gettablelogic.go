@@ -8,6 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/common/util/timeutil"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -49,8 +50,8 @@ func (l *GetTableLogic) GetTable(req *types.GetTableReq) (resp *types.GetTableRe
 			Capacity:   e.Capacity,
 			CategoryId: categoryID,
 			QrCode:     qrCode,
-			CreateAt:   e.CreatedAt.Unix(),
-			UpdateAt:   e.UpdatedAt.Unix(),
+			CreatedAt:  timeutil.TimeToString(e.CreatedAt),
+			UpdatedAt:  timeutil.TimeToString(e.UpdatedAt),
 		},
 	}, nil
 }

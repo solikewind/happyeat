@@ -19,6 +19,6 @@ type Order {
 	TableCategory string     `json:"table_category,optional"` // 餐桌类别（如大厅、包间）
 	Remark      string     `json:"remark,optional"`   // 备注
 	Items       []OrderItem `json:"items,optional"`  // 订单明细
-	CreateAt    int64      `json:"create_at"`   // 创建时间
-	UpdateAt    int64      `json:"update_at"`   // 更新时间
+	CreatedAt   string     `json:"create_at"`   // 创建时间
+	UpdatedAt   string     `json:"update_at"`   // 更新时间
 }

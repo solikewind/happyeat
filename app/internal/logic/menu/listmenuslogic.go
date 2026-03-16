@@ -19,6 +19,8 @@ type ListMenusLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
+const maxSpecsPerMenuInList = 20
+
 // 列出菜单
 func NewListMenusLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListMenusLogic {
 	return &ListMenusLogic{
@@ -51,7 +53,11 @@ func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusRep
 
 	menus := make([]types.Menu, 0, len(list))
 	for _, e := range list {
-		menus = append(menus, entMenuToType(e))
+		menu := entMenuToType(e)
+		if len(menu.Specs) > maxSpecsPerMenuInList {
+			menu.Specs = menu.Specs[:maxSpecsPerMenuInList]
+		}
+		menus = append(menus, menu)
 	}
 
 	return &types.ListMenusReply{

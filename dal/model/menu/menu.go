@@ -1,8 +1,8 @@
-// Package menu 提供菜单与分类的 data 逻辑。
 package menu
 
 import (
 	"context"
+	"strings"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent"
@@ -11,24 +11,20 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 )
 
-// Menu 菜单数据访问。
 type Menu struct {
 	c *ent.Client
 }
 
-// NewMenu 创建 Menu。
 func NewMenu(c *ent.Client) *Menu {
 	return &Menu{c: c}
 }
 
-// SpecInput 规格项入参。
 type SpecInput struct {
 	SpecType   string
 	SpecValue  string
 	PriceDelta float64
 }
 
-// CreateMenuInput 创建菜单入参。
 type CreateMenuInput struct {
 	Name        string
 	Description string
@@ -38,7 +34,6 @@ type CreateMenuInput struct {
 	Specs       []SpecInput
 }
 
-// Create 创建菜单及规格（事务内）。
 func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error) {
 	tx, err := m.c.Tx(ctx)
 	if err != nil {
@@ -78,19 +73,13 @@ func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error
 		return nil, err
 	}
 
-	return m.c.Menu.Query().Where(entmenu.IDEQ(entMenu.ID)).WithCategory().WithSpecs().Only(ctx)
+	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(entMenu.ID))).Only(ctx)
 }
 
-// GetByID 按 ID 获取菜单（含 category、specs）。
 func (m *Menu) GetByID(ctx context.Context, id int) (*ent.Menu, error) {
-	return m.c.Menu.Query().
-		Where(entmenu.IDEQ(id)).
-		WithCategory().
-		WithSpecs().
-		Only(ctx)
+	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(id))).Only(ctx)
 }
 
-// ListMenusFilter 列表筛选。
 type ListMenusFilter struct {
 	Name         string
 	CategoryName string
@@ -98,69 +87,86 @@ type ListMenusFilter struct {
 	Limit        int
 }
 
-// List 分页列出菜单（含 category、specs），返回列表与总数。
-// 统一支持拼音搜索：无论输入中文还是拼音，都使用统一的搜索逻辑。
+const maxPinyinScanRows = 1000
+
 func (m *Menu) List(ctx context.Context, f ListMenusFilter) ([]*ent.Menu, int64, error) {
-	q := m.c.Menu.Query().WithCategory().WithSpecs()
-
-	// 分类筛选在数据库层面处理
-	if f.CategoryName != "" {
-		q = q.Where(entmenu.HasCategoryWith(menucategory.NameEQ(f.CategoryName)))
-	}
-
-	var allList []*ent.Menu
-	var err error
-
-	// 如果有关键词，统一使用拼音匹配（支持中文和拼音）
-	if f.Name != "" {
-		// 先查询所有符合分类条件的菜单（不分页）
-		allList, err = q.Order(entmenu.ByID(sql.OrderDesc())).All(ctx)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		// 在内存中做拼音匹配（统一处理中文和拼音）
-		matchedList := make([]*ent.Menu, 0)
-		for _, menu := range allList {
-			if MatchPinyin(menu.Name, f.Name) {
-				matchedList = append(matchedList, menu)
-			}
-		}
-		allList = matchedList
-	} else {
-		// 没有关键词，直接查询所有
-		allList, err = q.Order(entmenu.ByID(sql.OrderDesc())).All(ctx)
-		if err != nil {
-			return nil, 0, err
-		}
-	}
-
-	// 计算总数
-	total := int64(len(allList))
-
-	// 手动分页
 	if f.Limit <= 0 {
 		f.Limit = 10
 	}
-
-	start := f.Offset
-	end := start + f.Limit
-	if start > len(allList) {
-		start = len(allList)
-	}
-	if end > len(allList) {
-		end = len(allList)
+	if f.Offset < 0 {
+		f.Offset = 0
 	}
 
-	if start >= end {
-		return []*ent.Menu{}, total, nil
+	newBaseQuery := func() *ent.MenuQuery {
+		q := m.c.Menu.Query()
+		if f.CategoryName != "" {
+			q = q.Where(entmenu.HasCategoryWith(menucategory.NameEQ(f.CategoryName)))
+		}
+		return q
 	}
 
-	list := allList[start:end]
-	return list, total, nil
+	name := strings.TrimSpace(f.Name)
+	if name == "" {
+		total, err := newBaseQuery().Count(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+		list, err := m.withMenuEdges(newBaseQuery()).
+			Order(entmenu.ByID(sql.OrderDesc())).
+			Offset(f.Offset).
+			Limit(f.Limit).
+			All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+		return list, int64(total), nil
+	}
+
+	candidatesQuery := newBaseQuery().Where(entmenu.NameContainsFold(name))
+	total, err := candidatesQuery.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	if total > 0 {
+		list, err := m.withMenuEdges(newBaseQuery().
+			Where(entmenu.NameContainsFold(name))).
+			Order(entmenu.ByID(sql.OrderDesc())).
+			Offset(f.Offset).
+			Limit(f.Limit).
+			All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+		return list, int64(total), nil
+	}
+
+	// Fallback for pinyin keyword search; cap scan size to avoid expensive full-table scans.
+	allList, err := m.withMenuEdges(newBaseQuery()).
+		Order(entmenu.ByID(sql.OrderDesc())).
+		Limit(maxPinyinScanRows).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	matchedList := make([]*ent.Menu, 0, len(allList))
+	for _, menu := range allList {
+		if MatchPinyin(menu.Name, name) {
+			matchedList = append(matchedList, menu)
+		}
+	}
+
+	totalMatched := len(matchedList)
+	if f.Offset >= totalMatched {
+		return []*ent.Menu{}, int64(totalMatched), nil
+	}
+	end := f.Offset + f.Limit
+	if end > totalMatched {
+		end = totalMatched
+	}
+	return matchedList[f.Offset:end], int64(totalMatched), nil
 }
 
-// UpdateMenuInput 更新菜单入参。
 type UpdateMenuInput struct {
 	Name        string
 	Description string
@@ -170,7 +176,6 @@ type UpdateMenuInput struct {
 	Specs       []SpecInput
 }
 
-// Update 更新菜单及规格（先删后建 specs，事务内）。
 func (m *Menu) Update(ctx context.Context, id int, in UpdateMenuInput) error {
 	tx, err := m.c.Tx(ctx)
 	if err != nil {
@@ -217,7 +222,6 @@ func (m *Menu) Update(ctx context.Context, id int, in UpdateMenuInput) error {
 	return tx.Commit()
 }
 
-// Delete 删除菜单及其规格（事务内）。
 func (m *Menu) Delete(ctx context.Context, id int) error {
 	tx, err := m.c.Tx(ctx)
 	if err != nil {
@@ -234,4 +238,13 @@ func (m *Menu) Delete(ctx context.Context, id int) error {
 	}
 
 	return tx.Commit()
+}
+
+func (m *Menu) withMenuEdges(q *ent.MenuQuery) *ent.MenuQuery {
+	return q.WithCategory().WithSpecs(func(sq *ent.MenuSpecQuery) {
+		sq.Order(
+			menuspec.BySort(sql.OrderAsc()),
+			menuspec.ByID(sql.OrderAsc()),
+		)
+	})
 }
