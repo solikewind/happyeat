@@ -9,8 +9,9 @@ services:
       POSTGRES_INITDB_ARGS: "-E UTF8"
       TZ: ${TZ:-Asia/Shanghai}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - postgres_backup:/backup
+      # 直接挂载到当前项目下的 data 目录，绝对安全
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/backup:/backup
     ports:
       - "5432:5432"
     networks:
@@ -26,10 +27,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    volumes:
-      # 相对路径挂载：数据会存在当前目录下的 data/postgres 文件夹
-      - ./data/postgres:/var/lib/postgresql/data
-      - ./data/backup:/backup
 
   happyeat-api:
     build:
