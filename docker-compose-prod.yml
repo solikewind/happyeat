@@ -58,12 +58,12 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    volumes:
+      # 相对路径挂载：数据会存在当前目录下的 data/postgres 文件夹
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/backup:/backup
 
 volumes:
-  postgres_data:
-    driver: local
-  postgres_backup:
-    driver: local
 
 networks:
   happyeat-network:
