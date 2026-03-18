@@ -62,3 +62,7 @@ Jenkinsfile
 # 调试
 debug
 *.debug
+
+# 数据库
+data/
+pgdata/
