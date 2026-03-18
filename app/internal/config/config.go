@@ -11,6 +11,7 @@ type Config struct {
 	Auth      Auth
 	Casbin    Casbin
 	LLM       LLM
+	ASR       ASR
 }
 type SqlConfig struct {
 	DataSource string
@@ -27,4 +28,13 @@ type Casbin struct {
 type LLM struct {
 	APIKey  string // OpenAI API Key（可选，优先使用环境变量 OPENAI_API_KEY）
 	BaseURL string // API Base URL（可选，用于兼容其他 OpenAI 兼容的 API）
+	Model   string // 模型名称（如 qwen-plus、gpt-4o-mini）
+}
+
+type ASR struct {
+	APIKey            string // 阿里云百炼 API Key
+	BaseURL           string // 百炼服务基地址
+	Model             string // ASR 模型名
+	TranscribePath    string // 语音识别接口路径
+	HotwordCreatePath string // 热词创建接口路径
 }

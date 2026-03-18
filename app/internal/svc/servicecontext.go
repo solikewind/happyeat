@@ -24,6 +24,8 @@ type ServiceContext struct {
 	DB     *sql.DB         // 共享连接池，仅用于关闭
 	Casbin *CasbinEnforcer // 权限：model 来自配置内联，policy 来自 DB casbin_rule 表
 	Agent  *blades.Agent   // 智能体
+	LLM    *agent.LangChainService
+	ASR    *agent.BailianASRClient
 
 	Menu     *menu.Menu     // 菜单 data 层
 	MenuType *menu.MenuType // 菜单分类 data 层
@@ -58,11 +60,23 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		return nil, err
 	}
 
+	var llmSvc *agent.LangChainService
+	if svc, err := agent.NewLangChainService(c.LLM); err == nil {
+		llmSvc = svc
+	}
+
+	var asrSvc *agent.BailianASRClient
+	if svc, err := agent.NewBailianASRClient(c.ASR); err == nil {
+		asrSvc = svc
+	}
+
 	return &ServiceContext{
 		Config: c,
 		DB:     db,
 		Casbin: ce,
 		Agent:  bladesAgent.Agent,
+		LLM:    llmSvc,
+		ASR:    asrSvc,
 
 		Menu:      menu.NewMenu(client),
 		MenuType:  menu.NewMenuType(client),

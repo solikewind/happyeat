@@ -9,6 +9,7 @@ import (
 type Config struct {
 	APIKey  string
 	BaseURL string
+	Model   string
 }
 
 // NewAgent 创建并配置 Blades Agent
@@ -23,6 +24,11 @@ func NewConfig(c config.LLM) (*Config, error) {
 	baseURL := c.BaseURL
 	if baseURL == "" {
 		baseURL = os.Getenv("OPENAI_BASE_URL")
+	}
+
+	model := c.Model
+	if model == "" {
+		model = os.Getenv("OPENAI_MODEL")
 	}
 
 	// // 创建 Agent 选项
@@ -43,5 +49,6 @@ func NewConfig(c config.LLM) (*Config, error) {
 	return &Config{
 		APIKey:  apiKey,
 		BaseURL: baseURL,
+		Model:   model,
 	}, nil
 }

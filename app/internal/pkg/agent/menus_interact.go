@@ -54,7 +54,12 @@ type extractedMenuItem struct {
 }
 
 func NewMenusTechAgent(c *Config, menuData *menu.Menu) (*MenusTechAgent, error) {
-	model := openai.NewModel(menusModelName, openai.Config{
+	modelName := menusModelName
+	if strings.TrimSpace(c.Model) != "" {
+		modelName = strings.TrimSpace(c.Model)
+	}
+
+	model := openai.NewModel(modelName, openai.Config{
 		APIKey:  c.APIKey,
 		BaseURL: c.BaseURL,
 	})

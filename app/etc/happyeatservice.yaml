@@ -15,4 +15,11 @@ casbin:
 llm:
   APIKey: ""
   BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  Model: "qwen-plus"
 
+asr:
+  APIKey: ""
+  BaseURL: "https://dashscope.aliyuncs.com/api/v1"
+  Model: "paraformer-realtime-v2"
+  TranscribePath: "/asr/transcribe"
+  HotwordCreatePath: "/asr/hotwords"
