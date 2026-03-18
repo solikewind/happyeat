@@ -60,8 +60,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-volumes:
-
 networks:
   happyeat-network:
     driver: bridge
