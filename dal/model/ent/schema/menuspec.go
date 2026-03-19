@@ -30,12 +30,9 @@ func (MenuSpec) Annotations() []schema.Annotation {
 
 func (MenuSpec) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("spec_type").
+		field.String("name").
 			MaxLen(64).
 			Comment("规格类型（如口味、大小）"),
-		field.String("spec_value").
-			MaxLen(64).
-			Comment("规格值（如中辣、大份）"),
 		field.Float("price_delta").
 			Default(0).
 			Comment("加价"),
@@ -47,6 +44,8 @@ func (MenuSpec) Fields() []ent.Field {
 
 func (MenuSpec) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("menu", Menu.Type).Ref("specs").Unique().Required(),
+		edge.From("menu", Menu.Type).Ref("menu_specs").Unique().Required(),
+		edge.From("category_spec", CategorySpec.Type).Ref("menu_specs").Unique().Optional(),
+		edge.To("menu_spec_options", MenuSpecOption.Type),
 	}
 }

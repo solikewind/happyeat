@@ -16,7 +16,7 @@ func _() {
 
 const (
 	_errCode_name_0 = "正确"
-	_errCode_name_1 = "defaultCode"
+	_errCode_name_1 = "defaultCode 用于动态生成错误，code 1001-1999"
 	_errCode_name_2 = "用户不存在"
 	_errCode_name_3 = "菜单不存在"
 )
