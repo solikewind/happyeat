@@ -7,8 +7,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/solikewind/happyeat/app/internal/pkg/constants"		
-	"github.com/solikewind/happyeat/app/internal/svc"	
+	"github.com/solikewind/happyeat/app/internal/pkg/status"
+	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/dal/model/ent"
 
@@ -32,14 +32,14 @@ func NewUpdateOrderStatusLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 // 允许的状态流转：当前状态 -> 可变更到的状态
 var allowedTransitions = map[string]map[string]bool{
-	constants.OrderStatusCreated: {
-		constants.OrderStatusPaid: true, constants.OrderStatusCancelled: true,
+	status.OrderStatusCreated: {
+		status.OrderStatusPaid: true, status.OrderStatusCancelled: true,
 	},
-	constants.OrderStatusPaid: {
-		constants.OrderStatusPreparing: true, constants.OrderStatusCancelled: true,
+	status.OrderStatusPaid: {
+		status.OrderStatusPreparing: true, status.OrderStatusCancelled: true,
 	},
-	constants.OrderStatusPreparing: {
-		constants.OrderStatusCompleted: true,
+	status.OrderStatusPreparing: {
+		status.OrderStatusCompleted: true,
 	},
 	// completed / cancelled 为终态，不可再改
 }

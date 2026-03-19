@@ -41,6 +41,7 @@ func (mt *MenuType) GetByID(ctx context.Context, id uint64) (*ent.MenuCategory, 
 	return mt.c.MenuCategory.Get(ctx, int(id))
 }
 
+// Exist 判断分类是否存在。
 func (mt *MenuType) Exist(ctx context.Context, id uint64) (bool, error) {
 	return mt.c.MenuCategory.Query().Where(menucategory.IDEQ(int(id))).Exist(ctx)
 }
@@ -63,6 +64,10 @@ func (mt *MenuType) List(ctx context.Context, f ListMenuCategoriesFilter) ([]*en
 	if err != nil {
 		return nil, 0, err
 	}
+	if total <= 0 {
+		return []*ent.MenuCategory{}, 0, nil
+	}
+
 	if f.Limit <= 0 {
 		f.Limit = 10
 	}

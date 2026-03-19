@@ -8,6 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/common/util/paging"
 	menudata "github.com/solikewind/happyeat/dal/model/menu"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -29,15 +30,9 @@ func NewListMenusCategoriesLogic(ctx context.Context, svcCtx *svc.ServiceContext
 }
 
 func (l *ListMenusCategoriesLogic) ListMenusCategories(req *types.ListMenusCategoriesReq) (*types.ListMenusCategoriesReply, error) {
-	pageSize := int(req.PageSize)
-	if pageSize <= 0 {
-		pageSize = 10
-	}
-	current := int(req.Current)
-	if current <= 0 {
-		current = 1
-	}
-	offset := (current - 1) * pageSize
+	pageParam := paging.NewPageParam(req.Current, req.PageSize)
+	offset := pageParam.Offset()
+	pageSize := pageParam.PageSize
 
 	list, total, err := l.svcCtx.MenuType.List(l.ctx, menudata.ListMenuCategoriesFilter{
 		Name:   req.Name,

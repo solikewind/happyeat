@@ -10,14 +10,7 @@ info (
 import "../base/menubase.api"
 import "../base/base.api"
 
-// 创建分类：name/description，id 服务端生成；name 由 logic 校验非空
-type CreateMenuCategoryReq {
-	Name        string `json:"name,optional"`
-	Description string `json:"description,optional"`
-}
-type CreateMenuCategoryReply {}
-
-// 创建菜单：业务字段，id/create_at/update_at 服务端生成
+// 创建菜单
 type CreateMenuReq {
 	Name        string     `json:"name"`
 	Description string     `json:"description,optional"`
@@ -67,6 +60,14 @@ type UpdateMenuInput {
  }
  type DeleteMenuReply {}
 
+// 【菜单分类接口】
+// 创建分类
+type CreateMenuCategoryReq {
+	Name        string `json:"name,optional"`
+	Description string `json:"description,optional"`
+}
+type CreateMenuCategoryReply {}
+
 // 列表为 GET，参数从 query 解析；current/pageSize/name 不传时由 logic 默认或不过滤
 type ListMenusCategoriesReq {
 	Current  int64 `json:"current,optional" form:"current,optional"`
@@ -82,7 +83,7 @@ type ListMenusCategoriesReq {
     Id uint64 `path:"id"`
  }
  type GetMenuCategoryReply {
-    MenuCategory MenuCategory `json:"category"`
+    Category MenuCategory `json:"category"`
  }
 
 // 更新菜单分类仅允许可编辑字段
