@@ -41,6 +41,10 @@ func (mt *MenuType) GetByID(ctx context.Context, id uint64) (*ent.MenuCategory, 
 	return mt.c.MenuCategory.Get(ctx, int(id))
 }
 
+func (mt *MenuType) Exist(ctx context.Context, id uint64) (bool, error) {
+	return mt.c.MenuCategory.Query().Where(menucategory.IDEQ(int(id))).Exist(ctx)
+}
+
 // ListMenuCategoriesFilter 分类列表筛选。
 type ListMenuCategoriesFilter struct {
 	Name   string

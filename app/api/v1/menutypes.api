@@ -8,6 +8,7 @@ info (
 )
 
 import "../base/menubase.api"
+import "../base/base.api"
 
 // 创建分类：name/description，id 服务端生成；name 由 logic 校验非空
 type CreateMenuCategoryReq {
@@ -21,7 +22,7 @@ type CreateMenuReq {
 	Name        string     `json:"name"`
 	Description string     `json:"description,optional"`
 	Image       string     `json:"image,optional"`
-	Price       float64    `json:"price"`
+	Price       int64    `json:"price"`	// 以分为单位，避免前端浮点数问题，展示/100
 	CategoryId  uint64     `json:"category_id"`
 	Specs       []MenuSpec `json:"specs,optional"`
 }
@@ -29,8 +30,7 @@ type CreateMenuReply {}
 
 // 列表为 GET，参数从 query 解析；current/pageSize 不传时由 logic 默认为 1/10
 type ListMenusReq {
-	Current  int64 `json:"current,optional" form:"current,optional"`
-	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
+	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
 	Category string `json:"category,optional" form:"category,optional"` // 按分类名字筛选
 }

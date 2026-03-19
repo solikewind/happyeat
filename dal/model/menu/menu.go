@@ -80,6 +80,10 @@ func (m *Menu) GetByID(ctx context.Context, id int) (*ent.Menu, error) {
 	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(id))).Only(ctx)
 }
 
+func (m *Menu) Exist(ctx context.Context, id int) (bool, error) {
+	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(id))).Exist(ctx)
+}
+
 type ListMenusFilter struct {
 	Name         string
 	CategoryName string

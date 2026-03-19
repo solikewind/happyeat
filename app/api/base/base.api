@@ -1,0 +1,11 @@
+syntax = "v1"
+
+info (
+    title:   "HappyEat API 基础类型定义"
+    version: "v1.0.0"
+)
+
+type PageInfo {
+    Current  int64 `json:"current,optional" form:"current,optional"`
+    PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
+}

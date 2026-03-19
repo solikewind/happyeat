@@ -14,9 +14,11 @@ import (
 	"github.com/solikewind/happyeat/app/internal/config"
 	"github.com/solikewind/happyeat/app/internal/handler"
 	"github.com/solikewind/happyeat/app/internal/svc"
+	"github.com/solikewind/happyeat/common/consts/code/errorx"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 var configFile = flag.String("f", "etc/happyeatservice.yaml", "the config file")
@@ -74,6 +76,15 @@ func main() {
 		},
 	})
 
+	httpx.SetErrorHandler(func(err error) (int, any) {
+		switch e := err.(type) {
+		case *errorx.CodeError:
+			// 此时 e.Code 是数字，e.Msg 是通过 stringer 自动生成的中文提示
+			return http.StatusOK, e
+		default:
+			return http.StatusInternalServerError, errorx.NewDefaultError(err.Error())
+		}
+	})
 	handler.RegisterHandlers(server, ctx)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
