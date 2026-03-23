@@ -8,12 +8,15 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
+	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
+	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 	"github.com/solikewind/happyeat/dal/model/ent/tablecategory"
 )
@@ -72,6 +75,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 		return err
 	}
 	return f(ctx, query)
+}
+
+// The CategorySpecFunc type is an adapter to allow the use of ordinary function as a Querier.
+type CategorySpecFunc func(context.Context, *ent.CategorySpecQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f CategorySpecFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.CategorySpecQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.CategorySpecQuery", q)
+}
+
+// The TraverseCategorySpec type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseCategorySpec func(context.Context, *ent.CategorySpecQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseCategorySpec) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseCategorySpec) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.CategorySpecQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.CategorySpecQuery", q)
 }
 
 // The MenuFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -209,6 +239,60 @@ func (f TraverseOrderItem) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.OrderItemQuery", q)
 }
 
+// The SpecGroupFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SpecGroupFunc func(context.Context, *ent.SpecGroupQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SpecGroupFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SpecGroupQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SpecGroupQuery", q)
+}
+
+// The TraverseSpecGroup type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSpecGroup func(context.Context, *ent.SpecGroupQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSpecGroup) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSpecGroup) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SpecGroupQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SpecGroupQuery", q)
+}
+
+// The SpecItemFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SpecItemFunc func(context.Context, *ent.SpecItemQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SpecItemFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SpecItemQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SpecItemQuery", q)
+}
+
+// The TraverseSpecItem type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSpecItem func(context.Context, *ent.SpecItemQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSpecItem) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSpecItem) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SpecItemQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SpecItemQuery", q)
+}
+
 // The TableFunc type is an adapter to allow the use of ordinary function as a Querier.
 type TableFunc func(context.Context, *ent.TableQuery) (ent.Value, error)
 
@@ -266,6 +350,8 @@ func (f TraverseTableCategory) Traverse(ctx context.Context, q ent.Query) error 
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.CategorySpecQuery:
+		return &query[*ent.CategorySpecQuery, predicate.CategorySpec, categoryspec.OrderOption]{typ: ent.TypeCategorySpec, tq: q}, nil
 	case *ent.MenuQuery:
 		return &query[*ent.MenuQuery, predicate.Menu, menu.OrderOption]{typ: ent.TypeMenu, tq: q}, nil
 	case *ent.MenuCategoryQuery:
@@ -276,6 +362,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.OrderQuery, predicate.Order, order.OrderOption]{typ: ent.TypeOrder, tq: q}, nil
 	case *ent.OrderItemQuery:
 		return &query[*ent.OrderItemQuery, predicate.OrderItem, orderitem.OrderOption]{typ: ent.TypeOrderItem, tq: q}, nil
+	case *ent.SpecGroupQuery:
+		return &query[*ent.SpecGroupQuery, predicate.SpecGroup, specgroup.OrderOption]{typ: ent.TypeSpecGroup, tq: q}, nil
+	case *ent.SpecItemQuery:
+		return &query[*ent.SpecItemQuery, predicate.SpecItem, specitem.OrderOption]{typ: ent.TypeSpecItem, tq: q}, nil
 	case *ent.TableQuery:
 		return &query[*ent.TableQuery, predicate.Table, table.OrderOption]{typ: ent.TypeTable, tq: q}, nil
 	case *ent.TableCategoryQuery:

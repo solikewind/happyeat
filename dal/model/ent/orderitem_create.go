@@ -124,8 +124,14 @@ func (_c *OrderItemCreate) SetNillableSort(v *int) *OrderItemCreate {
 	return _c
 }
 
+// SetID sets the "id" field.
+func (_c *OrderItemCreate) SetID(v uint64) *OrderItemCreate {
+	_c.mutation.SetID(v)
+	return _c
+}
+
 // SetOrderID sets the "order" edge to the Order entity by ID.
-func (_c *OrderItemCreate) SetOrderID(id int) *OrderItemCreate {
+func (_c *OrderItemCreate) SetOrderID(id uint64) *OrderItemCreate {
 	_c.mutation.SetOrderID(id)
 	return _c
 }
@@ -136,13 +142,13 @@ func (_c *OrderItemCreate) SetOrder(v *Order) *OrderItemCreate {
 }
 
 // SetMenuID sets the "menu" edge to the Menu entity by ID.
-func (_c *OrderItemCreate) SetMenuID(id int) *OrderItemCreate {
+func (_c *OrderItemCreate) SetMenuID(id uint64) *OrderItemCreate {
 	_c.mutation.SetMenuID(id)
 	return _c
 }
 
 // SetNillableMenuID sets the "menu" edge to the Menu entity by ID if the given value is not nil.
-func (_c *OrderItemCreate) SetNillableMenuID(id *int) *OrderItemCreate {
+func (_c *OrderItemCreate) SetNillableMenuID(id *uint64) *OrderItemCreate {
 	if id != nil {
 		_c = _c.SetMenuID(*id)
 	}
@@ -273,8 +279,10 @@ func (_c *OrderItemCreate) sqlSave(ctx context.Context) (*OrderItem, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -283,8 +291,12 @@ func (_c *OrderItemCreate) sqlSave(ctx context.Context) (*OrderItem, error) {
 func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 	var (
 		_node = &OrderItem{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(orderitem.Table, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(orderitem.Table, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64))
 	)
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(orderitem.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -329,7 +341,7 @@ func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 			Columns: []string{orderitem.OrderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -346,7 +358,7 @@ func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 			Columns: []string{orderitem.MenuColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -403,9 +415,9 @@ func (_c *OrderItemCreateBulk) Save(ctx context.Context) ([]*OrderItem, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

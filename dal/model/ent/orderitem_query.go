@@ -131,8 +131,8 @@ func (_q *OrderItemQuery) FirstX(ctx context.Context) *OrderItem {
 
 // FirstID returns the first OrderItem ID from the query.
 // Returns a *NotFoundError when no OrderItem ID was found.
-func (_q *OrderItemQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *OrderItemQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -144,7 +144,7 @@ func (_q *OrderItemQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *OrderItemQuery) FirstIDX(ctx context.Context) int {
+func (_q *OrderItemQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -182,8 +182,8 @@ func (_q *OrderItemQuery) OnlyX(ctx context.Context) *OrderItem {
 // OnlyID is like Only, but returns the only OrderItem ID in the query.
 // Returns a *NotSingularError when more than one OrderItem ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *OrderItemQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *OrderItemQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -199,7 +199,7 @@ func (_q *OrderItemQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *OrderItemQuery) OnlyIDX(ctx context.Context) int {
+func (_q *OrderItemQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -227,7 +227,7 @@ func (_q *OrderItemQuery) AllX(ctx context.Context) []*OrderItem {
 }
 
 // IDs executes the query and returns a list of OrderItem IDs.
-func (_q *OrderItemQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *OrderItemQuery) IDs(ctx context.Context) (ids []uint64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -239,7 +239,7 @@ func (_q *OrderItemQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *OrderItemQuery) IDsX(ctx context.Context) []int {
+func (_q *OrderItemQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -453,8 +453,8 @@ func (_q *OrderItemQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Or
 }
 
 func (_q *OrderItemQuery) loadOrder(ctx context.Context, query *OrderQuery, nodes []*OrderItem, init func(*OrderItem), assign func(*OrderItem, *Order)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*OrderItem)
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*OrderItem)
 	for i := range nodes {
 		if nodes[i].order_items == nil {
 			continue
@@ -485,8 +485,8 @@ func (_q *OrderItemQuery) loadOrder(ctx context.Context, query *OrderQuery, node
 	return nil
 }
 func (_q *OrderItemQuery) loadMenu(ctx context.Context, query *MenuQuery, nodes []*OrderItem, init func(*OrderItem), assign func(*OrderItem, *Menu)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*OrderItem)
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*OrderItem)
 	for i := range nodes {
 		if nodes[i].menu_order_items == nil {
 			continue
@@ -527,7 +527,7 @@ func (_q *OrderItemQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *OrderItemQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(orderitem.Table, orderitem.Columns, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(orderitem.Table, orderitem.Columns, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

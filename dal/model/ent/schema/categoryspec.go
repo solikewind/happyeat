@@ -15,6 +15,7 @@ type CategorySpec struct {
 
 func (CategorySpec) Mixin() []ent.Mixin {
 	return []ent.Mixin{
+		UniqueID{},
 		TimeMixin{},
 		SoftDeleteMixin{},
 	}

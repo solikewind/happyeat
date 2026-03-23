@@ -105,8 +105,14 @@ func (_c *MenuCreate) SetPrice(v float64) *MenuCreate {
 	return _c
 }
 
+// SetID sets the "id" field.
+func (_c *MenuCreate) SetID(v uint64) *MenuCreate {
+	_c.mutation.SetID(v)
+	return _c
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
-func (_c *MenuCreate) SetCategoryID(id int) *MenuCreate {
+func (_c *MenuCreate) SetCategoryID(id uint64) *MenuCreate {
 	_c.mutation.SetCategoryID(id)
 	return _c
 }
@@ -116,30 +122,30 @@ func (_c *MenuCreate) SetCategory(v *MenuCategory) *MenuCreate {
 	return _c.SetCategoryID(v.ID)
 }
 
-// AddSpecIDs adds the "specs" edge to the MenuSpec entity by IDs.
-func (_c *MenuCreate) AddSpecIDs(ids ...int) *MenuCreate {
-	_c.mutation.AddSpecIDs(ids...)
+// AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
+func (_c *MenuCreate) AddMenuSpecIDs(ids ...uint64) *MenuCreate {
+	_c.mutation.AddMenuSpecIDs(ids...)
 	return _c
 }
 
-// AddSpecs adds the "specs" edges to the MenuSpec entity.
-func (_c *MenuCreate) AddSpecs(v ...*MenuSpec) *MenuCreate {
-	ids := make([]int, len(v))
+// AddMenuSpecs adds the "menu_specs" edges to the MenuSpec entity.
+func (_c *MenuCreate) AddMenuSpecs(v ...*MenuSpec) *MenuCreate {
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _c.AddSpecIDs(ids...)
+	return _c.AddMenuSpecIDs(ids...)
 }
 
 // AddOrderItemIDs adds the "order_items" edge to the OrderItem entity by IDs.
-func (_c *MenuCreate) AddOrderItemIDs(ids ...int) *MenuCreate {
+func (_c *MenuCreate) AddOrderItemIDs(ids ...uint64) *MenuCreate {
 	_c.mutation.AddOrderItemIDs(ids...)
 	return _c
 }
 
 // AddOrderItems adds the "order_items" edges to the OrderItem entity.
 func (_c *MenuCreate) AddOrderItems(v ...*OrderItem) *MenuCreate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -248,8 +254,10 @@ func (_c *MenuCreate) sqlSave(ctx context.Context) (*Menu, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -258,8 +266,12 @@ func (_c *MenuCreate) sqlSave(ctx context.Context) (*Menu, error) {
 func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Menu{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(menu.Table, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(menu.Table, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64))
 	)
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(menu.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -296,7 +308,7 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 			Columns: []string{menu.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -305,15 +317,15 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 		_node.menu_category_menus = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.SpecsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.MenuSpecsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   menu.SpecsTable,
-			Columns: []string{menu.SpecsColumn},
+			Table:   menu.MenuSpecsTable,
+			Columns: []string{menu.MenuSpecsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -329,7 +341,7 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 			Columns: []string{menu.OrderItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -385,9 +397,9 @@ func (_c *MenuCreateBulk) Save(ctx context.Context) ([]*Menu, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

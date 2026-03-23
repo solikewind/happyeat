@@ -11,47 +11,47 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.MenuSpec {
+func ID(id uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.MenuSpec {
+func IDEQ(id uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.MenuSpec {
+func IDNEQ(id uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.MenuSpec {
+func IDIn(ids ...uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.MenuSpec {
+func IDNotIn(ids ...uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.MenuSpec {
+func IDGT(id uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.MenuSpec {
+func IDGTE(id uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.MenuSpec {
+func IDLT(id uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.MenuSpec {
+func IDLTE(id uint64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldLTE(FieldID, id))
 }
 
@@ -70,14 +70,19 @@ func DeleteTs(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldEQ(FieldDeleteTs, v))
 }
 
-// SpecType applies equality check predicate on the "spec_type" field. It's identical to SpecTypeEQ.
-func SpecType(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldEQ(FieldSpecType, v))
+// MenuID applies equality check predicate on the "menu_id" field. It's identical to MenuIDEQ.
+func MenuID(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldEQ(FieldMenuID, v))
 }
 
-// SpecValue applies equality check predicate on the "spec_value" field. It's identical to SpecValueEQ.
-func SpecValue(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldEQ(FieldSpecValue, v))
+// SpecItemID applies equality check predicate on the "spec_item_id" field. It's identical to SpecItemIDEQ.
+func SpecItemID(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldEQ(FieldSpecItemID, v))
+}
+
+// CategorySpecID applies equality check predicate on the "category_spec_id" field. It's identical to CategorySpecIDEQ.
+func CategorySpecID(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldEQ(FieldCategorySpecID, v))
 }
 
 // PriceDelta applies equality check predicate on the "price_delta" field. It's identical to PriceDeltaEQ.
@@ -210,134 +215,84 @@ func DeleteTsLTE(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldLTE(FieldDeleteTs, v))
 }
 
-// SpecTypeEQ applies the EQ predicate on the "spec_type" field.
-func SpecTypeEQ(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldEQ(FieldSpecType, v))
+// MenuIDEQ applies the EQ predicate on the "menu_id" field.
+func MenuIDEQ(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldEQ(FieldMenuID, v))
 }
 
-// SpecTypeNEQ applies the NEQ predicate on the "spec_type" field.
-func SpecTypeNEQ(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldNEQ(FieldSpecType, v))
+// MenuIDNEQ applies the NEQ predicate on the "menu_id" field.
+func MenuIDNEQ(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNEQ(FieldMenuID, v))
 }
 
-// SpecTypeIn applies the In predicate on the "spec_type" field.
-func SpecTypeIn(vs ...string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldIn(FieldSpecType, vs...))
+// MenuIDIn applies the In predicate on the "menu_id" field.
+func MenuIDIn(vs ...uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldIn(FieldMenuID, vs...))
 }
 
-// SpecTypeNotIn applies the NotIn predicate on the "spec_type" field.
-func SpecTypeNotIn(vs ...string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldNotIn(FieldSpecType, vs...))
+// MenuIDNotIn applies the NotIn predicate on the "menu_id" field.
+func MenuIDNotIn(vs ...uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNotIn(FieldMenuID, vs...))
 }
 
-// SpecTypeGT applies the GT predicate on the "spec_type" field.
-func SpecTypeGT(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldGT(FieldSpecType, v))
+// SpecItemIDEQ applies the EQ predicate on the "spec_item_id" field.
+func SpecItemIDEQ(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldEQ(FieldSpecItemID, v))
 }
 
-// SpecTypeGTE applies the GTE predicate on the "spec_type" field.
-func SpecTypeGTE(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldGTE(FieldSpecType, v))
+// SpecItemIDNEQ applies the NEQ predicate on the "spec_item_id" field.
+func SpecItemIDNEQ(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNEQ(FieldSpecItemID, v))
 }
 
-// SpecTypeLT applies the LT predicate on the "spec_type" field.
-func SpecTypeLT(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldLT(FieldSpecType, v))
+// SpecItemIDIn applies the In predicate on the "spec_item_id" field.
+func SpecItemIDIn(vs ...uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldIn(FieldSpecItemID, vs...))
 }
 
-// SpecTypeLTE applies the LTE predicate on the "spec_type" field.
-func SpecTypeLTE(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldLTE(FieldSpecType, v))
+// SpecItemIDNotIn applies the NotIn predicate on the "spec_item_id" field.
+func SpecItemIDNotIn(vs ...uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNotIn(FieldSpecItemID, vs...))
 }
 
-// SpecTypeContains applies the Contains predicate on the "spec_type" field.
-func SpecTypeContains(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldContains(FieldSpecType, v))
+// SpecItemIDIsNil applies the IsNil predicate on the "spec_item_id" field.
+func SpecItemIDIsNil() predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldIsNull(FieldSpecItemID))
 }
 
-// SpecTypeHasPrefix applies the HasPrefix predicate on the "spec_type" field.
-func SpecTypeHasPrefix(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldHasPrefix(FieldSpecType, v))
+// SpecItemIDNotNil applies the NotNil predicate on the "spec_item_id" field.
+func SpecItemIDNotNil() predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNotNull(FieldSpecItemID))
 }
 
-// SpecTypeHasSuffix applies the HasSuffix predicate on the "spec_type" field.
-func SpecTypeHasSuffix(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldHasSuffix(FieldSpecType, v))
+// CategorySpecIDEQ applies the EQ predicate on the "category_spec_id" field.
+func CategorySpecIDEQ(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldEQ(FieldCategorySpecID, v))
 }
 
-// SpecTypeEqualFold applies the EqualFold predicate on the "spec_type" field.
-func SpecTypeEqualFold(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldEqualFold(FieldSpecType, v))
+// CategorySpecIDNEQ applies the NEQ predicate on the "category_spec_id" field.
+func CategorySpecIDNEQ(v uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNEQ(FieldCategorySpecID, v))
 }
 
-// SpecTypeContainsFold applies the ContainsFold predicate on the "spec_type" field.
-func SpecTypeContainsFold(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldContainsFold(FieldSpecType, v))
+// CategorySpecIDIn applies the In predicate on the "category_spec_id" field.
+func CategorySpecIDIn(vs ...uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldIn(FieldCategorySpecID, vs...))
 }
 
-// SpecValueEQ applies the EQ predicate on the "spec_value" field.
-func SpecValueEQ(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldEQ(FieldSpecValue, v))
+// CategorySpecIDNotIn applies the NotIn predicate on the "category_spec_id" field.
+func CategorySpecIDNotIn(vs ...uint64) predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNotIn(FieldCategorySpecID, vs...))
 }
 
-// SpecValueNEQ applies the NEQ predicate on the "spec_value" field.
-func SpecValueNEQ(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldNEQ(FieldSpecValue, v))
+// CategorySpecIDIsNil applies the IsNil predicate on the "category_spec_id" field.
+func CategorySpecIDIsNil() predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldIsNull(FieldCategorySpecID))
 }
 
-// SpecValueIn applies the In predicate on the "spec_value" field.
-func SpecValueIn(vs ...string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldIn(FieldSpecValue, vs...))
-}
-
-// SpecValueNotIn applies the NotIn predicate on the "spec_value" field.
-func SpecValueNotIn(vs ...string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldNotIn(FieldSpecValue, vs...))
-}
-
-// SpecValueGT applies the GT predicate on the "spec_value" field.
-func SpecValueGT(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldGT(FieldSpecValue, v))
-}
-
-// SpecValueGTE applies the GTE predicate on the "spec_value" field.
-func SpecValueGTE(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldGTE(FieldSpecValue, v))
-}
-
-// SpecValueLT applies the LT predicate on the "spec_value" field.
-func SpecValueLT(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldLT(FieldSpecValue, v))
-}
-
-// SpecValueLTE applies the LTE predicate on the "spec_value" field.
-func SpecValueLTE(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldLTE(FieldSpecValue, v))
-}
-
-// SpecValueContains applies the Contains predicate on the "spec_value" field.
-func SpecValueContains(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldContains(FieldSpecValue, v))
-}
-
-// SpecValueHasPrefix applies the HasPrefix predicate on the "spec_value" field.
-func SpecValueHasPrefix(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldHasPrefix(FieldSpecValue, v))
-}
-
-// SpecValueHasSuffix applies the HasSuffix predicate on the "spec_value" field.
-func SpecValueHasSuffix(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldHasSuffix(FieldSpecValue, v))
-}
-
-// SpecValueEqualFold applies the EqualFold predicate on the "spec_value" field.
-func SpecValueEqualFold(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldEqualFold(FieldSpecValue, v))
-}
-
-// SpecValueContainsFold applies the ContainsFold predicate on the "spec_value" field.
-func SpecValueContainsFold(v string) predicate.MenuSpec {
-	return predicate.MenuSpec(sql.FieldContainsFold(FieldSpecValue, v))
+// CategorySpecIDNotNil applies the NotNil predicate on the "category_spec_id" field.
+func CategorySpecIDNotNil() predicate.MenuSpec {
+	return predicate.MenuSpec(sql.FieldNotNull(FieldCategorySpecID))
 }
 
 // PriceDeltaEQ applies the EQ predicate on the "price_delta" field.
@@ -435,6 +390,52 @@ func HasMenu() predicate.MenuSpec {
 func HasMenuWith(preds ...predicate.Menu) predicate.MenuSpec {
 	return predicate.MenuSpec(func(s *sql.Selector) {
 		step := newMenuStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCategorySpec applies the HasEdge predicate on the "category_spec" edge.
+func HasCategorySpec() predicate.MenuSpec {
+	return predicate.MenuSpec(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CategorySpecTable, CategorySpecColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCategorySpecWith applies the HasEdge predicate on the "category_spec" edge with a given conditions (other predicates).
+func HasCategorySpecWith(preds ...predicate.CategorySpec) predicate.MenuSpec {
+	return predicate.MenuSpec(func(s *sql.Selector) {
+		step := newCategorySpecStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSpecItem applies the HasEdge predicate on the "spec_item" edge.
+func HasSpecItem() predicate.MenuSpec {
+	return predicate.MenuSpec(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, SpecItemTable, SpecItemColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSpecItemWith applies the HasEdge predicate on the "spec_item" edge with a given conditions (other predicates).
+func HasSpecItemWith(preds ...predicate.SpecItem) predicate.MenuSpec {
+	return predicate.MenuSpec(func(s *sql.Selector) {
+		step := newSpecItemStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -12,11 +12,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
+	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
+	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 	"github.com/solikewind/happyeat/dal/model/ent/tablecategory"
 )
@@ -79,11 +82,14 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			categoryspec.Table:  categoryspec.ValidColumn,
 			menu.Table:          menu.ValidColumn,
 			menucategory.Table:  menucategory.ValidColumn,
 			menuspec.Table:      menuspec.ValidColumn,
 			order.Table:         order.ValidColumn,
 			orderitem.Table:     orderitem.ValidColumn,
+			specgroup.Table:     specgroup.ValidColumn,
+			specitem.Table:      specitem.ValidColumn,
 			table.Table:         table.ValidColumn,
 			tablecategory.Table: tablecategory.ValidColumn,
 		})

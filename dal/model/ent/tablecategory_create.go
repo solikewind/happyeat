@@ -83,15 +83,21 @@ func (_c *TableCategoryCreate) SetNillableDescription(v *string) *TableCategoryC
 	return _c
 }
 
+// SetID sets the "id" field.
+func (_c *TableCategoryCreate) SetID(v uint64) *TableCategoryCreate {
+	_c.mutation.SetID(v)
+	return _c
+}
+
 // AddTableIDs adds the "tables" edge to the Table entity by IDs.
-func (_c *TableCategoryCreate) AddTableIDs(ids ...int) *TableCategoryCreate {
+func (_c *TableCategoryCreate) AddTableIDs(ids ...uint64) *TableCategoryCreate {
 	_c.mutation.AddTableIDs(ids...)
 	return _c
 }
 
 // AddTables adds the "tables" edges to the Table entity.
 func (_c *TableCategoryCreate) AddTables(v ...*Table) *TableCategoryCreate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -189,8 +195,10 @@ func (_c *TableCategoryCreate) sqlSave(ctx context.Context) (*TableCategory, err
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -199,8 +207,12 @@ func (_c *TableCategoryCreate) sqlSave(ctx context.Context) (*TableCategory, err
 func (_c *TableCategoryCreate) createSpec() (*TableCategory, *sqlgraph.CreateSpec) {
 	var (
 		_node = &TableCategory{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(tablecategory.Table, sqlgraph.NewFieldSpec(tablecategory.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(tablecategory.Table, sqlgraph.NewFieldSpec(tablecategory.FieldID, field.TypeUint64))
 	)
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(tablecategory.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -229,7 +241,7 @@ func (_c *TableCategoryCreate) createSpec() (*TableCategory, *sqlgraph.CreateSpe
 			Columns: []string{tablecategory.TablesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -285,9 +297,9 @@ func (_c *TableCategoryCreateBulk) Save(ctx context.Context) ([]*TableCategory, 
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

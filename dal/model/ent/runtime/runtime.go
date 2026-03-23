@@ -5,12 +5,15 @@ package runtime
 import (
 	"time"
 
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/schema"
+	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
+	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 	"github.com/solikewind/happyeat/dal/model/ent/tablecategory"
 )
@@ -19,29 +22,74 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	categoryspecMixin := schema.CategorySpec{}.Mixin()
+	categoryspecMixinHooks0 := categoryspecMixin[0].Hooks()
+	categoryspecMixinHooks2 := categoryspecMixin[2].Hooks()
+	categoryspec.Hooks[0] = categoryspecMixinHooks0[0]
+	categoryspec.Hooks[1] = categoryspecMixinHooks2[0]
+	categoryspecMixinInters2 := categoryspecMixin[2].Interceptors()
+	categoryspec.Interceptors[0] = categoryspecMixinInters2[0]
+	categoryspecMixinFields1 := categoryspecMixin[1].Fields()
+	_ = categoryspecMixinFields1
+	categoryspecMixinFields2 := categoryspecMixin[2].Fields()
+	_ = categoryspecMixinFields2
+	categoryspecFields := schema.CategorySpec{}.Fields()
+	_ = categoryspecFields
+	// categoryspecDescCreatedAt is the schema descriptor for created_at field.
+	categoryspecDescCreatedAt := categoryspecMixinFields1[0].Descriptor()
+	// categoryspec.DefaultCreatedAt holds the default value on creation for the created_at field.
+	categoryspec.DefaultCreatedAt = categoryspecDescCreatedAt.Default.(func() time.Time)
+	// categoryspecDescUpdatedAt is the schema descriptor for updated_at field.
+	categoryspecDescUpdatedAt := categoryspecMixinFields1[1].Descriptor()
+	// categoryspec.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	categoryspec.DefaultUpdatedAt = categoryspecDescUpdatedAt.Default.(func() time.Time)
+	// categoryspec.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	categoryspec.UpdateDefaultUpdatedAt = categoryspecDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// categoryspecDescDeleteTs is the schema descriptor for delete_ts field.
+	categoryspecDescDeleteTs := categoryspecMixinFields2[0].Descriptor()
+	// categoryspec.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	categoryspec.DefaultDeleteTs = categoryspecDescDeleteTs.Default.(int64)
+	// categoryspecDescSpecType is the schema descriptor for spec_type field.
+	categoryspecDescSpecType := categoryspecFields[0].Descriptor()
+	// categoryspec.SpecTypeValidator is a validator for the "spec_type" field. It is called by the builders before save.
+	categoryspec.SpecTypeValidator = categoryspecDescSpecType.Validators[0].(func(string) error)
+	// categoryspecDescSpecValue is the schema descriptor for spec_value field.
+	categoryspecDescSpecValue := categoryspecFields[1].Descriptor()
+	// categoryspec.SpecValueValidator is a validator for the "spec_value" field. It is called by the builders before save.
+	categoryspec.SpecValueValidator = categoryspecDescSpecValue.Validators[0].(func(string) error)
+	// categoryspecDescPriceDelta is the schema descriptor for price_delta field.
+	categoryspecDescPriceDelta := categoryspecFields[2].Descriptor()
+	// categoryspec.DefaultPriceDelta holds the default value on creation for the price_delta field.
+	categoryspec.DefaultPriceDelta = categoryspecDescPriceDelta.Default.(float64)
+	// categoryspecDescSort is the schema descriptor for sort field.
+	categoryspecDescSort := categoryspecFields[3].Descriptor()
+	// categoryspec.DefaultSort holds the default value on creation for the sort field.
+	categoryspec.DefaultSort = categoryspecDescSort.Default.(int)
 	menuMixin := schema.Menu{}.Mixin()
-	menuMixinHooks1 := menuMixin[1].Hooks()
-	menu.Hooks[0] = menuMixinHooks1[0]
-	menuMixinInters1 := menuMixin[1].Interceptors()
-	menu.Interceptors[0] = menuMixinInters1[0]
-	menuMixinFields0 := menuMixin[0].Fields()
-	_ = menuMixinFields0
+	menuMixinHooks0 := menuMixin[0].Hooks()
+	menuMixinHooks2 := menuMixin[2].Hooks()
+	menu.Hooks[0] = menuMixinHooks0[0]
+	menu.Hooks[1] = menuMixinHooks2[0]
+	menuMixinInters2 := menuMixin[2].Interceptors()
+	menu.Interceptors[0] = menuMixinInters2[0]
 	menuMixinFields1 := menuMixin[1].Fields()
 	_ = menuMixinFields1
+	menuMixinFields2 := menuMixin[2].Fields()
+	_ = menuMixinFields2
 	menuFields := schema.Menu{}.Fields()
 	_ = menuFields
 	// menuDescCreatedAt is the schema descriptor for created_at field.
-	menuDescCreatedAt := menuMixinFields0[0].Descriptor()
+	menuDescCreatedAt := menuMixinFields1[0].Descriptor()
 	// menu.DefaultCreatedAt holds the default value on creation for the created_at field.
 	menu.DefaultCreatedAt = menuDescCreatedAt.Default.(func() time.Time)
 	// menuDescUpdatedAt is the schema descriptor for updated_at field.
-	menuDescUpdatedAt := menuMixinFields0[1].Descriptor()
+	menuDescUpdatedAt := menuMixinFields1[1].Descriptor()
 	// menu.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	menu.DefaultUpdatedAt = menuDescUpdatedAt.Default.(func() time.Time)
 	// menu.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	menu.UpdateDefaultUpdatedAt = menuDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// menuDescDeleteTs is the schema descriptor for delete_ts field.
-	menuDescDeleteTs := menuMixinFields1[0].Descriptor()
+	menuDescDeleteTs := menuMixinFields2[0].Descriptor()
 	// menu.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	menu.DefaultDeleteTs = menuDescDeleteTs.Default.(int64)
 	// menuDescName is the schema descriptor for name field.
@@ -53,28 +101,30 @@ func init() {
 	// menu.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	menu.ImageValidator = menuDescImage.Validators[0].(func(string) error)
 	menucategoryMixin := schema.MenuCategory{}.Mixin()
-	menucategoryMixinHooks1 := menucategoryMixin[1].Hooks()
-	menucategory.Hooks[0] = menucategoryMixinHooks1[0]
-	menucategoryMixinInters1 := menucategoryMixin[1].Interceptors()
-	menucategory.Interceptors[0] = menucategoryMixinInters1[0]
-	menucategoryMixinFields0 := menucategoryMixin[0].Fields()
-	_ = menucategoryMixinFields0
+	menucategoryMixinHooks0 := menucategoryMixin[0].Hooks()
+	menucategoryMixinHooks2 := menucategoryMixin[2].Hooks()
+	menucategory.Hooks[0] = menucategoryMixinHooks0[0]
+	menucategory.Hooks[1] = menucategoryMixinHooks2[0]
+	menucategoryMixinInters2 := menucategoryMixin[2].Interceptors()
+	menucategory.Interceptors[0] = menucategoryMixinInters2[0]
 	menucategoryMixinFields1 := menucategoryMixin[1].Fields()
 	_ = menucategoryMixinFields1
+	menucategoryMixinFields2 := menucategoryMixin[2].Fields()
+	_ = menucategoryMixinFields2
 	menucategoryFields := schema.MenuCategory{}.Fields()
 	_ = menucategoryFields
 	// menucategoryDescCreatedAt is the schema descriptor for created_at field.
-	menucategoryDescCreatedAt := menucategoryMixinFields0[0].Descriptor()
+	menucategoryDescCreatedAt := menucategoryMixinFields1[0].Descriptor()
 	// menucategory.DefaultCreatedAt holds the default value on creation for the created_at field.
 	menucategory.DefaultCreatedAt = menucategoryDescCreatedAt.Default.(func() time.Time)
 	// menucategoryDescUpdatedAt is the schema descriptor for updated_at field.
-	menucategoryDescUpdatedAt := menucategoryMixinFields0[1].Descriptor()
+	menucategoryDescUpdatedAt := menucategoryMixinFields1[1].Descriptor()
 	// menucategory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	menucategory.DefaultUpdatedAt = menucategoryDescUpdatedAt.Default.(func() time.Time)
 	// menucategory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	menucategory.UpdateDefaultUpdatedAt = menucategoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// menucategoryDescDeleteTs is the schema descriptor for delete_ts field.
-	menucategoryDescDeleteTs := menucategoryMixinFields1[0].Descriptor()
+	menucategoryDescDeleteTs := menucategoryMixinFields2[0].Descriptor()
 	// menucategory.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	menucategory.DefaultDeleteTs = menucategoryDescDeleteTs.Default.(int64)
 	// menucategoryDescName is the schema descriptor for name field.
@@ -82,69 +132,65 @@ func init() {
 	// menucategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	menucategory.NameValidator = menucategoryDescName.Validators[0].(func(string) error)
 	menuspecMixin := schema.MenuSpec{}.Mixin()
-	menuspecMixinHooks1 := menuspecMixin[1].Hooks()
-	menuspec.Hooks[0] = menuspecMixinHooks1[0]
-	menuspecMixinInters1 := menuspecMixin[1].Interceptors()
-	menuspec.Interceptors[0] = menuspecMixinInters1[0]
-	menuspecMixinFields0 := menuspecMixin[0].Fields()
-	_ = menuspecMixinFields0
+	menuspecMixinHooks0 := menuspecMixin[0].Hooks()
+	menuspecMixinHooks2 := menuspecMixin[2].Hooks()
+	menuspec.Hooks[0] = menuspecMixinHooks0[0]
+	menuspec.Hooks[1] = menuspecMixinHooks2[0]
+	menuspecMixinInters2 := menuspecMixin[2].Interceptors()
+	menuspec.Interceptors[0] = menuspecMixinInters2[0]
 	menuspecMixinFields1 := menuspecMixin[1].Fields()
 	_ = menuspecMixinFields1
+	menuspecMixinFields2 := menuspecMixin[2].Fields()
+	_ = menuspecMixinFields2
 	menuspecFields := schema.MenuSpec{}.Fields()
 	_ = menuspecFields
 	// menuspecDescCreatedAt is the schema descriptor for created_at field.
-	menuspecDescCreatedAt := menuspecMixinFields0[0].Descriptor()
+	menuspecDescCreatedAt := menuspecMixinFields1[0].Descriptor()
 	// menuspec.DefaultCreatedAt holds the default value on creation for the created_at field.
 	menuspec.DefaultCreatedAt = menuspecDescCreatedAt.Default.(func() time.Time)
 	// menuspecDescUpdatedAt is the schema descriptor for updated_at field.
-	menuspecDescUpdatedAt := menuspecMixinFields0[1].Descriptor()
+	menuspecDescUpdatedAt := menuspecMixinFields1[1].Descriptor()
 	// menuspec.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	menuspec.DefaultUpdatedAt = menuspecDescUpdatedAt.Default.(func() time.Time)
 	// menuspec.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	menuspec.UpdateDefaultUpdatedAt = menuspecDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// menuspecDescDeleteTs is the schema descriptor for delete_ts field.
-	menuspecDescDeleteTs := menuspecMixinFields1[0].Descriptor()
+	menuspecDescDeleteTs := menuspecMixinFields2[0].Descriptor()
 	// menuspec.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	menuspec.DefaultDeleteTs = menuspecDescDeleteTs.Default.(int64)
-	// menuspecDescSpecType is the schema descriptor for spec_type field.
-	menuspecDescSpecType := menuspecFields[0].Descriptor()
-	// menuspec.SpecTypeValidator is a validator for the "spec_type" field. It is called by the builders before save.
-	menuspec.SpecTypeValidator = menuspecDescSpecType.Validators[0].(func(string) error)
-	// menuspecDescSpecValue is the schema descriptor for spec_value field.
-	menuspecDescSpecValue := menuspecFields[1].Descriptor()
-	// menuspec.SpecValueValidator is a validator for the "spec_value" field. It is called by the builders before save.
-	menuspec.SpecValueValidator = menuspecDescSpecValue.Validators[0].(func(string) error)
 	// menuspecDescPriceDelta is the schema descriptor for price_delta field.
-	menuspecDescPriceDelta := menuspecFields[2].Descriptor()
+	menuspecDescPriceDelta := menuspecFields[3].Descriptor()
 	// menuspec.DefaultPriceDelta holds the default value on creation for the price_delta field.
 	menuspec.DefaultPriceDelta = menuspecDescPriceDelta.Default.(float64)
 	// menuspecDescSort is the schema descriptor for sort field.
-	menuspecDescSort := menuspecFields[3].Descriptor()
+	menuspecDescSort := menuspecFields[4].Descriptor()
 	// menuspec.DefaultSort holds the default value on creation for the sort field.
 	menuspec.DefaultSort = menuspecDescSort.Default.(int)
 	orderMixin := schema.Order{}.Mixin()
-	orderMixinHooks1 := orderMixin[1].Hooks()
-	order.Hooks[0] = orderMixinHooks1[0]
-	orderMixinInters1 := orderMixin[1].Interceptors()
-	order.Interceptors[0] = orderMixinInters1[0]
-	orderMixinFields0 := orderMixin[0].Fields()
-	_ = orderMixinFields0
+	orderMixinHooks0 := orderMixin[0].Hooks()
+	orderMixinHooks2 := orderMixin[2].Hooks()
+	order.Hooks[0] = orderMixinHooks0[0]
+	order.Hooks[1] = orderMixinHooks2[0]
+	orderMixinInters2 := orderMixin[2].Interceptors()
+	order.Interceptors[0] = orderMixinInters2[0]
 	orderMixinFields1 := orderMixin[1].Fields()
 	_ = orderMixinFields1
+	orderMixinFields2 := orderMixin[2].Fields()
+	_ = orderMixinFields2
 	orderFields := schema.Order{}.Fields()
 	_ = orderFields
 	// orderDescCreatedAt is the schema descriptor for created_at field.
-	orderDescCreatedAt := orderMixinFields0[0].Descriptor()
+	orderDescCreatedAt := orderMixinFields1[0].Descriptor()
 	// order.DefaultCreatedAt holds the default value on creation for the created_at field.
 	order.DefaultCreatedAt = orderDescCreatedAt.Default.(func() time.Time)
 	// orderDescUpdatedAt is the schema descriptor for updated_at field.
-	orderDescUpdatedAt := orderMixinFields0[1].Descriptor()
+	orderDescUpdatedAt := orderMixinFields1[1].Descriptor()
 	// order.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	order.DefaultUpdatedAt = orderDescUpdatedAt.Default.(func() time.Time)
 	// order.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	order.UpdateDefaultUpdatedAt = orderDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// orderDescDeleteTs is the schema descriptor for delete_ts field.
-	orderDescDeleteTs := orderMixinFields1[0].Descriptor()
+	orderDescDeleteTs := orderMixinFields2[0].Descriptor()
 	// order.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	order.DefaultDeleteTs = orderDescDeleteTs.Default.(int64)
 	// orderDescOrderNo is the schema descriptor for order_no field.
@@ -172,28 +218,30 @@ func init() {
 	// order.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
 	order.RemarkValidator = orderDescRemark.Validators[0].(func(string) error)
 	orderitemMixin := schema.OrderItem{}.Mixin()
-	orderitemMixinHooks1 := orderitemMixin[1].Hooks()
-	orderitem.Hooks[0] = orderitemMixinHooks1[0]
-	orderitemMixinInters1 := orderitemMixin[1].Interceptors()
-	orderitem.Interceptors[0] = orderitemMixinInters1[0]
-	orderitemMixinFields0 := orderitemMixin[0].Fields()
-	_ = orderitemMixinFields0
+	orderitemMixinHooks0 := orderitemMixin[0].Hooks()
+	orderitemMixinHooks2 := orderitemMixin[2].Hooks()
+	orderitem.Hooks[0] = orderitemMixinHooks0[0]
+	orderitem.Hooks[1] = orderitemMixinHooks2[0]
+	orderitemMixinInters2 := orderitemMixin[2].Interceptors()
+	orderitem.Interceptors[0] = orderitemMixinInters2[0]
 	orderitemMixinFields1 := orderitemMixin[1].Fields()
 	_ = orderitemMixinFields1
+	orderitemMixinFields2 := orderitemMixin[2].Fields()
+	_ = orderitemMixinFields2
 	orderitemFields := schema.OrderItem{}.Fields()
 	_ = orderitemFields
 	// orderitemDescCreatedAt is the schema descriptor for created_at field.
-	orderitemDescCreatedAt := orderitemMixinFields0[0].Descriptor()
+	orderitemDescCreatedAt := orderitemMixinFields1[0].Descriptor()
 	// orderitem.DefaultCreatedAt holds the default value on creation for the created_at field.
 	orderitem.DefaultCreatedAt = orderitemDescCreatedAt.Default.(func() time.Time)
 	// orderitemDescUpdatedAt is the schema descriptor for updated_at field.
-	orderitemDescUpdatedAt := orderitemMixinFields0[1].Descriptor()
+	orderitemDescUpdatedAt := orderitemMixinFields1[1].Descriptor()
 	// orderitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	orderitem.DefaultUpdatedAt = orderitemDescUpdatedAt.Default.(func() time.Time)
 	// orderitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	orderitem.UpdateDefaultUpdatedAt = orderitemDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// orderitemDescDeleteTs is the schema descriptor for delete_ts field.
-	orderitemDescDeleteTs := orderitemMixinFields1[0].Descriptor()
+	orderitemDescDeleteTs := orderitemMixinFields2[0].Descriptor()
 	// orderitem.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	orderitem.DefaultDeleteTs = orderitemDescDeleteTs.Default.(int64)
 	// orderitemDescMenuName is the schema descriptor for menu_name field.
@@ -212,29 +260,97 @@ func init() {
 	orderitemDescSort := orderitemFields[5].Descriptor()
 	// orderitem.DefaultSort holds the default value on creation for the sort field.
 	orderitem.DefaultSort = orderitemDescSort.Default.(int)
+	specgroupMixin := schema.SpecGroup{}.Mixin()
+	specgroupMixinHooks0 := specgroupMixin[0].Hooks()
+	specgroupMixinHooks2 := specgroupMixin[2].Hooks()
+	specgroup.Hooks[0] = specgroupMixinHooks0[0]
+	specgroup.Hooks[1] = specgroupMixinHooks2[0]
+	specgroupMixinInters2 := specgroupMixin[2].Interceptors()
+	specgroup.Interceptors[0] = specgroupMixinInters2[0]
+	specgroupMixinFields1 := specgroupMixin[1].Fields()
+	_ = specgroupMixinFields1
+	specgroupMixinFields2 := specgroupMixin[2].Fields()
+	_ = specgroupMixinFields2
+	specgroupFields := schema.SpecGroup{}.Fields()
+	_ = specgroupFields
+	// specgroupDescCreatedAt is the schema descriptor for created_at field.
+	specgroupDescCreatedAt := specgroupMixinFields1[0].Descriptor()
+	// specgroup.DefaultCreatedAt holds the default value on creation for the created_at field.
+	specgroup.DefaultCreatedAt = specgroupDescCreatedAt.Default.(func() time.Time)
+	// specgroupDescUpdatedAt is the schema descriptor for updated_at field.
+	specgroupDescUpdatedAt := specgroupMixinFields1[1].Descriptor()
+	// specgroup.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	specgroup.DefaultUpdatedAt = specgroupDescUpdatedAt.Default.(func() time.Time)
+	// specgroup.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	specgroup.UpdateDefaultUpdatedAt = specgroupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// specgroupDescDeleteTs is the schema descriptor for delete_ts field.
+	specgroupDescDeleteTs := specgroupMixinFields2[0].Descriptor()
+	// specgroup.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	specgroup.DefaultDeleteTs = specgroupDescDeleteTs.Default.(int64)
+	// specgroupDescName is the schema descriptor for name field.
+	specgroupDescName := specgroupFields[0].Descriptor()
+	// specgroup.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	specgroup.NameValidator = specgroupDescName.Validators[0].(func(string) error)
+	// specgroupDescSort is the schema descriptor for sort field.
+	specgroupDescSort := specgroupFields[1].Descriptor()
+	// specgroup.DefaultSort holds the default value on creation for the sort field.
+	specgroup.DefaultSort = specgroupDescSort.Default.(int)
+	specitemMixin := schema.SpecItem{}.Mixin()
+	specitemMixinHooks0 := specitemMixin[0].Hooks()
+	specitemMixinHooks2 := specitemMixin[2].Hooks()
+	specitem.Hooks[0] = specitemMixinHooks0[0]
+	specitem.Hooks[1] = specitemMixinHooks2[0]
+	specitemMixinInters2 := specitemMixin[2].Interceptors()
+	specitem.Interceptors[0] = specitemMixinInters2[0]
+	specitemMixinFields1 := specitemMixin[1].Fields()
+	_ = specitemMixinFields1
+	specitemMixinFields2 := specitemMixin[2].Fields()
+	_ = specitemMixinFields2
+	specitemFields := schema.SpecItem{}.Fields()
+	_ = specitemFields
+	// specitemDescCreatedAt is the schema descriptor for created_at field.
+	specitemDescCreatedAt := specitemMixinFields1[0].Descriptor()
+	// specitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	specitem.DefaultCreatedAt = specitemDescCreatedAt.Default.(func() time.Time)
+	// specitemDescUpdatedAt is the schema descriptor for updated_at field.
+	specitemDescUpdatedAt := specitemMixinFields1[1].Descriptor()
+	// specitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	specitem.DefaultUpdatedAt = specitemDescUpdatedAt.Default.(func() time.Time)
+	// specitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	specitem.UpdateDefaultUpdatedAt = specitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// specitemDescDeleteTs is the schema descriptor for delete_ts field.
+	specitemDescDeleteTs := specitemMixinFields2[0].Descriptor()
+	// specitem.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	specitem.DefaultDeleteTs = specitemDescDeleteTs.Default.(int64)
+	// specitemDescName is the schema descriptor for name field.
+	specitemDescName := specitemFields[1].Descriptor()
+	// specitem.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	specitem.NameValidator = specitemDescName.Validators[0].(func(string) error)
 	tableMixin := schema.Table{}.Mixin()
-	tableMixinHooks1 := tableMixin[1].Hooks()
-	table.Hooks[0] = tableMixinHooks1[0]
-	tableMixinInters1 := tableMixin[1].Interceptors()
-	table.Interceptors[0] = tableMixinInters1[0]
-	tableMixinFields0 := tableMixin[0].Fields()
-	_ = tableMixinFields0
+	tableMixinHooks0 := tableMixin[0].Hooks()
+	tableMixinHooks2 := tableMixin[2].Hooks()
+	table.Hooks[0] = tableMixinHooks0[0]
+	table.Hooks[1] = tableMixinHooks2[0]
+	tableMixinInters2 := tableMixin[2].Interceptors()
+	table.Interceptors[0] = tableMixinInters2[0]
 	tableMixinFields1 := tableMixin[1].Fields()
 	_ = tableMixinFields1
+	tableMixinFields2 := tableMixin[2].Fields()
+	_ = tableMixinFields2
 	tableFields := schema.Table{}.Fields()
 	_ = tableFields
 	// tableDescCreatedAt is the schema descriptor for created_at field.
-	tableDescCreatedAt := tableMixinFields0[0].Descriptor()
+	tableDescCreatedAt := tableMixinFields1[0].Descriptor()
 	// table.DefaultCreatedAt holds the default value on creation for the created_at field.
 	table.DefaultCreatedAt = tableDescCreatedAt.Default.(func() time.Time)
 	// tableDescUpdatedAt is the schema descriptor for updated_at field.
-	tableDescUpdatedAt := tableMixinFields0[1].Descriptor()
+	tableDescUpdatedAt := tableMixinFields1[1].Descriptor()
 	// table.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	table.DefaultUpdatedAt = tableDescUpdatedAt.Default.(func() time.Time)
 	// table.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	table.UpdateDefaultUpdatedAt = tableDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// tableDescDeleteTs is the schema descriptor for delete_ts field.
-	tableDescDeleteTs := tableMixinFields1[0].Descriptor()
+	tableDescDeleteTs := tableMixinFields2[0].Descriptor()
 	// table.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	table.DefaultDeleteTs = tableDescDeleteTs.Default.(int64)
 	// tableDescCode is the schema descriptor for code field.
@@ -256,28 +372,30 @@ func init() {
 	// table.QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
 	table.QrCodeValidator = tableDescQrCode.Validators[0].(func(string) error)
 	tablecategoryMixin := schema.TableCategory{}.Mixin()
-	tablecategoryMixinHooks1 := tablecategoryMixin[1].Hooks()
-	tablecategory.Hooks[0] = tablecategoryMixinHooks1[0]
-	tablecategoryMixinInters1 := tablecategoryMixin[1].Interceptors()
-	tablecategory.Interceptors[0] = tablecategoryMixinInters1[0]
-	tablecategoryMixinFields0 := tablecategoryMixin[0].Fields()
-	_ = tablecategoryMixinFields0
+	tablecategoryMixinHooks0 := tablecategoryMixin[0].Hooks()
+	tablecategoryMixinHooks2 := tablecategoryMixin[2].Hooks()
+	tablecategory.Hooks[0] = tablecategoryMixinHooks0[0]
+	tablecategory.Hooks[1] = tablecategoryMixinHooks2[0]
+	tablecategoryMixinInters2 := tablecategoryMixin[2].Interceptors()
+	tablecategory.Interceptors[0] = tablecategoryMixinInters2[0]
 	tablecategoryMixinFields1 := tablecategoryMixin[1].Fields()
 	_ = tablecategoryMixinFields1
+	tablecategoryMixinFields2 := tablecategoryMixin[2].Fields()
+	_ = tablecategoryMixinFields2
 	tablecategoryFields := schema.TableCategory{}.Fields()
 	_ = tablecategoryFields
 	// tablecategoryDescCreatedAt is the schema descriptor for created_at field.
-	tablecategoryDescCreatedAt := tablecategoryMixinFields0[0].Descriptor()
+	tablecategoryDescCreatedAt := tablecategoryMixinFields1[0].Descriptor()
 	// tablecategory.DefaultCreatedAt holds the default value on creation for the created_at field.
 	tablecategory.DefaultCreatedAt = tablecategoryDescCreatedAt.Default.(func() time.Time)
 	// tablecategoryDescUpdatedAt is the schema descriptor for updated_at field.
-	tablecategoryDescUpdatedAt := tablecategoryMixinFields0[1].Descriptor()
+	tablecategoryDescUpdatedAt := tablecategoryMixinFields1[1].Descriptor()
 	// tablecategory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	tablecategory.DefaultUpdatedAt = tablecategoryDescUpdatedAt.Default.(func() time.Time)
 	// tablecategory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	tablecategory.UpdateDefaultUpdatedAt = tablecategoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// tablecategoryDescDeleteTs is the schema descriptor for delete_ts field.
-	tablecategoryDescDeleteTs := tablecategoryMixinFields1[0].Descriptor()
+	tablecategoryDescDeleteTs := tablecategoryMixinFields2[0].Descriptor()
 	// tablecategory.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	tablecategory.DefaultDeleteTs = tablecategoryDescDeleteTs.Default.(int64)
 	// tablecategoryDescName is the schema descriptor for name field.

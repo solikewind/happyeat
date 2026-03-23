@@ -31,8 +31,8 @@ const (
 	FieldPrice = "price"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
-	// EdgeSpecs holds the string denoting the specs edge name in mutations.
-	EdgeSpecs = "specs"
+	// EdgeMenuSpecs holds the string denoting the menu_specs edge name in mutations.
+	EdgeMenuSpecs = "menu_specs"
 	// EdgeOrderItems holds the string denoting the order_items edge name in mutations.
 	EdgeOrderItems = "order_items"
 	// Table holds the table name of the menu in the database.
@@ -44,13 +44,13 @@ const (
 	CategoryInverseTable = "menu_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "menu_category_menus"
-	// SpecsTable is the table that holds the specs relation/edge.
-	SpecsTable = "menu_specs"
-	// SpecsInverseTable is the table name for the MenuSpec entity.
+	// MenuSpecsTable is the table that holds the menu_specs relation/edge.
+	MenuSpecsTable = "menu_specs"
+	// MenuSpecsInverseTable is the table name for the MenuSpec entity.
 	// It exists in this package in order to avoid circular dependency with the "menuspec" package.
-	SpecsInverseTable = "menu_specs"
-	// SpecsColumn is the table column denoting the specs relation/edge.
-	SpecsColumn = "menu_specs"
+	MenuSpecsInverseTable = "menu_specs"
+	// MenuSpecsColumn is the table column denoting the menu_specs relation/edge.
+	MenuSpecsColumn = "menu_id"
 	// OrderItemsTable is the table that holds the order_items relation/edge.
 	OrderItemsTable = "order_items"
 	// OrderItemsInverseTable is the table name for the OrderItem entity.
@@ -99,7 +99,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 var (
-	Hooks        [1]ent.Hook
+	Hooks        [2]ent.Hook
 	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
@@ -165,17 +165,17 @@ func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// BySpecsCount orders the results by specs count.
-func BySpecsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByMenuSpecsCount orders the results by menu_specs count.
+func ByMenuSpecsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSpecsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newMenuSpecsStep(), opts...)
 	}
 }
 
-// BySpecs orders the results by specs terms.
-func BySpecs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByMenuSpecs orders the results by menu_specs terms.
+func ByMenuSpecs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSpecsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newMenuSpecsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -199,11 +199,11 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
 	)
 }
-func newSpecsStep() *sqlgraph.Step {
+func newMenuSpecsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SpecsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SpecsTable, SpecsColumn),
+		sqlgraph.To(MenuSpecsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, MenuSpecsTable, MenuSpecsColumn),
 	)
 }
 func newOrderItemsStep() *sqlgraph.Step {

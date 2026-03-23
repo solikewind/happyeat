@@ -10,8 +10,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 )
 
 // MenuSpecCreate is the builder for creating a MenuSpec entity.
@@ -63,15 +65,37 @@ func (_c *MenuSpecCreate) SetNillableDeleteTs(v *int64) *MenuSpecCreate {
 	return _c
 }
 
-// SetSpecType sets the "spec_type" field.
-func (_c *MenuSpecCreate) SetSpecType(v string) *MenuSpecCreate {
-	_c.mutation.SetSpecType(v)
+// SetMenuID sets the "menu_id" field.
+func (_c *MenuSpecCreate) SetMenuID(v uint64) *MenuSpecCreate {
+	_c.mutation.SetMenuID(v)
 	return _c
 }
 
-// SetSpecValue sets the "spec_value" field.
-func (_c *MenuSpecCreate) SetSpecValue(v string) *MenuSpecCreate {
-	_c.mutation.SetSpecValue(v)
+// SetSpecItemID sets the "spec_item_id" field.
+func (_c *MenuSpecCreate) SetSpecItemID(v uint64) *MenuSpecCreate {
+	_c.mutation.SetSpecItemID(v)
+	return _c
+}
+
+// SetNillableSpecItemID sets the "spec_item_id" field if the given value is not nil.
+func (_c *MenuSpecCreate) SetNillableSpecItemID(v *uint64) *MenuSpecCreate {
+	if v != nil {
+		_c.SetSpecItemID(*v)
+	}
+	return _c
+}
+
+// SetCategorySpecID sets the "category_spec_id" field.
+func (_c *MenuSpecCreate) SetCategorySpecID(v uint64) *MenuSpecCreate {
+	_c.mutation.SetCategorySpecID(v)
+	return _c
+}
+
+// SetNillableCategorySpecID sets the "category_spec_id" field if the given value is not nil.
+func (_c *MenuSpecCreate) SetNillableCategorySpecID(v *uint64) *MenuSpecCreate {
+	if v != nil {
+		_c.SetCategorySpecID(*v)
+	}
 	return _c
 }
 
@@ -103,15 +127,25 @@ func (_c *MenuSpecCreate) SetNillableSort(v *int) *MenuSpecCreate {
 	return _c
 }
 
-// SetMenuID sets the "menu" edge to the Menu entity by ID.
-func (_c *MenuSpecCreate) SetMenuID(id int) *MenuSpecCreate {
-	_c.mutation.SetMenuID(id)
+// SetID sets the "id" field.
+func (_c *MenuSpecCreate) SetID(v uint64) *MenuSpecCreate {
+	_c.mutation.SetID(v)
 	return _c
 }
 
 // SetMenu sets the "menu" edge to the Menu entity.
 func (_c *MenuSpecCreate) SetMenu(v *Menu) *MenuSpecCreate {
 	return _c.SetMenuID(v.ID)
+}
+
+// SetCategorySpec sets the "category_spec" edge to the CategorySpec entity.
+func (_c *MenuSpecCreate) SetCategorySpec(v *CategorySpec) *MenuSpecCreate {
+	return _c.SetCategorySpecID(v.ID)
+}
+
+// SetSpecItem sets the "spec_item" edge to the SpecItem entity.
+func (_c *MenuSpecCreate) SetSpecItem(v *SpecItem) *MenuSpecCreate {
+	return _c.SetSpecItemID(v.ID)
 }
 
 // Mutation returns the MenuSpecMutation object of the builder.
@@ -191,21 +225,8 @@ func (_c *MenuSpecCreate) check() error {
 	if _, ok := _c.mutation.DeleteTs(); !ok {
 		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "MenuSpec.delete_ts"`)}
 	}
-	if _, ok := _c.mutation.SpecType(); !ok {
-		return &ValidationError{Name: "spec_type", err: errors.New(`ent: missing required field "MenuSpec.spec_type"`)}
-	}
-	if v, ok := _c.mutation.SpecType(); ok {
-		if err := menuspec.SpecTypeValidator(v); err != nil {
-			return &ValidationError{Name: "spec_type", err: fmt.Errorf(`ent: validator failed for field "MenuSpec.spec_type": %w`, err)}
-		}
-	}
-	if _, ok := _c.mutation.SpecValue(); !ok {
-		return &ValidationError{Name: "spec_value", err: errors.New(`ent: missing required field "MenuSpec.spec_value"`)}
-	}
-	if v, ok := _c.mutation.SpecValue(); ok {
-		if err := menuspec.SpecValueValidator(v); err != nil {
-			return &ValidationError{Name: "spec_value", err: fmt.Errorf(`ent: validator failed for field "MenuSpec.spec_value": %w`, err)}
-		}
+	if _, ok := _c.mutation.MenuID(); !ok {
+		return &ValidationError{Name: "menu_id", err: errors.New(`ent: missing required field "MenuSpec.menu_id"`)}
 	}
 	if _, ok := _c.mutation.PriceDelta(); !ok {
 		return &ValidationError{Name: "price_delta", err: errors.New(`ent: missing required field "MenuSpec.price_delta"`)}
@@ -230,8 +251,10 @@ func (_c *MenuSpecCreate) sqlSave(ctx context.Context) (*MenuSpec, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -240,8 +263,12 @@ func (_c *MenuSpecCreate) sqlSave(ctx context.Context) (*MenuSpec, error) {
 func (_c *MenuSpecCreate) createSpec() (*MenuSpec, *sqlgraph.CreateSpec) {
 	var (
 		_node = &MenuSpec{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(menuspec.Table, sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(menuspec.Table, sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64))
 	)
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(menuspec.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -253,14 +280,6 @@ func (_c *MenuSpecCreate) createSpec() (*MenuSpec, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.DeleteTs(); ok {
 		_spec.SetField(menuspec.FieldDeleteTs, field.TypeInt64, value)
 		_node.DeleteTs = value
-	}
-	if value, ok := _c.mutation.SpecType(); ok {
-		_spec.SetField(menuspec.FieldSpecType, field.TypeString, value)
-		_node.SpecType = value
-	}
-	if value, ok := _c.mutation.SpecValue(); ok {
-		_spec.SetField(menuspec.FieldSpecValue, field.TypeString, value)
-		_node.SpecValue = value
 	}
 	if value, ok := _c.mutation.PriceDelta(); ok {
 		_spec.SetField(menuspec.FieldPriceDelta, field.TypeFloat64, value)
@@ -278,13 +297,47 @@ func (_c *MenuSpecCreate) createSpec() (*MenuSpec, *sqlgraph.CreateSpec) {
 			Columns: []string{menuspec.MenuColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.menu_specs = &nodes[0]
+		_node.MenuID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CategorySpecIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   menuspec.CategorySpecTable,
+			Columns: []string{menuspec.CategorySpecColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CategorySpecID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SpecItemIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   menuspec.SpecItemTable,
+			Columns: []string{menuspec.SpecItemColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(specitem.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.SpecItemID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -335,9 +388,9 @@ func (_c *MenuSpecCreateBulk) Save(ctx context.Context) ([]*MenuSpec, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

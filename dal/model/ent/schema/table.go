@@ -15,6 +15,7 @@ type Table struct {
 
 func (Table) Mixin() []ent.Mixin {
 	return []ent.Mixin{
+		UniqueID{},
 		TimeMixin{},
 		SoftDeleteMixin{},
 	}

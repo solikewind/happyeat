@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// CategorySpec is the predicate function for categoryspec builders.
+type CategorySpec func(*sql.Selector)
+
 // Menu is the predicate function for menu builders.
 type Menu func(*sql.Selector)
 
@@ -20,6 +23,12 @@ type Order func(*sql.Selector)
 
 // OrderItem is the predicate function for orderitem builders.
 type OrderItem func(*sql.Selector)
+
+// SpecGroup is the predicate function for specgroup builders.
+type SpecGroup func(*sql.Selector)
+
+// SpecItem is the predicate function for specitem builders.
+type SpecItem func(*sql.Selector)
 
 // Table is the predicate function for table builders.
 type Table func(*sql.Selector)

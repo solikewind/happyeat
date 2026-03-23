@@ -176,7 +176,7 @@ func (_u *OrderItemUpdate) AddSort(v int) *OrderItemUpdate {
 }
 
 // SetOrderID sets the "order" edge to the Order entity by ID.
-func (_u *OrderItemUpdate) SetOrderID(id int) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetOrderID(id uint64) *OrderItemUpdate {
 	_u.mutation.SetOrderID(id)
 	return _u
 }
@@ -187,13 +187,13 @@ func (_u *OrderItemUpdate) SetOrder(v *Order) *OrderItemUpdate {
 }
 
 // SetMenuID sets the "menu" edge to the Menu entity by ID.
-func (_u *OrderItemUpdate) SetMenuID(id int) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetMenuID(id uint64) *OrderItemUpdate {
 	_u.mutation.SetMenuID(id)
 	return _u
 }
 
 // SetNillableMenuID sets the "menu" edge to the Menu entity by ID if the given value is not nil.
-func (_u *OrderItemUpdate) SetNillableMenuID(id *int) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetNillableMenuID(id *uint64) *OrderItemUpdate {
 	if id != nil {
 		_u = _u.SetMenuID(*id)
 	}
@@ -286,7 +286,7 @@ func (_u *OrderItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(orderitem.Table, orderitem.Columns, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(orderitem.Table, orderitem.Columns, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -344,7 +344,7 @@ func (_u *OrderItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{orderitem.OrderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -357,7 +357,7 @@ func (_u *OrderItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{orderitem.OrderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -373,7 +373,7 @@ func (_u *OrderItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{orderitem.MenuColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -386,7 +386,7 @@ func (_u *OrderItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{orderitem.MenuColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -560,7 +560,7 @@ func (_u *OrderItemUpdateOne) AddSort(v int) *OrderItemUpdateOne {
 }
 
 // SetOrderID sets the "order" edge to the Order entity by ID.
-func (_u *OrderItemUpdateOne) SetOrderID(id int) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetOrderID(id uint64) *OrderItemUpdateOne {
 	_u.mutation.SetOrderID(id)
 	return _u
 }
@@ -571,13 +571,13 @@ func (_u *OrderItemUpdateOne) SetOrder(v *Order) *OrderItemUpdateOne {
 }
 
 // SetMenuID sets the "menu" edge to the Menu entity by ID.
-func (_u *OrderItemUpdateOne) SetMenuID(id int) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetMenuID(id uint64) *OrderItemUpdateOne {
 	_u.mutation.SetMenuID(id)
 	return _u
 }
 
 // SetNillableMenuID sets the "menu" edge to the Menu entity by ID if the given value is not nil.
-func (_u *OrderItemUpdateOne) SetNillableMenuID(id *int) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetNillableMenuID(id *uint64) *OrderItemUpdateOne {
 	if id != nil {
 		_u = _u.SetMenuID(*id)
 	}
@@ -683,7 +683,7 @@ func (_u *OrderItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderItem, er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(orderitem.Table, orderitem.Columns, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(orderitem.Table, orderitem.Columns, sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "OrderItem.id" for update`)}
@@ -758,7 +758,7 @@ func (_u *OrderItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderItem, er
 			Columns: []string{orderitem.OrderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -771,7 +771,7 @@ func (_u *OrderItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderItem, er
 			Columns: []string{orderitem.OrderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -787,7 +787,7 @@ func (_u *OrderItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderItem, er
 			Columns: []string{orderitem.MenuColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -800,7 +800,7 @@ func (_u *OrderItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderItem, er
 			Columns: []string{orderitem.MenuColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

@@ -9,6 +9,18 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent"
 )
 
+// The CategorySpecFunc type is an adapter to allow the use of ordinary
+// function as CategorySpec mutator.
+type CategorySpecFunc func(context.Context, *ent.CategorySpecMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CategorySpecFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CategorySpecMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategorySpecMutation", m)
+}
+
 // The MenuFunc type is an adapter to allow the use of ordinary
 // function as Menu mutator.
 type MenuFunc func(context.Context, *ent.MenuMutation) (ent.Value, error)
@@ -67,6 +79,30 @@ func (f OrderItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderItemMutation", m)
+}
+
+// The SpecGroupFunc type is an adapter to allow the use of ordinary
+// function as SpecGroup mutator.
+type SpecGroupFunc func(context.Context, *ent.SpecGroupMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SpecGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SpecGroupMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SpecGroupMutation", m)
+}
+
+// The SpecItemFunc type is an adapter to allow the use of ordinary
+// function as SpecItem mutator.
+type SpecItemFunc func(context.Context, *ent.SpecItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SpecItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SpecItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SpecItemMutation", m)
 }
 
 // The TableFunc type is an adapter to allow the use of ordinary

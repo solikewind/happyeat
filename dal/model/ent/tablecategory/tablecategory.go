@@ -64,7 +64,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 var (
-	Hooks        [1]ent.Hook
+	Hooks        [2]ent.Hook
 	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time

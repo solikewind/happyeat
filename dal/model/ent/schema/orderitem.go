@@ -15,6 +15,7 @@ type OrderItem struct {
 
 func (OrderItem) Mixin() []ent.Mixin {
 	return []ent.Mixin{
+		UniqueID{},
 		TimeMixin{},
 		SoftDeleteMixin{},
 	}

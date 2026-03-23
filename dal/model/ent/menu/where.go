@@ -11,47 +11,47 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Menu {
+func ID(id uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Menu {
+func IDEQ(id uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Menu {
+func IDNEQ(id uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Menu {
+func IDIn(ids ...uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Menu {
+func IDNotIn(ids ...uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Menu {
+func IDGT(id uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Menu {
+func IDGTE(id uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Menu {
+func IDLT(id uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Menu {
+func IDLTE(id uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldLTE(FieldID, id))
 }
 
@@ -488,21 +488,21 @@ func HasCategoryWith(preds ...predicate.MenuCategory) predicate.Menu {
 	})
 }
 
-// HasSpecs applies the HasEdge predicate on the "specs" edge.
-func HasSpecs() predicate.Menu {
+// HasMenuSpecs applies the HasEdge predicate on the "menu_specs" edge.
+func HasMenuSpecs() predicate.Menu {
 	return predicate.Menu(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SpecsTable, SpecsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, MenuSpecsTable, MenuSpecsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSpecsWith applies the HasEdge predicate on the "specs" edge with a given conditions (other predicates).
-func HasSpecsWith(preds ...predicate.MenuSpec) predicate.Menu {
+// HasMenuSpecsWith applies the HasEdge predicate on the "menu_specs" edge with a given conditions (other predicates).
+func HasMenuSpecsWith(preds ...predicate.MenuSpec) predicate.Menu {
 	return predicate.Menu(func(s *sql.Selector) {
-		step := newSpecsStep()
+		step := newMenuSpecsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

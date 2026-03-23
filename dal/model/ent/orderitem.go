@@ -18,7 +18,8 @@ import (
 type OrderItem struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// ID
+	ID uint64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -40,8 +41,8 @@ type OrderItem struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderItemQuery when eager-loading is set.
 	Edges            OrderItemEdges `json:"edges"`
-	menu_order_items *int
-	order_items      *int
+	menu_order_items *uint64
+	order_items      *uint64
 	selectValues     sql.SelectValues
 }
 
@@ -115,7 +116,7 @@ func (_m *OrderItem) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = uint64(value.Int64)
 		case orderitem.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -175,15 +176,15 @@ func (_m *OrderItem) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field menu_order_items", value)
 			} else if value.Valid {
-				_m.menu_order_items = new(int)
-				*_m.menu_order_items = int(value.Int64)
+				_m.menu_order_items = new(uint64)
+				*_m.menu_order_items = uint64(value.Int64)
 			}
 		case orderitem.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field order_items", value)
 			} else if value.Valid {
-				_m.order_items = new(int)
-				*_m.order_items = int(value.Int64)
+				_m.order_items = new(uint64)
+				*_m.order_items = uint64(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

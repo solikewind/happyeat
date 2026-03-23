@@ -15,11 +15,14 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
+	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
+	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 	"github.com/solikewind/happyeat/dal/model/ent/tablecategory"
 )
@@ -29,6 +32,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// CategorySpec is the client for interacting with the CategorySpec builders.
+	CategorySpec *CategorySpecClient
 	// Menu is the client for interacting with the Menu builders.
 	Menu *MenuClient
 	// MenuCategory is the client for interacting with the MenuCategory builders.
@@ -39,6 +44,10 @@ type Client struct {
 	Order *OrderClient
 	// OrderItem is the client for interacting with the OrderItem builders.
 	OrderItem *OrderItemClient
+	// SpecGroup is the client for interacting with the SpecGroup builders.
+	SpecGroup *SpecGroupClient
+	// SpecItem is the client for interacting with the SpecItem builders.
+	SpecItem *SpecItemClient
 	// Table is the client for interacting with the Table builders.
 	Table *TableClient
 	// TableCategory is the client for interacting with the TableCategory builders.
@@ -54,11 +63,14 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.CategorySpec = NewCategorySpecClient(c.config)
 	c.Menu = NewMenuClient(c.config)
 	c.MenuCategory = NewMenuCategoryClient(c.config)
 	c.MenuSpec = NewMenuSpecClient(c.config)
 	c.Order = NewOrderClient(c.config)
 	c.OrderItem = NewOrderItemClient(c.config)
+	c.SpecGroup = NewSpecGroupClient(c.config)
+	c.SpecItem = NewSpecItemClient(c.config)
 	c.Table = NewTableClient(c.config)
 	c.TableCategory = NewTableCategoryClient(c.config)
 }
@@ -153,11 +165,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		CategorySpec:  NewCategorySpecClient(cfg),
 		Menu:          NewMenuClient(cfg),
 		MenuCategory:  NewMenuCategoryClient(cfg),
 		MenuSpec:      NewMenuSpecClient(cfg),
 		Order:         NewOrderClient(cfg),
 		OrderItem:     NewOrderItemClient(cfg),
+		SpecGroup:     NewSpecGroupClient(cfg),
+		SpecItem:      NewSpecItemClient(cfg),
 		Table:         NewTableClient(cfg),
 		TableCategory: NewTableCategoryClient(cfg),
 	}, nil
@@ -179,11 +194,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		CategorySpec:  NewCategorySpecClient(cfg),
 		Menu:          NewMenuClient(cfg),
 		MenuCategory:  NewMenuCategoryClient(cfg),
 		MenuSpec:      NewMenuSpecClient(cfg),
 		Order:         NewOrderClient(cfg),
 		OrderItem:     NewOrderItemClient(cfg),
+		SpecGroup:     NewSpecGroupClient(cfg),
+		SpecItem:      NewSpecItemClient(cfg),
 		Table:         NewTableClient(cfg),
 		TableCategory: NewTableCategoryClient(cfg),
 	}, nil
@@ -192,7 +210,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Menu.
+//		CategorySpec.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -215,8 +233,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Menu, c.MenuCategory, c.MenuSpec, c.Order, c.OrderItem, c.Table,
-		c.TableCategory,
+		c.CategorySpec, c.Menu, c.MenuCategory, c.MenuSpec, c.Order, c.OrderItem,
+		c.SpecGroup, c.SpecItem, c.Table, c.TableCategory,
 	} {
 		n.Use(hooks...)
 	}
@@ -226,8 +244,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Menu, c.MenuCategory, c.MenuSpec, c.Order, c.OrderItem, c.Table,
-		c.TableCategory,
+		c.CategorySpec, c.Menu, c.MenuCategory, c.MenuSpec, c.Order, c.OrderItem,
+		c.SpecGroup, c.SpecItem, c.Table, c.TableCategory,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -236,6 +254,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *CategorySpecMutation:
+		return c.CategorySpec.mutate(ctx, m)
 	case *MenuMutation:
 		return c.Menu.mutate(ctx, m)
 	case *MenuCategoryMutation:
@@ -246,12 +266,183 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Order.mutate(ctx, m)
 	case *OrderItemMutation:
 		return c.OrderItem.mutate(ctx, m)
+	case *SpecGroupMutation:
+		return c.SpecGroup.mutate(ctx, m)
+	case *SpecItemMutation:
+		return c.SpecItem.mutate(ctx, m)
 	case *TableMutation:
 		return c.Table.mutate(ctx, m)
 	case *TableCategoryMutation:
 		return c.TableCategory.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// CategorySpecClient is a client for the CategorySpec schema.
+type CategorySpecClient struct {
+	config
+}
+
+// NewCategorySpecClient returns a client for the CategorySpec from the given config.
+func NewCategorySpecClient(c config) *CategorySpecClient {
+	return &CategorySpecClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `categoryspec.Hooks(f(g(h())))`.
+func (c *CategorySpecClient) Use(hooks ...Hook) {
+	c.hooks.CategorySpec = append(c.hooks.CategorySpec, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `categoryspec.Intercept(f(g(h())))`.
+func (c *CategorySpecClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CategorySpec = append(c.inters.CategorySpec, interceptors...)
+}
+
+// Create returns a builder for creating a CategorySpec entity.
+func (c *CategorySpecClient) Create() *CategorySpecCreate {
+	mutation := newCategorySpecMutation(c.config, OpCreate)
+	return &CategorySpecCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CategorySpec entities.
+func (c *CategorySpecClient) CreateBulk(builders ...*CategorySpecCreate) *CategorySpecCreateBulk {
+	return &CategorySpecCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CategorySpecClient) MapCreateBulk(slice any, setFunc func(*CategorySpecCreate, int)) *CategorySpecCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CategorySpecCreateBulk{err: fmt.Errorf("calling to CategorySpecClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CategorySpecCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CategorySpecCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CategorySpec.
+func (c *CategorySpecClient) Update() *CategorySpecUpdate {
+	mutation := newCategorySpecMutation(c.config, OpUpdate)
+	return &CategorySpecUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CategorySpecClient) UpdateOne(_m *CategorySpec) *CategorySpecUpdateOne {
+	mutation := newCategorySpecMutation(c.config, OpUpdateOne, withCategorySpec(_m))
+	return &CategorySpecUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CategorySpecClient) UpdateOneID(id uint64) *CategorySpecUpdateOne {
+	mutation := newCategorySpecMutation(c.config, OpUpdateOne, withCategorySpecID(id))
+	return &CategorySpecUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CategorySpec.
+func (c *CategorySpecClient) Delete() *CategorySpecDelete {
+	mutation := newCategorySpecMutation(c.config, OpDelete)
+	return &CategorySpecDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CategorySpecClient) DeleteOne(_m *CategorySpec) *CategorySpecDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CategorySpecClient) DeleteOneID(id uint64) *CategorySpecDeleteOne {
+	builder := c.Delete().Where(categoryspec.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CategorySpecDeleteOne{builder}
+}
+
+// Query returns a query builder for CategorySpec.
+func (c *CategorySpecClient) Query() *CategorySpecQuery {
+	return &CategorySpecQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCategorySpec},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CategorySpec entity by its id.
+func (c *CategorySpecClient) Get(ctx context.Context, id uint64) (*CategorySpec, error) {
+	return c.Query().Where(categoryspec.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CategorySpecClient) GetX(ctx context.Context, id uint64) *CategorySpec {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCategory queries the category edge of a CategorySpec.
+func (c *CategorySpecClient) QueryCategory(_m *CategorySpec) *MenuCategoryQuery {
+	query := (&MenuCategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(categoryspec.Table, categoryspec.FieldID, id),
+			sqlgraph.To(menucategory.Table, menucategory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, categoryspec.CategoryTable, categoryspec.CategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMenuSpecs queries the menu_specs edge of a CategorySpec.
+func (c *CategorySpecClient) QueryMenuSpecs(_m *CategorySpec) *MenuSpecQuery {
+	query := (&MenuSpecClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(categoryspec.Table, categoryspec.FieldID, id),
+			sqlgraph.To(menuspec.Table, menuspec.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, categoryspec.MenuSpecsTable, categoryspec.MenuSpecsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CategorySpecClient) Hooks() []Hook {
+	hooks := c.hooks.CategorySpec
+	return append(hooks[:len(hooks):len(hooks)], categoryspec.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *CategorySpecClient) Interceptors() []Interceptor {
+	inters := c.inters.CategorySpec
+	return append(inters[:len(inters):len(inters)], categoryspec.Interceptors[:]...)
+}
+
+func (c *CategorySpecClient) mutate(ctx context.Context, m *CategorySpecMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CategorySpecCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CategorySpecUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CategorySpecUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CategorySpecDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CategorySpec mutation op: %q", m.Op())
 	}
 }
 
@@ -316,7 +507,7 @@ func (c *MenuClient) UpdateOne(_m *Menu) *MenuUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *MenuClient) UpdateOneID(id int) *MenuUpdateOne {
+func (c *MenuClient) UpdateOneID(id uint64) *MenuUpdateOne {
 	mutation := newMenuMutation(c.config, OpUpdateOne, withMenuID(id))
 	return &MenuUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -333,7 +524,7 @@ func (c *MenuClient) DeleteOne(_m *Menu) *MenuDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *MenuClient) DeleteOneID(id int) *MenuDeleteOne {
+func (c *MenuClient) DeleteOneID(id uint64) *MenuDeleteOne {
 	builder := c.Delete().Where(menu.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -350,12 +541,12 @@ func (c *MenuClient) Query() *MenuQuery {
 }
 
 // Get returns a Menu entity by its id.
-func (c *MenuClient) Get(ctx context.Context, id int) (*Menu, error) {
+func (c *MenuClient) Get(ctx context.Context, id uint64) (*Menu, error) {
 	return c.Query().Where(menu.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *MenuClient) GetX(ctx context.Context, id int) *Menu {
+func (c *MenuClient) GetX(ctx context.Context, id uint64) *Menu {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -379,15 +570,15 @@ func (c *MenuClient) QueryCategory(_m *Menu) *MenuCategoryQuery {
 	return query
 }
 
-// QuerySpecs queries the specs edge of a Menu.
-func (c *MenuClient) QuerySpecs(_m *Menu) *MenuSpecQuery {
+// QueryMenuSpecs queries the menu_specs edge of a Menu.
+func (c *MenuClient) QueryMenuSpecs(_m *Menu) *MenuSpecQuery {
 	query := (&MenuSpecClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(menu.Table, menu.FieldID, id),
 			sqlgraph.To(menuspec.Table, menuspec.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, menu.SpecsTable, menu.SpecsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, menu.MenuSpecsTable, menu.MenuSpecsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -499,7 +690,7 @@ func (c *MenuCategoryClient) UpdateOne(_m *MenuCategory) *MenuCategoryUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *MenuCategoryClient) UpdateOneID(id int) *MenuCategoryUpdateOne {
+func (c *MenuCategoryClient) UpdateOneID(id uint64) *MenuCategoryUpdateOne {
 	mutation := newMenuCategoryMutation(c.config, OpUpdateOne, withMenuCategoryID(id))
 	return &MenuCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -516,7 +707,7 @@ func (c *MenuCategoryClient) DeleteOne(_m *MenuCategory) *MenuCategoryDeleteOne 
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *MenuCategoryClient) DeleteOneID(id int) *MenuCategoryDeleteOne {
+func (c *MenuCategoryClient) DeleteOneID(id uint64) *MenuCategoryDeleteOne {
 	builder := c.Delete().Where(menucategory.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -533,12 +724,12 @@ func (c *MenuCategoryClient) Query() *MenuCategoryQuery {
 }
 
 // Get returns a MenuCategory entity by its id.
-func (c *MenuCategoryClient) Get(ctx context.Context, id int) (*MenuCategory, error) {
+func (c *MenuCategoryClient) Get(ctx context.Context, id uint64) (*MenuCategory, error) {
 	return c.Query().Where(menucategory.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *MenuCategoryClient) GetX(ctx context.Context, id int) *MenuCategory {
+func (c *MenuCategoryClient) GetX(ctx context.Context, id uint64) *MenuCategory {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -555,6 +746,22 @@ func (c *MenuCategoryClient) QueryMenus(_m *MenuCategory) *MenuQuery {
 			sqlgraph.From(menucategory.Table, menucategory.FieldID, id),
 			sqlgraph.To(menu.Table, menu.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, menucategory.MenusTable, menucategory.MenusColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCategorySpecs queries the category_specs edge of a MenuCategory.
+func (c *MenuCategoryClient) QueryCategorySpecs(_m *MenuCategory) *CategorySpecQuery {
+	query := (&CategorySpecClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(menucategory.Table, menucategory.FieldID, id),
+			sqlgraph.To(categoryspec.Table, categoryspec.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, menucategory.CategorySpecsTable, menucategory.CategorySpecsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -650,7 +857,7 @@ func (c *MenuSpecClient) UpdateOne(_m *MenuSpec) *MenuSpecUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *MenuSpecClient) UpdateOneID(id int) *MenuSpecUpdateOne {
+func (c *MenuSpecClient) UpdateOneID(id uint64) *MenuSpecUpdateOne {
 	mutation := newMenuSpecMutation(c.config, OpUpdateOne, withMenuSpecID(id))
 	return &MenuSpecUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -667,7 +874,7 @@ func (c *MenuSpecClient) DeleteOne(_m *MenuSpec) *MenuSpecDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *MenuSpecClient) DeleteOneID(id int) *MenuSpecDeleteOne {
+func (c *MenuSpecClient) DeleteOneID(id uint64) *MenuSpecDeleteOne {
 	builder := c.Delete().Where(menuspec.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -684,12 +891,12 @@ func (c *MenuSpecClient) Query() *MenuSpecQuery {
 }
 
 // Get returns a MenuSpec entity by its id.
-func (c *MenuSpecClient) Get(ctx context.Context, id int) (*MenuSpec, error) {
+func (c *MenuSpecClient) Get(ctx context.Context, id uint64) (*MenuSpec, error) {
 	return c.Query().Where(menuspec.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *MenuSpecClient) GetX(ctx context.Context, id int) *MenuSpec {
+func (c *MenuSpecClient) GetX(ctx context.Context, id uint64) *MenuSpec {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -706,6 +913,38 @@ func (c *MenuSpecClient) QueryMenu(_m *MenuSpec) *MenuQuery {
 			sqlgraph.From(menuspec.Table, menuspec.FieldID, id),
 			sqlgraph.To(menu.Table, menu.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, menuspec.MenuTable, menuspec.MenuColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCategorySpec queries the category_spec edge of a MenuSpec.
+func (c *MenuSpecClient) QueryCategorySpec(_m *MenuSpec) *CategorySpecQuery {
+	query := (&CategorySpecClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(menuspec.Table, menuspec.FieldID, id),
+			sqlgraph.To(categoryspec.Table, categoryspec.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, menuspec.CategorySpecTable, menuspec.CategorySpecColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySpecItem queries the spec_item edge of a MenuSpec.
+func (c *MenuSpecClient) QuerySpecItem(_m *MenuSpec) *SpecItemQuery {
+	query := (&SpecItemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(menuspec.Table, menuspec.FieldID, id),
+			sqlgraph.To(specitem.Table, specitem.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, menuspec.SpecItemTable, menuspec.SpecItemColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -801,7 +1040,7 @@ func (c *OrderClient) UpdateOne(_m *Order) *OrderUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *OrderClient) UpdateOneID(id int) *OrderUpdateOne {
+func (c *OrderClient) UpdateOneID(id uint64) *OrderUpdateOne {
 	mutation := newOrderMutation(c.config, OpUpdateOne, withOrderID(id))
 	return &OrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -818,7 +1057,7 @@ func (c *OrderClient) DeleteOne(_m *Order) *OrderDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *OrderClient) DeleteOneID(id int) *OrderDeleteOne {
+func (c *OrderClient) DeleteOneID(id uint64) *OrderDeleteOne {
 	builder := c.Delete().Where(order.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -835,12 +1074,12 @@ func (c *OrderClient) Query() *OrderQuery {
 }
 
 // Get returns a Order entity by its id.
-func (c *OrderClient) Get(ctx context.Context, id int) (*Order, error) {
+func (c *OrderClient) Get(ctx context.Context, id uint64) (*Order, error) {
 	return c.Query().Where(order.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *OrderClient) GetX(ctx context.Context, id int) *Order {
+func (c *OrderClient) GetX(ctx context.Context, id uint64) *Order {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -968,7 +1207,7 @@ func (c *OrderItemClient) UpdateOne(_m *OrderItem) *OrderItemUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *OrderItemClient) UpdateOneID(id int) *OrderItemUpdateOne {
+func (c *OrderItemClient) UpdateOneID(id uint64) *OrderItemUpdateOne {
 	mutation := newOrderItemMutation(c.config, OpUpdateOne, withOrderItemID(id))
 	return &OrderItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -985,7 +1224,7 @@ func (c *OrderItemClient) DeleteOne(_m *OrderItem) *OrderItemDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *OrderItemClient) DeleteOneID(id int) *OrderItemDeleteOne {
+func (c *OrderItemClient) DeleteOneID(id uint64) *OrderItemDeleteOne {
 	builder := c.Delete().Where(orderitem.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1002,12 +1241,12 @@ func (c *OrderItemClient) Query() *OrderItemQuery {
 }
 
 // Get returns a OrderItem entity by its id.
-func (c *OrderItemClient) Get(ctx context.Context, id int) (*OrderItem, error) {
+func (c *OrderItemClient) Get(ctx context.Context, id uint64) (*OrderItem, error) {
 	return c.Query().Where(orderitem.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *OrderItemClient) GetX(ctx context.Context, id int) *OrderItem {
+func (c *OrderItemClient) GetX(ctx context.Context, id uint64) *OrderItem {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1074,6 +1313,324 @@ func (c *OrderItemClient) mutate(ctx context.Context, m *OrderItemMutation) (Val
 	}
 }
 
+// SpecGroupClient is a client for the SpecGroup schema.
+type SpecGroupClient struct {
+	config
+}
+
+// NewSpecGroupClient returns a client for the SpecGroup from the given config.
+func NewSpecGroupClient(c config) *SpecGroupClient {
+	return &SpecGroupClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `specgroup.Hooks(f(g(h())))`.
+func (c *SpecGroupClient) Use(hooks ...Hook) {
+	c.hooks.SpecGroup = append(c.hooks.SpecGroup, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `specgroup.Intercept(f(g(h())))`.
+func (c *SpecGroupClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SpecGroup = append(c.inters.SpecGroup, interceptors...)
+}
+
+// Create returns a builder for creating a SpecGroup entity.
+func (c *SpecGroupClient) Create() *SpecGroupCreate {
+	mutation := newSpecGroupMutation(c.config, OpCreate)
+	return &SpecGroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SpecGroup entities.
+func (c *SpecGroupClient) CreateBulk(builders ...*SpecGroupCreate) *SpecGroupCreateBulk {
+	return &SpecGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SpecGroupClient) MapCreateBulk(slice any, setFunc func(*SpecGroupCreate, int)) *SpecGroupCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SpecGroupCreateBulk{err: fmt.Errorf("calling to SpecGroupClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SpecGroupCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SpecGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SpecGroup.
+func (c *SpecGroupClient) Update() *SpecGroupUpdate {
+	mutation := newSpecGroupMutation(c.config, OpUpdate)
+	return &SpecGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SpecGroupClient) UpdateOne(_m *SpecGroup) *SpecGroupUpdateOne {
+	mutation := newSpecGroupMutation(c.config, OpUpdateOne, withSpecGroup(_m))
+	return &SpecGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SpecGroupClient) UpdateOneID(id uint64) *SpecGroupUpdateOne {
+	mutation := newSpecGroupMutation(c.config, OpUpdateOne, withSpecGroupID(id))
+	return &SpecGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SpecGroup.
+func (c *SpecGroupClient) Delete() *SpecGroupDelete {
+	mutation := newSpecGroupMutation(c.config, OpDelete)
+	return &SpecGroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SpecGroupClient) DeleteOne(_m *SpecGroup) *SpecGroupDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SpecGroupClient) DeleteOneID(id uint64) *SpecGroupDeleteOne {
+	builder := c.Delete().Where(specgroup.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SpecGroupDeleteOne{builder}
+}
+
+// Query returns a query builder for SpecGroup.
+func (c *SpecGroupClient) Query() *SpecGroupQuery {
+	return &SpecGroupQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSpecGroup},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SpecGroup entity by its id.
+func (c *SpecGroupClient) Get(ctx context.Context, id uint64) (*SpecGroup, error) {
+	return c.Query().Where(specgroup.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SpecGroupClient) GetX(ctx context.Context, id uint64) *SpecGroup {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySpecItems queries the spec_items edge of a SpecGroup.
+func (c *SpecGroupClient) QuerySpecItems(_m *SpecGroup) *SpecItemQuery {
+	query := (&SpecItemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(specgroup.Table, specgroup.FieldID, id),
+			sqlgraph.To(specitem.Table, specitem.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, specgroup.SpecItemsTable, specgroup.SpecItemsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SpecGroupClient) Hooks() []Hook {
+	hooks := c.hooks.SpecGroup
+	return append(hooks[:len(hooks):len(hooks)], specgroup.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SpecGroupClient) Interceptors() []Interceptor {
+	inters := c.inters.SpecGroup
+	return append(inters[:len(inters):len(inters)], specgroup.Interceptors[:]...)
+}
+
+func (c *SpecGroupClient) mutate(ctx context.Context, m *SpecGroupMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SpecGroupCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SpecGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SpecGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SpecGroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SpecGroup mutation op: %q", m.Op())
+	}
+}
+
+// SpecItemClient is a client for the SpecItem schema.
+type SpecItemClient struct {
+	config
+}
+
+// NewSpecItemClient returns a client for the SpecItem from the given config.
+func NewSpecItemClient(c config) *SpecItemClient {
+	return &SpecItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `specitem.Hooks(f(g(h())))`.
+func (c *SpecItemClient) Use(hooks ...Hook) {
+	c.hooks.SpecItem = append(c.hooks.SpecItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `specitem.Intercept(f(g(h())))`.
+func (c *SpecItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SpecItem = append(c.inters.SpecItem, interceptors...)
+}
+
+// Create returns a builder for creating a SpecItem entity.
+func (c *SpecItemClient) Create() *SpecItemCreate {
+	mutation := newSpecItemMutation(c.config, OpCreate)
+	return &SpecItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SpecItem entities.
+func (c *SpecItemClient) CreateBulk(builders ...*SpecItemCreate) *SpecItemCreateBulk {
+	return &SpecItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SpecItemClient) MapCreateBulk(slice any, setFunc func(*SpecItemCreate, int)) *SpecItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SpecItemCreateBulk{err: fmt.Errorf("calling to SpecItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SpecItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SpecItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SpecItem.
+func (c *SpecItemClient) Update() *SpecItemUpdate {
+	mutation := newSpecItemMutation(c.config, OpUpdate)
+	return &SpecItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SpecItemClient) UpdateOne(_m *SpecItem) *SpecItemUpdateOne {
+	mutation := newSpecItemMutation(c.config, OpUpdateOne, withSpecItem(_m))
+	return &SpecItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SpecItemClient) UpdateOneID(id uint64) *SpecItemUpdateOne {
+	mutation := newSpecItemMutation(c.config, OpUpdateOne, withSpecItemID(id))
+	return &SpecItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SpecItem.
+func (c *SpecItemClient) Delete() *SpecItemDelete {
+	mutation := newSpecItemMutation(c.config, OpDelete)
+	return &SpecItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SpecItemClient) DeleteOne(_m *SpecItem) *SpecItemDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SpecItemClient) DeleteOneID(id uint64) *SpecItemDeleteOne {
+	builder := c.Delete().Where(specitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SpecItemDeleteOne{builder}
+}
+
+// Query returns a query builder for SpecItem.
+func (c *SpecItemClient) Query() *SpecItemQuery {
+	return &SpecItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSpecItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SpecItem entity by its id.
+func (c *SpecItemClient) Get(ctx context.Context, id uint64) (*SpecItem, error) {
+	return c.Query().Where(specitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SpecItemClient) GetX(ctx context.Context, id uint64) *SpecItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySpecGroup queries the Spec_group edge of a SpecItem.
+func (c *SpecItemClient) QuerySpecGroup(_m *SpecItem) *SpecGroupQuery {
+	query := (&SpecGroupClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(specitem.Table, specitem.FieldID, id),
+			sqlgraph.To(specgroup.Table, specgroup.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, specitem.SpecGroupTable, specitem.SpecGroupColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMenuSpecs queries the menu_specs edge of a SpecItem.
+func (c *SpecItemClient) QueryMenuSpecs(_m *SpecItem) *MenuSpecQuery {
+	query := (&MenuSpecClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(specitem.Table, specitem.FieldID, id),
+			sqlgraph.To(menuspec.Table, menuspec.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, specitem.MenuSpecsTable, specitem.MenuSpecsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SpecItemClient) Hooks() []Hook {
+	hooks := c.hooks.SpecItem
+	return append(hooks[:len(hooks):len(hooks)], specitem.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SpecItemClient) Interceptors() []Interceptor {
+	inters := c.inters.SpecItem
+	return append(inters[:len(inters):len(inters)], specitem.Interceptors[:]...)
+}
+
+func (c *SpecItemClient) mutate(ctx context.Context, m *SpecItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SpecItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SpecItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SpecItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SpecItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SpecItem mutation op: %q", m.Op())
+	}
+}
+
 // TableClient is a client for the Table schema.
 type TableClient struct {
 	config
@@ -1135,7 +1692,7 @@ func (c *TableClient) UpdateOne(_m *Table) *TableUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TableClient) UpdateOneID(id int) *TableUpdateOne {
+func (c *TableClient) UpdateOneID(id uint64) *TableUpdateOne {
 	mutation := newTableMutation(c.config, OpUpdateOne, withTableID(id))
 	return &TableUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1152,7 +1709,7 @@ func (c *TableClient) DeleteOne(_m *Table) *TableDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TableClient) DeleteOneID(id int) *TableDeleteOne {
+func (c *TableClient) DeleteOneID(id uint64) *TableDeleteOne {
 	builder := c.Delete().Where(table.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1169,12 +1726,12 @@ func (c *TableClient) Query() *TableQuery {
 }
 
 // Get returns a Table entity by its id.
-func (c *TableClient) Get(ctx context.Context, id int) (*Table, error) {
+func (c *TableClient) Get(ctx context.Context, id uint64) (*Table, error) {
 	return c.Query().Where(table.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TableClient) GetX(ctx context.Context, id int) *Table {
+func (c *TableClient) GetX(ctx context.Context, id uint64) *Table {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1302,7 +1859,7 @@ func (c *TableCategoryClient) UpdateOne(_m *TableCategory) *TableCategoryUpdateO
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TableCategoryClient) UpdateOneID(id int) *TableCategoryUpdateOne {
+func (c *TableCategoryClient) UpdateOneID(id uint64) *TableCategoryUpdateOne {
 	mutation := newTableCategoryMutation(c.config, OpUpdateOne, withTableCategoryID(id))
 	return &TableCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1319,7 +1876,7 @@ func (c *TableCategoryClient) DeleteOne(_m *TableCategory) *TableCategoryDeleteO
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TableCategoryClient) DeleteOneID(id int) *TableCategoryDeleteOne {
+func (c *TableCategoryClient) DeleteOneID(id uint64) *TableCategoryDeleteOne {
 	builder := c.Delete().Where(tablecategory.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1336,12 +1893,12 @@ func (c *TableCategoryClient) Query() *TableCategoryQuery {
 }
 
 // Get returns a TableCategory entity by its id.
-func (c *TableCategoryClient) Get(ctx context.Context, id int) (*TableCategory, error) {
+func (c *TableCategoryClient) Get(ctx context.Context, id uint64) (*TableCategory, error) {
 	return c.Query().Where(tablecategory.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TableCategoryClient) GetX(ctx context.Context, id int) *TableCategory {
+func (c *TableCategoryClient) GetX(ctx context.Context, id uint64) *TableCategory {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1395,10 +1952,11 @@ func (c *TableCategoryClient) mutate(ctx context.Context, m *TableCategoryMutati
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Menu, MenuCategory, MenuSpec, Order, OrderItem, Table, TableCategory []ent.Hook
+		CategorySpec, Menu, MenuCategory, MenuSpec, Order, OrderItem, SpecGroup,
+		SpecItem, Table, TableCategory []ent.Hook
 	}
 	inters struct {
-		Menu, MenuCategory, MenuSpec, Order, OrderItem, Table,
-		TableCategory []ent.Interceptor
+		CategorySpec, Menu, MenuCategory, MenuSpec, Order, OrderItem, SpecGroup,
+		SpecItem, Table, TableCategory []ent.Interceptor
 	}
 )

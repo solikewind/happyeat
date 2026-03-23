@@ -91,14 +91,14 @@ func (_u *TableCategoryUpdate) ClearDescription() *TableCategoryUpdate {
 }
 
 // AddTableIDs adds the "tables" edge to the Table entity by IDs.
-func (_u *TableCategoryUpdate) AddTableIDs(ids ...int) *TableCategoryUpdate {
+func (_u *TableCategoryUpdate) AddTableIDs(ids ...uint64) *TableCategoryUpdate {
 	_u.mutation.AddTableIDs(ids...)
 	return _u
 }
 
 // AddTables adds the "tables" edges to the Table entity.
 func (_u *TableCategoryUpdate) AddTables(v ...*Table) *TableCategoryUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -117,14 +117,14 @@ func (_u *TableCategoryUpdate) ClearTables() *TableCategoryUpdate {
 }
 
 // RemoveTableIDs removes the "tables" edge to Table entities by IDs.
-func (_u *TableCategoryUpdate) RemoveTableIDs(ids ...int) *TableCategoryUpdate {
+func (_u *TableCategoryUpdate) RemoveTableIDs(ids ...uint64) *TableCategoryUpdate {
 	_u.mutation.RemoveTableIDs(ids...)
 	return _u
 }
 
 // RemoveTables removes "tables" edges to Table entities.
 func (_u *TableCategoryUpdate) RemoveTables(v ...*Table) *TableCategoryUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -187,7 +187,7 @@ func (_u *TableCategoryUpdate) sqlSave(ctx context.Context) (_node int, err erro
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(tablecategory.Table, tablecategory.Columns, sqlgraph.NewFieldSpec(tablecategory.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(tablecategory.Table, tablecategory.Columns, sqlgraph.NewFieldSpec(tablecategory.FieldID, field.TypeUint64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -221,7 +221,7 @@ func (_u *TableCategoryUpdate) sqlSave(ctx context.Context) (_node int, err erro
 			Columns: []string{tablecategory.TablesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -234,7 +234,7 @@ func (_u *TableCategoryUpdate) sqlSave(ctx context.Context) (_node int, err erro
 			Columns: []string{tablecategory.TablesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -250,7 +250,7 @@ func (_u *TableCategoryUpdate) sqlSave(ctx context.Context) (_node int, err erro
 			Columns: []string{tablecategory.TablesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -340,14 +340,14 @@ func (_u *TableCategoryUpdateOne) ClearDescription() *TableCategoryUpdateOne {
 }
 
 // AddTableIDs adds the "tables" edge to the Table entity by IDs.
-func (_u *TableCategoryUpdateOne) AddTableIDs(ids ...int) *TableCategoryUpdateOne {
+func (_u *TableCategoryUpdateOne) AddTableIDs(ids ...uint64) *TableCategoryUpdateOne {
 	_u.mutation.AddTableIDs(ids...)
 	return _u
 }
 
 // AddTables adds the "tables" edges to the Table entity.
 func (_u *TableCategoryUpdateOne) AddTables(v ...*Table) *TableCategoryUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -366,14 +366,14 @@ func (_u *TableCategoryUpdateOne) ClearTables() *TableCategoryUpdateOne {
 }
 
 // RemoveTableIDs removes the "tables" edge to Table entities by IDs.
-func (_u *TableCategoryUpdateOne) RemoveTableIDs(ids ...int) *TableCategoryUpdateOne {
+func (_u *TableCategoryUpdateOne) RemoveTableIDs(ids ...uint64) *TableCategoryUpdateOne {
 	_u.mutation.RemoveTableIDs(ids...)
 	return _u
 }
 
 // RemoveTables removes "tables" edges to Table entities.
 func (_u *TableCategoryUpdateOne) RemoveTables(v ...*Table) *TableCategoryUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -449,7 +449,7 @@ func (_u *TableCategoryUpdateOne) sqlSave(ctx context.Context) (_node *TableCate
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(tablecategory.Table, tablecategory.Columns, sqlgraph.NewFieldSpec(tablecategory.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(tablecategory.Table, tablecategory.Columns, sqlgraph.NewFieldSpec(tablecategory.FieldID, field.TypeUint64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "TableCategory.id" for update`)}
@@ -500,7 +500,7 @@ func (_u *TableCategoryUpdateOne) sqlSave(ctx context.Context) (_node *TableCate
 			Columns: []string{tablecategory.TablesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -513,7 +513,7 @@ func (_u *TableCategoryUpdateOne) sqlSave(ctx context.Context) (_node *TableCate
 			Columns: []string{tablecategory.TablesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -529,7 +529,7 @@ func (_u *TableCategoryUpdateOne) sqlSave(ctx context.Context) (_node *TableCate
 			Columns: []string{tablecategory.TablesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

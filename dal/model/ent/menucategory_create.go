@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 )
@@ -83,19 +84,40 @@ func (_c *MenuCategoryCreate) SetNillableDescription(v *string) *MenuCategoryCre
 	return _c
 }
 
+// SetID sets the "id" field.
+func (_c *MenuCategoryCreate) SetID(v uint64) *MenuCategoryCreate {
+	_c.mutation.SetID(v)
+	return _c
+}
+
 // AddMenuIDs adds the "menus" edge to the Menu entity by IDs.
-func (_c *MenuCategoryCreate) AddMenuIDs(ids ...int) *MenuCategoryCreate {
+func (_c *MenuCategoryCreate) AddMenuIDs(ids ...uint64) *MenuCategoryCreate {
 	_c.mutation.AddMenuIDs(ids...)
 	return _c
 }
 
 // AddMenus adds the "menus" edges to the Menu entity.
 func (_c *MenuCategoryCreate) AddMenus(v ...*Menu) *MenuCategoryCreate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
 	return _c.AddMenuIDs(ids...)
+}
+
+// AddCategorySpecIDs adds the "category_specs" edge to the CategorySpec entity by IDs.
+func (_c *MenuCategoryCreate) AddCategorySpecIDs(ids ...uint64) *MenuCategoryCreate {
+	_c.mutation.AddCategorySpecIDs(ids...)
+	return _c
+}
+
+// AddCategorySpecs adds the "category_specs" edges to the CategorySpec entity.
+func (_c *MenuCategoryCreate) AddCategorySpecs(v ...*CategorySpec) *MenuCategoryCreate {
+	ids := make([]uint64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddCategorySpecIDs(ids...)
 }
 
 // Mutation returns the MenuCategoryMutation object of the builder.
@@ -189,8 +211,10 @@ func (_c *MenuCategoryCreate) sqlSave(ctx context.Context) (*MenuCategory, error
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -199,8 +223,12 @@ func (_c *MenuCategoryCreate) sqlSave(ctx context.Context) (*MenuCategory, error
 func (_c *MenuCategoryCreate) createSpec() (*MenuCategory, *sqlgraph.CreateSpec) {
 	var (
 		_node = &MenuCategory{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(menucategory.Table, sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(menucategory.Table, sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeUint64))
 	)
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(menucategory.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -229,7 +257,23 @@ func (_c *MenuCategoryCreate) createSpec() (*MenuCategory, *sqlgraph.CreateSpec)
 			Columns: []string{menucategory.MenusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CategorySpecsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   menucategory.CategorySpecsTable,
+			Columns: []string{menucategory.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -285,9 +329,9 @@ func (_c *MenuCategoryCreateBulk) Save(ctx context.Context) ([]*MenuCategory, er
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

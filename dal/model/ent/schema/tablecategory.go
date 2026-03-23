@@ -15,6 +15,7 @@ type TableCategory struct {
 
 func (TableCategory) Mixin() []ent.Mixin {
 	return []ent.Mixin{
+		UniqueID{},
 		TimeMixin{},
 		SoftDeleteMixin{},
 	}

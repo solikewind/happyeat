@@ -134,7 +134,7 @@ func (_u *MenuUpdate) AddPrice(v float64) *MenuUpdate {
 }
 
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
-func (_u *MenuUpdate) SetCategoryID(id int) *MenuUpdate {
+func (_u *MenuUpdate) SetCategoryID(id uint64) *MenuUpdate {
 	_u.mutation.SetCategoryID(id)
 	return _u
 }
@@ -144,30 +144,30 @@ func (_u *MenuUpdate) SetCategory(v *MenuCategory) *MenuUpdate {
 	return _u.SetCategoryID(v.ID)
 }
 
-// AddSpecIDs adds the "specs" edge to the MenuSpec entity by IDs.
-func (_u *MenuUpdate) AddSpecIDs(ids ...int) *MenuUpdate {
-	_u.mutation.AddSpecIDs(ids...)
+// AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
+func (_u *MenuUpdate) AddMenuSpecIDs(ids ...uint64) *MenuUpdate {
+	_u.mutation.AddMenuSpecIDs(ids...)
 	return _u
 }
 
-// AddSpecs adds the "specs" edges to the MenuSpec entity.
-func (_u *MenuUpdate) AddSpecs(v ...*MenuSpec) *MenuUpdate {
-	ids := make([]int, len(v))
+// AddMenuSpecs adds the "menu_specs" edges to the MenuSpec entity.
+func (_u *MenuUpdate) AddMenuSpecs(v ...*MenuSpec) *MenuUpdate {
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _u.AddSpecIDs(ids...)
+	return _u.AddMenuSpecIDs(ids...)
 }
 
 // AddOrderItemIDs adds the "order_items" edge to the OrderItem entity by IDs.
-func (_u *MenuUpdate) AddOrderItemIDs(ids ...int) *MenuUpdate {
+func (_u *MenuUpdate) AddOrderItemIDs(ids ...uint64) *MenuUpdate {
 	_u.mutation.AddOrderItemIDs(ids...)
 	return _u
 }
 
 // AddOrderItems adds the "order_items" edges to the OrderItem entity.
 func (_u *MenuUpdate) AddOrderItems(v ...*OrderItem) *MenuUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -185,25 +185,25 @@ func (_u *MenuUpdate) ClearCategory() *MenuUpdate {
 	return _u
 }
 
-// ClearSpecs clears all "specs" edges to the MenuSpec entity.
-func (_u *MenuUpdate) ClearSpecs() *MenuUpdate {
-	_u.mutation.ClearSpecs()
+// ClearMenuSpecs clears all "menu_specs" edges to the MenuSpec entity.
+func (_u *MenuUpdate) ClearMenuSpecs() *MenuUpdate {
+	_u.mutation.ClearMenuSpecs()
 	return _u
 }
 
-// RemoveSpecIDs removes the "specs" edge to MenuSpec entities by IDs.
-func (_u *MenuUpdate) RemoveSpecIDs(ids ...int) *MenuUpdate {
-	_u.mutation.RemoveSpecIDs(ids...)
+// RemoveMenuSpecIDs removes the "menu_specs" edge to MenuSpec entities by IDs.
+func (_u *MenuUpdate) RemoveMenuSpecIDs(ids ...uint64) *MenuUpdate {
+	_u.mutation.RemoveMenuSpecIDs(ids...)
 	return _u
 }
 
-// RemoveSpecs removes "specs" edges to MenuSpec entities.
-func (_u *MenuUpdate) RemoveSpecs(v ...*MenuSpec) *MenuUpdate {
-	ids := make([]int, len(v))
+// RemoveMenuSpecs removes "menu_specs" edges to MenuSpec entities.
+func (_u *MenuUpdate) RemoveMenuSpecs(v ...*MenuSpec) *MenuUpdate {
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _u.RemoveSpecIDs(ids...)
+	return _u.RemoveMenuSpecIDs(ids...)
 }
 
 // ClearOrderItems clears all "order_items" edges to the OrderItem entity.
@@ -213,14 +213,14 @@ func (_u *MenuUpdate) ClearOrderItems() *MenuUpdate {
 }
 
 // RemoveOrderItemIDs removes the "order_items" edge to OrderItem entities by IDs.
-func (_u *MenuUpdate) RemoveOrderItemIDs(ids ...int) *MenuUpdate {
+func (_u *MenuUpdate) RemoveOrderItemIDs(ids ...uint64) *MenuUpdate {
 	_u.mutation.RemoveOrderItemIDs(ids...)
 	return _u
 }
 
 // RemoveOrderItems removes "order_items" edges to OrderItem entities.
 func (_u *MenuUpdate) RemoveOrderItems(v ...*OrderItem) *MenuUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -291,7 +291,7 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(menu.Table, menu.Columns, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(menu.Table, menu.Columns, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -337,7 +337,7 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{menu.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -350,7 +350,7 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{menu.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -358,28 +358,28 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.SpecsCleared() {
+	if _u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   menu.SpecsTable,
-			Columns: []string{menu.SpecsColumn},
+			Table:   menu.MenuSpecsTable,
+			Columns: []string{menu.MenuSpecsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.RemovedSpecsIDs(); len(nodes) > 0 && !_u.mutation.SpecsCleared() {
+	if nodes := _u.mutation.RemovedMenuSpecsIDs(); len(nodes) > 0 && !_u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   menu.SpecsTable,
-			Columns: []string{menu.SpecsColumn},
+			Table:   menu.MenuSpecsTable,
+			Columns: []string{menu.MenuSpecsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -387,15 +387,15 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.SpecsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MenuSpecsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   menu.SpecsTable,
-			Columns: []string{menu.SpecsColumn},
+			Table:   menu.MenuSpecsTable,
+			Columns: []string{menu.MenuSpecsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -411,7 +411,7 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{menu.OrderItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -424,7 +424,7 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{menu.OrderItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -440,7 +440,7 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{menu.OrderItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -571,7 +571,7 @@ func (_u *MenuUpdateOne) AddPrice(v float64) *MenuUpdateOne {
 }
 
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
-func (_u *MenuUpdateOne) SetCategoryID(id int) *MenuUpdateOne {
+func (_u *MenuUpdateOne) SetCategoryID(id uint64) *MenuUpdateOne {
 	_u.mutation.SetCategoryID(id)
 	return _u
 }
@@ -581,30 +581,30 @@ func (_u *MenuUpdateOne) SetCategory(v *MenuCategory) *MenuUpdateOne {
 	return _u.SetCategoryID(v.ID)
 }
 
-// AddSpecIDs adds the "specs" edge to the MenuSpec entity by IDs.
-func (_u *MenuUpdateOne) AddSpecIDs(ids ...int) *MenuUpdateOne {
-	_u.mutation.AddSpecIDs(ids...)
+// AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
+func (_u *MenuUpdateOne) AddMenuSpecIDs(ids ...uint64) *MenuUpdateOne {
+	_u.mutation.AddMenuSpecIDs(ids...)
 	return _u
 }
 
-// AddSpecs adds the "specs" edges to the MenuSpec entity.
-func (_u *MenuUpdateOne) AddSpecs(v ...*MenuSpec) *MenuUpdateOne {
-	ids := make([]int, len(v))
+// AddMenuSpecs adds the "menu_specs" edges to the MenuSpec entity.
+func (_u *MenuUpdateOne) AddMenuSpecs(v ...*MenuSpec) *MenuUpdateOne {
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _u.AddSpecIDs(ids...)
+	return _u.AddMenuSpecIDs(ids...)
 }
 
 // AddOrderItemIDs adds the "order_items" edge to the OrderItem entity by IDs.
-func (_u *MenuUpdateOne) AddOrderItemIDs(ids ...int) *MenuUpdateOne {
+func (_u *MenuUpdateOne) AddOrderItemIDs(ids ...uint64) *MenuUpdateOne {
 	_u.mutation.AddOrderItemIDs(ids...)
 	return _u
 }
 
 // AddOrderItems adds the "order_items" edges to the OrderItem entity.
 func (_u *MenuUpdateOne) AddOrderItems(v ...*OrderItem) *MenuUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -622,25 +622,25 @@ func (_u *MenuUpdateOne) ClearCategory() *MenuUpdateOne {
 	return _u
 }
 
-// ClearSpecs clears all "specs" edges to the MenuSpec entity.
-func (_u *MenuUpdateOne) ClearSpecs() *MenuUpdateOne {
-	_u.mutation.ClearSpecs()
+// ClearMenuSpecs clears all "menu_specs" edges to the MenuSpec entity.
+func (_u *MenuUpdateOne) ClearMenuSpecs() *MenuUpdateOne {
+	_u.mutation.ClearMenuSpecs()
 	return _u
 }
 
-// RemoveSpecIDs removes the "specs" edge to MenuSpec entities by IDs.
-func (_u *MenuUpdateOne) RemoveSpecIDs(ids ...int) *MenuUpdateOne {
-	_u.mutation.RemoveSpecIDs(ids...)
+// RemoveMenuSpecIDs removes the "menu_specs" edge to MenuSpec entities by IDs.
+func (_u *MenuUpdateOne) RemoveMenuSpecIDs(ids ...uint64) *MenuUpdateOne {
+	_u.mutation.RemoveMenuSpecIDs(ids...)
 	return _u
 }
 
-// RemoveSpecs removes "specs" edges to MenuSpec entities.
-func (_u *MenuUpdateOne) RemoveSpecs(v ...*MenuSpec) *MenuUpdateOne {
-	ids := make([]int, len(v))
+// RemoveMenuSpecs removes "menu_specs" edges to MenuSpec entities.
+func (_u *MenuUpdateOne) RemoveMenuSpecs(v ...*MenuSpec) *MenuUpdateOne {
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return _u.RemoveSpecIDs(ids...)
+	return _u.RemoveMenuSpecIDs(ids...)
 }
 
 // ClearOrderItems clears all "order_items" edges to the OrderItem entity.
@@ -650,14 +650,14 @@ func (_u *MenuUpdateOne) ClearOrderItems() *MenuUpdateOne {
 }
 
 // RemoveOrderItemIDs removes the "order_items" edge to OrderItem entities by IDs.
-func (_u *MenuUpdateOne) RemoveOrderItemIDs(ids ...int) *MenuUpdateOne {
+func (_u *MenuUpdateOne) RemoveOrderItemIDs(ids ...uint64) *MenuUpdateOne {
 	_u.mutation.RemoveOrderItemIDs(ids...)
 	return _u
 }
 
 // RemoveOrderItems removes "order_items" edges to OrderItem entities.
 func (_u *MenuUpdateOne) RemoveOrderItems(v ...*OrderItem) *MenuUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -741,7 +741,7 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(menu.Table, menu.Columns, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(menu.Table, menu.Columns, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Menu.id" for update`)}
@@ -804,7 +804,7 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 			Columns: []string{menu.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -817,7 +817,7 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 			Columns: []string{menu.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -825,28 +825,28 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.SpecsCleared() {
+	if _u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   menu.SpecsTable,
-			Columns: []string{menu.SpecsColumn},
+			Table:   menu.MenuSpecsTable,
+			Columns: []string{menu.MenuSpecsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.RemovedSpecsIDs(); len(nodes) > 0 && !_u.mutation.SpecsCleared() {
+	if nodes := _u.mutation.RemovedMenuSpecsIDs(); len(nodes) > 0 && !_u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   menu.SpecsTable,
-			Columns: []string{menu.SpecsColumn},
+			Table:   menu.MenuSpecsTable,
+			Columns: []string{menu.MenuSpecsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -854,15 +854,15 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.SpecsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MenuSpecsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   menu.SpecsTable,
-			Columns: []string{menu.SpecsColumn},
+			Table:   menu.MenuSpecsTable,
+			Columns: []string{menu.MenuSpecsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(menuspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -878,7 +878,7 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 			Columns: []string{menu.OrderItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -891,7 +891,7 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 			Columns: []string{menu.OrderItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -907,7 +907,7 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 			Columns: []string{menu.OrderItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

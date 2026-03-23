@@ -9,33 +9,37 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 )
 
 // 菜单规格（如口味、大小及加价）
 type MenuSpec struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// ID
+	ID uint64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 删除时间戳
 	DeleteTs int64 `json:"delete_ts,omitempty"`
-	// 规格类型（如口味、大小）
-	SpecType string `json:"spec_type,omitempty"`
-	// 规格值（如中辣、大份）
-	SpecValue string `json:"spec_value,omitempty"`
-	// 加价
+	// 菜单ID
+	MenuID uint64 `json:"menu_id,omitempty"`
+	// 菜单规格项ID
+	SpecItemID *uint64 `json:"spec_item_id,omitempty"`
+	// 菜单种类下的规格项ID
+	CategorySpecID *uint64 `json:"category_spec_id,omitempty"`
+	// 特殊加价
 	PriceDelta float64 `json:"price_delta,omitempty"`
-	// 排序
+	// 顺序
 	Sort int `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuSpecQuery when eager-loading is set.
 	Edges        MenuSpecEdges `json:"edges"`
-	menu_specs   *int
 	selectValues sql.SelectValues
 }
 
@@ -43,9 +47,13 @@ type MenuSpec struct {
 type MenuSpecEdges struct {
 	// Menu holds the value of the menu edge.
 	Menu *Menu `json:"menu,omitempty"`
+	// CategorySpec holds the value of the category_spec edge.
+	CategorySpec *CategorySpec `json:"category_spec,omitempty"`
+	// SpecItem holds the value of the spec_item edge.
+	SpecItem *SpecItem `json:"spec_item,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // MenuOrErr returns the Menu value or an error if the edge
@@ -59,6 +67,28 @@ func (e MenuSpecEdges) MenuOrErr() (*Menu, error) {
 	return nil, &NotLoadedError{edge: "menu"}
 }
 
+// CategorySpecOrErr returns the CategorySpec value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MenuSpecEdges) CategorySpecOrErr() (*CategorySpec, error) {
+	if e.CategorySpec != nil {
+		return e.CategorySpec, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: categoryspec.Label}
+	}
+	return nil, &NotLoadedError{edge: "category_spec"}
+}
+
+// SpecItemOrErr returns the SpecItem value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MenuSpecEdges) SpecItemOrErr() (*SpecItem, error) {
+	if e.SpecItem != nil {
+		return e.SpecItem, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: specitem.Label}
+	}
+	return nil, &NotLoadedError{edge: "spec_item"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*MenuSpec) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -66,14 +96,10 @@ func (*MenuSpec) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case menuspec.FieldPriceDelta:
 			values[i] = new(sql.NullFloat64)
-		case menuspec.FieldID, menuspec.FieldDeleteTs, menuspec.FieldSort:
+		case menuspec.FieldID, menuspec.FieldDeleteTs, menuspec.FieldMenuID, menuspec.FieldSpecItemID, menuspec.FieldCategorySpecID, menuspec.FieldSort:
 			values[i] = new(sql.NullInt64)
-		case menuspec.FieldSpecType, menuspec.FieldSpecValue:
-			values[i] = new(sql.NullString)
 		case menuspec.FieldCreatedAt, menuspec.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case menuspec.ForeignKeys[0]: // menu_specs
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -94,7 +120,7 @@ func (_m *MenuSpec) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = uint64(value.Int64)
 		case menuspec.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -113,17 +139,25 @@ func (_m *MenuSpec) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DeleteTs = value.Int64
 			}
-		case menuspec.FieldSpecType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field spec_type", values[i])
+		case menuspec.FieldMenuID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field menu_id", values[i])
 			} else if value.Valid {
-				_m.SpecType = value.String
+				_m.MenuID = uint64(value.Int64)
 			}
-		case menuspec.FieldSpecValue:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field spec_value", values[i])
+		case menuspec.FieldSpecItemID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spec_item_id", values[i])
 			} else if value.Valid {
-				_m.SpecValue = value.String
+				_m.SpecItemID = new(uint64)
+				*_m.SpecItemID = uint64(value.Int64)
+			}
+		case menuspec.FieldCategorySpecID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field category_spec_id", values[i])
+			} else if value.Valid {
+				_m.CategorySpecID = new(uint64)
+				*_m.CategorySpecID = uint64(value.Int64)
 			}
 		case menuspec.FieldPriceDelta:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -136,13 +170,6 @@ func (_m *MenuSpec) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
 				_m.Sort = int(value.Int64)
-			}
-		case menuspec.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field menu_specs", value)
-			} else if value.Valid {
-				_m.menu_specs = new(int)
-				*_m.menu_specs = int(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -160,6 +187,16 @@ func (_m *MenuSpec) Value(name string) (ent.Value, error) {
 // QueryMenu queries the "menu" edge of the MenuSpec entity.
 func (_m *MenuSpec) QueryMenu() *MenuQuery {
 	return NewMenuSpecClient(_m.config).QueryMenu(_m)
+}
+
+// QueryCategorySpec queries the "category_spec" edge of the MenuSpec entity.
+func (_m *MenuSpec) QueryCategorySpec() *CategorySpecQuery {
+	return NewMenuSpecClient(_m.config).QueryCategorySpec(_m)
+}
+
+// QuerySpecItem queries the "spec_item" edge of the MenuSpec entity.
+func (_m *MenuSpec) QuerySpecItem() *SpecItemQuery {
+	return NewMenuSpecClient(_m.config).QuerySpecItem(_m)
 }
 
 // Update returns a builder for updating this MenuSpec.
@@ -194,11 +231,18 @@ func (_m *MenuSpec) String() string {
 	builder.WriteString("delete_ts=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
 	builder.WriteString(", ")
-	builder.WriteString("spec_type=")
-	builder.WriteString(_m.SpecType)
+	builder.WriteString("menu_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MenuID))
 	builder.WriteString(", ")
-	builder.WriteString("spec_value=")
-	builder.WriteString(_m.SpecValue)
+	if v := _m.SpecItemID; v != nil {
+		builder.WriteString("spec_item_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.CategorySpecID; v != nil {
+		builder.WriteString("category_spec_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("price_delta=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PriceDelta))

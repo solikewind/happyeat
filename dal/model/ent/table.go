@@ -17,7 +17,8 @@ import (
 type Table struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// ID
+	ID uint64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -35,7 +36,7 @@ type Table struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TableQuery when eager-loading is set.
 	Edges                 TableEdges `json:"edges"`
-	table_category_tables *int
+	table_category_tables *uint64
 	selectValues          sql.SelectValues
 }
 
@@ -103,7 +104,7 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = uint64(value.Int64)
 		case table.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -151,8 +152,8 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field table_category_tables", value)
 			} else if value.Valid {
-				_m.table_category_tables = new(int)
-				*_m.table_category_tables = int(value.Int64)
+				_m.table_category_tables = new(uint64)
+				*_m.table_category_tables = uint64(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

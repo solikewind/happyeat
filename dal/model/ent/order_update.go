@@ -141,13 +141,13 @@ func (_u *OrderUpdate) ClearRemark() *OrderUpdate {
 }
 
 // SetTableID sets the "table" edge to the Table entity by ID.
-func (_u *OrderUpdate) SetTableID(id int) *OrderUpdate {
+func (_u *OrderUpdate) SetTableID(id uint64) *OrderUpdate {
 	_u.mutation.SetTableID(id)
 	return _u
 }
 
 // SetNillableTableID sets the "table" edge to the Table entity by ID if the given value is not nil.
-func (_u *OrderUpdate) SetNillableTableID(id *int) *OrderUpdate {
+func (_u *OrderUpdate) SetNillableTableID(id *uint64) *OrderUpdate {
 	if id != nil {
 		_u = _u.SetTableID(*id)
 	}
@@ -160,14 +160,14 @@ func (_u *OrderUpdate) SetTable(v *Table) *OrderUpdate {
 }
 
 // AddItemIDs adds the "items" edge to the OrderItem entity by IDs.
-func (_u *OrderUpdate) AddItemIDs(ids ...int) *OrderUpdate {
+func (_u *OrderUpdate) AddItemIDs(ids ...uint64) *OrderUpdate {
 	_u.mutation.AddItemIDs(ids...)
 	return _u
 }
 
 // AddItems adds the "items" edges to the OrderItem entity.
 func (_u *OrderUpdate) AddItems(v ...*OrderItem) *OrderUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -192,14 +192,14 @@ func (_u *OrderUpdate) ClearItems() *OrderUpdate {
 }
 
 // RemoveItemIDs removes the "items" edge to OrderItem entities by IDs.
-func (_u *OrderUpdate) RemoveItemIDs(ids ...int) *OrderUpdate {
+func (_u *OrderUpdate) RemoveItemIDs(ids ...uint64) *OrderUpdate {
 	_u.mutation.RemoveItemIDs(ids...)
 	return _u
 }
 
 // RemoveItems removes "items" edges to OrderItem entities.
 func (_u *OrderUpdate) RemoveItems(v ...*OrderItem) *OrderUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -277,7 +277,7 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeUint64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -323,7 +323,7 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{order.TableColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -336,7 +336,7 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{order.TableColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -352,7 +352,7 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{order.ItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -365,7 +365,7 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{order.ItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -381,7 +381,7 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{order.ItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -520,13 +520,13 @@ func (_u *OrderUpdateOne) ClearRemark() *OrderUpdateOne {
 }
 
 // SetTableID sets the "table" edge to the Table entity by ID.
-func (_u *OrderUpdateOne) SetTableID(id int) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetTableID(id uint64) *OrderUpdateOne {
 	_u.mutation.SetTableID(id)
 	return _u
 }
 
 // SetNillableTableID sets the "table" edge to the Table entity by ID if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableTableID(id *int) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillableTableID(id *uint64) *OrderUpdateOne {
 	if id != nil {
 		_u = _u.SetTableID(*id)
 	}
@@ -539,14 +539,14 @@ func (_u *OrderUpdateOne) SetTable(v *Table) *OrderUpdateOne {
 }
 
 // AddItemIDs adds the "items" edge to the OrderItem entity by IDs.
-func (_u *OrderUpdateOne) AddItemIDs(ids ...int) *OrderUpdateOne {
+func (_u *OrderUpdateOne) AddItemIDs(ids ...uint64) *OrderUpdateOne {
 	_u.mutation.AddItemIDs(ids...)
 	return _u
 }
 
 // AddItems adds the "items" edges to the OrderItem entity.
 func (_u *OrderUpdateOne) AddItems(v ...*OrderItem) *OrderUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -571,14 +571,14 @@ func (_u *OrderUpdateOne) ClearItems() *OrderUpdateOne {
 }
 
 // RemoveItemIDs removes the "items" edge to OrderItem entities by IDs.
-func (_u *OrderUpdateOne) RemoveItemIDs(ids ...int) *OrderUpdateOne {
+func (_u *OrderUpdateOne) RemoveItemIDs(ids ...uint64) *OrderUpdateOne {
 	_u.mutation.RemoveItemIDs(ids...)
 	return _u
 }
 
 // RemoveItems removes "items" edges to OrderItem entities.
 func (_u *OrderUpdateOne) RemoveItems(v ...*OrderItem) *OrderUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -669,7 +669,7 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeUint64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Order.id" for update`)}
@@ -732,7 +732,7 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 			Columns: []string{order.TableColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -745,7 +745,7 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 			Columns: []string{order.TableColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -761,7 +761,7 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 			Columns: []string{order.ItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -774,7 +774,7 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 			Columns: []string{order.ItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -790,7 +790,7 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 			Columns: []string{order.ItemsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(orderitem.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

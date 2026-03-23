@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// CategorySpec is the client for interacting with the CategorySpec builders.
+	CategorySpec *CategorySpecClient
 	// Menu is the client for interacting with the Menu builders.
 	Menu *MenuClient
 	// MenuCategory is the client for interacting with the MenuCategory builders.
@@ -22,6 +24,10 @@ type Tx struct {
 	Order *OrderClient
 	// OrderItem is the client for interacting with the OrderItem builders.
 	OrderItem *OrderItemClient
+	// SpecGroup is the client for interacting with the SpecGroup builders.
+	SpecGroup *SpecGroupClient
+	// SpecItem is the client for interacting with the SpecItem builders.
+	SpecItem *SpecItemClient
 	// Table is the client for interacting with the Table builders.
 	Table *TableClient
 	// TableCategory is the client for interacting with the TableCategory builders.
@@ -157,11 +163,14 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.CategorySpec = NewCategorySpecClient(tx.config)
 	tx.Menu = NewMenuClient(tx.config)
 	tx.MenuCategory = NewMenuCategoryClient(tx.config)
 	tx.MenuSpec = NewMenuSpecClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
 	tx.OrderItem = NewOrderItemClient(tx.config)
+	tx.SpecGroup = NewSpecGroupClient(tx.config)
+	tx.SpecItem = NewSpecItemClient(tx.config)
 	tx.Table = NewTableClient(tx.config)
 	tx.TableCategory = NewTableCategoryClient(tx.config)
 }
@@ -173,7 +182,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Menu.QueryXXX(), the query will be executed
+// applies a query, for example: CategorySpec.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

@@ -17,7 +17,8 @@ import (
 type Menu struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// ID
+	ID uint64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -35,7 +36,7 @@ type Menu struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuQuery when eager-loading is set.
 	Edges               MenuEdges `json:"edges"`
-	menu_category_menus *int
+	menu_category_menus *uint64
 	selectValues        sql.SelectValues
 }
 
@@ -43,8 +44,8 @@ type Menu struct {
 type MenuEdges struct {
 	// Category holds the value of the category edge.
 	Category *MenuCategory `json:"category,omitempty"`
-	// Specs holds the value of the specs edge.
-	Specs []*MenuSpec `json:"specs,omitempty"`
+	// MenuSpecs holds the value of the menu_specs edge.
+	MenuSpecs []*MenuSpec `json:"menu_specs,omitempty"`
 	// 被订单项引用，可选
 	OrderItems []*OrderItem `json:"order_items,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -63,13 +64,13 @@ func (e MenuEdges) CategoryOrErr() (*MenuCategory, error) {
 	return nil, &NotLoadedError{edge: "category"}
 }
 
-// SpecsOrErr returns the Specs value or an error if the edge
+// MenuSpecsOrErr returns the MenuSpecs value or an error if the edge
 // was not loaded in eager-loading.
-func (e MenuEdges) SpecsOrErr() ([]*MenuSpec, error) {
+func (e MenuEdges) MenuSpecsOrErr() ([]*MenuSpec, error) {
 	if e.loadedTypes[1] {
-		return e.Specs, nil
+		return e.MenuSpecs, nil
 	}
-	return nil, &NotLoadedError{edge: "specs"}
+	return nil, &NotLoadedError{edge: "menu_specs"}
 }
 
 // OrderItemsOrErr returns the OrderItems value or an error if the edge
@@ -116,7 +117,7 @@ func (_m *Menu) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = uint64(value.Int64)
 		case menu.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -165,8 +166,8 @@ func (_m *Menu) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field menu_category_menus", value)
 			} else if value.Valid {
-				_m.menu_category_menus = new(int)
-				*_m.menu_category_menus = int(value.Int64)
+				_m.menu_category_menus = new(uint64)
+				*_m.menu_category_menus = uint64(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -186,9 +187,9 @@ func (_m *Menu) QueryCategory() *MenuCategoryQuery {
 	return NewMenuClient(_m.config).QueryCategory(_m)
 }
 
-// QuerySpecs queries the "specs" edge of the Menu entity.
-func (_m *Menu) QuerySpecs() *MenuSpecQuery {
-	return NewMenuClient(_m.config).QuerySpecs(_m)
+// QueryMenuSpecs queries the "menu_specs" edge of the Menu entity.
+func (_m *Menu) QueryMenuSpecs() *MenuSpecQuery {
+	return NewMenuClient(_m.config).QueryMenuSpecs(_m)
 }
 
 // QueryOrderItems queries the "order_items" edge of the Menu entity.

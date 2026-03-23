@@ -27,6 +27,8 @@ const (
 	FieldDescription = "description"
 	// EdgeMenus holds the string denoting the menus edge name in mutations.
 	EdgeMenus = "menus"
+	// EdgeCategorySpecs holds the string denoting the category_specs edge name in mutations.
+	EdgeCategorySpecs = "category_specs"
 	// Table holds the table name of the menucategory in the database.
 	Table = "menu_categories"
 	// MenusTable is the table that holds the menus relation/edge.
@@ -36,6 +38,13 @@ const (
 	MenusInverseTable = "menus"
 	// MenusColumn is the table column denoting the menus relation/edge.
 	MenusColumn = "menu_category_menus"
+	// CategorySpecsTable is the table that holds the category_specs relation/edge.
+	CategorySpecsTable = "category_specs"
+	// CategorySpecsInverseTable is the table name for the CategorySpec entity.
+	// It exists in this package in order to avoid circular dependency with the "categoryspec" package.
+	CategorySpecsInverseTable = "category_specs"
+	// CategorySpecsColumn is the table column denoting the category_specs relation/edge.
+	CategorySpecsColumn = "menu_category_category_specs"
 )
 
 // Columns holds all SQL columns for menucategory fields.
@@ -64,7 +73,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 var (
-	Hooks        [1]ent.Hook
+	Hooks        [2]ent.Hook
 	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
@@ -124,10 +133,31 @@ func ByMenus(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMenusStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCategorySpecsCount orders the results by category_specs count.
+func ByCategorySpecsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCategorySpecsStep(), opts...)
+	}
+}
+
+// ByCategorySpecs orders the results by category_specs terms.
+func ByCategorySpecs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategorySpecsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newMenusStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MenusInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, MenusTable, MenusColumn),
+	)
+}
+func newCategorySpecsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategorySpecsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CategorySpecsTable, CategorySpecsColumn),
 	)
 }

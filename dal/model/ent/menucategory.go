@@ -16,7 +16,8 @@ import (
 type MenuCategory struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// ID
+	ID uint64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -37,9 +38,11 @@ type MenuCategory struct {
 type MenuCategoryEdges struct {
 	// Menus holds the value of the menus edge.
 	Menus []*Menu `json:"menus,omitempty"`
+	// CategorySpecs holds the value of the category_specs edge.
+	CategorySpecs []*CategorySpec `json:"category_specs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // MenusOrErr returns the Menus value or an error if the edge
@@ -49,6 +52,15 @@ func (e MenuCategoryEdges) MenusOrErr() ([]*Menu, error) {
 		return e.Menus, nil
 	}
 	return nil, &NotLoadedError{edge: "menus"}
+}
+
+// CategorySpecsOrErr returns the CategorySpecs value or an error if the edge
+// was not loaded in eager-loading.
+func (e MenuCategoryEdges) CategorySpecsOrErr() ([]*CategorySpec, error) {
+	if e.loadedTypes[1] {
+		return e.CategorySpecs, nil
+	}
+	return nil, &NotLoadedError{edge: "category_specs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -82,7 +94,7 @@ func (_m *MenuCategory) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = uint64(value.Int64)
 		case menucategory.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -130,6 +142,11 @@ func (_m *MenuCategory) Value(name string) (ent.Value, error) {
 // QueryMenus queries the "menus" edge of the MenuCategory entity.
 func (_m *MenuCategory) QueryMenus() *MenuQuery {
 	return NewMenuCategoryClient(_m.config).QueryMenus(_m)
+}
+
+// QueryCategorySpecs queries the "category_specs" edge of the MenuCategory entity.
+func (_m *MenuCategory) QueryCategorySpecs() *CategorySpecQuery {
+	return NewMenuCategoryClient(_m.config).QueryCategorySpecs(_m)
 }
 
 // Update returns a builder for updating this MenuCategory.

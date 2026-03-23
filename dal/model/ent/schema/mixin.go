@@ -13,6 +13,7 @@ import (
 	gen "github.com/solikewind/happyeat/dal/model/ent"
 	"github.com/solikewind/happyeat/dal/model/ent/hook"
 	"github.com/solikewind/happyeat/dal/model/ent/intercept"
+	"github.com/sony/sonyflake"
 )
 
 var CST = time.FixedZone("CST", 8*3600)
@@ -41,6 +42,63 @@ func (TimeMixin) Fields() []ent.Field {
 				dialect.Postgres: "timestamptz",
 			}).
 			Comment("更新时间"),
+	}
+}
+
+// UniqueID to be shared will all different schemas.
+type UniqueID struct {
+	mixin.Schema
+}
+
+// Fields of the Mixin.
+func (UniqueID) Fields() []ent.Field {
+	return []ent.Field{
+		field.Uint64("id").
+			Unique().
+			Immutable().
+			Comment("ID"),
+	}
+}
+
+// Hooks of the UniqueID.
+func (UniqueID) Hooks() []ent.Hook {
+	return []ent.Hook{
+		hook.On(
+			uniqueIDHook(),
+			ent.OpCreate,
+		),
+	}
+}
+
+var sf = sonyflake.NewSonyflake(sonyflake.Settings{})
+
+func uniqueIDHook() ent.Hook {
+	type IDGetter interface {
+		ID() (uint64, bool)
+	}
+	type IDSetter interface {
+		SetID(uint64)
+	}
+	return func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			isID, ok := m.(IDGetter)
+			if ok {
+				if id, has := isID.ID(); has && id != 0 {
+					return next.Mutate(ctx, m)
+				}
+			}
+
+			is, ok := m.(IDSetter)
+			if !ok {
+				return nil, fmt.Errorf(" mutation %T", m)
+			}
+			id, err := sf.NextID()
+			if err != nil {
+				return nil, err
+			}
+			is.SetID(id)
+			return next.Mutate(ctx, m)
+		})
 	}
 }
 

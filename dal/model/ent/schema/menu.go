@@ -15,6 +15,7 @@ type Menu struct {
 
 func (Menu) Mixin() []ent.Mixin {
 	return []ent.Mixin{
+		UniqueID{},
 		TimeMixin{},
 		SoftDeleteMixin{},
 	}

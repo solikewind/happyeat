@@ -27,7 +27,7 @@ type MenuQuery struct {
 	inters         []Interceptor
 	predicates     []predicate.Menu
 	withCategory   *MenuCategoryQuery
-	withSpecs      *MenuSpecQuery
+	withMenuSpecs  *MenuSpecQuery
 	withOrderItems *OrderItemQuery
 	withFKs        bool
 	// intermediate query (i.e. traversal path).
@@ -88,8 +88,8 @@ func (_q *MenuQuery) QueryCategory() *MenuCategoryQuery {
 	return query
 }
 
-// QuerySpecs chains the current query on the "specs" edge.
-func (_q *MenuQuery) QuerySpecs() *MenuSpecQuery {
+// QueryMenuSpecs chains the current query on the "menu_specs" edge.
+func (_q *MenuQuery) QueryMenuSpecs() *MenuSpecQuery {
 	query := (&MenuSpecClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -102,7 +102,7 @@ func (_q *MenuQuery) QuerySpecs() *MenuSpecQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(menu.Table, menu.FieldID, selector),
 			sqlgraph.To(menuspec.Table, menuspec.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, menu.SpecsTable, menu.SpecsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, menu.MenuSpecsTable, menu.MenuSpecsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -156,8 +156,8 @@ func (_q *MenuQuery) FirstX(ctx context.Context) *Menu {
 
 // FirstID returns the first Menu ID from the query.
 // Returns a *NotFoundError when no Menu ID was found.
-func (_q *MenuQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *MenuQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -169,7 +169,7 @@ func (_q *MenuQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *MenuQuery) FirstIDX(ctx context.Context) int {
+func (_q *MenuQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -207,8 +207,8 @@ func (_q *MenuQuery) OnlyX(ctx context.Context) *Menu {
 // OnlyID is like Only, but returns the only Menu ID in the query.
 // Returns a *NotSingularError when more than one Menu ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *MenuQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *MenuQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -224,7 +224,7 @@ func (_q *MenuQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *MenuQuery) OnlyIDX(ctx context.Context) int {
+func (_q *MenuQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -252,7 +252,7 @@ func (_q *MenuQuery) AllX(ctx context.Context) []*Menu {
 }
 
 // IDs executes the query and returns a list of Menu IDs.
-func (_q *MenuQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *MenuQuery) IDs(ctx context.Context) (ids []uint64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -264,7 +264,7 @@ func (_q *MenuQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *MenuQuery) IDsX(ctx context.Context) []int {
+func (_q *MenuQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -325,7 +325,7 @@ func (_q *MenuQuery) Clone() *MenuQuery {
 		inters:         append([]Interceptor{}, _q.inters...),
 		predicates:     append([]predicate.Menu{}, _q.predicates...),
 		withCategory:   _q.withCategory.Clone(),
-		withSpecs:      _q.withSpecs.Clone(),
+		withMenuSpecs:  _q.withMenuSpecs.Clone(),
 		withOrderItems: _q.withOrderItems.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
@@ -344,14 +344,14 @@ func (_q *MenuQuery) WithCategory(opts ...func(*MenuCategoryQuery)) *MenuQuery {
 	return _q
 }
 
-// WithSpecs tells the query-builder to eager-load the nodes that are connected to
-// the "specs" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *MenuQuery) WithSpecs(opts ...func(*MenuSpecQuery)) *MenuQuery {
+// WithMenuSpecs tells the query-builder to eager-load the nodes that are connected to
+// the "menu_specs" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MenuQuery) WithMenuSpecs(opts ...func(*MenuSpecQuery)) *MenuQuery {
 	query := (&MenuSpecClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withSpecs = query
+	_q.withMenuSpecs = query
 	return _q
 }
 
@@ -447,7 +447,7 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 		_spec       = _q.querySpec()
 		loadedTypes = [3]bool{
 			_q.withCategory != nil,
-			_q.withSpecs != nil,
+			_q.withMenuSpecs != nil,
 			_q.withOrderItems != nil,
 		}
 	)
@@ -481,10 +481,10 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 			return nil, err
 		}
 	}
-	if query := _q.withSpecs; query != nil {
-		if err := _q.loadSpecs(ctx, query, nodes,
-			func(n *Menu) { n.Edges.Specs = []*MenuSpec{} },
-			func(n *Menu, e *MenuSpec) { n.Edges.Specs = append(n.Edges.Specs, e) }); err != nil {
+	if query := _q.withMenuSpecs; query != nil {
+		if err := _q.loadMenuSpecs(ctx, query, nodes,
+			func(n *Menu) { n.Edges.MenuSpecs = []*MenuSpec{} },
+			func(n *Menu, e *MenuSpec) { n.Edges.MenuSpecs = append(n.Edges.MenuSpecs, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -499,8 +499,8 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 }
 
 func (_q *MenuQuery) loadCategory(ctx context.Context, query *MenuCategoryQuery, nodes []*Menu, init func(*Menu), assign func(*Menu, *MenuCategory)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Menu)
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*Menu)
 	for i := range nodes {
 		if nodes[i].menu_category_menus == nil {
 			continue
@@ -530,9 +530,9 @@ func (_q *MenuQuery) loadCategory(ctx context.Context, query *MenuCategoryQuery,
 	}
 	return nil
 }
-func (_q *MenuQuery) loadSpecs(ctx context.Context, query *MenuSpecQuery, nodes []*Menu, init func(*Menu), assign func(*Menu, *MenuSpec)) error {
+func (_q *MenuQuery) loadMenuSpecs(ctx context.Context, query *MenuSpecQuery, nodes []*Menu, init func(*Menu), assign func(*Menu, *MenuSpec)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Menu)
+	nodeids := make(map[uint64]*Menu)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -540,22 +540,21 @@ func (_q *MenuQuery) loadSpecs(ctx context.Context, query *MenuSpecQuery, nodes 
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(menuspec.FieldMenuID)
+	}
 	query.Where(predicate.MenuSpec(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(menu.SpecsColumn), fks...))
+		s.Where(sql.InValues(s.C(menu.MenuSpecsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.menu_specs
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "menu_specs" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.MenuID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "menu_specs" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "menu_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -563,7 +562,7 @@ func (_q *MenuQuery) loadSpecs(ctx context.Context, query *MenuSpecQuery, nodes 
 }
 func (_q *MenuQuery) loadOrderItems(ctx context.Context, query *OrderItemQuery, nodes []*Menu, init func(*Menu), assign func(*Menu, *OrderItem)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Menu)
+	nodeids := make(map[uint64]*Menu)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -603,7 +602,7 @@ func (_q *MenuQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *MenuQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(menu.Table, menu.Columns, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(menu.Table, menu.Columns, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

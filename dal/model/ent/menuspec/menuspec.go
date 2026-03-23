@@ -21,16 +21,22 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeleteTs holds the string denoting the delete_ts field in the database.
 	FieldDeleteTs = "delete_ts"
-	// FieldSpecType holds the string denoting the spec_type field in the database.
-	FieldSpecType = "spec_type"
-	// FieldSpecValue holds the string denoting the spec_value field in the database.
-	FieldSpecValue = "spec_value"
+	// FieldMenuID holds the string denoting the menu_id field in the database.
+	FieldMenuID = "menu_id"
+	// FieldSpecItemID holds the string denoting the spec_item_id field in the database.
+	FieldSpecItemID = "spec_item_id"
+	// FieldCategorySpecID holds the string denoting the category_spec_id field in the database.
+	FieldCategorySpecID = "category_spec_id"
 	// FieldPriceDelta holds the string denoting the price_delta field in the database.
 	FieldPriceDelta = "price_delta"
 	// FieldSort holds the string denoting the sort field in the database.
 	FieldSort = "sort"
 	// EdgeMenu holds the string denoting the menu edge name in mutations.
 	EdgeMenu = "menu"
+	// EdgeCategorySpec holds the string denoting the category_spec edge name in mutations.
+	EdgeCategorySpec = "category_spec"
+	// EdgeSpecItem holds the string denoting the spec_item edge name in mutations.
+	EdgeSpecItem = "spec_item"
 	// Table holds the table name of the menuspec in the database.
 	Table = "menu_specs"
 	// MenuTable is the table that holds the menu relation/edge.
@@ -39,7 +45,21 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "menu" package.
 	MenuInverseTable = "menus"
 	// MenuColumn is the table column denoting the menu relation/edge.
-	MenuColumn = "menu_specs"
+	MenuColumn = "menu_id"
+	// CategorySpecTable is the table that holds the category_spec relation/edge.
+	CategorySpecTable = "menu_specs"
+	// CategorySpecInverseTable is the table name for the CategorySpec entity.
+	// It exists in this package in order to avoid circular dependency with the "categoryspec" package.
+	CategorySpecInverseTable = "category_specs"
+	// CategorySpecColumn is the table column denoting the category_spec relation/edge.
+	CategorySpecColumn = "category_spec_id"
+	// SpecItemTable is the table that holds the spec_item relation/edge.
+	SpecItemTable = "menu_specs"
+	// SpecItemInverseTable is the table name for the SpecItem entity.
+	// It exists in this package in order to avoid circular dependency with the "specitem" package.
+	SpecItemInverseTable = "spec_items"
+	// SpecItemColumn is the table column denoting the spec_item relation/edge.
+	SpecItemColumn = "spec_item_id"
 )
 
 // Columns holds all SQL columns for menuspec fields.
@@ -48,27 +68,17 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeleteTs,
-	FieldSpecType,
-	FieldSpecValue,
+	FieldMenuID,
+	FieldSpecItemID,
+	FieldCategorySpecID,
 	FieldPriceDelta,
 	FieldSort,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "menu_specs"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"menu_specs",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -81,7 +91,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 var (
-	Hooks        [1]ent.Hook
+	Hooks        [2]ent.Hook
 	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
@@ -91,10 +101,6 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultDeleteTs holds the default value on creation for the "delete_ts" field.
 	DefaultDeleteTs int64
-	// SpecTypeValidator is a validator for the "spec_type" field. It is called by the builders before save.
-	SpecTypeValidator func(string) error
-	// SpecValueValidator is a validator for the "spec_value" field. It is called by the builders before save.
-	SpecValueValidator func(string) error
 	// DefaultPriceDelta holds the default value on creation for the "price_delta" field.
 	DefaultPriceDelta float64
 	// DefaultSort holds the default value on creation for the "sort" field.
@@ -124,14 +130,19 @@ func ByDeleteTs(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeleteTs, opts...).ToFunc()
 }
 
-// BySpecType orders the results by the spec_type field.
-func BySpecType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSpecType, opts...).ToFunc()
+// ByMenuID orders the results by the menu_id field.
+func ByMenuID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMenuID, opts...).ToFunc()
 }
 
-// BySpecValue orders the results by the spec_value field.
-func BySpecValue(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSpecValue, opts...).ToFunc()
+// BySpecItemID orders the results by the spec_item_id field.
+func BySpecItemID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpecItemID, opts...).ToFunc()
+}
+
+// ByCategorySpecID orders the results by the category_spec_id field.
+func ByCategorySpecID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCategorySpecID, opts...).ToFunc()
 }
 
 // ByPriceDelta orders the results by the price_delta field.
@@ -150,10 +161,38 @@ func ByMenuField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMenuStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCategorySpecField orders the results by category_spec field.
+func ByCategorySpecField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategorySpecStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// BySpecItemField orders the results by spec_item field.
+func BySpecItemField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSpecItemStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newMenuStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MenuInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, MenuTable, MenuColumn),
+	)
+}
+func newCategorySpecStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategorySpecInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CategorySpecTable, CategorySpecColumn),
+	)
+}
+func newSpecItemStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SpecItemInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, SpecItemTable, SpecItemColumn),
 	)
 }

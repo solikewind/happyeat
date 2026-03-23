@@ -59,11 +59,11 @@ func entMenuToType(e *ent.Menu) types.Menu {
 		out.CategoryId = uint64(cat.ID)
 	}
 
-	specs, _ := e.Edges.SpecsOrErr()
+	specs, _ := e.Edges.MenuSpecsOrErr()
 	for _, s := range specs {
 		out.Specs = append(out.Specs, types.MenuSpec{
-			SpecType:   s.SpecType,
-			SpecValue:  s.SpecValue,
+			SpecType:   s.MenuSpecType,
+			SpecValue:  s.MenuSpecValue,
 			PriceDelta: s.PriceDelta,
 		})
 	}
