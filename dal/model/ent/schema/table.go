@@ -31,6 +31,8 @@ func (Table) Annotations() []schema.Annotation {
 
 func (Table) Fields() []ent.Field {
 	return []ent.Field{
+		field.Uint64("table_category_id").
+			Comment("所属分类ID"),
 		field.String("code").
 			MaxLen(32).
 			Unique().
@@ -52,7 +54,12 @@ func (Table) Fields() []ent.Field {
 
 func (Table) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("category", TableCategory.Type).Ref("tables").Unique().Required(),
-		edge.To("orders", Order.Type).Comment("堂食订单关联"),
+		edge.From("category", TableCategory.Type).
+			Ref("tables").
+			Field("table_category_id").
+			Unique().
+			Required(),
+		edge.To("orders", Order.Type).
+			Comment("堂食订单关联"),
 	}
 }

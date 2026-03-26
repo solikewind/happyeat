@@ -41,7 +41,7 @@ func (SpecItem) Fields() []ent.Field {
 
 func (SpecItem) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("Spec_group", SpecGroup.Type).
+		edge.From("spec_group", SpecGroup.Type).
 			Ref("spec_items").
 			Field("spec_group_id").
 			Unique().

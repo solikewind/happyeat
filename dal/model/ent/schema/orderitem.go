@@ -25,19 +25,21 @@ func (OrderItem) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),
 		entsql.Annotation{Table: "order_items"},
-		schema.Comment("订单明细"),
+		schema.Comment("订单明细表"),
 	}
 }
 
 func (OrderItem) Fields() []ent.Field {
 	return []ent.Field{
+		field.Uint64("menu_id").
+			Comment("菜单ID"),
 		field.String("menu_name").
-			MaxLen(128).
+			MaxLen(64).
 			Comment("菜品名称快照"),
 		field.Int("quantity").
 			Default(1).
 			Comment("数量"),
-		field.Float("unit_price").
+		field.Int64("unit_price").
 			Comment("单价（含规格加价）"),
 		field.Float("amount").
 			Comment("小计金额"),
@@ -54,7 +56,13 @@ func (OrderItem) Fields() []ent.Field {
 
 func (OrderItem) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("order", Order.Type).Ref("items").Unique().Required(),
-		edge.From("menu", Menu.Type).Ref("order_items").Unique().Comment("关联菜单，可选；删除菜单不影响历史订单"),
+		edge.From("order", Order.Type).
+			Ref("items").
+			Unique().
+			Required(),
+		edge.From("menu", Menu.Type).
+			Ref("order_items").
+			Unique().
+			Comment("关联菜单，可选；删除菜单不影响历史订单"),
 	}
 }

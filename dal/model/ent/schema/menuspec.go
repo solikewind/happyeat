@@ -58,7 +58,7 @@ func (MenuSpec) Edges() []ent.Edge {
 			Field("menu_id").
 			Unique().
 			Required(), // 菜单
-		edge.From("category_spec", CategorySpec.Type).
+		edge.From("category_spec", MenuCategorySpec.Type).
 			Ref("menu_specs").
 			Field("category_spec_id").
 			Unique(), // 菜单种类下的的规格组

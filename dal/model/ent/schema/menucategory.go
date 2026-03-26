@@ -44,6 +44,6 @@ func (MenuCategory) Fields() []ent.Field {
 func (MenuCategory) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("menus", Menu.Type),
-		edge.To("category_specs", CategorySpec.Type),
+		edge.To("category_specs", MenuCategorySpec.Type),
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/common/consts/enum"
 )
 
 // Order 订单（堂食关联餐桌，打包外带无桌台）
@@ -25,7 +26,7 @@ func (Order) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),
 		entsql.Annotation{Table: "orders"},
-		schema.Comment("订单"),
+		schema.Comment("订单表"),
 	}
 }
 
@@ -35,15 +36,19 @@ func (Order) Fields() []ent.Field {
 			MaxLen(64).
 			Unique().
 			Comment("订单号"),
-		field.String("order_type").
-			Default("dine_in").
-			MaxLen(32).
+		field.Enum("order_type").
+			GoType(enum.OrderTypeDineIn).
+			Annotations(
+				entsql.Default(enum.OrderTypeDineIn.String()),
+			).
 			Comment("dine_in=堂食 takeaway=打包外带"),
-		field.String("status").
-			Default("created").
-			MaxLen(32).
+		field.Enum("status").
+			GoType(enum.OrderStatusCreated).
+			Annotations(
+				entsql.Default(enum.OrderStatusCreated.String()),
+			).
 			Comment("created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消"),
-		field.Float("total_amount").
+		field.Int64("total_amount").
 			Default(0).
 			Comment("订单总金额"),
 		field.String("remark").
