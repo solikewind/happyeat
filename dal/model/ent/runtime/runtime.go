@@ -60,7 +60,7 @@ func init() {
 	// categoryspecDescPriceDelta is the schema descriptor for price_delta field.
 	categoryspecDescPriceDelta := categoryspecFields[3].Descriptor()
 	// categoryspec.DefaultPriceDelta holds the default value on creation for the price_delta field.
-	categoryspec.DefaultPriceDelta = categoryspecDescPriceDelta.Default.(float64)
+	categoryspec.DefaultPriceDelta = categoryspecDescPriceDelta.Default.(int64)
 	// categoryspecDescSort is the schema descriptor for sort field.
 	categoryspecDescSort := categoryspecFields[4].Descriptor()
 	// categoryspec.DefaultSort holds the default value on creation for the sort field.

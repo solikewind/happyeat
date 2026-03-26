@@ -86,14 +86,14 @@ func (_u *SpecItemUpdate) SetNillableName(v *string) *SpecItemUpdate {
 }
 
 // SetDefaultPrice sets the "default_price" field.
-func (_u *SpecItemUpdate) SetDefaultPrice(v float64) *SpecItemUpdate {
+func (_u *SpecItemUpdate) SetDefaultPrice(v int64) *SpecItemUpdate {
 	_u.mutation.ResetDefaultPrice()
 	_u.mutation.SetDefaultPrice(v)
 	return _u
 }
 
 // SetNillableDefaultPrice sets the "default_price" field if the given value is not nil.
-func (_u *SpecItemUpdate) SetNillableDefaultPrice(v *float64) *SpecItemUpdate {
+func (_u *SpecItemUpdate) SetNillableDefaultPrice(v *int64) *SpecItemUpdate {
 	if v != nil {
 		_u.SetDefaultPrice(*v)
 	}
@@ -101,7 +101,7 @@ func (_u *SpecItemUpdate) SetNillableDefaultPrice(v *float64) *SpecItemUpdate {
 }
 
 // AddDefaultPrice adds value to the "default_price" field.
-func (_u *SpecItemUpdate) AddDefaultPrice(v float64) *SpecItemUpdate {
+func (_u *SpecItemUpdate) AddDefaultPrice(v int64) *SpecItemUpdate {
 	_u.mutation.AddDefaultPrice(v)
 	return _u
 }
@@ -238,10 +238,10 @@ func (_u *SpecItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(specitem.FieldName, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.DefaultPrice(); ok {
-		_spec.SetField(specitem.FieldDefaultPrice, field.TypeFloat64, value)
+		_spec.SetField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedDefaultPrice(); ok {
-		_spec.AddField(specitem.FieldDefaultPrice, field.TypeFloat64, value)
+		_spec.AddField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 	}
 	if _u.mutation.SpecGroupCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -393,14 +393,14 @@ func (_u *SpecItemUpdateOne) SetNillableName(v *string) *SpecItemUpdateOne {
 }
 
 // SetDefaultPrice sets the "default_price" field.
-func (_u *SpecItemUpdateOne) SetDefaultPrice(v float64) *SpecItemUpdateOne {
+func (_u *SpecItemUpdateOne) SetDefaultPrice(v int64) *SpecItemUpdateOne {
 	_u.mutation.ResetDefaultPrice()
 	_u.mutation.SetDefaultPrice(v)
 	return _u
 }
 
 // SetNillableDefaultPrice sets the "default_price" field if the given value is not nil.
-func (_u *SpecItemUpdateOne) SetNillableDefaultPrice(v *float64) *SpecItemUpdateOne {
+func (_u *SpecItemUpdateOne) SetNillableDefaultPrice(v *int64) *SpecItemUpdateOne {
 	if v != nil {
 		_u.SetDefaultPrice(*v)
 	}
@@ -408,7 +408,7 @@ func (_u *SpecItemUpdateOne) SetNillableDefaultPrice(v *float64) *SpecItemUpdate
 }
 
 // AddDefaultPrice adds value to the "default_price" field.
-func (_u *SpecItemUpdateOne) AddDefaultPrice(v float64) *SpecItemUpdateOne {
+func (_u *SpecItemUpdateOne) AddDefaultPrice(v int64) *SpecItemUpdateOne {
 	_u.mutation.AddDefaultPrice(v)
 	return _u
 }
@@ -575,10 +575,10 @@ func (_u *SpecItemUpdateOne) sqlSave(ctx context.Context) (_node *SpecItem, err 
 		_spec.SetField(specitem.FieldName, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.DefaultPrice(); ok {
-		_spec.SetField(specitem.FieldDefaultPrice, field.TypeFloat64, value)
+		_spec.SetField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedDefaultPrice(); ok {
-		_spec.AddField(specitem.FieldDefaultPrice, field.TypeFloat64, value)
+		_spec.AddField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 	}
 	if _u.mutation.SpecGroupCleared() {
 		edge := &sqlgraph.EdgeSpec{

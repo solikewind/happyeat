@@ -29,7 +29,7 @@ func NewGetTableLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetTable
 }
 
 func (l *GetTableLogic) GetTable(req *types.GetTableReq) (resp *types.GetTableReply, err error) {
-	e, err := l.svcCtx.Table.GetByID(l.ctx, int(req.Id))
+	e, err := l.svcCtx.Table.GetByID(l.ctx, req.Id)
 	if err != nil {
 		l.Errorf("GetTable GetByID err: %v", err)
 		return nil, err
@@ -44,7 +44,7 @@ func (l *GetTableLogic) GetTable(req *types.GetTableReq) (resp *types.GetTableRe
 	}
 	return &types.GetTableReply{
 		Table: types.Table{
-			Id:         uint64(e.ID),
+			Id:         e.ID,
 			Code:       e.Code,
 			Status:     e.Status,
 			Capacity:   e.Capacity,

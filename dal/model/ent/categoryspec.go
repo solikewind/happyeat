@@ -32,7 +32,7 @@ type CategorySpec struct {
 	// 规格选项，如微辣、大杯
 	SpecValue string `json:"spec_value,omitempty"`
 	// 加价
-	PriceDelta float64 `json:"price_delta,omitempty"`
+	PriceDelta int64 `json:"price_delta,omitempty"`
 	// 排序
 	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -77,9 +77,7 @@ func (*CategorySpec) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case categoryspec.FieldPriceDelta:
-			values[i] = new(sql.NullFloat64)
-		case categoryspec.FieldID, categoryspec.FieldDeleteTs, categoryspec.FieldMenuCategoryID, categoryspec.FieldSort:
+		case categoryspec.FieldID, categoryspec.FieldDeleteTs, categoryspec.FieldMenuCategoryID, categoryspec.FieldPriceDelta, categoryspec.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case categoryspec.FieldSpecType, categoryspec.FieldSpecValue:
 			values[i] = new(sql.NullString)
@@ -143,10 +141,10 @@ func (_m *CategorySpec) assignValues(columns []string, values []any) error {
 				_m.SpecValue = value.String
 			}
 		case categoryspec.FieldPriceDelta:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field price_delta", values[i])
 			} else if value.Valid {
-				_m.PriceDelta = value.Float64
+				_m.PriceDelta = value.Int64
 			}
 		case categoryspec.FieldSort:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

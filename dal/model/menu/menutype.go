@@ -38,12 +38,12 @@ func (mt *MenuType) Create(ctx context.Context, in CreateMenuCategoryInput) (*en
 
 // GetByID 按 ID 获取分类。
 func (mt *MenuType) GetByID(ctx context.Context, id uint64) (*ent.MenuCategory, error) {
-	return mt.c.MenuCategory.Get(ctx, int(id))
+	return mt.c.MenuCategory.Get(ctx, id)
 }
 
 // Exist 判断分类是否存在。
 func (mt *MenuType) Exist(ctx context.Context, id uint64) (bool, error) {
-	return mt.c.MenuCategory.Query().Where(menucategory.IDEQ(int(id))).Exist(ctx)
+	return mt.c.MenuCategory.Query().Where(menucategory.IDEQ(id)).Exist(ctx)
 }
 
 // ListMenuCategoriesFilter 分类列表筛选。
@@ -81,7 +81,7 @@ func (mt *MenuType) List(ctx context.Context, f ListMenuCategoriesFilter) ([]*en
 }
 
 // Update 更新分类。
-func (mt *MenuType) Update(ctx context.Context, id int, name, description string) error {
+func (mt *MenuType) Update(ctx context.Context, id uint64, name, description string) error {
 	upd := mt.c.MenuCategory.UpdateOneID(id).SetName(name)
 	if description != "" {
 		upd = upd.SetDescription(description)
@@ -94,11 +94,11 @@ func (mt *MenuType) Update(ctx context.Context, id int, name, description string
 }
 
 // Delete 删除分类。
-func (mt *MenuType) Delete(ctx context.Context, id int) error {
+func (mt *MenuType) Delete(ctx context.Context, id uint64) error {
 	return mt.c.MenuCategory.DeleteOneID(id).Exec(ctx)
 }
 
 // CountMenusByCategoryID 统计某分类下菜单数量。
-func (mt *MenuType) CountMenusByCategoryID(ctx context.Context, categoryID int) (int, error) {
+func (mt *MenuType) CountMenusByCategoryID(ctx context.Context, categoryID uint64) (int, error) {
 	return mt.c.Menu.Query().Where(entmenu.HasCategoryWith(menucategory.IDEQ(categoryID))).Count(ctx)
 }

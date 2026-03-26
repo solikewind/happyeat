@@ -20,17 +20,18 @@ func NewMenu(c *ent.Client) *Menu {
 }
 
 type SpecInput struct {
-	SpecType   string
-	SpecValue  string
-	PriceDelta float64
+	SpecItemID     uint64
+	CategorySpecID uint64
+	PriceDelta     int64
+	Sort           uint32
 }
 
 type CreateMenuInput struct {
 	Name        string
 	Description string
 	Image       string
-	Price       float64
-	CategoryID  int
+	Price       int64
+	CategoryID  uint64
 	Specs       []SpecInput
 }
 
@@ -57,13 +58,21 @@ func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error
 	}
 
 	for i, spec := range in.Specs {
-		_, err = tx.MenuSpec.Create().
+		createSpec := tx.MenuSpec.Create().
 			SetMenuID(entMenu.ID).
-			SetSpecType(spec.SpecType).
-			SetSpecValue(spec.SpecValue).
-			SetPriceDelta(spec.PriceDelta).
-			SetSort(i).
-			Save(ctx)
+			SetPriceDelta(spec.PriceDelta)
+		if spec.SpecItemID > 0 {
+			createSpec = createSpec.SetSpecItemID(spec.SpecItemID)
+		}
+		if spec.CategorySpecID > 0 {
+			createSpec = createSpec.SetCategorySpecID(spec.CategorySpecID)
+		}
+		if spec.Sort > 0 {
+			createSpec = createSpec.SetSort(spec.Sort)
+		} else {
+			createSpec = createSpec.SetSort(uint32(i))
+		}
+		_, err = createSpec.Save(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -76,11 +85,11 @@ func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error
 	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(entMenu.ID))).Only(ctx)
 }
 
-func (m *Menu) GetByID(ctx context.Context, id int) (*ent.Menu, error) {
+func (m *Menu) GetByID(ctx context.Context, id uint64) (*ent.Menu, error) {
 	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(id))).Only(ctx)
 }
 
-func (m *Menu) Exist(ctx context.Context, id int) (bool, error) {
+func (m *Menu) Exist(ctx context.Context, id uint64) (bool, error) {
 	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(id))).Exist(ctx)
 }
 
@@ -175,12 +184,12 @@ type UpdateMenuInput struct {
 	Name        string
 	Description string
 	Image       string
-	Price       float64
-	CategoryID  int
+	Price       int64
+	CategoryID  uint64
 	Specs       []SpecInput
 }
 
-func (m *Menu) Update(ctx context.Context, id int, in UpdateMenuInput) error {
+func (m *Menu) Update(ctx context.Context, id uint64, in UpdateMenuInput) error {
 	tx, err := m.c.Tx(ctx)
 	if err != nil {
 		return err
@@ -211,13 +220,21 @@ func (m *Menu) Update(ctx context.Context, id int, in UpdateMenuInput) error {
 	}
 
 	for i, spec := range in.Specs {
-		_, err = tx.MenuSpec.Create().
+		createSpec := tx.MenuSpec.Create().
 			SetMenuID(id).
-			SetSpecType(spec.SpecType).
-			SetSpecValue(spec.SpecValue).
-			SetPriceDelta(spec.PriceDelta).
-			SetSort(i).
-			Save(ctx)
+			SetPriceDelta(spec.PriceDelta)
+		if spec.SpecItemID > 0 {
+			createSpec = createSpec.SetSpecItemID(spec.SpecItemID)
+		}
+		if spec.CategorySpecID > 0 {
+			createSpec = createSpec.SetCategorySpecID(spec.CategorySpecID)
+		}
+		if spec.Sort > 0 {
+			createSpec = createSpec.SetSort(spec.Sort)
+		} else {
+			createSpec = createSpec.SetSort(uint32(i))
+		}
+		_, err = createSpec.Save(ctx)
 		if err != nil {
 			return err
 		}
@@ -226,7 +243,7 @@ func (m *Menu) Update(ctx context.Context, id int, in UpdateMenuInput) error {
 	return tx.Commit()
 }
 
-func (m *Menu) Delete(ctx context.Context, id int) error {
+func (m *Menu) Delete(ctx context.Context, id uint64) error {
 	tx, err := m.c.Tx(ctx)
 	if err != nil {
 		return err
@@ -245,7 +262,7 @@ func (m *Menu) Delete(ctx context.Context, id int) error {
 }
 
 func (m *Menu) withMenuEdges(q *ent.MenuQuery) *ent.MenuQuery {
-	return q.WithCategory().WithSpecs(func(sq *ent.MenuSpecQuery) {
+	return q.WithCategory().WithMenuSpecs(func(sq *ent.MenuSpecQuery) {
 		sq.Order(
 			menuspec.BySort(sql.OrderAsc()),
 			menuspec.ByID(sql.OrderAsc()),

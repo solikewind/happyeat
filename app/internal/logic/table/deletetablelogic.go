@@ -28,7 +28,7 @@ func NewDeleteTableLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delet
 }
 
 func (l *DeleteTableLogic) DeleteTable(req *types.DeleteTableReq) (resp *types.DeleteTableReply, err error) {
-	err = l.svcCtx.Table.Delete(l.ctx, int(req.Id))
+	err = l.svcCtx.Table.Delete(l.ctx, req.Id)
 	if err != nil {
 		l.Errorf("DeleteTable err: %v", err)
 		return nil, err

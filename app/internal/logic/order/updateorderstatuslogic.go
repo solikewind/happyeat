@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/app/internal/pkg/status"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -31,21 +32,21 @@ func NewUpdateOrderStatusLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 }
 
 // 允许的状态流转：当前状态 -> 可变更到的状态
-var allowedTransitions = map[string]map[string]bool{
-	status.OrderStatusCreated: {
-		status.OrderStatusPaid: true, status.OrderStatusCancelled: true,
+var allowedTransitions = map[enum.OrderStatus]map[enum.OrderStatus]bool{
+	enum.OrderStatus(status.OrderStatusCreated): {
+		enum.OrderStatus(status.OrderStatusPaid): true, enum.OrderStatus(status.OrderStatusCancelled): true,
 	},
-	status.OrderStatusPaid: {
-		status.OrderStatusPreparing: true, status.OrderStatusCancelled: true,
+	enum.OrderStatus(status.OrderStatusPaid): {
+		enum.OrderStatus(status.OrderStatusPreparing): true, enum.OrderStatus(status.OrderStatusCancelled): true,
 	},
-	status.OrderStatusPreparing: {
-		status.OrderStatusCompleted: true,
+	enum.OrderStatus(status.OrderStatusPreparing): {
+		enum.OrderStatus(status.OrderStatusCompleted): true,
 	},
 	// completed / cancelled 为终态，不可再改
 }
 
 func (l *UpdateOrderStatusLogic) UpdateOrderStatus(req *types.UpdateOrderStatusReq) (*types.UpdateOrderStatusReply, error) {
-	cur, err := l.svcCtx.Order.GetByID(l.ctx, int(req.Id))
+	cur, err := l.svcCtx.Order.GetByID(l.ctx, req.Id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errors.New("订单不存在")
@@ -53,13 +54,13 @@ func (l *UpdateOrderStatusLogic) UpdateOrderStatus(req *types.UpdateOrderStatusR
 		return nil, err
 	}
 
-	next := req.Status
+	next := enum.OrderStatus(req.Status)
 	allowed, ok := allowedTransitions[cur.Status]
 	if !ok || !allowed[next] {
-		return nil, errors.New("当前状态不允许变更为 " + next)
+		return nil, errors.New("当前状态不允许变更为 " + string(next))
 	}
 
-	err = l.svcCtx.Order.UpdateStatus(l.ctx, int(req.Id), req.Status)
+	err = l.svcCtx.Order.UpdateStatus(l.ctx, req.Id, enum.OrderStatus(req.Status))
 	if err != nil {
 		return nil, err
 	}

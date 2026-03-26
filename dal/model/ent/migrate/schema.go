@@ -17,7 +17,7 @@ var (
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "spec_type", Type: field.TypeString, Size: 64, Comment: "规格类型，如辣度、容量"},
 		{Name: "spec_value", Type: field.TypeString, Size: 64, Comment: "规格选项，如微辣、大杯"},
-		{Name: "price_delta", Type: field.TypeFloat64, Comment: "加价", Default: 0},
+		{Name: "price_delta", Type: field.TypeInt64, Comment: "加价", Default: 0},
 		{Name: "sort", Type: field.TypeUint32, Comment: "排序", Default: 0},
 		{Name: "menu_category_id", Type: field.TypeUint64, Comment: "菜单分类ID"},
 	}
@@ -205,7 +205,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "规格项名"},
-		{Name: "default_price", Type: field.TypeFloat64, Comment: "默认价格"},
+		{Name: "default_price", Type: field.TypeInt64, Comment: "默认价格"},
 		{Name: "spec_group_id", Type: field.TypeUint64, Comment: "所属规格组ID"},
 	}
 	// SpecItemsTable holds the schema information for the "spec_items" table.

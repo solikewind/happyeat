@@ -83,13 +83,13 @@ func (_c *CategorySpecCreate) SetSpecValue(v string) *CategorySpecCreate {
 }
 
 // SetPriceDelta sets the "price_delta" field.
-func (_c *CategorySpecCreate) SetPriceDelta(v float64) *CategorySpecCreate {
+func (_c *CategorySpecCreate) SetPriceDelta(v int64) *CategorySpecCreate {
 	_c.mutation.SetPriceDelta(v)
 	return _c
 }
 
 // SetNillablePriceDelta sets the "price_delta" field if the given value is not nil.
-func (_c *CategorySpecCreate) SetNillablePriceDelta(v *float64) *CategorySpecCreate {
+func (_c *CategorySpecCreate) SetNillablePriceDelta(v *int64) *CategorySpecCreate {
 	if v != nil {
 		_c.SetPriceDelta(*v)
 	}
@@ -300,7 +300,7 @@ func (_c *CategorySpecCreate) createSpec() (*CategorySpec, *sqlgraph.CreateSpec)
 		_node.SpecValue = value
 	}
 	if value, ok := _c.mutation.PriceDelta(); ok {
-		_spec.SetField(categoryspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.SetField(categoryspec.FieldPriceDelta, field.TypeInt64, value)
 		_node.PriceDelta = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {

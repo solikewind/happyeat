@@ -6,6 +6,7 @@ package order
 import (
 	"context"
 
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	orderdata "github.com/solikewind/happyeat/dal/model/order"
@@ -40,13 +41,13 @@ func (l *ListOrdersLogic) ListOrders(req *types.ListOrdersReq) (*types.ListOrder
 	offset := (current - 1) * pageSize
 
 	filter := orderdata.ListOrdersFilter{
-		Status:    req.Status,
-		OrderType: req.OrderType,
+		Status:    enum.OrderStatus(req.Status),
+		OrderType: enum.OrderType(req.OrderType),
 		Offset:    offset,
 		Limit:     pageSize,
 	}
 	if req.TableId > 0 {
-		tid := int(req.TableId)
+		tid := req.TableId
 		filter.TableID = &tid
 	}
 

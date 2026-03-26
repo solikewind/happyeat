@@ -34,7 +34,7 @@ func (SpecItem) Fields() []ent.Field {
 		field.String("name").
 			MaxLen(64).
 			Comment("规格项名"),
-		field.Float("default_price").
+		field.Int64("default_price").
 			Comment("默认价格"),
 	}
 }

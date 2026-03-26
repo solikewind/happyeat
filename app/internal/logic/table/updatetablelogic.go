@@ -31,18 +31,17 @@ func NewUpdateTableLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Updat
 }
 
 func (l *UpdateTableLogic) UpdateTable(req *types.UpdateTableReq) (resp *types.UpdateTableReply, err error) {
-	t := req.Table
-	if t.Code == "" {
+	if req.Code == "" {
 		return nil, errors.New("餐桌编号不能为空")
 	}
-	if t.Status == "" {
+	if req.Status == "" {
 		return nil, errors.New("餐桌状态不能为空")
 	}
-	if t.Capacity <= 0 {
+	if req.Capacity <= 0 {
 		return nil, errors.New("餐桌容量不能小于等于0")
 	}
 
-	_, err = l.svcCtx.TableType.GetByID(l.ctx, t.CategoryId)
+	_, err = l.svcCtx.TableType.GetByID(l.ctx, req.CategoryId)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errors.New("餐桌分类不存在")
@@ -50,12 +49,12 @@ func (l *UpdateTableLogic) UpdateTable(req *types.UpdateTableReq) (resp *types.U
 		return nil, err
 	}
 
-	err = l.svcCtx.Table.Update(l.ctx, int(req.Id), daltable.UpdateTableInput{
-		Code:       t.Code,
-		Status:     t.Status,
-		Capacity:   t.Capacity,
-		CategoryID: int(t.CategoryId),
-		QRCode:     t.QrCode,
+	err = l.svcCtx.Table.Update(l.ctx, req.Id, daltable.UpdateTableInput{
+		Code:       req.Code,
+		Status:     req.Status,
+		Capacity:   req.Capacity,
+		CategoryID: req.CategoryId,
+		QRCode:     req.QrCode,
 	})
 	if err != nil {
 		if ent.IsNotFound(err) {

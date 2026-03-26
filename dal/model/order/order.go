@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	entorder "github.com/solikewind/happyeat/dal/model/ent/order"
 	enttable "github.com/solikewind/happyeat/dal/model/ent/table"
@@ -27,16 +28,16 @@ func NewOrder(c *ent.Client) *Order {
 type ItemInput struct {
 	MenuName  string
 	Quantity  int
-	UnitPrice float64
+	UnitPrice int64
 	SpecInfo  string
 }
 
 // CreateOrderInput 创建订单入参。
 type CreateOrderInput struct {
-	OrderType   string      // dine_in | takeaway
-	TableID     *int        // 堂食时必填，外带为 nil
+	OrderType   enum.OrderType // dine_in | takeaway
+	TableID     *uint64     // 堂食时必填，外带为 nil
 	Items       []ItemInput // 至少一项
-	TotalAmount float64
+	TotalAmount int64
 	Remark      string
 }
 
@@ -80,8 +81,8 @@ func (o *Order) Create(ctx context.Context, in CreateOrderInput) (*ent.Order, er
 			SetMenuName(item.MenuName).
 			SetQuantity(item.Quantity).
 			SetUnitPrice(item.UnitPrice).
-			SetAmount(item.UnitPrice * float64(item.Quantity)).
-			SetSort(i)
+			SetAmount(item.UnitPrice * int64(item.Quantity)).
+			SetSort(uint32(i))
 		if item.SpecInfo != "" {
 			itemCreate = itemCreate.SetSpecInfo(item.SpecInfo)
 		}
@@ -100,7 +101,7 @@ func (o *Order) Create(ctx context.Context, in CreateOrderInput) (*ent.Order, er
 }
 
 // GetByID 按 ID 获取订单（含 table、items）。
-func (o *Order) GetByID(ctx context.Context, id int) (*ent.Order, error) {
+func (o *Order) GetByID(ctx context.Context, id uint64) (*ent.Order, error) {
 	return o.c.Order.Query().
 		Where(entorder.IDEQ(id)).
 		WithTable(func(q *ent.TableQuery) {
@@ -112,10 +113,10 @@ func (o *Order) GetByID(ctx context.Context, id int) (*ent.Order, error) {
 
 // ListOrdersFilter 列表筛选。
 type ListOrdersFilter struct {
-	Status    string   // 单状态
-	Statuses  []string // 多状态（与 Status 二选一，Statuses 优先）
-	OrderType string
-	TableID   *int
+	Status    enum.OrderStatus   // 单状态
+	Statuses  []enum.OrderStatus // 多状态（与 Status 二选一，Statuses 优先）
+	OrderType enum.OrderType
+	TableID   *uint64
 	Offset    int
 	Limit     int
 }
@@ -154,7 +155,7 @@ func (o *Order) List(ctx context.Context, f ListOrdersFilter) ([]*ent.Order, int
 }
 
 // UpdateStatus 更新订单状态。
-func (o *Order) UpdateStatus(ctx context.Context, id int, status string) error {
+func (o *Order) UpdateStatus(ctx context.Context, id uint64, status enum.OrderStatus) error {
 	_, err := o.c.Order.UpdateOneID(id).SetStatus(status).Save(ctx)
 	return err
 }

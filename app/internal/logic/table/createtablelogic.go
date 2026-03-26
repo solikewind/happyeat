@@ -42,8 +42,8 @@ func (l *CreateTableLogic) CreateTable(req *types.CreateTableReq) (resp *types.C
 	_, err = l.svcCtx.Table.Create(l.ctx, daltable.CreateTableInput{
 		Code:       req.Code,
 		Status:     req.Status,
-		Capacity:   int(req.Capacity),
-		CategoryID: int(req.CategoryId),
+		Capacity:   req.Capacity,
+		CategoryID: req.CategoryId,
 		QRCode:     req.QrCode,
 	})
 	if err != nil {

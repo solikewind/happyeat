@@ -81,7 +81,7 @@ func Name(v string) predicate.SpecItem {
 }
 
 // DefaultPrice applies equality check predicate on the "default_price" field. It's identical to DefaultPriceEQ.
-func DefaultPrice(v float64) predicate.SpecItem {
+func DefaultPrice(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldEQ(FieldDefaultPrice, v))
 }
 
@@ -291,42 +291,42 @@ func NameContainsFold(v string) predicate.SpecItem {
 }
 
 // DefaultPriceEQ applies the EQ predicate on the "default_price" field.
-func DefaultPriceEQ(v float64) predicate.SpecItem {
+func DefaultPriceEQ(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldEQ(FieldDefaultPrice, v))
 }
 
 // DefaultPriceNEQ applies the NEQ predicate on the "default_price" field.
-func DefaultPriceNEQ(v float64) predicate.SpecItem {
+func DefaultPriceNEQ(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldNEQ(FieldDefaultPrice, v))
 }
 
 // DefaultPriceIn applies the In predicate on the "default_price" field.
-func DefaultPriceIn(vs ...float64) predicate.SpecItem {
+func DefaultPriceIn(vs ...int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldIn(FieldDefaultPrice, vs...))
 }
 
 // DefaultPriceNotIn applies the NotIn predicate on the "default_price" field.
-func DefaultPriceNotIn(vs ...float64) predicate.SpecItem {
+func DefaultPriceNotIn(vs ...int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldNotIn(FieldDefaultPrice, vs...))
 }
 
 // DefaultPriceGT applies the GT predicate on the "default_price" field.
-func DefaultPriceGT(v float64) predicate.SpecItem {
+func DefaultPriceGT(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldGT(FieldDefaultPrice, v))
 }
 
 // DefaultPriceGTE applies the GTE predicate on the "default_price" field.
-func DefaultPriceGTE(v float64) predicate.SpecItem {
+func DefaultPriceGTE(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldGTE(FieldDefaultPrice, v))
 }
 
 // DefaultPriceLT applies the LT predicate on the "default_price" field.
-func DefaultPriceLT(v float64) predicate.SpecItem {
+func DefaultPriceLT(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldLT(FieldDefaultPrice, v))
 }
 
 // DefaultPriceLTE applies the LTE predicate on the "default_price" field.
-func DefaultPriceLTE(v float64) predicate.SpecItem {
+func DefaultPriceLTE(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldLTE(FieldDefaultPrice, v))
 }
 

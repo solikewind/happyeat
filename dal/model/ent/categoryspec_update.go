@@ -100,14 +100,14 @@ func (_u *CategorySpecUpdate) SetNillableSpecValue(v *string) *CategorySpecUpdat
 }
 
 // SetPriceDelta sets the "price_delta" field.
-func (_u *CategorySpecUpdate) SetPriceDelta(v float64) *CategorySpecUpdate {
+func (_u *CategorySpecUpdate) SetPriceDelta(v int64) *CategorySpecUpdate {
 	_u.mutation.ResetPriceDelta()
 	_u.mutation.SetPriceDelta(v)
 	return _u
 }
 
 // SetNillablePriceDelta sets the "price_delta" field if the given value is not nil.
-func (_u *CategorySpecUpdate) SetNillablePriceDelta(v *float64) *CategorySpecUpdate {
+func (_u *CategorySpecUpdate) SetNillablePriceDelta(v *int64) *CategorySpecUpdate {
 	if v != nil {
 		_u.SetPriceDelta(*v)
 	}
@@ -115,7 +115,7 @@ func (_u *CategorySpecUpdate) SetNillablePriceDelta(v *float64) *CategorySpecUpd
 }
 
 // AddPriceDelta adds value to the "price_delta" field.
-func (_u *CategorySpecUpdate) AddPriceDelta(v float64) *CategorySpecUpdate {
+func (_u *CategorySpecUpdate) AddPriceDelta(v int64) *CategorySpecUpdate {
 	_u.mutation.AddPriceDelta(v)
 	return _u
 }
@@ -287,10 +287,10 @@ func (_u *CategorySpecUpdate) sqlSave(ctx context.Context) (_node int, err error
 		_spec.SetField(categoryspec.FieldSpecValue, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.PriceDelta(); ok {
-		_spec.SetField(categoryspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.SetField(categoryspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPriceDelta(); ok {
-		_spec.AddField(categoryspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.AddField(categoryspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(categoryspec.FieldSort, field.TypeUint32, value)
@@ -462,14 +462,14 @@ func (_u *CategorySpecUpdateOne) SetNillableSpecValue(v *string) *CategorySpecUp
 }
 
 // SetPriceDelta sets the "price_delta" field.
-func (_u *CategorySpecUpdateOne) SetPriceDelta(v float64) *CategorySpecUpdateOne {
+func (_u *CategorySpecUpdateOne) SetPriceDelta(v int64) *CategorySpecUpdateOne {
 	_u.mutation.ResetPriceDelta()
 	_u.mutation.SetPriceDelta(v)
 	return _u
 }
 
 // SetNillablePriceDelta sets the "price_delta" field if the given value is not nil.
-func (_u *CategorySpecUpdateOne) SetNillablePriceDelta(v *float64) *CategorySpecUpdateOne {
+func (_u *CategorySpecUpdateOne) SetNillablePriceDelta(v *int64) *CategorySpecUpdateOne {
 	if v != nil {
 		_u.SetPriceDelta(*v)
 	}
@@ -477,7 +477,7 @@ func (_u *CategorySpecUpdateOne) SetNillablePriceDelta(v *float64) *CategorySpec
 }
 
 // AddPriceDelta adds value to the "price_delta" field.
-func (_u *CategorySpecUpdateOne) AddPriceDelta(v float64) *CategorySpecUpdateOne {
+func (_u *CategorySpecUpdateOne) AddPriceDelta(v int64) *CategorySpecUpdateOne {
 	_u.mutation.AddPriceDelta(v)
 	return _u
 }
@@ -679,10 +679,10 @@ func (_u *CategorySpecUpdateOne) sqlSave(ctx context.Context) (_node *CategorySp
 		_spec.SetField(categoryspec.FieldSpecValue, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.PriceDelta(); ok {
-		_spec.SetField(categoryspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.SetField(categoryspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPriceDelta(); ok {
-		_spec.AddField(categoryspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.AddField(categoryspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(categoryspec.FieldSort, field.TypeUint32, value)

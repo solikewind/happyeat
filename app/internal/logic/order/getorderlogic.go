@@ -30,7 +30,7 @@ func NewGetOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetOrder
 }
 
 func (l *GetOrderLogic) GetOrder(req *types.GetOrderReq) (*types.GetOrderReply, error) {
-	entOrder, err := l.svcCtx.Order.GetByID(l.ctx, int(req.Id))
+	entOrder, err := l.svcCtx.Order.GetByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +43,8 @@ func EntOrderToType(e *ent.Order) types.Order {
 	out := types.Order{
 		Id:          uint64(e.ID),
 		OrderNo:     e.OrderNo,
-		OrderType:   e.OrderType,
-		Status:      e.Status,
+		OrderType:   string(e.OrderType),
+		Status:      string(e.Status),
 		TotalAmount: e.TotalAmount,
 		CreatedAt:   timeutil.TimeToString(e.CreatedAt),
 		UpdatedAt:   timeutil.TimeToString(e.UpdatedAt),

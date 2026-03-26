@@ -1,14 +1,13 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package MenuCategory
+package menucategory
 
 import (
 	"context"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
-	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,23 +27,8 @@ func NewGetMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 	}
 }
 
-func (l *GetMenuCategoryLogic) GetMenuCategory(req *types.GetMenuCategoryReq) (*types.GetMenuCategoryReply, error) {
-	cat, err := l.svcCtx.MenuType.GetByID(l.ctx, req.Id)
-	if err != nil {
-		return nil, err
-	}
+func (l *GetMenuCategoryLogic) GetMenuCategory(req *types.GetMenuCategoryReq) (resp *types.GetMenuCategoryReply, err error) {
+	// todo: add your logic here and delete this line
 
-	return &types.GetMenuCategoryReply{
-		Category: entCategoryToType(cat),
-	}, nil
-}
-
-func entCategoryToType(e *ent.MenuCategory) types.MenuCategory {
-	out := types.MenuCategory{Id: uint64(e.ID), Name: e.Name}
-
-	if e.Description != nil {
-		out.Description = *e.Description
-	}
-
-	return out
+	return
 }

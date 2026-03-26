@@ -58,8 +58,8 @@ type CategorySpecMutation struct {
 	adddelete_ts      *int64
 	spec_type         *string
 	spec_value        *string
-	price_delta       *float64
-	addprice_delta    *float64
+	price_delta       *int64
+	addprice_delta    *int64
 	sort              *uint32
 	addsort           *int32
 	clearedFields     map[string]struct{}
@@ -414,13 +414,13 @@ func (m *CategorySpecMutation) ResetSpecValue() {
 }
 
 // SetPriceDelta sets the "price_delta" field.
-func (m *CategorySpecMutation) SetPriceDelta(f float64) {
-	m.price_delta = &f
+func (m *CategorySpecMutation) SetPriceDelta(i int64) {
+	m.price_delta = &i
 	m.addprice_delta = nil
 }
 
 // PriceDelta returns the value of the "price_delta" field in the mutation.
-func (m *CategorySpecMutation) PriceDelta() (r float64, exists bool) {
+func (m *CategorySpecMutation) PriceDelta() (r int64, exists bool) {
 	v := m.price_delta
 	if v == nil {
 		return
@@ -431,7 +431,7 @@ func (m *CategorySpecMutation) PriceDelta() (r float64, exists bool) {
 // OldPriceDelta returns the old "price_delta" field's value of the CategorySpec entity.
 // If the CategorySpec object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CategorySpecMutation) OldPriceDelta(ctx context.Context) (v float64, err error) {
+func (m *CategorySpecMutation) OldPriceDelta(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPriceDelta is only allowed on UpdateOne operations")
 	}
@@ -445,17 +445,17 @@ func (m *CategorySpecMutation) OldPriceDelta(ctx context.Context) (v float64, er
 	return oldValue.PriceDelta, nil
 }
 
-// AddPriceDelta adds f to the "price_delta" field.
-func (m *CategorySpecMutation) AddPriceDelta(f float64) {
+// AddPriceDelta adds i to the "price_delta" field.
+func (m *CategorySpecMutation) AddPriceDelta(i int64) {
 	if m.addprice_delta != nil {
-		*m.addprice_delta += f
+		*m.addprice_delta += i
 	} else {
-		m.addprice_delta = &f
+		m.addprice_delta = &i
 	}
 }
 
 // AddedPriceDelta returns the value that was added to the "price_delta" field in this mutation.
-func (m *CategorySpecMutation) AddedPriceDelta() (r float64, exists bool) {
+func (m *CategorySpecMutation) AddedPriceDelta() (r int64, exists bool) {
 	v := m.addprice_delta
 	if v == nil {
 		return
@@ -779,7 +779,7 @@ func (m *CategorySpecMutation) SetField(name string, value ent.Value) error {
 		m.SetSpecValue(v)
 		return nil
 	case categoryspec.FieldPriceDelta:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -840,7 +840,7 @@ func (m *CategorySpecMutation) AddField(name string, value ent.Value) error {
 		m.AddDeleteTs(v)
 		return nil
 	case categoryspec.FieldPriceDelta:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6761,8 +6761,8 @@ type SpecItemMutation struct {
 	delete_ts         *int64
 	adddelete_ts      *int64
 	name              *string
-	default_price     *float64
-	adddefault_price  *float64
+	default_price     *int64
+	adddefault_price  *int64
 	clearedFields     map[string]struct{}
 	spec_group        *uint64
 	clearedspec_group bool
@@ -7079,13 +7079,13 @@ func (m *SpecItemMutation) ResetName() {
 }
 
 // SetDefaultPrice sets the "default_price" field.
-func (m *SpecItemMutation) SetDefaultPrice(f float64) {
-	m.default_price = &f
+func (m *SpecItemMutation) SetDefaultPrice(i int64) {
+	m.default_price = &i
 	m.adddefault_price = nil
 }
 
 // DefaultPrice returns the value of the "default_price" field in the mutation.
-func (m *SpecItemMutation) DefaultPrice() (r float64, exists bool) {
+func (m *SpecItemMutation) DefaultPrice() (r int64, exists bool) {
 	v := m.default_price
 	if v == nil {
 		return
@@ -7096,7 +7096,7 @@ func (m *SpecItemMutation) DefaultPrice() (r float64, exists bool) {
 // OldDefaultPrice returns the old "default_price" field's value of the SpecItem entity.
 // If the SpecItem object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SpecItemMutation) OldDefaultPrice(ctx context.Context) (v float64, err error) {
+func (m *SpecItemMutation) OldDefaultPrice(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDefaultPrice is only allowed on UpdateOne operations")
 	}
@@ -7110,17 +7110,17 @@ func (m *SpecItemMutation) OldDefaultPrice(ctx context.Context) (v float64, err 
 	return oldValue.DefaultPrice, nil
 }
 
-// AddDefaultPrice adds f to the "default_price" field.
-func (m *SpecItemMutation) AddDefaultPrice(f float64) {
+// AddDefaultPrice adds i to the "default_price" field.
+func (m *SpecItemMutation) AddDefaultPrice(i int64) {
 	if m.adddefault_price != nil {
-		*m.adddefault_price += f
+		*m.adddefault_price += i
 	} else {
-		m.adddefault_price = &f
+		m.adddefault_price = &i
 	}
 }
 
 // AddedDefaultPrice returns the value that was added to the "default_price" field in this mutation.
-func (m *SpecItemMutation) AddedDefaultPrice() (r float64, exists bool) {
+func (m *SpecItemMutation) AddedDefaultPrice() (r int64, exists bool) {
 	v := m.adddefault_price
 	if v == nil {
 		return
@@ -7354,7 +7354,7 @@ func (m *SpecItemMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case specitem.FieldDefaultPrice:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7403,7 +7403,7 @@ func (m *SpecItemMutation) AddField(name string, value ent.Value) error {
 		m.AddDeleteTs(v)
 		return nil
 	case specitem.FieldDefaultPrice:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

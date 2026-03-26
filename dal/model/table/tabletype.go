@@ -38,7 +38,7 @@ func (tt *TableType) Create(ctx context.Context, in CreateTableCategoryInput) (*
 
 // GetByID 按 ID 获取分类。
 func (tt *TableType) GetByID(ctx context.Context, id uint64) (*ent.TableCategory, error) {
-	return tt.c.TableCategory.Get(ctx, int(id))
+	return tt.c.TableCategory.Get(ctx, id)
 }
 
 // ListTableCategoriesFilter 分类列表筛选。
@@ -72,7 +72,7 @@ func (tt *TableType) List(ctx context.Context, f ListTableCategoriesFilter) ([]*
 }
 
 // Update 更新分类。
-func (tt *TableType) Update(ctx context.Context, id int, name, description string) error {
+func (tt *TableType) Update(ctx context.Context, id uint64, name, description string) error {
 	upd := tt.c.TableCategory.UpdateOneID(id).SetName(name)
 	if description != "" {
 		upd = upd.SetDescription(description)
@@ -85,11 +85,11 @@ func (tt *TableType) Update(ctx context.Context, id int, name, description strin
 }
 
 // Delete 删除分类。
-func (tt *TableType) Delete(ctx context.Context, id int) error {
+func (tt *TableType) Delete(ctx context.Context, id uint64) error {
 	return tt.c.TableCategory.DeleteOneID(id).Exec(ctx)
 }
 
 // CountTablesByCategoryID 统计某分类下餐桌数量。
-func (tt *TableType) CountTablesByCategoryID(ctx context.Context, categoryID int) (int, error) {
+func (tt *TableType) CountTablesByCategoryID(ctx context.Context, categoryID uint64) (int, error) {
 	return tt.c.Table.Query().Where(enttable.HasCategoryWith(tablecategory.IDEQ(categoryID))).Count(ctx)
 }

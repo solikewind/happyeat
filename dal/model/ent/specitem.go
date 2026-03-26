@@ -30,7 +30,7 @@ type SpecItem struct {
 	// 规格项名
 	Name string `json:"name,omitempty"`
 	// 默认价格
-	DefaultPrice float64 `json:"default_price,omitempty"`
+	DefaultPrice int64 `json:"default_price,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SpecItemQuery when eager-loading is set.
 	Edges        SpecItemEdges `json:"edges"`
@@ -73,9 +73,7 @@ func (*SpecItem) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case specitem.FieldDefaultPrice:
-			values[i] = new(sql.NullFloat64)
-		case specitem.FieldID, specitem.FieldDeleteTs, specitem.FieldSpecGroupID:
+		case specitem.FieldID, specitem.FieldDeleteTs, specitem.FieldSpecGroupID, specitem.FieldDefaultPrice:
 			values[i] = new(sql.NullInt64)
 		case specitem.FieldName:
 			values[i] = new(sql.NullString)
@@ -133,10 +131,10 @@ func (_m *SpecItem) assignValues(columns []string, values []any) error {
 				_m.Name = value.String
 			}
 		case specitem.FieldDefaultPrice:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field default_price", values[i])
 			} else if value.Valid {
-				_m.DefaultPrice = value.Float64
+				_m.DefaultPrice = value.Int64
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

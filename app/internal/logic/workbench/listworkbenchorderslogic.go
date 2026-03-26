@@ -8,8 +8,10 @@ import (
 	"strings"
 
 	"github.com/solikewind/happyeat/app/internal/logic/order"
+	"github.com/solikewind/happyeat/app/internal/pkg/status"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/common/consts/enum"
 	orderdata "github.com/solikewind/happyeat/dal/model/order"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -49,9 +51,13 @@ func (l *ListWorkbenchOrdersLogic) ListWorkbenchOrders(req *types.ListWorkbenchO
 		Limit:  pageSize,
 	}
 	if strings.TrimSpace(req.Status) != "" {
-		filter.Status = strings.TrimSpace(req.Status)
+		filter.Status = enum.OrderStatus(strings.TrimSpace(req.Status))
 	} else {
-		filter.Statuses = workbenchDefaultStatuses
+		filter.Statuses = []enum.OrderStatus{
+			enum.OrderStatus(status.OrderStatusCreated),
+			enum.OrderStatus(status.OrderStatusPaid),
+			enum.OrderStatus(status.OrderStatusPreparing),
+		}
 	}
 
 	list, total, err := l.svcCtx.Order.List(l.ctx, filter)

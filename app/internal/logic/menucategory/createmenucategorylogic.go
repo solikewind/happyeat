@@ -5,11 +5,9 @@ package menucategory
 
 import (
 	"context"
-	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
-	menudata "github.com/solikewind/happyeat/dal/model/menu"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,18 +27,8 @@ func NewCreateMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-func (l *CreateMenuCategoryLogic) CreateMenuCategory(req *types.CreateMenuCategoryReq) (*types.CreateMenuCategoryReply, error) {
-	if req.Name == "" {
-		return nil, errors.New("分类名称不能为空")
-	}
+func (l *CreateMenuCategoryLogic) CreateMenuCategory(req *types.CreateMenuCategoryReq) (resp *types.CreateMenuCategoryReply, err error) {
+	// todo: add your logic here and delete this line
 
-	_, err := l.svcCtx.MenuType.Create(l.ctx, menudata.CreateMenuCategoryInput{
-		Name:        req.Name,
-		Description: req.Description,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.CreateMenuCategoryReply{}, nil
+	return
 }

@@ -77,7 +77,7 @@ func (_c *SpecItemCreate) SetName(v string) *SpecItemCreate {
 }
 
 // SetDefaultPrice sets the "default_price" field.
-func (_c *SpecItemCreate) SetDefaultPrice(v float64) *SpecItemCreate {
+func (_c *SpecItemCreate) SetDefaultPrice(v int64) *SpecItemCreate {
 	_c.mutation.SetDefaultPrice(v)
 	return _c
 }
@@ -243,7 +243,7 @@ func (_c *SpecItemCreate) createSpec() (*SpecItem, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := _c.mutation.DefaultPrice(); ok {
-		_spec.SetField(specitem.FieldDefaultPrice, field.TypeFloat64, value)
+		_spec.SetField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 		_node.DefaultPrice = value
 	}
 	if nodes := _c.mutation.SpecGroupIDs(); len(nodes) > 0 {

@@ -35,7 +35,7 @@ func (l *UpdateTableCategoryLogic) UpdateTableCategory(req *types.UpdateTableCat
 		return nil, errors.New("分类名称不能为空")
 	}
 
-	err = l.svcCtx.TableType.Update(l.ctx, int(req.Id), c.Name, c.Description)
+	err = l.svcCtx.TableType.Update(l.ctx, req.Id, c.Name, c.Description)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errors.New("餐桌分类不存在")

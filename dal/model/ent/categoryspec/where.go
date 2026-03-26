@@ -86,7 +86,7 @@ func SpecValue(v string) predicate.CategorySpec {
 }
 
 // PriceDelta applies equality check predicate on the "price_delta" field. It's identical to PriceDeltaEQ.
-func PriceDelta(v float64) predicate.CategorySpec {
+func PriceDelta(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldPriceDelta, v))
 }
 
@@ -366,42 +366,42 @@ func SpecValueContainsFold(v string) predicate.CategorySpec {
 }
 
 // PriceDeltaEQ applies the EQ predicate on the "price_delta" field.
-func PriceDeltaEQ(v float64) predicate.CategorySpec {
+func PriceDeltaEQ(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldPriceDelta, v))
 }
 
 // PriceDeltaNEQ applies the NEQ predicate on the "price_delta" field.
-func PriceDeltaNEQ(v float64) predicate.CategorySpec {
+func PriceDeltaNEQ(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldNEQ(FieldPriceDelta, v))
 }
 
 // PriceDeltaIn applies the In predicate on the "price_delta" field.
-func PriceDeltaIn(vs ...float64) predicate.CategorySpec {
+func PriceDeltaIn(vs ...int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldIn(FieldPriceDelta, vs...))
 }
 
 // PriceDeltaNotIn applies the NotIn predicate on the "price_delta" field.
-func PriceDeltaNotIn(vs ...float64) predicate.CategorySpec {
+func PriceDeltaNotIn(vs ...int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldNotIn(FieldPriceDelta, vs...))
 }
 
 // PriceDeltaGT applies the GT predicate on the "price_delta" field.
-func PriceDeltaGT(v float64) predicate.CategorySpec {
+func PriceDeltaGT(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldGT(FieldPriceDelta, v))
 }
 
 // PriceDeltaGTE applies the GTE predicate on the "price_delta" field.
-func PriceDeltaGTE(v float64) predicate.CategorySpec {
+func PriceDeltaGTE(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldGTE(FieldPriceDelta, v))
 }
 
 // PriceDeltaLT applies the LT predicate on the "price_delta" field.
-func PriceDeltaLT(v float64) predicate.CategorySpec {
+func PriceDeltaLT(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldLT(FieldPriceDelta, v))
 }
 
 // PriceDeltaLTE applies the LTE predicate on the "price_delta" field.
-func PriceDeltaLTE(v float64) predicate.CategorySpec {
+func PriceDeltaLTE(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldLTE(FieldPriceDelta, v))
 }
 

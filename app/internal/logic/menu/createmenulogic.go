@@ -56,7 +56,12 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 
 	specs := make([]menudata.SpecInput, 0, len(req.Specs))
 	for _, s := range req.Specs {
-		specs = append(specs, menudata.SpecInput{SpecType: s.SpecType, SpecValue: s.SpecValue, PriceDelta: s.PriceDelta})
+		specs = append(specs, menudata.SpecInput{
+			SpecItemID:     s.SpecItemId,
+			CategorySpecID: s.CategorySpecId,
+			PriceDelta:     s.PriceDelta,
+			Sort:           s.Sort,
+		})
 	}
 
 	_, err = l.svcCtx.Menu.Create(l.ctx, menudata.CreateMenuInput{
@@ -64,7 +69,7 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 		Description: req.Description,
 		Image:       req.Image,
 		Price:       req.Price,
-		CategoryID:  int(req.CategoryId),
+		CategoryID:  req.CategoryId,
 		Specs:       specs,
 	})
 	if err != nil {

@@ -30,7 +30,7 @@ func NewDeleteMenuLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 }
 
 func (l *DeleteMenuLogic) DeleteMenu(req *types.DeleteMenuReq) (*types.DeleteMenuReply, error) {
-	err := l.svcCtx.Menu.Delete(l.ctx, int(req.Id))
+	err := l.svcCtx.Menu.Delete(l.ctx, req.Id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errors.New("菜单不存在")

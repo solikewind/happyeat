@@ -201,11 +201,11 @@ func (a *MenusTechAgent) SearchMenusWithPrompt(ctx context.Context, prompt strin
 	}
 
 	resultText := fmt.Sprintf("找到 %d 个菜单：\n\n", len(items))
-	totalPrice := 0.0
+	totalPrice := int64(0)
 	for i, item := range items {
-		price := item.Menu.Price * float64(item.Quantity)
+		price := item.Menu.Price * int64(item.Quantity)
 		totalPrice += price
-		resultText += fmt.Sprintf("%d. %s × %d = ¥%.2f\n", i+1, item.Menu.Name, item.Quantity, price)
+		resultText += fmt.Sprintf("%d. %s × %d = ¥%.2f\n", i+1, item.Menu.Name, item.Quantity, float64(price)/100.0)
 		if item.Menu.Description != nil && *item.Menu.Description != "" {
 			resultText += fmt.Sprintf("   描述: %s\n", *item.Menu.Description)
 		}
@@ -214,7 +214,7 @@ func (a *MenusTechAgent) SearchMenusWithPrompt(ctx context.Context, prompt strin
 		}
 		resultText += "\n"
 	}
-	resultText += fmt.Sprintf("总计: ¥%.2f\n", totalPrice)
+	resultText += fmt.Sprintf("总计: ¥%.2f\n", float64(totalPrice)/100.0)
 
 	return resultText, nil
 }

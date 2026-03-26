@@ -24,8 +24,8 @@ func NewTable(c *ent.Client) *Table {
 type CreateTableInput struct {
 	Code       string
 	Status     string
-	Capacity   int
-	CategoryID int
+	Capacity   uint32
+	CategoryID uint64
 	QRCode     string
 }
 
@@ -50,7 +50,7 @@ func (t *Table) Create(ctx context.Context, in CreateTableInput) (*ent.Table, er
 }
 
 // GetByID 按 ID 获取餐桌（含 category）。
-func (t *Table) GetByID(ctx context.Context, id int) (*ent.Table, error) {
+func (t *Table) GetByID(ctx context.Context, id uint64) (*ent.Table, error) {
 	return t.c.Table.Query().
 		Where(enttable.IDEQ(id)).
 		WithCategory().
@@ -99,13 +99,13 @@ func (t *Table) List(ctx context.Context, f ListTablesFilter) ([]*ent.Table, int
 type UpdateTableInput struct {
 	Code       string
 	Status     string
-	Capacity   int
-	CategoryID int
+	Capacity   uint32
+	CategoryID uint64
 	QRCode     string
 }
 
 // Update 更新餐桌。
-func (t *Table) Update(ctx context.Context, id int, in UpdateTableInput) error {
+func (t *Table) Update(ctx context.Context, id uint64, in UpdateTableInput) error {
 	upd := t.c.Table.UpdateOneID(id).
 		SetCode(in.Code).
 		SetStatus(in.Status).
@@ -122,6 +122,6 @@ func (t *Table) Update(ctx context.Context, id int, in UpdateTableInput) error {
 }
 
 // Delete 删除餐桌。
-func (t *Table) Delete(ctx context.Context, id int) error {
+func (t *Table) Delete(ctx context.Context, id uint64) error {
 	return t.c.Table.DeleteOneID(id).Exec(ctx)
 }

@@ -6,7 +6,7 @@ package menucategory
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/MenuCategory"
+	"github.com/solikewind/happyeat/app/internal/logic/menucategory"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -21,7 +21,7 @@ func CreateMenuCategoryHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := MenuCategory.NewCreateMenuCategoryLogic(r.Context(), svcCtx)
+		l := menucategory.NewCreateMenuCategoryLogic(r.Context(), svcCtx)
 		resp, err := l.CreateMenuCategory(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)

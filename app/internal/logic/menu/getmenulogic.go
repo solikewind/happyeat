@@ -30,7 +30,7 @@ func NewGetMenuLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetMenuLo
 }
 
 func (l *GetMenuLogic) GetMenu(req *types.GetMenuReq) (*types.GetMenuReply, error) {
-	entMenu, err := l.svcCtx.Menu.GetByID(l.ctx, int(req.Id))
+	entMenu, err := l.svcCtx.Menu.GetByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,17 @@ func entMenuToType(e *ent.Menu) types.Menu {
 
 	specs, _ := e.Edges.MenuSpecsOrErr()
 	for _, s := range specs {
-		out.Specs = append(out.Specs, types.MenuSpec{
-			SpecType:   s.MenuSpecType,
-			SpecValue:  s.MenuSpecValue,
+		spec := types.MenuSpec{
 			PriceDelta: s.PriceDelta,
-		})
+			Sort:       s.Sort,
+		}
+		if s.SpecItemID != nil {
+			spec.SpecItemId = *s.SpecItemID
+		}
+		if s.CategorySpecID != nil {
+			spec.CategorySpecId = *s.CategorySpecID
+		}
+		out.Specs = append(out.Specs, spec)
 	}
 
 	return out

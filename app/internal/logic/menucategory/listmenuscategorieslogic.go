@@ -1,15 +1,13 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package MenuCategory
+package menucategory
 
 import (
 	"context"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
-	"github.com/solikewind/happyeat/common/util/paging"
-	menudata "github.com/solikewind/happyeat/dal/model/menu"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,27 +27,8 @@ func NewListMenusCategoriesLogic(ctx context.Context, svcCtx *svc.ServiceContext
 	}
 }
 
-func (l *ListMenusCategoriesLogic) ListMenusCategories(req *types.ListMenusCategoriesReq) (*types.ListMenusCategoriesReply, error) {
-	pageParam := paging.NewPageParam(req.Current, req.PageSize)
-	offset := pageParam.Offset()
-	pageSize := pageParam.PageSize
+func (l *ListMenusCategoriesLogic) ListMenusCategories(req *types.ListMenusCategoriesReq) (resp *types.ListMenusCategoriesReply, err error) {
+	// todo: add your logic here and delete this line
 
-	list, total, err := l.svcCtx.MenuType.List(l.ctx, menudata.ListMenuCategoriesFilter{
-		Name:   req.Name,
-		Offset: offset,
-		Limit:  pageSize,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	categories := make([]types.MenuCategory, 0, len(list))
-	for _, e := range list {
-		categories = append(categories, entCategoryToType(e))
-	}
-
-	return &types.ListMenusCategoriesReply{
-		Categories: categories,
-		Total:      total,
-	}, nil
+	return
 }

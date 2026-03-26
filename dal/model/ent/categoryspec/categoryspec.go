@@ -97,7 +97,7 @@ var (
 	// SpecValueValidator is a validator for the "spec_value" field. It is called by the builders before save.
 	SpecValueValidator func(string) error
 	// DefaultPriceDelta holds the default value on creation for the "price_delta" field.
-	DefaultPriceDelta float64
+	DefaultPriceDelta int64
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort uint32
 )

@@ -1,12 +1,12 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package MenuCategory
+package menucategory
 
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/MenuCategory"
+	"github.com/solikewind/happyeat/app/internal/logic/menucategory"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -21,7 +21,7 @@ func DeleteMenuCategoryHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := MenuCategory.NewDeleteMenuCategoryLogic(r.Context(), svcCtx)
+		l := menucategory.NewDeleteMenuCategoryLogic(r.Context(), svcCtx)
 		resp, err := l.DeleteMenuCategory(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)

@@ -48,15 +48,20 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 
 	specs := make([]menudata.SpecInput, 0, len(req.Specs))
 	for _, s := range req.Specs {
-		specs = append(specs, menudata.SpecInput{SpecType: s.SpecType, SpecValue: s.SpecValue, PriceDelta: s.PriceDelta})
+		specs = append(specs, menudata.SpecInput{
+			SpecItemID:     s.SpecItemId,
+			CategorySpecID: s.CategorySpecId,
+			PriceDelta:     s.PriceDelta,
+			Sort:           s.Sort,
+		})
 	}
 
-	err = l.svcCtx.Menu.Update(l.ctx, int(req.Id), menudata.UpdateMenuInput{
+	err = l.svcCtx.Menu.Update(l.ctx, req.Id, menudata.UpdateMenuInput{
 		Name:        req.Name,
 		Description: req.Description,
 		Image:       req.Image,
 		Price:       req.Price,
-		CategoryID:  int(req.CategoryId),
+		CategoryID:  req.CategoryId,
 		Specs:       specs,
 	})
 	if err != nil {

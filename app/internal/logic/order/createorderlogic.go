@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	orderdata "github.com/solikewind/happyeat/dal/model/order"
@@ -42,22 +43,22 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		items = append(items, orderdata.ItemInput{
 			MenuName:  it.MenuName,
 			Quantity:  it.Quantity,
-			UnitPrice: float64(it.UnitPrice),
+			UnitPrice: it.UnitPrice,
 			SpecInfo:  it.SpecInfo,
 		})
 	}
 
-	var tableID *int
+	var tableID *uint64
 	if req.TableId > 0 {
-		tid := int(req.TableId)
+		tid := req.TableId
 		tableID = &tid
 	}
 
 	entOrder, err := l.svcCtx.Order.Create(l.ctx, orderdata.CreateOrderInput{
-		OrderType:   req.OrderType,
+		OrderType:   enum.OrderType(req.OrderType),
 		TableID:     tableID,
 		Items:       items,
-		TotalAmount: float64(req.TotalAmount),
+		TotalAmount: req.TotalAmount,	
 		Remark:      req.Remark,
 	})
 	if err != nil {

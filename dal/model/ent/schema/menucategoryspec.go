@@ -39,7 +39,7 @@ func (CategorySpec) Fields() []ent.Field {
 		field.String("spec_value").
 			MaxLen(64).
 			Comment("规格选项，如微辣、大杯"),
-		field.Float("price_delta").
+		field.Int64("price_delta").
 			Default(0).
 			Comment("加价"),
 		field.Uint32("sort").
