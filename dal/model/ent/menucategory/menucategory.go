@@ -37,14 +37,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "menu" package.
 	MenusInverseTable = "menus"
 	// MenusColumn is the table column denoting the menus relation/edge.
-	MenusColumn = "menu_category_menus"
+	MenusColumn = "menu_category_id"
 	// CategorySpecsTable is the table that holds the category_specs relation/edge.
 	CategorySpecsTable = "category_specs"
 	// CategorySpecsInverseTable is the table name for the CategorySpec entity.
 	// It exists in this package in order to avoid circular dependency with the "categoryspec" package.
 	CategorySpecsInverseTable = "category_specs"
 	// CategorySpecsColumn is the table column denoting the category_specs relation/edge.
-	CategorySpecsColumn = "menu_category_category_specs"
+	CategorySpecsColumn = "menu_category_id"
 )
 
 // Columns holds all SQL columns for menucategory fields.

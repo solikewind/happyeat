@@ -457,7 +457,9 @@ func (_q *MenuCategoryQuery) loadMenus(ctx context.Context, query *MenuQuery, no
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(menu.FieldMenuCategoryID)
+	}
 	query.Where(predicate.Menu(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(menucategory.MenusColumn), fks...))
 	}))
@@ -466,13 +468,10 @@ func (_q *MenuCategoryQuery) loadMenus(ctx context.Context, query *MenuQuery, no
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.menu_category_menus
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "menu_category_menus" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.MenuCategoryID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "menu_category_menus" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "menu_category_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -488,7 +487,9 @@ func (_q *MenuCategoryQuery) loadCategorySpecs(ctx context.Context, query *Categ
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(categoryspec.FieldMenuCategoryID)
+	}
 	query.Where(predicate.CategorySpec(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(menucategory.CategorySpecsColumn), fks...))
 	}))
@@ -497,13 +498,10 @@ func (_q *MenuCategoryQuery) loadCategorySpecs(ctx context.Context, query *Categ
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.menu_category_category_specs
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "menu_category_category_specs" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.MenuCategoryID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "menu_category_category_specs" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "menu_category_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

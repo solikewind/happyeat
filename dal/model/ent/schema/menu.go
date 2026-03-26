@@ -31,7 +31,7 @@ func (Menu) Annotations() []schema.Annotation {
 
 func (Menu) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("menu_category_id").
+		field.Uint64("menu_category_id").
 			Comment("菜单分类ID"),
 		field.String("name").
 			MaxLen(128).
@@ -45,7 +45,7 @@ func (Menu) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("图片URL"),
-		field.Float("price").
+		field.Int64("price").
 			Comment("价格"),
 	}
 }
@@ -58,6 +58,7 @@ func (Menu) Edges() []ent.Edge {
 			Unique().
 			Required(),
 		edge.To("menu_specs", MenuSpec.Type),
-		edge.To("order_items", OrderItem.Type).Comment("被订单项引用，可选"),
+		edge.To("order_items", OrderItem.Type).
+			Comment("被订单项引用，可选"),
 	}
 }

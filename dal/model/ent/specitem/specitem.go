@@ -28,17 +28,17 @@ const (
 	// FieldDefaultPrice holds the string denoting the default_price field in the database.
 	FieldDefaultPrice = "default_price"
 	// EdgeSpecGroup holds the string denoting the spec_group edge name in mutations.
-	EdgeSpecGroup = "Spec_group"
+	EdgeSpecGroup = "spec_group"
 	// EdgeMenuSpecs holds the string denoting the menu_specs edge name in mutations.
 	EdgeMenuSpecs = "menu_specs"
 	// Table holds the table name of the specitem in the database.
 	Table = "spec_items"
-	// SpecGroupTable is the table that holds the Spec_group relation/edge.
+	// SpecGroupTable is the table that holds the spec_group relation/edge.
 	SpecGroupTable = "spec_items"
 	// SpecGroupInverseTable is the table name for the SpecGroup entity.
 	// It exists in this package in order to avoid circular dependency with the "specgroup" package.
-	SpecGroupInverseTable = "spec_group"
-	// SpecGroupColumn is the table column denoting the Spec_group relation/edge.
+	SpecGroupInverseTable = "spec_groups"
+	// SpecGroupColumn is the table column denoting the spec_group relation/edge.
 	SpecGroupColumn = "spec_group_id"
 	// MenuSpecsTable is the table that holds the menu_specs relation/edge.
 	MenuSpecsTable = "menu_specs"
@@ -128,7 +128,7 @@ func ByDefaultPrice(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDefaultPrice, opts...).ToFunc()
 }
 
-// BySpecGroupField orders the results by Spec_group field.
+// BySpecGroupField orders the results by spec_group field.
 func BySpecGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newSpecGroupStep(), sql.OrderByField(field, opts...))
@@ -159,6 +159,6 @@ func newMenuSpecsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MenuSpecsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, MenuSpecsTable, MenuSpecsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, MenuSpecsTable, MenuSpecsColumn),
 	)
 }

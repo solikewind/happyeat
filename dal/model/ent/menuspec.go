@@ -34,9 +34,9 @@ type MenuSpec struct {
 	// 菜单种类下的规格项ID
 	CategorySpecID *uint64 `json:"category_spec_id,omitempty"`
 	// 特殊加价
-	PriceDelta float64 `json:"price_delta,omitempty"`
+	PriceDelta int64 `json:"price_delta,omitempty"`
 	// 顺序
-	Sort int `json:"sort,omitempty"`
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuSpecQuery when eager-loading is set.
 	Edges        MenuSpecEdges `json:"edges"`
@@ -94,9 +94,7 @@ func (*MenuSpec) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case menuspec.FieldPriceDelta:
-			values[i] = new(sql.NullFloat64)
-		case menuspec.FieldID, menuspec.FieldDeleteTs, menuspec.FieldMenuID, menuspec.FieldSpecItemID, menuspec.FieldCategorySpecID, menuspec.FieldSort:
+		case menuspec.FieldID, menuspec.FieldDeleteTs, menuspec.FieldMenuID, menuspec.FieldSpecItemID, menuspec.FieldCategorySpecID, menuspec.FieldPriceDelta, menuspec.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case menuspec.FieldCreatedAt, menuspec.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -160,16 +158,16 @@ func (_m *MenuSpec) assignValues(columns []string, values []any) error {
 				*_m.CategorySpecID = uint64(value.Int64)
 			}
 		case menuspec.FieldPriceDelta:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field price_delta", values[i])
 			} else if value.Valid {
-				_m.PriceDelta = value.Float64
+				_m.PriceDelta = value.Int64
 			}
 		case menuspec.FieldSort:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = int(value.Int64)
+				_m.Sort = uint32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

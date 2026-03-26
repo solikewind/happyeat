@@ -27,7 +27,6 @@ type TableQuery struct {
 	predicates   []predicate.Table
 	withCategory *TableCategoryQuery
 	withOrders   *OrderQuery
-	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -407,19 +406,12 @@ func (_q *TableQuery) prepareQuery(ctx context.Context) error {
 func (_q *TableQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Table, error) {
 	var (
 		nodes       = []*Table{}
-		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
 			_q.withCategory != nil,
 			_q.withOrders != nil,
 		}
 	)
-	if _q.withCategory != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, table.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Table).scanValues(nil, columns)
 	}
@@ -458,10 +450,7 @@ func (_q *TableQuery) loadCategory(ctx context.Context, query *TableCategoryQuer
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*Table)
 	for i := range nodes {
-		if nodes[i].table_category_tables == nil {
-			continue
-		}
-		fk := *nodes[i].table_category_tables
+		fk := nodes[i].TableCategoryID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -478,7 +467,7 @@ func (_q *TableQuery) loadCategory(ctx context.Context, query *TableCategoryQuer
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "table_category_tables" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "table_category_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -496,7 +485,9 @@ func (_q *TableQuery) loadOrders(ctx context.Context, query *OrderQuery, nodes [
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(order.FieldTableID)
+	}
 	query.Where(predicate.Order(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(table.OrdersColumn), fks...))
 	}))
@@ -505,13 +496,13 @@ func (_q *TableQuery) loadOrders(ctx context.Context, query *OrderQuery, nodes [
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.table_orders
+		fk := n.TableID
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "table_orders" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "table_id" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "table_orders" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "table_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -542,6 +533,9 @@ func (_q *TableQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != table.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withCategory != nil {
+			_spec.Node.AddColumnOnce(table.FieldTableCategoryID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

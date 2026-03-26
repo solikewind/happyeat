@@ -944,7 +944,7 @@ func (c *MenuSpecClient) QuerySpecItem(_m *MenuSpec) *SpecItemQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(menuspec.Table, menuspec.FieldID, id),
 			sqlgraph.To(specitem.Table, specitem.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, menuspec.SpecItemTable, menuspec.SpecItemColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, menuspec.SpecItemTable, menuspec.SpecItemColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -1572,7 +1572,7 @@ func (c *SpecItemClient) GetX(ctx context.Context, id uint64) *SpecItem {
 	return obj
 }
 
-// QuerySpecGroup queries the Spec_group edge of a SpecItem.
+// QuerySpecGroup queries the spec_group edge of a SpecItem.
 func (c *SpecItemClient) QuerySpecGroup(_m *SpecItem) *SpecGroupQuery {
 	query := (&SpecGroupClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
@@ -1596,7 +1596,7 @@ func (c *SpecItemClient) QueryMenuSpecs(_m *SpecItem) *MenuSpecQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(specitem.Table, specitem.FieldID, id),
 			sqlgraph.To(menuspec.Table, menuspec.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, specitem.MenuSpecsTable, specitem.MenuSpecsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, specitem.MenuSpecsTable, specitem.MenuSpecsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil

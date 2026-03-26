@@ -14,6 +14,7 @@ type ListTablesReq {
 	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
 	Code     string `json:"code,optional" form:"code,optional"`
 	Status   string `json:"status,optional" form:"status,optional"`
+	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"` // 按分类id筛选
 	Category string `json:"category,optional" form:"category,optional"` // 按分类名字筛选
 }
 type ListTablesReply {
@@ -31,24 +32,19 @@ type GetTableReply {
 type CreateTableReq {
 	Code       string `json:"code"`
 	Status     string `json:"status"`
-	Capacity   int    `json:"capacity"`
+	Capacity   uint32    `json:"capacity,optional"`
 	CategoryId uint64 `json:"category_id"`
 	QrCode     string `json:"qr_code,optional"`
 }
 type CreateTableReply {}
 
-// 更新餐桌仅允许可编辑字段，create_at/update_at 由服务端维护
-type UpdateTableInput {
-	Code       string `json:"code"`
-	Status     string `json:"status"`
-	Capacity   int    `json:"capacity"`
-	CategoryId uint64 `json:"category_id"`
-	QrCode     string `json:"qr_code,optional"`
-}
-
 type UpdateTableReq {
 	Id    uint64           `path:"id"`
-	Table UpdateTableInput `json:"table"`
+	Code       string `json:"code"`
+	Status     string `json:"status"`
+	Capacity   uint32    `json:"capacity,optional"`
+	CategoryId uint64 `json:"category_id"`
+	QrCode     string `json:"qr_code,optional"`
 }
 type UpdateTableReply {}
 
@@ -58,8 +54,7 @@ type DeleteTableReq {
 type DeleteTableReply {}
 
 type ListTableCategoriesReq {
-	Current  int64 `json:"current,optional" form:"current,optional"`
-	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
+	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
 }
 type ListTableCategoriesReply {

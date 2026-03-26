@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
 )
 
@@ -70,23 +71,18 @@ func DeleteTs(v int64) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldDeleteTs, v))
 }
 
+// TableID applies equality check predicate on the "table_id" field. It's identical to TableIDEQ.
+func TableID(v uint64) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldTableID, v))
+}
+
 // OrderNo applies equality check predicate on the "order_no" field. It's identical to OrderNoEQ.
 func OrderNo(v string) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldOrderNo, v))
 }
 
-// OrderType applies equality check predicate on the "order_type" field. It's identical to OrderTypeEQ.
-func OrderType(v string) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldOrderType, v))
-}
-
-// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v string) predicate.Order {
-	return predicate.Order(sql.FieldEQ(FieldStatus, v))
-}
-
 // TotalAmount applies equality check predicate on the "total_amount" field. It's identical to TotalAmountEQ.
-func TotalAmount(v float64) predicate.Order {
+func TotalAmount(v int64) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldTotalAmount, v))
 }
 
@@ -215,6 +211,36 @@ func DeleteTsLTE(v int64) predicate.Order {
 	return predicate.Order(sql.FieldLTE(FieldDeleteTs, v))
 }
 
+// TableIDEQ applies the EQ predicate on the "table_id" field.
+func TableIDEQ(v uint64) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldTableID, v))
+}
+
+// TableIDNEQ applies the NEQ predicate on the "table_id" field.
+func TableIDNEQ(v uint64) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldTableID, v))
+}
+
+// TableIDIn applies the In predicate on the "table_id" field.
+func TableIDIn(vs ...uint64) predicate.Order {
+	return predicate.Order(sql.FieldIn(FieldTableID, vs...))
+}
+
+// TableIDNotIn applies the NotIn predicate on the "table_id" field.
+func TableIDNotIn(vs ...uint64) predicate.Order {
+	return predicate.Order(sql.FieldNotIn(FieldTableID, vs...))
+}
+
+// TableIDIsNil applies the IsNil predicate on the "table_id" field.
+func TableIDIsNil() predicate.Order {
+	return predicate.Order(sql.FieldIsNull(FieldTableID))
+}
+
+// TableIDNotNil applies the NotNil predicate on the "table_id" field.
+func TableIDNotNil() predicate.Order {
+	return predicate.Order(sql.FieldNotNull(FieldTableID))
+}
+
 // OrderNoEQ applies the EQ predicate on the "order_no" field.
 func OrderNoEQ(v string) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldOrderNo, v))
@@ -281,172 +307,82 @@ func OrderNoContainsFold(v string) predicate.Order {
 }
 
 // OrderTypeEQ applies the EQ predicate on the "order_type" field.
-func OrderTypeEQ(v string) predicate.Order {
+func OrderTypeEQ(v enum.OrderType) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldOrderType, v))
 }
 
 // OrderTypeNEQ applies the NEQ predicate on the "order_type" field.
-func OrderTypeNEQ(v string) predicate.Order {
+func OrderTypeNEQ(v enum.OrderType) predicate.Order {
 	return predicate.Order(sql.FieldNEQ(FieldOrderType, v))
 }
 
 // OrderTypeIn applies the In predicate on the "order_type" field.
-func OrderTypeIn(vs ...string) predicate.Order {
+func OrderTypeIn(vs ...enum.OrderType) predicate.Order {
 	return predicate.Order(sql.FieldIn(FieldOrderType, vs...))
 }
 
 // OrderTypeNotIn applies the NotIn predicate on the "order_type" field.
-func OrderTypeNotIn(vs ...string) predicate.Order {
+func OrderTypeNotIn(vs ...enum.OrderType) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldOrderType, vs...))
 }
 
-// OrderTypeGT applies the GT predicate on the "order_type" field.
-func OrderTypeGT(v string) predicate.Order {
-	return predicate.Order(sql.FieldGT(FieldOrderType, v))
-}
-
-// OrderTypeGTE applies the GTE predicate on the "order_type" field.
-func OrderTypeGTE(v string) predicate.Order {
-	return predicate.Order(sql.FieldGTE(FieldOrderType, v))
-}
-
-// OrderTypeLT applies the LT predicate on the "order_type" field.
-func OrderTypeLT(v string) predicate.Order {
-	return predicate.Order(sql.FieldLT(FieldOrderType, v))
-}
-
-// OrderTypeLTE applies the LTE predicate on the "order_type" field.
-func OrderTypeLTE(v string) predicate.Order {
-	return predicate.Order(sql.FieldLTE(FieldOrderType, v))
-}
-
-// OrderTypeContains applies the Contains predicate on the "order_type" field.
-func OrderTypeContains(v string) predicate.Order {
-	return predicate.Order(sql.FieldContains(FieldOrderType, v))
-}
-
-// OrderTypeHasPrefix applies the HasPrefix predicate on the "order_type" field.
-func OrderTypeHasPrefix(v string) predicate.Order {
-	return predicate.Order(sql.FieldHasPrefix(FieldOrderType, v))
-}
-
-// OrderTypeHasSuffix applies the HasSuffix predicate on the "order_type" field.
-func OrderTypeHasSuffix(v string) predicate.Order {
-	return predicate.Order(sql.FieldHasSuffix(FieldOrderType, v))
-}
-
-// OrderTypeEqualFold applies the EqualFold predicate on the "order_type" field.
-func OrderTypeEqualFold(v string) predicate.Order {
-	return predicate.Order(sql.FieldEqualFold(FieldOrderType, v))
-}
-
-// OrderTypeContainsFold applies the ContainsFold predicate on the "order_type" field.
-func OrderTypeContainsFold(v string) predicate.Order {
-	return predicate.Order(sql.FieldContainsFold(FieldOrderType, v))
-}
-
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v string) predicate.Order {
+func StatusEQ(v enum.OrderStatus) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v string) predicate.Order {
+func StatusNEQ(v enum.OrderStatus) predicate.Order {
 	return predicate.Order(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...string) predicate.Order {
+func StatusIn(vs ...enum.OrderStatus) predicate.Order {
 	return predicate.Order(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...string) predicate.Order {
+func StatusNotIn(vs ...enum.OrderStatus) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldStatus, vs...))
 }
 
-// StatusGT applies the GT predicate on the "status" field.
-func StatusGT(v string) predicate.Order {
-	return predicate.Order(sql.FieldGT(FieldStatus, v))
-}
-
-// StatusGTE applies the GTE predicate on the "status" field.
-func StatusGTE(v string) predicate.Order {
-	return predicate.Order(sql.FieldGTE(FieldStatus, v))
-}
-
-// StatusLT applies the LT predicate on the "status" field.
-func StatusLT(v string) predicate.Order {
-	return predicate.Order(sql.FieldLT(FieldStatus, v))
-}
-
-// StatusLTE applies the LTE predicate on the "status" field.
-func StatusLTE(v string) predicate.Order {
-	return predicate.Order(sql.FieldLTE(FieldStatus, v))
-}
-
-// StatusContains applies the Contains predicate on the "status" field.
-func StatusContains(v string) predicate.Order {
-	return predicate.Order(sql.FieldContains(FieldStatus, v))
-}
-
-// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
-func StatusHasPrefix(v string) predicate.Order {
-	return predicate.Order(sql.FieldHasPrefix(FieldStatus, v))
-}
-
-// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
-func StatusHasSuffix(v string) predicate.Order {
-	return predicate.Order(sql.FieldHasSuffix(FieldStatus, v))
-}
-
-// StatusEqualFold applies the EqualFold predicate on the "status" field.
-func StatusEqualFold(v string) predicate.Order {
-	return predicate.Order(sql.FieldEqualFold(FieldStatus, v))
-}
-
-// StatusContainsFold applies the ContainsFold predicate on the "status" field.
-func StatusContainsFold(v string) predicate.Order {
-	return predicate.Order(sql.FieldContainsFold(FieldStatus, v))
-}
-
 // TotalAmountEQ applies the EQ predicate on the "total_amount" field.
-func TotalAmountEQ(v float64) predicate.Order {
+func TotalAmountEQ(v int64) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldTotalAmount, v))
 }
 
 // TotalAmountNEQ applies the NEQ predicate on the "total_amount" field.
-func TotalAmountNEQ(v float64) predicate.Order {
+func TotalAmountNEQ(v int64) predicate.Order {
 	return predicate.Order(sql.FieldNEQ(FieldTotalAmount, v))
 }
 
 // TotalAmountIn applies the In predicate on the "total_amount" field.
-func TotalAmountIn(vs ...float64) predicate.Order {
+func TotalAmountIn(vs ...int64) predicate.Order {
 	return predicate.Order(sql.FieldIn(FieldTotalAmount, vs...))
 }
 
 // TotalAmountNotIn applies the NotIn predicate on the "total_amount" field.
-func TotalAmountNotIn(vs ...float64) predicate.Order {
+func TotalAmountNotIn(vs ...int64) predicate.Order {
 	return predicate.Order(sql.FieldNotIn(FieldTotalAmount, vs...))
 }
 
 // TotalAmountGT applies the GT predicate on the "total_amount" field.
-func TotalAmountGT(v float64) predicate.Order {
+func TotalAmountGT(v int64) predicate.Order {
 	return predicate.Order(sql.FieldGT(FieldTotalAmount, v))
 }
 
 // TotalAmountGTE applies the GTE predicate on the "total_amount" field.
-func TotalAmountGTE(v float64) predicate.Order {
+func TotalAmountGTE(v int64) predicate.Order {
 	return predicate.Order(sql.FieldGTE(FieldTotalAmount, v))
 }
 
 // TotalAmountLT applies the LT predicate on the "total_amount" field.
-func TotalAmountLT(v float64) predicate.Order {
+func TotalAmountLT(v int64) predicate.Order {
 	return predicate.Order(sql.FieldLT(FieldTotalAmount, v))
 }
 
 // TotalAmountLTE applies the LTE predicate on the "total_amount" field.
-func TotalAmountLTE(v float64) predicate.Order {
+func TotalAmountLTE(v int64) predicate.Order {
 	return predicate.Order(sql.FieldLTE(FieldTotalAmount, v))
 }
 

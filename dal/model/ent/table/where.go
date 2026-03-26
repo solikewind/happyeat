@@ -70,6 +70,11 @@ func DeleteTs(v int64) predicate.Table {
 	return predicate.Table(sql.FieldEQ(FieldDeleteTs, v))
 }
 
+// TableCategoryID applies equality check predicate on the "table_category_id" field. It's identical to TableCategoryIDEQ.
+func TableCategoryID(v uint64) predicate.Table {
+	return predicate.Table(sql.FieldEQ(FieldTableCategoryID, v))
+}
+
 // Code applies equality check predicate on the "code" field. It's identical to CodeEQ.
 func Code(v string) predicate.Table {
 	return predicate.Table(sql.FieldEQ(FieldCode, v))
@@ -81,7 +86,7 @@ func Status(v string) predicate.Table {
 }
 
 // Capacity applies equality check predicate on the "capacity" field. It's identical to CapacityEQ.
-func Capacity(v int) predicate.Table {
+func Capacity(v uint32) predicate.Table {
 	return predicate.Table(sql.FieldEQ(FieldCapacity, v))
 }
 
@@ -208,6 +213,26 @@ func DeleteTsLT(v int64) predicate.Table {
 // DeleteTsLTE applies the LTE predicate on the "delete_ts" field.
 func DeleteTsLTE(v int64) predicate.Table {
 	return predicate.Table(sql.FieldLTE(FieldDeleteTs, v))
+}
+
+// TableCategoryIDEQ applies the EQ predicate on the "table_category_id" field.
+func TableCategoryIDEQ(v uint64) predicate.Table {
+	return predicate.Table(sql.FieldEQ(FieldTableCategoryID, v))
+}
+
+// TableCategoryIDNEQ applies the NEQ predicate on the "table_category_id" field.
+func TableCategoryIDNEQ(v uint64) predicate.Table {
+	return predicate.Table(sql.FieldNEQ(FieldTableCategoryID, v))
+}
+
+// TableCategoryIDIn applies the In predicate on the "table_category_id" field.
+func TableCategoryIDIn(vs ...uint64) predicate.Table {
+	return predicate.Table(sql.FieldIn(FieldTableCategoryID, vs...))
+}
+
+// TableCategoryIDNotIn applies the NotIn predicate on the "table_category_id" field.
+func TableCategoryIDNotIn(vs ...uint64) predicate.Table {
+	return predicate.Table(sql.FieldNotIn(FieldTableCategoryID, vs...))
 }
 
 // CodeEQ applies the EQ predicate on the "code" field.
@@ -341,42 +366,42 @@ func StatusContainsFold(v string) predicate.Table {
 }
 
 // CapacityEQ applies the EQ predicate on the "capacity" field.
-func CapacityEQ(v int) predicate.Table {
+func CapacityEQ(v uint32) predicate.Table {
 	return predicate.Table(sql.FieldEQ(FieldCapacity, v))
 }
 
 // CapacityNEQ applies the NEQ predicate on the "capacity" field.
-func CapacityNEQ(v int) predicate.Table {
+func CapacityNEQ(v uint32) predicate.Table {
 	return predicate.Table(sql.FieldNEQ(FieldCapacity, v))
 }
 
 // CapacityIn applies the In predicate on the "capacity" field.
-func CapacityIn(vs ...int) predicate.Table {
+func CapacityIn(vs ...uint32) predicate.Table {
 	return predicate.Table(sql.FieldIn(FieldCapacity, vs...))
 }
 
 // CapacityNotIn applies the NotIn predicate on the "capacity" field.
-func CapacityNotIn(vs ...int) predicate.Table {
+func CapacityNotIn(vs ...uint32) predicate.Table {
 	return predicate.Table(sql.FieldNotIn(FieldCapacity, vs...))
 }
 
 // CapacityGT applies the GT predicate on the "capacity" field.
-func CapacityGT(v int) predicate.Table {
+func CapacityGT(v uint32) predicate.Table {
 	return predicate.Table(sql.FieldGT(FieldCapacity, v))
 }
 
 // CapacityGTE applies the GTE predicate on the "capacity" field.
-func CapacityGTE(v int) predicate.Table {
+func CapacityGTE(v uint32) predicate.Table {
 	return predicate.Table(sql.FieldGTE(FieldCapacity, v))
 }
 
 // CapacityLT applies the LT predicate on the "capacity" field.
-func CapacityLT(v int) predicate.Table {
+func CapacityLT(v uint32) predicate.Table {
 	return predicate.Table(sql.FieldLT(FieldCapacity, v))
 }
 
 // CapacityLTE applies the LTE predicate on the "capacity" field.
-func CapacityLTE(v int) predicate.Table {
+func CapacityLTE(v uint32) predicate.Table {
 	return predicate.Table(sql.FieldLTE(FieldCapacity, v))
 }
 

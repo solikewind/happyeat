@@ -50,21 +50,21 @@ func init() {
 	// categoryspec.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	categoryspec.DefaultDeleteTs = categoryspecDescDeleteTs.Default.(int64)
 	// categoryspecDescSpecType is the schema descriptor for spec_type field.
-	categoryspecDescSpecType := categoryspecFields[0].Descriptor()
+	categoryspecDescSpecType := categoryspecFields[1].Descriptor()
 	// categoryspec.SpecTypeValidator is a validator for the "spec_type" field. It is called by the builders before save.
 	categoryspec.SpecTypeValidator = categoryspecDescSpecType.Validators[0].(func(string) error)
 	// categoryspecDescSpecValue is the schema descriptor for spec_value field.
-	categoryspecDescSpecValue := categoryspecFields[1].Descriptor()
+	categoryspecDescSpecValue := categoryspecFields[2].Descriptor()
 	// categoryspec.SpecValueValidator is a validator for the "spec_value" field. It is called by the builders before save.
 	categoryspec.SpecValueValidator = categoryspecDescSpecValue.Validators[0].(func(string) error)
 	// categoryspecDescPriceDelta is the schema descriptor for price_delta field.
-	categoryspecDescPriceDelta := categoryspecFields[2].Descriptor()
+	categoryspecDescPriceDelta := categoryspecFields[3].Descriptor()
 	// categoryspec.DefaultPriceDelta holds the default value on creation for the price_delta field.
 	categoryspec.DefaultPriceDelta = categoryspecDescPriceDelta.Default.(float64)
 	// categoryspecDescSort is the schema descriptor for sort field.
-	categoryspecDescSort := categoryspecFields[3].Descriptor()
+	categoryspecDescSort := categoryspecFields[4].Descriptor()
 	// categoryspec.DefaultSort holds the default value on creation for the sort field.
-	categoryspec.DefaultSort = categoryspecDescSort.Default.(int)
+	categoryspec.DefaultSort = categoryspecDescSort.Default.(uint32)
 	menuMixin := schema.Menu{}.Mixin()
 	menuMixinHooks0 := menuMixin[0].Hooks()
 	menuMixinHooks2 := menuMixin[2].Hooks()
@@ -93,11 +93,11 @@ func init() {
 	// menu.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	menu.DefaultDeleteTs = menuDescDeleteTs.Default.(int64)
 	// menuDescName is the schema descriptor for name field.
-	menuDescName := menuFields[0].Descriptor()
+	menuDescName := menuFields[1].Descriptor()
 	// menu.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	menu.NameValidator = menuDescName.Validators[0].(func(string) error)
 	// menuDescImage is the schema descriptor for image field.
-	menuDescImage := menuFields[2].Descriptor()
+	menuDescImage := menuFields[3].Descriptor()
 	// menu.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	menu.ImageValidator = menuDescImage.Validators[0].(func(string) error)
 	menucategoryMixin := schema.MenuCategory{}.Mixin()
@@ -161,11 +161,11 @@ func init() {
 	// menuspecDescPriceDelta is the schema descriptor for price_delta field.
 	menuspecDescPriceDelta := menuspecFields[3].Descriptor()
 	// menuspec.DefaultPriceDelta holds the default value on creation for the price_delta field.
-	menuspec.DefaultPriceDelta = menuspecDescPriceDelta.Default.(float64)
+	menuspec.DefaultPriceDelta = menuspecDescPriceDelta.Default.(int64)
 	// menuspecDescSort is the schema descriptor for sort field.
 	menuspecDescSort := menuspecFields[4].Descriptor()
 	// menuspec.DefaultSort holds the default value on creation for the sort field.
-	menuspec.DefaultSort = menuspecDescSort.Default.(int)
+	menuspec.DefaultSort = menuspecDescSort.Default.(uint32)
 	orderMixin := schema.Order{}.Mixin()
 	orderMixinHooks0 := orderMixin[0].Hooks()
 	orderMixinHooks2 := orderMixin[2].Hooks()
@@ -194,27 +194,15 @@ func init() {
 	// order.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	order.DefaultDeleteTs = orderDescDeleteTs.Default.(int64)
 	// orderDescOrderNo is the schema descriptor for order_no field.
-	orderDescOrderNo := orderFields[0].Descriptor()
+	orderDescOrderNo := orderFields[1].Descriptor()
 	// order.OrderNoValidator is a validator for the "order_no" field. It is called by the builders before save.
 	order.OrderNoValidator = orderDescOrderNo.Validators[0].(func(string) error)
-	// orderDescOrderType is the schema descriptor for order_type field.
-	orderDescOrderType := orderFields[1].Descriptor()
-	// order.DefaultOrderType holds the default value on creation for the order_type field.
-	order.DefaultOrderType = orderDescOrderType.Default.(string)
-	// order.OrderTypeValidator is a validator for the "order_type" field. It is called by the builders before save.
-	order.OrderTypeValidator = orderDescOrderType.Validators[0].(func(string) error)
-	// orderDescStatus is the schema descriptor for status field.
-	orderDescStatus := orderFields[2].Descriptor()
-	// order.DefaultStatus holds the default value on creation for the status field.
-	order.DefaultStatus = orderDescStatus.Default.(string)
-	// order.StatusValidator is a validator for the "status" field. It is called by the builders before save.
-	order.StatusValidator = orderDescStatus.Validators[0].(func(string) error)
 	// orderDescTotalAmount is the schema descriptor for total_amount field.
-	orderDescTotalAmount := orderFields[3].Descriptor()
+	orderDescTotalAmount := orderFields[4].Descriptor()
 	// order.DefaultTotalAmount holds the default value on creation for the total_amount field.
-	order.DefaultTotalAmount = orderDescTotalAmount.Default.(float64)
+	order.DefaultTotalAmount = orderDescTotalAmount.Default.(int64)
 	// orderDescRemark is the schema descriptor for remark field.
-	orderDescRemark := orderFields[4].Descriptor()
+	orderDescRemark := orderFields[5].Descriptor()
 	// order.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
 	order.RemarkValidator = orderDescRemark.Validators[0].(func(string) error)
 	orderitemMixin := schema.OrderItem{}.Mixin()
@@ -245,21 +233,21 @@ func init() {
 	// orderitem.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	orderitem.DefaultDeleteTs = orderitemDescDeleteTs.Default.(int64)
 	// orderitemDescMenuName is the schema descriptor for menu_name field.
-	orderitemDescMenuName := orderitemFields[0].Descriptor()
+	orderitemDescMenuName := orderitemFields[2].Descriptor()
 	// orderitem.MenuNameValidator is a validator for the "menu_name" field. It is called by the builders before save.
 	orderitem.MenuNameValidator = orderitemDescMenuName.Validators[0].(func(string) error)
 	// orderitemDescQuantity is the schema descriptor for quantity field.
-	orderitemDescQuantity := orderitemFields[1].Descriptor()
+	orderitemDescQuantity := orderitemFields[3].Descriptor()
 	// orderitem.DefaultQuantity holds the default value on creation for the quantity field.
 	orderitem.DefaultQuantity = orderitemDescQuantity.Default.(int)
 	// orderitemDescSpecInfo is the schema descriptor for spec_info field.
-	orderitemDescSpecInfo := orderitemFields[4].Descriptor()
+	orderitemDescSpecInfo := orderitemFields[6].Descriptor()
 	// orderitem.SpecInfoValidator is a validator for the "spec_info" field. It is called by the builders before save.
 	orderitem.SpecInfoValidator = orderitemDescSpecInfo.Validators[0].(func(string) error)
 	// orderitemDescSort is the schema descriptor for sort field.
-	orderitemDescSort := orderitemFields[5].Descriptor()
+	orderitemDescSort := orderitemFields[7].Descriptor()
 	// orderitem.DefaultSort holds the default value on creation for the sort field.
-	orderitem.DefaultSort = orderitemDescSort.Default.(int)
+	orderitem.DefaultSort = orderitemDescSort.Default.(uint32)
 	specgroupMixin := schema.SpecGroup{}.Mixin()
 	specgroupMixinHooks0 := specgroupMixin[0].Hooks()
 	specgroupMixinHooks2 := specgroupMixin[2].Hooks()
@@ -294,7 +282,7 @@ func init() {
 	// specgroupDescSort is the schema descriptor for sort field.
 	specgroupDescSort := specgroupFields[1].Descriptor()
 	// specgroup.DefaultSort holds the default value on creation for the sort field.
-	specgroup.DefaultSort = specgroupDescSort.Default.(int)
+	specgroup.DefaultSort = specgroupDescSort.Default.(uint32)
 	specitemMixin := schema.SpecItem{}.Mixin()
 	specitemMixinHooks0 := specitemMixin[0].Hooks()
 	specitemMixinHooks2 := specitemMixin[2].Hooks()
@@ -354,21 +342,23 @@ func init() {
 	// table.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	table.DefaultDeleteTs = tableDescDeleteTs.Default.(int64)
 	// tableDescCode is the schema descriptor for code field.
-	tableDescCode := tableFields[0].Descriptor()
+	tableDescCode := tableFields[1].Descriptor()
 	// table.CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	table.CodeValidator = tableDescCode.Validators[0].(func(string) error)
 	// tableDescStatus is the schema descriptor for status field.
-	tableDescStatus := tableFields[1].Descriptor()
+	tableDescStatus := tableFields[2].Descriptor()
 	// table.DefaultStatus holds the default value on creation for the status field.
 	table.DefaultStatus = tableDescStatus.Default.(string)
 	// table.StatusValidator is a validator for the "status" field. It is called by the builders before save.
 	table.StatusValidator = tableDescStatus.Validators[0].(func(string) error)
 	// tableDescCapacity is the schema descriptor for capacity field.
-	tableDescCapacity := tableFields[2].Descriptor()
+	tableDescCapacity := tableFields[3].Descriptor()
 	// table.DefaultCapacity holds the default value on creation for the capacity field.
-	table.DefaultCapacity = tableDescCapacity.Default.(int)
+	table.DefaultCapacity = tableDescCapacity.Default.(uint32)
+	// table.CapacityValidator is a validator for the "capacity" field. It is called by the builders before save.
+	table.CapacityValidator = tableDescCapacity.Validators[0].(func(uint32) error)
 	// tableDescQrCode is the schema descriptor for qr_code field.
-	tableDescQrCode := tableFields[3].Descriptor()
+	tableDescQrCode := tableFields[4].Descriptor()
 	// table.QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
 	table.QrCodeValidator = tableDescQrCode.Validators[0].(func(string) error)
 	tablecategoryMixin := schema.TableCategory{}.Mixin()

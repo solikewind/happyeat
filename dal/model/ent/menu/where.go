@@ -70,6 +70,11 @@ func DeleteTs(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldDeleteTs, v))
 }
 
+// MenuCategoryID applies equality check predicate on the "menu_category_id" field. It's identical to MenuCategoryIDEQ.
+func MenuCategoryID(v uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldEQ(FieldMenuCategoryID, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldName, v))
@@ -86,7 +91,7 @@ func Image(v string) predicate.Menu {
 }
 
 // Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
-func Price(v float64) predicate.Menu {
+func Price(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldPrice, v))
 }
 
@@ -208,6 +213,26 @@ func DeleteTsLT(v int64) predicate.Menu {
 // DeleteTsLTE applies the LTE predicate on the "delete_ts" field.
 func DeleteTsLTE(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldLTE(FieldDeleteTs, v))
+}
+
+// MenuCategoryIDEQ applies the EQ predicate on the "menu_category_id" field.
+func MenuCategoryIDEQ(v uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldEQ(FieldMenuCategoryID, v))
+}
+
+// MenuCategoryIDNEQ applies the NEQ predicate on the "menu_category_id" field.
+func MenuCategoryIDNEQ(v uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldNEQ(FieldMenuCategoryID, v))
+}
+
+// MenuCategoryIDIn applies the In predicate on the "menu_category_id" field.
+func MenuCategoryIDIn(vs ...uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldIn(FieldMenuCategoryID, vs...))
+}
+
+// MenuCategoryIDNotIn applies the NotIn predicate on the "menu_category_id" field.
+func MenuCategoryIDNotIn(vs ...uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldNotIn(FieldMenuCategoryID, vs...))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -426,42 +451,42 @@ func ImageContainsFold(v string) predicate.Menu {
 }
 
 // PriceEQ applies the EQ predicate on the "price" field.
-func PriceEQ(v float64) predicate.Menu {
+func PriceEQ(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldPrice, v))
 }
 
 // PriceNEQ applies the NEQ predicate on the "price" field.
-func PriceNEQ(v float64) predicate.Menu {
+func PriceNEQ(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldNEQ(FieldPrice, v))
 }
 
 // PriceIn applies the In predicate on the "price" field.
-func PriceIn(vs ...float64) predicate.Menu {
+func PriceIn(vs ...int64) predicate.Menu {
 	return predicate.Menu(sql.FieldIn(FieldPrice, vs...))
 }
 
 // PriceNotIn applies the NotIn predicate on the "price" field.
-func PriceNotIn(vs ...float64) predicate.Menu {
+func PriceNotIn(vs ...int64) predicate.Menu {
 	return predicate.Menu(sql.FieldNotIn(FieldPrice, vs...))
 }
 
 // PriceGT applies the GT predicate on the "price" field.
-func PriceGT(v float64) predicate.Menu {
+func PriceGT(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldGT(FieldPrice, v))
 }
 
 // PriceGTE applies the GTE predicate on the "price" field.
-func PriceGTE(v float64) predicate.Menu {
+func PriceGTE(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldGTE(FieldPrice, v))
 }
 
 // PriceLT applies the LT predicate on the "price" field.
-func PriceLT(v float64) predicate.Menu {
+func PriceLT(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldLT(FieldPrice, v))
 }
 
 // PriceLTE applies the LTE predicate on the "price" field.
-func PriceLTE(v float64) predicate.Menu {
+func PriceLTE(v int64) predicate.Menu {
 	return predicate.Menu(sql.FieldLTE(FieldPrice, v))
 }
 

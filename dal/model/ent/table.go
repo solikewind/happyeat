@@ -25,19 +25,20 @@ type Table struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 删除时间戳
 	DeleteTs int64 `json:"delete_ts,omitempty"`
+	// 餐桌分类ID
+	TableCategoryID uint64 `json:"table_category_id,omitempty"`
 	// 桌号
 	Code string `json:"code,omitempty"`
 	// idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
 	Status string `json:"status,omitempty"`
 	// 可坐人数
-	Capacity int `json:"capacity,omitempty"`
+	Capacity uint32 `json:"capacity,omitempty"`
 	// 二维码
 	QrCode *string `json:"qr_code,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TableQuery when eager-loading is set.
-	Edges                 TableEdges `json:"edges"`
-	table_category_tables *uint64
-	selectValues          sql.SelectValues
+	Edges        TableEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // TableEdges holds the relations/edges for other nodes in the graph.
@@ -76,14 +77,12 @@ func (*Table) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case table.FieldID, table.FieldDeleteTs, table.FieldCapacity:
+		case table.FieldID, table.FieldDeleteTs, table.FieldTableCategoryID, table.FieldCapacity:
 			values[i] = new(sql.NullInt64)
 		case table.FieldCode, table.FieldStatus, table.FieldQrCode:
 			values[i] = new(sql.NullString)
 		case table.FieldCreatedAt, table.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case table.ForeignKeys[0]: // table_category_tables
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -123,6 +122,12 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DeleteTs = value.Int64
 			}
+		case table.FieldTableCategoryID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field table_category_id", values[i])
+			} else if value.Valid {
+				_m.TableCategoryID = uint64(value.Int64)
+			}
 		case table.FieldCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field code", values[i])
@@ -139,7 +144,7 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field capacity", values[i])
 			} else if value.Valid {
-				_m.Capacity = int(value.Int64)
+				_m.Capacity = uint32(value.Int64)
 			}
 		case table.FieldQrCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -147,13 +152,6 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.QrCode = new(string)
 				*_m.QrCode = value.String
-			}
-		case table.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field table_category_tables", value)
-			} else if value.Valid {
-				_m.table_category_tables = new(uint64)
-				*_m.table_category_tables = uint64(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -209,6 +207,9 @@ func (_m *Table) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("delete_ts=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
+	builder.WriteString(", ")
+	builder.WriteString("table_category_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TableCategoryID))
 	builder.WriteString(", ")
 	builder.WriteString("code=")
 	builder.WriteString(_m.Code)

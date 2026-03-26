@@ -18,8 +18,8 @@ var (
 		{Name: "spec_type", Type: field.TypeString, Size: 64, Comment: "规格类型，如辣度、容量"},
 		{Name: "spec_value", Type: field.TypeString, Size: 64, Comment: "规格选项，如微辣、大杯"},
 		{Name: "price_delta", Type: field.TypeFloat64, Comment: "加价", Default: 0},
-		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
-		{Name: "menu_category_category_specs", Type: field.TypeUint64},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序", Default: 0},
+		{Name: "menu_category_id", Type: field.TypeUint64, Comment: "菜单分类ID"},
 	}
 	// CategorySpecsTable holds the schema information for the "category_specs" table.
 	CategorySpecsTable = &schema.Table{
@@ -45,8 +45,8 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 128, Comment: "菜名"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 		{Name: "image", Type: field.TypeString, Nullable: true, Size: 512, Comment: "图片URL"},
-		{Name: "price", Type: field.TypeFloat64, Comment: "价格"},
-		{Name: "menu_category_menus", Type: field.TypeUint64},
+		{Name: "price", Type: field.TypeInt64, Comment: "价格"},
+		{Name: "menu_category_id", Type: field.TypeUint64, Comment: "菜单分类ID"},
 	}
 	// MenusTable holds the schema information for the "menus" table.
 	MenusTable = &schema.Table{
@@ -85,8 +85,8 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
-		{Name: "price_delta", Type: field.TypeFloat64, Comment: "特殊加价", Default: 0},
-		{Name: "sort", Type: field.TypeInt, Comment: "顺序", Default: 0},
+		{Name: "price_delta", Type: field.TypeInt64, Comment: "特殊加价", Default: 0},
+		{Name: "sort", Type: field.TypeUint32, Comment: "顺序", Default: 0},
 		{Name: "category_spec_id", Type: field.TypeUint64, Nullable: true, Comment: "菜单种类下的规格项ID"},
 		{Name: "menu_id", Type: field.TypeUint64, Comment: "菜单ID"},
 		{Name: "spec_item_id", Type: field.TypeUint64, Nullable: true, Comment: "菜单规格项ID"},
@@ -111,7 +111,7 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "menu_specs_spec_items_spec_item",
+				Symbol:     "menu_specs_spec_items_menu_specs",
 				Columns:    []*schema.Column{MenuSpecsColumns[8]},
 				RefColumns: []*schema.Column{SpecItemsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -125,16 +125,16 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "order_no", Type: field.TypeString, Unique: true, Size: 64, Comment: "订单号"},
-		{Name: "order_type", Type: field.TypeString, Size: 32, Comment: "dine_in=堂食 takeaway=打包外带", Default: "dine_in"},
-		{Name: "status", Type: field.TypeString, Size: 32, Comment: "created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消", Default: "created"},
-		{Name: "total_amount", Type: field.TypeFloat64, Comment: "订单总金额", Default: 0},
+		{Name: "order_type", Type: field.TypeEnum, Comment: "dine_in=堂食 takeaway=打包外带", Enums: []string{"dine_in", "takeaway"}, Default: "dine_in"},
+		{Name: "status", Type: field.TypeEnum, Comment: "created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消", Enums: []string{"CREATED", "PAID", "PREPARING", "COMPLETED", "CANCELLED"}, Default: "CREATED"},
+		{Name: "total_amount", Type: field.TypeInt64, Comment: "订单总金额", Default: 0},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注"},
-		{Name: "table_orders", Type: field.TypeUint64, Nullable: true},
+		{Name: "table_id", Type: field.TypeUint64, Nullable: true, Comment: "餐桌ID"},
 	}
 	// OrdersTable holds the schema information for the "orders" table.
 	OrdersTable = &schema.Table{
 		Name:       "orders",
-		Comment:    "订单",
+		Comment:    "订单表",
 		Columns:    OrdersColumns,
 		PrimaryKey: []*schema.Column{OrdersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
@@ -152,19 +152,19 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
-		{Name: "menu_name", Type: field.TypeString, Size: 128, Comment: "菜品名称快照"},
+		{Name: "menu_name", Type: field.TypeString, Size: 64, Comment: "菜品名称快照"},
 		{Name: "quantity", Type: field.TypeInt, Comment: "数量", Default: 1},
-		{Name: "unit_price", Type: field.TypeFloat64, Comment: "单价（含规格加价）"},
-		{Name: "amount", Type: field.TypeFloat64, Comment: "小计金额"},
+		{Name: "unit_price", Type: field.TypeInt64, Comment: "单价（含规格加价）"},
+		{Name: "amount", Type: field.TypeInt64, Comment: "小计金额"},
 		{Name: "spec_info", Type: field.TypeString, Nullable: true, Size: 256, Comment: "规格描述快照，如 大份,中辣"},
-		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
-		{Name: "menu_order_items", Type: field.TypeUint64, Nullable: true},
-		{Name: "order_items", Type: field.TypeUint64},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序", Default: 0},
+		{Name: "menu_id", Type: field.TypeUint64, Nullable: true, Comment: "菜单ID"},
+		{Name: "order_id", Type: field.TypeUint64, Comment: "订单ID"},
 	}
 	// OrderItemsTable holds the schema information for the "order_items" table.
 	OrderItemsTable = &schema.Table{
 		Name:       "order_items",
-		Comment:    "订单明细",
+		Comment:    "订单明细表",
 		Columns:    OrderItemsColumns,
 		PrimaryKey: []*schema.Column{OrderItemsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
@@ -182,21 +182,21 @@ var (
 			},
 		},
 	}
-	// SpecGroupColumns holds the columns for the "spec_group" table.
-	SpecGroupColumns = []*schema.Column{
+	// SpecGroupsColumns holds the columns for the "spec_groups" table.
+	SpecGroupsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true, Comment: "ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "规格名（辣度）"},
-		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序", Default: 0},
 	}
-	// SpecGroupTable holds the schema information for the "spec_group" table.
-	SpecGroupTable = &schema.Table{
-		Name:       "spec_group",
+	// SpecGroupsTable holds the schema information for the "spec_groups" table.
+	SpecGroupsTable = &schema.Table{
+		Name:       "spec_groups",
 		Comment:    "规格组",
-		Columns:    SpecGroupColumns,
-		PrimaryKey: []*schema.Column{SpecGroupColumns[0]},
+		Columns:    SpecGroupsColumns,
+		PrimaryKey: []*schema.Column{SpecGroupsColumns[0]},
 	}
 	// SpecItemsColumns holds the columns for the "spec_items" table.
 	SpecItemsColumns = []*schema.Column{
@@ -215,9 +215,9 @@ var (
 		PrimaryKey: []*schema.Column{SpecItemsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "spec_items_spec_group_spec_items",
+				Symbol:     "spec_items_spec_groups_spec_items",
 				Columns:    []*schema.Column{SpecItemsColumns[6]},
-				RefColumns: []*schema.Column{SpecGroupColumns[0]},
+				RefColumns: []*schema.Column{SpecGroupsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -230,9 +230,9 @@ var (
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "code", Type: field.TypeString, Unique: true, Size: 32, Comment: "桌号"},
 		{Name: "status", Type: field.TypeString, Size: 32, Comment: "idle=空闲 using=使用中 reserved=预留 cleaning=清洁中", Default: "idle"},
-		{Name: "capacity", Type: field.TypeInt, Comment: "可坐人数", Default: 4},
+		{Name: "capacity", Type: field.TypeUint32, Comment: "可坐人数", Default: 1},
 		{Name: "qr_code", Type: field.TypeString, Nullable: true, Size: 256, Comment: "二维码"},
-		{Name: "table_category_tables", Type: field.TypeUint64},
+		{Name: "table_category_id", Type: field.TypeUint64, Comment: "餐桌分类ID"},
 	}
 	// TablesTable holds the schema information for the "tables" table.
 	TablesTable = &schema.Table{
@@ -273,7 +273,7 @@ var (
 		MenuSpecsTable,
 		OrdersTable,
 		OrderItemsTable,
-		SpecGroupTable,
+		SpecGroupsTable,
 		SpecItemsTable,
 		TablesTable,
 		TableCategoriesTable,
@@ -307,10 +307,10 @@ func init() {
 	OrderItemsTable.Annotation = &entsql.Annotation{
 		Table: "order_items",
 	}
-	SpecGroupTable.Annotation = &entsql.Annotation{
-		Table: "spec_group",
+	SpecGroupsTable.Annotation = &entsql.Annotation{
+		Table: "spec_groups",
 	}
-	SpecItemsTable.ForeignKeys[0].RefTable = SpecGroupTable
+	SpecItemsTable.ForeignKeys[0].RefTable = SpecGroupsTable
 	SpecItemsTable.Annotation = &entsql.Annotation{
 		Table: "spec_items",
 	}

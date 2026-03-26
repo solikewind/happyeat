@@ -88,7 +88,7 @@ func (_c *SpecItemCreate) SetID(v uint64) *SpecItemCreate {
 	return _c
 }
 
-// SetSpecGroup sets the "Spec_group" edge to the SpecGroup entity.
+// SetSpecGroup sets the "spec_group" edge to the SpecGroup entity.
 func (_c *SpecItemCreate) SetSpecGroup(v *SpecGroup) *SpecItemCreate {
 	return _c.SetSpecGroupID(v.ID)
 }
@@ -192,7 +192,7 @@ func (_c *SpecItemCreate) check() error {
 		return &ValidationError{Name: "default_price", err: errors.New(`ent: missing required field "SpecItem.default_price"`)}
 	}
 	if len(_c.mutation.SpecGroupIDs()) == 0 {
-		return &ValidationError{Name: "Spec_group", err: errors.New(`ent: missing required edge "SpecItem.Spec_group"`)}
+		return &ValidationError{Name: "spec_group", err: errors.New(`ent: missing required edge "SpecItem.spec_group"`)}
 	}
 	return nil
 }
@@ -266,7 +266,7 @@ func (_c *SpecItemCreate) createSpec() (*SpecItem, *sqlgraph.CreateSpec) {
 	if nodes := _c.mutation.MenuSpecsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   specitem.MenuSpecsTable,
 			Columns: []string{specitem.MenuSpecsColumn},
 			Bidi:    false,

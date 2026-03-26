@@ -70,6 +70,11 @@ func DeleteTs(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldDeleteTs, v))
 }
 
+// MenuCategoryID applies equality check predicate on the "menu_category_id" field. It's identical to MenuCategoryIDEQ.
+func MenuCategoryID(v uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldEQ(FieldMenuCategoryID, v))
+}
+
 // SpecType applies equality check predicate on the "spec_type" field. It's identical to SpecTypeEQ.
 func SpecType(v string) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldSpecType, v))
@@ -86,7 +91,7 @@ func PriceDelta(v float64) predicate.CategorySpec {
 }
 
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
-func Sort(v int) predicate.CategorySpec {
+func Sort(v uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldSort, v))
 }
 
@@ -208,6 +213,26 @@ func DeleteTsLT(v int64) predicate.CategorySpec {
 // DeleteTsLTE applies the LTE predicate on the "delete_ts" field.
 func DeleteTsLTE(v int64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldLTE(FieldDeleteTs, v))
+}
+
+// MenuCategoryIDEQ applies the EQ predicate on the "menu_category_id" field.
+func MenuCategoryIDEQ(v uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldEQ(FieldMenuCategoryID, v))
+}
+
+// MenuCategoryIDNEQ applies the NEQ predicate on the "menu_category_id" field.
+func MenuCategoryIDNEQ(v uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldNEQ(FieldMenuCategoryID, v))
+}
+
+// MenuCategoryIDIn applies the In predicate on the "menu_category_id" field.
+func MenuCategoryIDIn(vs ...uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldIn(FieldMenuCategoryID, vs...))
+}
+
+// MenuCategoryIDNotIn applies the NotIn predicate on the "menu_category_id" field.
+func MenuCategoryIDNotIn(vs ...uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldNotIn(FieldMenuCategoryID, vs...))
 }
 
 // SpecTypeEQ applies the EQ predicate on the "spec_type" field.
@@ -381,42 +406,42 @@ func PriceDeltaLTE(v float64) predicate.CategorySpec {
 }
 
 // SortEQ applies the EQ predicate on the "sort" field.
-func SortEQ(v int) predicate.CategorySpec {
+func SortEQ(v uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldSort, v))
 }
 
 // SortNEQ applies the NEQ predicate on the "sort" field.
-func SortNEQ(v int) predicate.CategorySpec {
+func SortNEQ(v uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldNEQ(FieldSort, v))
 }
 
 // SortIn applies the In predicate on the "sort" field.
-func SortIn(vs ...int) predicate.CategorySpec {
+func SortIn(vs ...uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldIn(FieldSort, vs...))
 }
 
 // SortNotIn applies the NotIn predicate on the "sort" field.
-func SortNotIn(vs ...int) predicate.CategorySpec {
+func SortNotIn(vs ...uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldNotIn(FieldSort, vs...))
 }
 
 // SortGT applies the GT predicate on the "sort" field.
-func SortGT(v int) predicate.CategorySpec {
+func SortGT(v uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldGT(FieldSort, v))
 }
 
 // SortGTE applies the GTE predicate on the "sort" field.
-func SortGTE(v int) predicate.CategorySpec {
+func SortGTE(v uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldGTE(FieldSort, v))
 }
 
 // SortLT applies the LT predicate on the "sort" field.
-func SortLT(v int) predicate.CategorySpec {
+func SortLT(v uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldLT(FieldSort, v))
 }
 
 // SortLTE applies the LTE predicate on the "sort" field.
-func SortLTE(v int) predicate.CategorySpec {
+func SortLTE(v uint32) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldLTE(FieldSort, v))
 }
 

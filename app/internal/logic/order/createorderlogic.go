@@ -42,7 +42,7 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		items = append(items, orderdata.ItemInput{
 			MenuName:  it.MenuName,
 			Quantity:  it.Quantity,
-			UnitPrice: it.UnitPrice,
+			UnitPrice: float64(it.UnitPrice),
 			SpecInfo:  it.SpecInfo,
 		})
 	}
@@ -57,7 +57,7 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		OrderType:   req.OrderType,
 		TableID:     tableID,
 		Items:       items,
-		TotalAmount: req.TotalAmount,
+		TotalAmount: float64(req.TotalAmount),
 		Remark:      req.Remark,
 	})
 	if err != nil {

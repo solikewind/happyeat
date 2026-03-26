@@ -9,11 +9,10 @@ info (
 import "../base/orderbase.api"
 
 type ListOrdersReq {
-	Current   int64 `json:"current,optional" form:"current,optional"`
-	PageSize  int64 `json:"pageSize,optional" form:"pageSize,optional"`
+	PageInfo
 	Status    string `json:"status,optional" form:"status,optional"`
 	OrderType string `json:"order_type,optional" form:"order_type,optional"` // dine_in | takeaway
-	TableId   uint64 `json:"table_id,optional" form:"table_id,optional"`       // 按餐桌筛选
+	TableId   uint64 `json:"table_id,optional" form:"table_id,optional"`     // 按餐桌筛选
 }
 type ListOrdersReply {
 	Orders []Order `json:"orders"`
@@ -30,14 +29,14 @@ type GetOrderReply {
 type CreateOrderItemReq {
 	MenuName  string  `json:"menu_name"`
 	Quantity  int     `json:"quantity"`
-	UnitPrice float64 `json:"unit_price"`
+	UnitPrice int64 `json:"unit_price"`
 	SpecInfo  string  `json:"spec_info,optional"`
 }
 type CreateOrderReq {
 	OrderType   string             `json:"order_type"`   // dine_in | takeaway
 	TableId     uint64             `json:"table_id,optional"` // 堂食必填
 	Items       []CreateOrderItemReq `json:"items"`
-	TotalAmount float64            `json:"total_amount"`
+	TotalAmount int64            `json:"total_amount"`
 	Remark      string             `json:"remark,optional"`
 }
 type CreateOrderReply {

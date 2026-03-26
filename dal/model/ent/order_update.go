@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
@@ -57,6 +58,26 @@ func (_u *OrderUpdate) AddDeleteTs(v int64) *OrderUpdate {
 	return _u
 }
 
+// SetTableID sets the "table_id" field.
+func (_u *OrderUpdate) SetTableID(v uint64) *OrderUpdate {
+	_u.mutation.SetTableID(v)
+	return _u
+}
+
+// SetNillableTableID sets the "table_id" field if the given value is not nil.
+func (_u *OrderUpdate) SetNillableTableID(v *uint64) *OrderUpdate {
+	if v != nil {
+		_u.SetTableID(*v)
+	}
+	return _u
+}
+
+// ClearTableID clears the value of the "table_id" field.
+func (_u *OrderUpdate) ClearTableID() *OrderUpdate {
+	_u.mutation.ClearTableID()
+	return _u
+}
+
 // SetOrderNo sets the "order_no" field.
 func (_u *OrderUpdate) SetOrderNo(v string) *OrderUpdate {
 	_u.mutation.SetOrderNo(v)
@@ -72,13 +93,13 @@ func (_u *OrderUpdate) SetNillableOrderNo(v *string) *OrderUpdate {
 }
 
 // SetOrderType sets the "order_type" field.
-func (_u *OrderUpdate) SetOrderType(v string) *OrderUpdate {
+func (_u *OrderUpdate) SetOrderType(v enum.OrderType) *OrderUpdate {
 	_u.mutation.SetOrderType(v)
 	return _u
 }
 
 // SetNillableOrderType sets the "order_type" field if the given value is not nil.
-func (_u *OrderUpdate) SetNillableOrderType(v *string) *OrderUpdate {
+func (_u *OrderUpdate) SetNillableOrderType(v *enum.OrderType) *OrderUpdate {
 	if v != nil {
 		_u.SetOrderType(*v)
 	}
@@ -86,13 +107,13 @@ func (_u *OrderUpdate) SetNillableOrderType(v *string) *OrderUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (_u *OrderUpdate) SetStatus(v string) *OrderUpdate {
+func (_u *OrderUpdate) SetStatus(v enum.OrderStatus) *OrderUpdate {
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *OrderUpdate) SetNillableStatus(v *string) *OrderUpdate {
+func (_u *OrderUpdate) SetNillableStatus(v *enum.OrderStatus) *OrderUpdate {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -100,14 +121,14 @@ func (_u *OrderUpdate) SetNillableStatus(v *string) *OrderUpdate {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_u *OrderUpdate) SetTotalAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) SetTotalAmount(v int64) *OrderUpdate {
 	_u.mutation.ResetTotalAmount()
 	_u.mutation.SetTotalAmount(v)
 	return _u
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_u *OrderUpdate) SetNillableTotalAmount(v *float64) *OrderUpdate {
+func (_u *OrderUpdate) SetNillableTotalAmount(v *int64) *OrderUpdate {
 	if v != nil {
 		_u.SetTotalAmount(*v)
 	}
@@ -115,7 +136,7 @@ func (_u *OrderUpdate) SetNillableTotalAmount(v *float64) *OrderUpdate {
 }
 
 // AddTotalAmount adds value to the "total_amount" field.
-func (_u *OrderUpdate) AddTotalAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) AddTotalAmount(v int64) *OrderUpdate {
 	_u.mutation.AddTotalAmount(v)
 	return _u
 }
@@ -137,20 +158,6 @@ func (_u *OrderUpdate) SetNillableRemark(v *string) *OrderUpdate {
 // ClearRemark clears the value of the "remark" field.
 func (_u *OrderUpdate) ClearRemark() *OrderUpdate {
 	_u.mutation.ClearRemark()
-	return _u
-}
-
-// SetTableID sets the "table" edge to the Table entity by ID.
-func (_u *OrderUpdate) SetTableID(id uint64) *OrderUpdate {
-	_u.mutation.SetTableID(id)
-	return _u
-}
-
-// SetNillableTableID sets the "table" edge to the Table entity by ID if the given value is not nil.
-func (_u *OrderUpdate) SetNillableTableID(id *uint64) *OrderUpdate {
-	if id != nil {
-		_u = _u.SetTableID(*id)
-	}
 	return _u
 }
 
@@ -298,16 +305,16 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(order.FieldOrderNo, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.OrderType(); ok {
-		_spec.SetField(order.FieldOrderType, field.TypeString, value)
+		_spec.SetField(order.FieldOrderType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(order.FieldStatus, field.TypeString, value)
+		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.TotalAmount(); ok {
-		_spec.SetField(order.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
-		_spec.AddField(order.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Remark(); ok {
 		_spec.SetField(order.FieldRemark, field.TypeString, value)
@@ -436,6 +443,26 @@ func (_u *OrderUpdateOne) AddDeleteTs(v int64) *OrderUpdateOne {
 	return _u
 }
 
+// SetTableID sets the "table_id" field.
+func (_u *OrderUpdateOne) SetTableID(v uint64) *OrderUpdateOne {
+	_u.mutation.SetTableID(v)
+	return _u
+}
+
+// SetNillableTableID sets the "table_id" field if the given value is not nil.
+func (_u *OrderUpdateOne) SetNillableTableID(v *uint64) *OrderUpdateOne {
+	if v != nil {
+		_u.SetTableID(*v)
+	}
+	return _u
+}
+
+// ClearTableID clears the value of the "table_id" field.
+func (_u *OrderUpdateOne) ClearTableID() *OrderUpdateOne {
+	_u.mutation.ClearTableID()
+	return _u
+}
+
 // SetOrderNo sets the "order_no" field.
 func (_u *OrderUpdateOne) SetOrderNo(v string) *OrderUpdateOne {
 	_u.mutation.SetOrderNo(v)
@@ -451,13 +478,13 @@ func (_u *OrderUpdateOne) SetNillableOrderNo(v *string) *OrderUpdateOne {
 }
 
 // SetOrderType sets the "order_type" field.
-func (_u *OrderUpdateOne) SetOrderType(v string) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetOrderType(v enum.OrderType) *OrderUpdateOne {
 	_u.mutation.SetOrderType(v)
 	return _u
 }
 
 // SetNillableOrderType sets the "order_type" field if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableOrderType(v *string) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillableOrderType(v *enum.OrderType) *OrderUpdateOne {
 	if v != nil {
 		_u.SetOrderType(*v)
 	}
@@ -465,13 +492,13 @@ func (_u *OrderUpdateOne) SetNillableOrderType(v *string) *OrderUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (_u *OrderUpdateOne) SetStatus(v string) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetStatus(v enum.OrderStatus) *OrderUpdateOne {
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableStatus(v *string) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillableStatus(v *enum.OrderStatus) *OrderUpdateOne {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -479,14 +506,14 @@ func (_u *OrderUpdateOne) SetNillableStatus(v *string) *OrderUpdateOne {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_u *OrderUpdateOne) SetTotalAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetTotalAmount(v int64) *OrderUpdateOne {
 	_u.mutation.ResetTotalAmount()
 	_u.mutation.SetTotalAmount(v)
 	return _u
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableTotalAmount(v *float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillableTotalAmount(v *int64) *OrderUpdateOne {
 	if v != nil {
 		_u.SetTotalAmount(*v)
 	}
@@ -494,7 +521,7 @@ func (_u *OrderUpdateOne) SetNillableTotalAmount(v *float64) *OrderUpdateOne {
 }
 
 // AddTotalAmount adds value to the "total_amount" field.
-func (_u *OrderUpdateOne) AddTotalAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) AddTotalAmount(v int64) *OrderUpdateOne {
 	_u.mutation.AddTotalAmount(v)
 	return _u
 }
@@ -516,20 +543,6 @@ func (_u *OrderUpdateOne) SetNillableRemark(v *string) *OrderUpdateOne {
 // ClearRemark clears the value of the "remark" field.
 func (_u *OrderUpdateOne) ClearRemark() *OrderUpdateOne {
 	_u.mutation.ClearRemark()
-	return _u
-}
-
-// SetTableID sets the "table" edge to the Table entity by ID.
-func (_u *OrderUpdateOne) SetTableID(id uint64) *OrderUpdateOne {
-	_u.mutation.SetTableID(id)
-	return _u
-}
-
-// SetNillableTableID sets the "table" edge to the Table entity by ID if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableTableID(id *uint64) *OrderUpdateOne {
-	if id != nil {
-		_u = _u.SetTableID(*id)
-	}
 	return _u
 }
 
@@ -707,16 +720,16 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 		_spec.SetField(order.FieldOrderNo, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.OrderType(); ok {
-		_spec.SetField(order.FieldOrderType, field.TypeString, value)
+		_spec.SetField(order.FieldOrderType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(order.FieldStatus, field.TypeString, value)
+		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.TotalAmount(); ok {
-		_spec.SetField(order.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
-		_spec.AddField(order.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Remark(); ok {
 		_spec.SetField(order.FieldRemark, field.TypeString, value)

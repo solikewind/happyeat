@@ -57,6 +57,20 @@ func (_u *CategorySpecUpdate) AddDeleteTs(v int64) *CategorySpecUpdate {
 	return _u
 }
 
+// SetMenuCategoryID sets the "menu_category_id" field.
+func (_u *CategorySpecUpdate) SetMenuCategoryID(v uint64) *CategorySpecUpdate {
+	_u.mutation.SetMenuCategoryID(v)
+	return _u
+}
+
+// SetNillableMenuCategoryID sets the "menu_category_id" field if the given value is not nil.
+func (_u *CategorySpecUpdate) SetNillableMenuCategoryID(v *uint64) *CategorySpecUpdate {
+	if v != nil {
+		_u.SetMenuCategoryID(*v)
+	}
+	return _u
+}
+
 // SetSpecType sets the "spec_type" field.
 func (_u *CategorySpecUpdate) SetSpecType(v string) *CategorySpecUpdate {
 	_u.mutation.SetSpecType(v)
@@ -107,14 +121,14 @@ func (_u *CategorySpecUpdate) AddPriceDelta(v float64) *CategorySpecUpdate {
 }
 
 // SetSort sets the "sort" field.
-func (_u *CategorySpecUpdate) SetSort(v int) *CategorySpecUpdate {
+func (_u *CategorySpecUpdate) SetSort(v uint32) *CategorySpecUpdate {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *CategorySpecUpdate) SetNillableSort(v *int) *CategorySpecUpdate {
+func (_u *CategorySpecUpdate) SetNillableSort(v *uint32) *CategorySpecUpdate {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -122,7 +136,7 @@ func (_u *CategorySpecUpdate) SetNillableSort(v *int) *CategorySpecUpdate {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *CategorySpecUpdate) AddSort(v int) *CategorySpecUpdate {
+func (_u *CategorySpecUpdate) AddSort(v int32) *CategorySpecUpdate {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -279,10 +293,10 @@ func (_u *CategorySpecUpdate) sqlSave(ctx context.Context) (_node int, err error
 		_spec.AddField(categoryspec.FieldPriceDelta, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(categoryspec.FieldSort, field.TypeInt, value)
+		_spec.SetField(categoryspec.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(categoryspec.FieldSort, field.TypeInt, value)
+		_spec.AddField(categoryspec.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -405,6 +419,20 @@ func (_u *CategorySpecUpdateOne) AddDeleteTs(v int64) *CategorySpecUpdateOne {
 	return _u
 }
 
+// SetMenuCategoryID sets the "menu_category_id" field.
+func (_u *CategorySpecUpdateOne) SetMenuCategoryID(v uint64) *CategorySpecUpdateOne {
+	_u.mutation.SetMenuCategoryID(v)
+	return _u
+}
+
+// SetNillableMenuCategoryID sets the "menu_category_id" field if the given value is not nil.
+func (_u *CategorySpecUpdateOne) SetNillableMenuCategoryID(v *uint64) *CategorySpecUpdateOne {
+	if v != nil {
+		_u.SetMenuCategoryID(*v)
+	}
+	return _u
+}
+
 // SetSpecType sets the "spec_type" field.
 func (_u *CategorySpecUpdateOne) SetSpecType(v string) *CategorySpecUpdateOne {
 	_u.mutation.SetSpecType(v)
@@ -455,14 +483,14 @@ func (_u *CategorySpecUpdateOne) AddPriceDelta(v float64) *CategorySpecUpdateOne
 }
 
 // SetSort sets the "sort" field.
-func (_u *CategorySpecUpdateOne) SetSort(v int) *CategorySpecUpdateOne {
+func (_u *CategorySpecUpdateOne) SetSort(v uint32) *CategorySpecUpdateOne {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *CategorySpecUpdateOne) SetNillableSort(v *int) *CategorySpecUpdateOne {
+func (_u *CategorySpecUpdateOne) SetNillableSort(v *uint32) *CategorySpecUpdateOne {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -470,7 +498,7 @@ func (_u *CategorySpecUpdateOne) SetNillableSort(v *int) *CategorySpecUpdateOne 
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *CategorySpecUpdateOne) AddSort(v int) *CategorySpecUpdateOne {
+func (_u *CategorySpecUpdateOne) AddSort(v int32) *CategorySpecUpdateOne {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -657,10 +685,10 @@ func (_u *CategorySpecUpdateOne) sqlSave(ctx context.Context) (_node *CategorySp
 		_spec.AddField(categoryspec.FieldPriceDelta, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(categoryspec.FieldSort, field.TypeInt, value)
+		_spec.SetField(categoryspec.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(categoryspec.FieldSort, field.TypeInt, value)
+		_spec.AddField(categoryspec.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

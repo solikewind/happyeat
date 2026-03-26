@@ -27,7 +27,7 @@ type SpecGroup struct {
 	// 规格名（辣度）
 	Name string `json:"name,omitempty"`
 	// 排序
-	Sort int `json:"sort,omitempty"`
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SpecGroupQuery when eager-loading is set.
 	Edges        SpecGroupEdges `json:"edges"`
@@ -112,7 +112,7 @@ func (_m *SpecGroup) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = int(value.Int64)
+				_m.Sort = uint32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

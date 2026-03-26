@@ -3,11 +3,13 @@
 package order
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/solikewind/happyeat/common/consts/enum"
 )
 
 const (
@@ -21,6 +23,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeleteTs holds the string denoting the delete_ts field in the database.
 	FieldDeleteTs = "delete_ts"
+	// FieldTableID holds the string denoting the table_id field in the database.
+	FieldTableID = "table_id"
 	// FieldOrderNo holds the string denoting the order_no field in the database.
 	FieldOrderNo = "order_no"
 	// FieldOrderType holds the string denoting the order_type field in the database.
@@ -43,14 +47,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "table" package.
 	TableInverseTable = "tables"
 	// TableColumn is the table column denoting the table relation/edge.
-	TableColumn = "table_orders"
+	TableColumn = "table_id"
 	// ItemsTable is the table that holds the items relation/edge.
 	ItemsTable = "order_items"
 	// ItemsInverseTable is the table name for the OrderItem entity.
 	// It exists in this package in order to avoid circular dependency with the "orderitem" package.
 	ItemsInverseTable = "order_items"
 	// ItemsColumn is the table column denoting the items relation/edge.
-	ItemsColumn = "order_items"
+	ItemsColumn = "order_id"
 )
 
 // Columns holds all SQL columns for order fields.
@@ -59,6 +63,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeleteTs,
+	FieldTableID,
 	FieldOrderNo,
 	FieldOrderType,
 	FieldStatus,
@@ -66,21 +71,10 @@ var Columns = []string{
 	FieldRemark,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "orders"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"table_orders",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -105,19 +99,31 @@ var (
 	DefaultDeleteTs int64
 	// OrderNoValidator is a validator for the "order_no" field. It is called by the builders before save.
 	OrderNoValidator func(string) error
-	// DefaultOrderType holds the default value on creation for the "order_type" field.
-	DefaultOrderType string
-	// OrderTypeValidator is a validator for the "order_type" field. It is called by the builders before save.
-	OrderTypeValidator func(string) error
-	// DefaultStatus holds the default value on creation for the "status" field.
-	DefaultStatus string
-	// StatusValidator is a validator for the "status" field. It is called by the builders before save.
-	StatusValidator func(string) error
 	// DefaultTotalAmount holds the default value on creation for the "total_amount" field.
-	DefaultTotalAmount float64
+	DefaultTotalAmount int64
 	// RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
 	RemarkValidator func(string) error
 )
+
+// OrderTypeValidator is a validator for the "order_type" field enum values. It is called by the builders before save.
+func OrderTypeValidator(ot enum.OrderType) error {
+	switch ot.String() {
+	case "dine_in", "takeaway":
+		return nil
+	default:
+		return fmt.Errorf("order: invalid enum value for order_type field: %q", ot)
+	}
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s enum.OrderStatus) error {
+	switch s.String() {
+	case "CREATED", "PAID", "PREPARING", "COMPLETED", "CANCELLED":
+		return nil
+	default:
+		return fmt.Errorf("order: invalid enum value for status field: %q", s)
+	}
+}
 
 // OrderOption defines the ordering options for the Order queries.
 type OrderOption func(*sql.Selector)
@@ -140,6 +146,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByDeleteTs orders the results by the delete_ts field.
 func ByDeleteTs(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeleteTs, opts...).ToFunc()
+}
+
+// ByTableID orders the results by the table_id field.
+func ByTableID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTableID, opts...).ToFunc()
 }
 
 // ByOrderNo orders the results by the order_no field.

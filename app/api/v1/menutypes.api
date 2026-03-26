@@ -25,6 +25,7 @@ type CreateMenuReply {}
 type ListMenusReq {
 	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
+	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"` // 按分类id筛选
 	Category string `json:"category,optional" form:"category,optional"` // 按分类名字筛选
 }
  type ListMenusReply {
@@ -39,19 +40,15 @@ type ListMenusReq {
     Menu Menu `json:"menu"`
  }
 
-// 更新菜单仅允许可编辑字段，create_at/update_at 由服务端维护
-type UpdateMenuInput {
-	Name        string     `json:"name"`
-	Description string     `json:"description,optional"`
-	Image       string     `json:"image,optional"`
-	Price       float64    `json:"price"`
-	CategoryId  uint64     `json:"category_id"`
-	Specs       []MenuSpec `json:"specs,optional"`
-}
 
  type UpdateMenuReq {
     Id   uint64 `path:"id"`
-    Menu UpdateMenuInput   `json:"menu"`
+    Name        string     `json:"name"`
+	Description string     `json:"description,optional"`
+	Image       string     `json:"image,optional"`
+	Price       int64	    `json:"price,optional"`
+	CategoryId  uint64     `json:"category_id,optional"`
+	Specs       []MenuSpec `json:"specs,optional"`
  }
  type UpdateMenuReply {}
 
@@ -63,15 +60,14 @@ type UpdateMenuInput {
 // 【菜单分类接口】
 // 创建分类
 type CreateMenuCategoryReq {
-	Name        string `json:"name,optional"`
-	Description string `json:"description,optional"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 type CreateMenuCategoryReply {}
 
 // 列表为 GET，参数从 query 解析；current/pageSize/name 不传时由 logic 默认或不过滤
 type ListMenusCategoriesReq {
-	Current  int64 `json:"current,optional" form:"current,optional"`
-	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
+	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
 }
  type ListMenusCategoriesReply {
@@ -97,3 +93,118 @@ type ListMenusCategoriesReq {
     Id uint64 `path:"id"`
  }
  type DeleteMenuCategoryReply {}
+
+// 【规格组接口】
+type CreateSpecGroupReq {
+	Name string `json:"name"`
+	Sort uint32 `json:"sort,optional"`
+}
+type CreateSpecGroupReply {}
+
+type ListSpecGroupsReq {
+	PageInfo
+	Name string `json:"name,optional" form:"name,optional"`
+}
+type ListSpecGroupsReply {
+	Groups []SpecGroup `json:"groups"`
+	Total  int64       `json:"total"`
+}
+
+type GetSpecGroupReq {
+	Id uint64 `path:"id"`
+}
+type GetSpecGroupReply {
+	Group SpecGroup `json:"group"`
+}
+
+type UpdateSpecGroupReq {
+	Id   uint64 `path:"id"`
+	Name string `json:"name"`
+	Sort uint32 `json:"sort,optional"`
+}
+type UpdateSpecGroupReply {}
+
+type DeleteSpecGroupReq {
+	Id uint64 `path:"id"`
+}
+type DeleteSpecGroupReply {}
+
+// 【规格项接口】
+type CreateSpecItemReq {
+	SpecGroupId  uint64 `json:"spec_group_id"`
+	Name         string `json:"name"`
+	DefaultPrice int64  `json:"default_price,optional"`
+}
+type CreateSpecItemReply {}
+
+type ListSpecItemsReq {
+	PageInfo
+	SpecGroupId uint64 `json:"spec_group_id,optional" form:"spec_group_id,optional"`
+	Name        string `json:"name,optional" form:"name,optional"`
+}
+type ListSpecItemsReply {
+	Items []SpecItem `json:"items"`
+	Total int64      `json:"total"`
+}
+
+type GetSpecItemReq {
+	Id uint64 `path:"id"`
+}
+type GetSpecItemReply {
+	Item SpecItem `json:"item"`
+}
+
+type UpdateSpecItemReq {
+	Id           uint64 `path:"id"`
+	SpecGroupId  uint64 `json:"spec_group_id"`
+	Name         string `json:"name"`
+	DefaultPrice int64  `json:"default_price,optional"`
+}
+type UpdateSpecItemReply {}
+
+type DeleteSpecItemReq {
+	Id uint64 `path:"id"`
+}
+type DeleteSpecItemReply {}
+
+// 【分类规格模板接口】
+type CreateCategorySpecReq {
+	CategoryId uint64 `json:"category_id"`
+	SpecType   string `json:"spec_type"`
+	SpecValue  string `json:"spec_value"`
+	PriceDelta int64  `json:"price_delta,optional"`
+	Sort       uint32 `json:"sort,optional"`
+}
+type CreateCategorySpecReply {}
+
+type ListCategorySpecsReq {
+	PageInfo
+	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"`
+	SpecType   string `json:"spec_type,optional" form:"spec_type,optional"`
+}
+type ListCategorySpecsReply {
+	Specs []CategorySpec `json:"specs"`
+	Total int64          `json:"total"`
+}
+
+type GetCategorySpecReq {
+	Id uint64 `path:"id"`
+}
+type GetCategorySpecReply {
+	Spec CategorySpec `json:"spec"`
+}
+
+type UpdateCategorySpecReq {
+	Id         uint64 `path:"id"`
+	CategoryId uint64 `json:"category_id"`
+	SpecType   string `json:"spec_type"`
+	SpecValue  string `json:"spec_value"`
+	PriceDelta int64  `json:"price_delta,optional"`
+	Sort       uint32 `json:"sort,optional"`
+}
+type UpdateCategorySpecReply {}
+
+type DeleteCategorySpecReq {
+	Id uint64 `path:"id"`
+}
+type DeleteCategorySpecReply {}

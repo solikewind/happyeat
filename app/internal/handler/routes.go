@@ -9,8 +9,9 @@ import (
 
 	auth "github.com/solikewind/happyeat/app/internal/handler/auth"
 	menu "github.com/solikewind/happyeat/app/internal/handler/menu"
-	menutype "github.com/solikewind/happyeat/app/internal/handler/menutype"
+	menucategory "github.com/solikewind/happyeat/app/internal/handler/menucategory"
 	order "github.com/solikewind/happyeat/app/internal/handler/order"
+	spec "github.com/solikewind/happyeat/app/internal/handler/spec"
 	table "github.com/solikewind/happyeat/app/internal/handler/table"
 	tablecategory "github.com/solikewind/happyeat/app/internal/handler/tablecategory"
 	workbench "github.com/solikewind/happyeat/app/internal/handler/workbench"
@@ -77,31 +78,31 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				// 列出菜单种类
 				Method:  http.MethodGet,
 				Path:    "/menu/categories",
-				Handler: menutype.ListMenusCategoriesHandler(serverCtx),
+				Handler: menucategory.ListMenusCategoriesHandler(serverCtx),
 			},
 			{
 				// 创建菜单种类
 				Method:  http.MethodPost,
 				Path:    "/menu/category",
-				Handler: menutype.CreateMenuCategoryHandler(serverCtx),
+				Handler: menucategory.CreateMenuCategoryHandler(serverCtx),
 			},
 			{
 				// 获取菜单种类
 				Method:  http.MethodGet,
 				Path:    "/menu/category/:id",
-				Handler: menutype.GetMenuCategoryHandler(serverCtx),
+				Handler: menucategory.GetMenuCategoryHandler(serverCtx),
 			},
 			{
 				// 更新菜单种类
 				Method:  http.MethodPut,
 				Path:    "/menu/category/:id",
-				Handler: menutype.UpdateMenuCategoryHandler(serverCtx),
+				Handler: menucategory.UpdateMenuCategoryHandler(serverCtx),
 			},
 			{
 				// 删除菜单种类
 				Method:  http.MethodDelete,
 				Path:    "/menu/category/:id",
-				Handler: menutype.DeleteMenuCategoryHandler(serverCtx),
+				Handler: menucategory.DeleteMenuCategoryHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
@@ -134,6 +135,104 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/orders",
 				Handler: order.CreateOrderHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 创建分类规格模板
+				Method:  http.MethodPost,
+				Path:    "/spec/category-spec",
+				Handler: spec.CreateCategorySpecHandler(serverCtx),
+			},
+			{
+				// 获取分类规格模板
+				Method:  http.MethodGet,
+				Path:    "/spec/category-spec/:id",
+				Handler: spec.GetCategorySpecHandler(serverCtx),
+			},
+			{
+				// 更新分类规格模板
+				Method:  http.MethodPut,
+				Path:    "/spec/category-spec/:id",
+				Handler: spec.UpdateCategorySpecHandler(serverCtx),
+			},
+			{
+				// 删除分类规格模板
+				Method:  http.MethodDelete,
+				Path:    "/spec/category-spec/:id",
+				Handler: spec.DeleteCategorySpecHandler(serverCtx),
+			},
+			{
+				// 列出分类规格模板
+				Method:  http.MethodGet,
+				Path:    "/spec/category-specs",
+				Handler: spec.ListCategorySpecsHandler(serverCtx),
+			},
+			{
+				// 创建规格组
+				Method:  http.MethodPost,
+				Path:    "/spec/group",
+				Handler: spec.CreateSpecGroupHandler(serverCtx),
+			},
+			{
+				// 获取规格组
+				Method:  http.MethodGet,
+				Path:    "/spec/group/:id",
+				Handler: spec.GetSpecGroupHandler(serverCtx),
+			},
+			{
+				// 更新规格组
+				Method:  http.MethodPut,
+				Path:    "/spec/group/:id",
+				Handler: spec.UpdateSpecGroupHandler(serverCtx),
+			},
+			{
+				// 删除规格组
+				Method:  http.MethodDelete,
+				Path:    "/spec/group/:id",
+				Handler: spec.DeleteSpecGroupHandler(serverCtx),
+			},
+			{
+				// 列出规格组
+				Method:  http.MethodGet,
+				Path:    "/spec/groups",
+				Handler: spec.ListSpecGroupsHandler(serverCtx),
+			},
+			{
+				// 创建规格项
+				Method:  http.MethodPost,
+				Path:    "/spec/item",
+				Handler: spec.CreateSpecItemHandler(serverCtx),
+			},
+			{
+				// 获取规格项
+				Method:  http.MethodGet,
+				Path:    "/spec/item/:id",
+				Handler: spec.GetSpecItemHandler(serverCtx),
+			},
+			{
+				// 更新规格项
+				Method:  http.MethodPut,
+				Path:    "/spec/item/:id",
+				Handler: spec.UpdateSpecItemHandler(serverCtx),
+			},
+			{
+				// 删除规格项
+				Method:  http.MethodDelete,
+				Path:    "/spec/item/:id",
+				Handler: spec.DeleteSpecItemHandler(serverCtx),
+			},
+			{
+				// 列出规格项
+				Method:  http.MethodGet,
+				Path:    "/spec/items",
+				Handler: spec.ListSpecItemsHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),

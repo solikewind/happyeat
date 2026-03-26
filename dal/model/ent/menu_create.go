@@ -65,6 +65,12 @@ func (_c *MenuCreate) SetNillableDeleteTs(v *int64) *MenuCreate {
 	return _c
 }
 
+// SetMenuCategoryID sets the "menu_category_id" field.
+func (_c *MenuCreate) SetMenuCategoryID(v uint64) *MenuCreate {
+	_c.mutation.SetMenuCategoryID(v)
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *MenuCreate) SetName(v string) *MenuCreate {
 	_c.mutation.SetName(v)
@@ -100,7 +106,7 @@ func (_c *MenuCreate) SetNillableImage(v *string) *MenuCreate {
 }
 
 // SetPrice sets the "price" field.
-func (_c *MenuCreate) SetPrice(v float64) *MenuCreate {
+func (_c *MenuCreate) SetPrice(v int64) *MenuCreate {
 	_c.mutation.SetPrice(v)
 	return _c
 }
@@ -221,6 +227,9 @@ func (_c *MenuCreate) check() error {
 	if _, ok := _c.mutation.DeleteTs(); !ok {
 		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "Menu.delete_ts"`)}
 	}
+	if _, ok := _c.mutation.MenuCategoryID(); !ok {
+		return &ValidationError{Name: "menu_category_id", err: errors.New(`ent: missing required field "Menu.menu_category_id"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Menu.name"`)}
 	}
@@ -297,7 +306,7 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 		_node.Image = &value
 	}
 	if value, ok := _c.mutation.Price(); ok {
-		_spec.SetField(menu.FieldPrice, field.TypeFloat64, value)
+		_spec.SetField(menu.FieldPrice, field.TypeInt64, value)
 		_node.Price = value
 	}
 	if nodes := _c.mutation.CategoryIDs(); len(nodes) > 0 {
@@ -314,7 +323,7 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.menu_category_menus = &nodes[0]
+		_node.MenuCategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.MenuSpecsIDs(); len(nodes) > 0 {

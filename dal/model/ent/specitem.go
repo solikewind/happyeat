@@ -39,8 +39,8 @@ type SpecItem struct {
 
 // SpecItemEdges holds the relations/edges for other nodes in the graph.
 type SpecItemEdges struct {
-	// SpecGroup holds the value of the Spec_group edge.
-	SpecGroup *SpecGroup `json:"Spec_group,omitempty"`
+	// SpecGroup holds the value of the spec_group edge.
+	SpecGroup *SpecGroup `json:"spec_group,omitempty"`
 	// MenuSpecs holds the value of the menu_specs edge.
 	MenuSpecs []*MenuSpec `json:"menu_specs,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -56,7 +56,7 @@ func (e SpecItemEdges) SpecGroupOrErr() (*SpecGroup, error) {
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: specgroup.Label}
 	}
-	return nil, &NotLoadedError{edge: "Spec_group"}
+	return nil, &NotLoadedError{edge: "spec_group"}
 }
 
 // MenuSpecsOrErr returns the MenuSpecs value or an error if the edge
@@ -151,7 +151,7 @@ func (_m *SpecItem) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QuerySpecGroup queries the "Spec_group" edge of the SpecItem entity.
+// QuerySpecGroup queries the "spec_group" edge of the SpecItem entity.
 func (_m *SpecItem) QuerySpecGroup() *SpecGroupQuery {
 	return NewSpecItemClient(_m.config).QuerySpecGroup(_m)
 }

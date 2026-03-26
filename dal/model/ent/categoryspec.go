@@ -25,6 +25,8 @@ type CategorySpec struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 删除时间戳
 	DeleteTs int64 `json:"delete_ts,omitempty"`
+	// 菜单分类ID
+	MenuCategoryID uint64 `json:"menu_category_id,omitempty"`
 	// 规格类型，如辣度、容量
 	SpecType string `json:"spec_type,omitempty"`
 	// 规格选项，如微辣、大杯
@@ -32,12 +34,11 @@ type CategorySpec struct {
 	// 加价
 	PriceDelta float64 `json:"price_delta,omitempty"`
 	// 排序
-	Sort int `json:"sort,omitempty"`
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CategorySpecQuery when eager-loading is set.
-	Edges                        CategorySpecEdges `json:"edges"`
-	menu_category_category_specs *uint64
-	selectValues                 sql.SelectValues
+	Edges        CategorySpecEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // CategorySpecEdges holds the relations/edges for other nodes in the graph.
@@ -78,14 +79,12 @@ func (*CategorySpec) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case categoryspec.FieldPriceDelta:
 			values[i] = new(sql.NullFloat64)
-		case categoryspec.FieldID, categoryspec.FieldDeleteTs, categoryspec.FieldSort:
+		case categoryspec.FieldID, categoryspec.FieldDeleteTs, categoryspec.FieldMenuCategoryID, categoryspec.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case categoryspec.FieldSpecType, categoryspec.FieldSpecValue:
 			values[i] = new(sql.NullString)
 		case categoryspec.FieldCreatedAt, categoryspec.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case categoryspec.ForeignKeys[0]: // menu_category_category_specs
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -125,6 +124,12 @@ func (_m *CategorySpec) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DeleteTs = value.Int64
 			}
+		case categoryspec.FieldMenuCategoryID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field menu_category_id", values[i])
+			} else if value.Valid {
+				_m.MenuCategoryID = uint64(value.Int64)
+			}
 		case categoryspec.FieldSpecType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field spec_type", values[i])
@@ -147,14 +152,7 @@ func (_m *CategorySpec) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = int(value.Int64)
-			}
-		case categoryspec.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field menu_category_category_specs", value)
-			} else if value.Valid {
-				_m.menu_category_category_specs = new(uint64)
-				*_m.menu_category_category_specs = uint64(value.Int64)
+				_m.Sort = uint32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -210,6 +208,9 @@ func (_m *CategorySpec) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("delete_ts=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
+	builder.WriteString(", ")
+	builder.WriteString("menu_category_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MenuCategoryID))
 	builder.WriteString(", ")
 	builder.WriteString("spec_type=")
 	builder.WriteString(_m.SpecType)

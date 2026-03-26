@@ -32,6 +32,10 @@ func (Order) Annotations() []schema.Annotation {
 
 func (Order) Fields() []ent.Field {
 	return []ent.Field{
+		field.Uint64("table_id").
+			Optional().
+			Nillable().
+			Comment("餐桌ID"),
 		field.String("order_no").
 			MaxLen(64).
 			Unique().
@@ -61,7 +65,11 @@ func (Order) Fields() []ent.Field {
 
 func (Order) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("table", Table.Type).Ref("orders").Unique().Comment("堂食时关联餐桌，外带为空"),
+		edge.From("table", Table.Type).
+			Ref("orders").
+			Field("table_id").
+			Unique().
+			Comment("堂食时关联餐桌，外带为空"),
 		edge.To("items", OrderItem.Type),
 	}
 }

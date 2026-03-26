@@ -31,7 +31,11 @@ func (OrderItem) Annotations() []schema.Annotation {
 
 func (OrderItem) Fields() []ent.Field {
 	return []ent.Field{
+		field.Uint64("order_id").
+			Comment("订单ID"),
 		field.Uint64("menu_id").
+			Optional().
+			Nillable().
 			Comment("菜单ID"),
 		field.String("menu_name").
 			MaxLen(64).
@@ -41,14 +45,14 @@ func (OrderItem) Fields() []ent.Field {
 			Comment("数量"),
 		field.Int64("unit_price").
 			Comment("单价（含规格加价）"),
-		field.Float("amount").
+		field.Int64("amount").
 			Comment("小计金额"),
 		field.String("spec_info").
 			MaxLen(256).
 			Optional().
 			Nillable().
 			Comment("规格描述快照，如 大份,中辣"),
-		field.Int("sort").
+		field.Uint32("sort").
 			Default(0).
 			Comment("排序"),
 	}
@@ -58,10 +62,12 @@ func (OrderItem) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("order", Order.Type).
 			Ref("items").
+			Field("order_id").
 			Unique().
 			Required(),
 		edge.From("menu", Menu.Type).
 			Ref("order_items").
+			Field("menu_id").
 			Unique().
 			Comment("关联菜单，可选；删除菜单不影响历史订单"),
 	}

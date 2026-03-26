@@ -86,12 +86,12 @@ func CategorySpecID(v uint64) predicate.MenuSpec {
 }
 
 // PriceDelta applies equality check predicate on the "price_delta" field. It's identical to PriceDeltaEQ.
-func PriceDelta(v float64) predicate.MenuSpec {
+func PriceDelta(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldEQ(FieldPriceDelta, v))
 }
 
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
-func Sort(v int) predicate.MenuSpec {
+func Sort(v uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldEQ(FieldSort, v))
 }
 
@@ -296,82 +296,82 @@ func CategorySpecIDNotNil() predicate.MenuSpec {
 }
 
 // PriceDeltaEQ applies the EQ predicate on the "price_delta" field.
-func PriceDeltaEQ(v float64) predicate.MenuSpec {
+func PriceDeltaEQ(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldEQ(FieldPriceDelta, v))
 }
 
 // PriceDeltaNEQ applies the NEQ predicate on the "price_delta" field.
-func PriceDeltaNEQ(v float64) predicate.MenuSpec {
+func PriceDeltaNEQ(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldNEQ(FieldPriceDelta, v))
 }
 
 // PriceDeltaIn applies the In predicate on the "price_delta" field.
-func PriceDeltaIn(vs ...float64) predicate.MenuSpec {
+func PriceDeltaIn(vs ...int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldIn(FieldPriceDelta, vs...))
 }
 
 // PriceDeltaNotIn applies the NotIn predicate on the "price_delta" field.
-func PriceDeltaNotIn(vs ...float64) predicate.MenuSpec {
+func PriceDeltaNotIn(vs ...int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldNotIn(FieldPriceDelta, vs...))
 }
 
 // PriceDeltaGT applies the GT predicate on the "price_delta" field.
-func PriceDeltaGT(v float64) predicate.MenuSpec {
+func PriceDeltaGT(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldGT(FieldPriceDelta, v))
 }
 
 // PriceDeltaGTE applies the GTE predicate on the "price_delta" field.
-func PriceDeltaGTE(v float64) predicate.MenuSpec {
+func PriceDeltaGTE(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldGTE(FieldPriceDelta, v))
 }
 
 // PriceDeltaLT applies the LT predicate on the "price_delta" field.
-func PriceDeltaLT(v float64) predicate.MenuSpec {
+func PriceDeltaLT(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldLT(FieldPriceDelta, v))
 }
 
 // PriceDeltaLTE applies the LTE predicate on the "price_delta" field.
-func PriceDeltaLTE(v float64) predicate.MenuSpec {
+func PriceDeltaLTE(v int64) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldLTE(FieldPriceDelta, v))
 }
 
 // SortEQ applies the EQ predicate on the "sort" field.
-func SortEQ(v int) predicate.MenuSpec {
+func SortEQ(v uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldEQ(FieldSort, v))
 }
 
 // SortNEQ applies the NEQ predicate on the "sort" field.
-func SortNEQ(v int) predicate.MenuSpec {
+func SortNEQ(v uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldNEQ(FieldSort, v))
 }
 
 // SortIn applies the In predicate on the "sort" field.
-func SortIn(vs ...int) predicate.MenuSpec {
+func SortIn(vs ...uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldIn(FieldSort, vs...))
 }
 
 // SortNotIn applies the NotIn predicate on the "sort" field.
-func SortNotIn(vs ...int) predicate.MenuSpec {
+func SortNotIn(vs ...uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldNotIn(FieldSort, vs...))
 }
 
 // SortGT applies the GT predicate on the "sort" field.
-func SortGT(v int) predicate.MenuSpec {
+func SortGT(v uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldGT(FieldSort, v))
 }
 
 // SortGTE applies the GTE predicate on the "sort" field.
-func SortGTE(v int) predicate.MenuSpec {
+func SortGTE(v uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldGTE(FieldSort, v))
 }
 
 // SortLT applies the LT predicate on the "sort" field.
-func SortLT(v int) predicate.MenuSpec {
+func SortLT(v uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldLT(FieldSort, v))
 }
 
 // SortLTE applies the LTE predicate on the "sort" field.
-func SortLTE(v int) predicate.MenuSpec {
+func SortLTE(v uint32) predicate.MenuSpec {
 	return predicate.MenuSpec(sql.FieldLTE(FieldSort, v))
 }
 
@@ -426,7 +426,7 @@ func HasSpecItem() predicate.MenuSpec {
 	return predicate.MenuSpec(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SpecItemTable, SpecItemColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, SpecItemTable, SpecItemColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

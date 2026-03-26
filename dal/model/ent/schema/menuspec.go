@@ -42,10 +42,10 @@ func (MenuSpec) Fields() []ent.Field {
 			Nillable().
 			Comment("菜单种类下的规格项ID"),
 		// field.Uint64("")
-		field.Float("price_delta").
+		field.Int64("price_delta").
 			Default(0).
 			Comment("特殊加价"),
-		field.Int("sort").
+		field.Uint32("sort").
 			Default(0).
 			Comment("顺序"),
 	}
@@ -58,12 +58,13 @@ func (MenuSpec) Edges() []ent.Edge {
 			Field("menu_id").
 			Unique().
 			Required(), // 菜单
-		edge.From("category_spec", MenuCategorySpec.Type).
+		edge.From("category_spec", CategorySpec.Type).
 			Ref("menu_specs").
 			Field("category_spec_id").
 			Unique(), // 菜单种类下的的规格组
-		edge.To("spec_item", SpecItem.Type).
-			Unique().
-			Field("spec_item_id"), // 规格值
+		edge.From("spec_item", SpecItem.Type).
+			Ref("menu_specs").
+			Field("spec_item_id").
+			Unique(), // 规格值
 	}
 }

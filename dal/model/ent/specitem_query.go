@@ -63,7 +63,7 @@ func (_q *SpecItemQuery) Order(o ...specitem.OrderOption) *SpecItemQuery {
 	return _q
 }
 
-// QuerySpecGroup chains the current query on the "Spec_group" edge.
+// QuerySpecGroup chains the current query on the "spec_group" edge.
 func (_q *SpecItemQuery) QuerySpecGroup() *SpecGroupQuery {
 	query := (&SpecGroupClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
@@ -99,7 +99,7 @@ func (_q *SpecItemQuery) QueryMenuSpecs() *MenuSpecQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(specitem.Table, specitem.FieldID, selector),
 			sqlgraph.To(menuspec.Table, menuspec.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, specitem.MenuSpecsTable, specitem.MenuSpecsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, specitem.MenuSpecsTable, specitem.MenuSpecsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -308,7 +308,7 @@ func (_q *SpecItemQuery) Clone() *SpecItemQuery {
 }
 
 // WithSpecGroup tells the query-builder to eager-load the nodes that are connected to
-// the "Spec_group" edge. The optional arguments are used to configure the query builder of the edge.
+// the "spec_group" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *SpecItemQuery) WithSpecGroup(opts ...func(*SpecGroupQuery)) *SpecItemQuery {
 	query := (&SpecGroupClient{config: _q.config}).Query()
 	for _, opt := range opts {

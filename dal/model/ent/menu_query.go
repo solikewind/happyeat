@@ -29,7 +29,6 @@ type MenuQuery struct {
 	withCategory   *MenuCategoryQuery
 	withMenuSpecs  *MenuSpecQuery
 	withOrderItems *OrderItemQuery
-	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -443,7 +442,6 @@ func (_q *MenuQuery) prepareQuery(ctx context.Context) error {
 func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, error) {
 	var (
 		nodes       = []*Menu{}
-		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [3]bool{
 			_q.withCategory != nil,
@@ -451,12 +449,6 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 			_q.withOrderItems != nil,
 		}
 	)
-	if _q.withCategory != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, menu.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Menu).scanValues(nil, columns)
 	}
@@ -502,10 +494,7 @@ func (_q *MenuQuery) loadCategory(ctx context.Context, query *MenuCategoryQuery,
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*Menu)
 	for i := range nodes {
-		if nodes[i].menu_category_menus == nil {
-			continue
-		}
-		fk := *nodes[i].menu_category_menus
+		fk := nodes[i].MenuCategoryID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -522,7 +511,7 @@ func (_q *MenuQuery) loadCategory(ctx context.Context, query *MenuCategoryQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "menu_category_menus" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "menu_category_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -570,7 +559,9 @@ func (_q *MenuQuery) loadOrderItems(ctx context.Context, query *OrderItemQuery, 
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(orderitem.FieldMenuID)
+	}
 	query.Where(predicate.OrderItem(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(menu.OrderItemsColumn), fks...))
 	}))
@@ -579,13 +570,13 @@ func (_q *MenuQuery) loadOrderItems(ctx context.Context, query *OrderItemQuery, 
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.menu_order_items
+		fk := n.MenuID
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "menu_order_items" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "menu_id" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "menu_order_items" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "menu_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -616,6 +607,9 @@ func (_q *MenuQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != menu.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withCategory != nil {
+			_spec.Node.AddColumnOnce(menu.FieldMenuCategoryID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

@@ -70,13 +70,13 @@ func (_c *SpecGroupCreate) SetName(v string) *SpecGroupCreate {
 }
 
 // SetSort sets the "sort" field.
-func (_c *SpecGroupCreate) SetSort(v int) *SpecGroupCreate {
+func (_c *SpecGroupCreate) SetSort(v uint32) *SpecGroupCreate {
 	_c.mutation.SetSort(v)
 	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_c *SpecGroupCreate) SetNillableSort(v *int) *SpecGroupCreate {
+func (_c *SpecGroupCreate) SetNillableSort(v *uint32) *SpecGroupCreate {
 	if v != nil {
 		_c.SetSort(*v)
 	}
@@ -237,7 +237,7 @@ func (_c *SpecGroupCreate) createSpec() (*SpecGroup, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(specgroup.FieldSort, field.TypeInt, value)
+		_spec.SetField(specgroup.FieldSort, field.TypeUint32, value)
 		_node.Sort = value
 	}
 	if nodes := _c.mutation.SpecItemsIDs(); len(nodes) > 0 {

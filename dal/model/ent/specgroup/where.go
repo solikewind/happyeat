@@ -76,7 +76,7 @@ func Name(v string) predicate.SpecGroup {
 }
 
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
-func Sort(v int) predicate.SpecGroup {
+func Sort(v uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldEQ(FieldSort, v))
 }
 
@@ -266,42 +266,42 @@ func NameContainsFold(v string) predicate.SpecGroup {
 }
 
 // SortEQ applies the EQ predicate on the "sort" field.
-func SortEQ(v int) predicate.SpecGroup {
+func SortEQ(v uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldEQ(FieldSort, v))
 }
 
 // SortNEQ applies the NEQ predicate on the "sort" field.
-func SortNEQ(v int) predicate.SpecGroup {
+func SortNEQ(v uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldNEQ(FieldSort, v))
 }
 
 // SortIn applies the In predicate on the "sort" field.
-func SortIn(vs ...int) predicate.SpecGroup {
+func SortIn(vs ...uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldIn(FieldSort, vs...))
 }
 
 // SortNotIn applies the NotIn predicate on the "sort" field.
-func SortNotIn(vs ...int) predicate.SpecGroup {
+func SortNotIn(vs ...uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldNotIn(FieldSort, vs...))
 }
 
 // SortGT applies the GT predicate on the "sort" field.
-func SortGT(v int) predicate.SpecGroup {
+func SortGT(v uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldGT(FieldSort, v))
 }
 
 // SortGTE applies the GTE predicate on the "sort" field.
-func SortGTE(v int) predicate.SpecGroup {
+func SortGTE(v uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldGTE(FieldSort, v))
 }
 
 // SortLT applies the LT predicate on the "sort" field.
-func SortLT(v int) predicate.SpecGroup {
+func SortLT(v uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldLT(FieldSort, v))
 }
 
 // SortLTE applies the LTE predicate on the "sort" field.
-func SortLTE(v int) predicate.SpecGroup {
+func SortLTE(v uint32) predicate.SpecGroup {
 	return predicate.SpecGroup(sql.FieldLTE(FieldSort, v))
 }
 

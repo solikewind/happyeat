@@ -14,7 +14,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 )
 
-// 订单明细
+// 订单明细表
 type OrderItem struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -26,24 +26,26 @@ type OrderItem struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 删除时间戳
 	DeleteTs int64 `json:"delete_ts,omitempty"`
+	// 订单ID
+	OrderID uint64 `json:"order_id,omitempty"`
+	// 菜单ID
+	MenuID *uint64 `json:"menu_id,omitempty"`
 	// 菜品名称快照
 	MenuName string `json:"menu_name,omitempty"`
 	// 数量
 	Quantity int `json:"quantity,omitempty"`
 	// 单价（含规格加价）
-	UnitPrice float64 `json:"unit_price,omitempty"`
+	UnitPrice int64 `json:"unit_price,omitempty"`
 	// 小计金额
-	Amount float64 `json:"amount,omitempty"`
+	Amount int64 `json:"amount,omitempty"`
 	// 规格描述快照，如 大份,中辣
 	SpecInfo *string `json:"spec_info,omitempty"`
 	// 排序
-	Sort int `json:"sort,omitempty"`
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderItemQuery when eager-loading is set.
-	Edges            OrderItemEdges `json:"edges"`
-	menu_order_items *uint64
-	order_items      *uint64
-	selectValues     sql.SelectValues
+	Edges        OrderItemEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // OrderItemEdges holds the relations/edges for other nodes in the graph.
@@ -84,18 +86,12 @@ func (*OrderItem) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case orderitem.FieldUnitPrice, orderitem.FieldAmount:
-			values[i] = new(sql.NullFloat64)
-		case orderitem.FieldID, orderitem.FieldDeleteTs, orderitem.FieldQuantity, orderitem.FieldSort:
+		case orderitem.FieldID, orderitem.FieldDeleteTs, orderitem.FieldOrderID, orderitem.FieldMenuID, orderitem.FieldQuantity, orderitem.FieldUnitPrice, orderitem.FieldAmount, orderitem.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case orderitem.FieldMenuName, orderitem.FieldSpecInfo:
 			values[i] = new(sql.NullString)
 		case orderitem.FieldCreatedAt, orderitem.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case orderitem.ForeignKeys[0]: // menu_order_items
-			values[i] = new(sql.NullInt64)
-		case orderitem.ForeignKeys[1]: // order_items
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -135,6 +131,19 @@ func (_m *OrderItem) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DeleteTs = value.Int64
 			}
+		case orderitem.FieldOrderID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field order_id", values[i])
+			} else if value.Valid {
+				_m.OrderID = uint64(value.Int64)
+			}
+		case orderitem.FieldMenuID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field menu_id", values[i])
+			} else if value.Valid {
+				_m.MenuID = new(uint64)
+				*_m.MenuID = uint64(value.Int64)
+			}
 		case orderitem.FieldMenuName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field menu_name", values[i])
@@ -148,16 +157,16 @@ func (_m *OrderItem) assignValues(columns []string, values []any) error {
 				_m.Quantity = int(value.Int64)
 			}
 		case orderitem.FieldUnitPrice:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field unit_price", values[i])
 			} else if value.Valid {
-				_m.UnitPrice = value.Float64
+				_m.UnitPrice = value.Int64
 			}
 		case orderitem.FieldAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				_m.Amount = value.Float64
+				_m.Amount = value.Int64
 			}
 		case orderitem.FieldSpecInfo:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -170,21 +179,7 @@ func (_m *OrderItem) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = int(value.Int64)
-			}
-		case orderitem.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field menu_order_items", value)
-			} else if value.Valid {
-				_m.menu_order_items = new(uint64)
-				*_m.menu_order_items = uint64(value.Int64)
-			}
-		case orderitem.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field order_items", value)
-			} else if value.Valid {
-				_m.order_items = new(uint64)
-				*_m.order_items = uint64(value.Int64)
+				_m.Sort = uint32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -240,6 +235,14 @@ func (_m *OrderItem) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("delete_ts=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
+	builder.WriteString(", ")
+	builder.WriteString("order_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.OrderID))
+	builder.WriteString(", ")
+	if v := _m.MenuID; v != nil {
+		builder.WriteString("menu_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("menu_name=")
 	builder.WriteString(_m.MenuName)

@@ -113,14 +113,14 @@ func (_u *MenuSpecUpdate) ClearCategorySpecID() *MenuSpecUpdate {
 }
 
 // SetPriceDelta sets the "price_delta" field.
-func (_u *MenuSpecUpdate) SetPriceDelta(v float64) *MenuSpecUpdate {
+func (_u *MenuSpecUpdate) SetPriceDelta(v int64) *MenuSpecUpdate {
 	_u.mutation.ResetPriceDelta()
 	_u.mutation.SetPriceDelta(v)
 	return _u
 }
 
 // SetNillablePriceDelta sets the "price_delta" field if the given value is not nil.
-func (_u *MenuSpecUpdate) SetNillablePriceDelta(v *float64) *MenuSpecUpdate {
+func (_u *MenuSpecUpdate) SetNillablePriceDelta(v *int64) *MenuSpecUpdate {
 	if v != nil {
 		_u.SetPriceDelta(*v)
 	}
@@ -128,20 +128,20 @@ func (_u *MenuSpecUpdate) SetNillablePriceDelta(v *float64) *MenuSpecUpdate {
 }
 
 // AddPriceDelta adds value to the "price_delta" field.
-func (_u *MenuSpecUpdate) AddPriceDelta(v float64) *MenuSpecUpdate {
+func (_u *MenuSpecUpdate) AddPriceDelta(v int64) *MenuSpecUpdate {
 	_u.mutation.AddPriceDelta(v)
 	return _u
 }
 
 // SetSort sets the "sort" field.
-func (_u *MenuSpecUpdate) SetSort(v int) *MenuSpecUpdate {
+func (_u *MenuSpecUpdate) SetSort(v uint32) *MenuSpecUpdate {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *MenuSpecUpdate) SetNillableSort(v *int) *MenuSpecUpdate {
+func (_u *MenuSpecUpdate) SetNillableSort(v *uint32) *MenuSpecUpdate {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -149,7 +149,7 @@ func (_u *MenuSpecUpdate) SetNillableSort(v *int) *MenuSpecUpdate {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *MenuSpecUpdate) AddSort(v int) *MenuSpecUpdate {
+func (_u *MenuSpecUpdate) AddSort(v int32) *MenuSpecUpdate {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -264,16 +264,16 @@ func (_u *MenuSpecUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.AddField(menuspec.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.PriceDelta(); ok {
-		_spec.SetField(menuspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.SetField(menuspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPriceDelta(); ok {
-		_spec.AddField(menuspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.AddField(menuspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(menuspec.FieldSort, field.TypeInt, value)
+		_spec.SetField(menuspec.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(menuspec.FieldSort, field.TypeInt, value)
+		_spec.AddField(menuspec.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.MenuCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -336,7 +336,7 @@ func (_u *MenuSpecUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.SpecItemCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   menuspec.SpecItemTable,
 			Columns: []string{menuspec.SpecItemColumn},
 			Bidi:    false,
@@ -349,7 +349,7 @@ func (_u *MenuSpecUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if nodes := _u.mutation.SpecItemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   menuspec.SpecItemTable,
 			Columns: []string{menuspec.SpecItemColumn},
 			Bidi:    false,
@@ -464,14 +464,14 @@ func (_u *MenuSpecUpdateOne) ClearCategorySpecID() *MenuSpecUpdateOne {
 }
 
 // SetPriceDelta sets the "price_delta" field.
-func (_u *MenuSpecUpdateOne) SetPriceDelta(v float64) *MenuSpecUpdateOne {
+func (_u *MenuSpecUpdateOne) SetPriceDelta(v int64) *MenuSpecUpdateOne {
 	_u.mutation.ResetPriceDelta()
 	_u.mutation.SetPriceDelta(v)
 	return _u
 }
 
 // SetNillablePriceDelta sets the "price_delta" field if the given value is not nil.
-func (_u *MenuSpecUpdateOne) SetNillablePriceDelta(v *float64) *MenuSpecUpdateOne {
+func (_u *MenuSpecUpdateOne) SetNillablePriceDelta(v *int64) *MenuSpecUpdateOne {
 	if v != nil {
 		_u.SetPriceDelta(*v)
 	}
@@ -479,20 +479,20 @@ func (_u *MenuSpecUpdateOne) SetNillablePriceDelta(v *float64) *MenuSpecUpdateOn
 }
 
 // AddPriceDelta adds value to the "price_delta" field.
-func (_u *MenuSpecUpdateOne) AddPriceDelta(v float64) *MenuSpecUpdateOne {
+func (_u *MenuSpecUpdateOne) AddPriceDelta(v int64) *MenuSpecUpdateOne {
 	_u.mutation.AddPriceDelta(v)
 	return _u
 }
 
 // SetSort sets the "sort" field.
-func (_u *MenuSpecUpdateOne) SetSort(v int) *MenuSpecUpdateOne {
+func (_u *MenuSpecUpdateOne) SetSort(v uint32) *MenuSpecUpdateOne {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *MenuSpecUpdateOne) SetNillableSort(v *int) *MenuSpecUpdateOne {
+func (_u *MenuSpecUpdateOne) SetNillableSort(v *uint32) *MenuSpecUpdateOne {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -500,7 +500,7 @@ func (_u *MenuSpecUpdateOne) SetNillableSort(v *int) *MenuSpecUpdateOne {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *MenuSpecUpdateOne) AddSort(v int) *MenuSpecUpdateOne {
+func (_u *MenuSpecUpdateOne) AddSort(v int32) *MenuSpecUpdateOne {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -645,16 +645,16 @@ func (_u *MenuSpecUpdateOne) sqlSave(ctx context.Context) (_node *MenuSpec, err 
 		_spec.AddField(menuspec.FieldDeleteTs, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.PriceDelta(); ok {
-		_spec.SetField(menuspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.SetField(menuspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPriceDelta(); ok {
-		_spec.AddField(menuspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.AddField(menuspec.FieldPriceDelta, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(menuspec.FieldSort, field.TypeInt, value)
+		_spec.SetField(menuspec.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(menuspec.FieldSort, field.TypeInt, value)
+		_spec.AddField(menuspec.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.MenuCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -717,7 +717,7 @@ func (_u *MenuSpecUpdateOne) sqlSave(ctx context.Context) (_node *MenuSpec, err 
 	if _u.mutation.SpecItemCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   menuspec.SpecItemTable,
 			Columns: []string{menuspec.SpecItemColumn},
 			Bidi:    false,
@@ -730,7 +730,7 @@ func (_u *MenuSpecUpdateOne) sqlSave(ctx context.Context) (_node *MenuSpec, err 
 	if nodes := _u.mutation.SpecItemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   menuspec.SpecItemTable,
 			Columns: []string{menuspec.SpecItemColumn},
 			Bidi:    false,

@@ -32,7 +32,7 @@ func (Table) Annotations() []schema.Annotation {
 func (Table) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("table_category_id").
-			Comment("所属分类ID"),
+			Comment("餐桌分类ID"),
 		field.String("code").
 			MaxLen(32).
 			Unique().
@@ -41,8 +41,9 @@ func (Table) Fields() []ent.Field {
 			Default("idle").
 			MaxLen(32).
 			Comment("idle=空闲 using=使用中 reserved=预留 cleaning=清洁中"),
-		field.Int("capacity").
-			Default(4).
+		field.Uint32("capacity").
+			Default(1).
+			Positive().
 			Comment("可坐人数"),
 		field.String("qr_code").
 			MaxLen(256).

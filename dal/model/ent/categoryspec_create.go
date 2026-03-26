@@ -64,6 +64,12 @@ func (_c *CategorySpecCreate) SetNillableDeleteTs(v *int64) *CategorySpecCreate 
 	return _c
 }
 
+// SetMenuCategoryID sets the "menu_category_id" field.
+func (_c *CategorySpecCreate) SetMenuCategoryID(v uint64) *CategorySpecCreate {
+	_c.mutation.SetMenuCategoryID(v)
+	return _c
+}
+
 // SetSpecType sets the "spec_type" field.
 func (_c *CategorySpecCreate) SetSpecType(v string) *CategorySpecCreate {
 	_c.mutation.SetSpecType(v)
@@ -91,13 +97,13 @@ func (_c *CategorySpecCreate) SetNillablePriceDelta(v *float64) *CategorySpecCre
 }
 
 // SetSort sets the "sort" field.
-func (_c *CategorySpecCreate) SetSort(v int) *CategorySpecCreate {
+func (_c *CategorySpecCreate) SetSort(v uint32) *CategorySpecCreate {
 	_c.mutation.SetSort(v)
 	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_c *CategorySpecCreate) SetNillableSort(v *int) *CategorySpecCreate {
+func (_c *CategorySpecCreate) SetNillableSort(v *uint32) *CategorySpecCreate {
 	if v != nil {
 		_c.SetSort(*v)
 	}
@@ -213,6 +219,9 @@ func (_c *CategorySpecCreate) check() error {
 	if _, ok := _c.mutation.DeleteTs(); !ok {
 		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "CategorySpec.delete_ts"`)}
 	}
+	if _, ok := _c.mutation.MenuCategoryID(); !ok {
+		return &ValidationError{Name: "menu_category_id", err: errors.New(`ent: missing required field "CategorySpec.menu_category_id"`)}
+	}
 	if _, ok := _c.mutation.SpecType(); !ok {
 		return &ValidationError{Name: "spec_type", err: errors.New(`ent: missing required field "CategorySpec.spec_type"`)}
 	}
@@ -295,7 +304,7 @@ func (_c *CategorySpecCreate) createSpec() (*CategorySpec, *sqlgraph.CreateSpec)
 		_node.PriceDelta = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(categoryspec.FieldSort, field.TypeInt, value)
+		_spec.SetField(categoryspec.FieldSort, field.TypeUint32, value)
 		_node.Sort = value
 	}
 	if nodes := _c.mutation.CategoryIDs(); len(nodes) > 0 {
@@ -312,7 +321,7 @@ func (_c *CategorySpecCreate) createSpec() (*CategorySpec, *sqlgraph.CreateSpec)
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.menu_category_category_specs = &nodes[0]
+		_node.MenuCategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.MenuSpecsIDs(); len(nodes) > 0 {

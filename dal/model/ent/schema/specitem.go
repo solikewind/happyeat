@@ -46,7 +46,6 @@ func (SpecItem) Edges() []ent.Edge {
 			Field("spec_group_id").
 			Unique().
 			Required(),
-		edge.From("menu_specs", MenuSpec.Type).
-			Ref("spec_item"),
+		edge.To("menu_specs", MenuSpec.Type),
 	}
 }

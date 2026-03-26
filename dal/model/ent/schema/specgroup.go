@@ -23,7 +23,7 @@ func (SpecGroup) Mixin() []ent.Mixin {
 func (SpecGroup) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),
-		entsql.Annotation{Table: "spec_group"},
+		entsql.Annotation{Table: "spec_groups"},
 		schema.Comment("规格组"),
 	}
 }
@@ -33,7 +33,7 @@ func (SpecGroup) Fields() []ent.Field {
 		field.String("name").
 			MaxLen(64).
 			Comment("规格名（辣度）"),
-		field.Int("sort").
+		field.Uint32("sort").
 			Default(0).
 			Comment("排序"),
 	}

@@ -64,6 +64,26 @@ func (_c *OrderItemCreate) SetNillableDeleteTs(v *int64) *OrderItemCreate {
 	return _c
 }
 
+// SetOrderID sets the "order_id" field.
+func (_c *OrderItemCreate) SetOrderID(v uint64) *OrderItemCreate {
+	_c.mutation.SetOrderID(v)
+	return _c
+}
+
+// SetMenuID sets the "menu_id" field.
+func (_c *OrderItemCreate) SetMenuID(v uint64) *OrderItemCreate {
+	_c.mutation.SetMenuID(v)
+	return _c
+}
+
+// SetNillableMenuID sets the "menu_id" field if the given value is not nil.
+func (_c *OrderItemCreate) SetNillableMenuID(v *uint64) *OrderItemCreate {
+	if v != nil {
+		_c.SetMenuID(*v)
+	}
+	return _c
+}
+
 // SetMenuName sets the "menu_name" field.
 func (_c *OrderItemCreate) SetMenuName(v string) *OrderItemCreate {
 	_c.mutation.SetMenuName(v)
@@ -85,13 +105,13 @@ func (_c *OrderItemCreate) SetNillableQuantity(v *int) *OrderItemCreate {
 }
 
 // SetUnitPrice sets the "unit_price" field.
-func (_c *OrderItemCreate) SetUnitPrice(v float64) *OrderItemCreate {
+func (_c *OrderItemCreate) SetUnitPrice(v int64) *OrderItemCreate {
 	_c.mutation.SetUnitPrice(v)
 	return _c
 }
 
 // SetAmount sets the "amount" field.
-func (_c *OrderItemCreate) SetAmount(v float64) *OrderItemCreate {
+func (_c *OrderItemCreate) SetAmount(v int64) *OrderItemCreate {
 	_c.mutation.SetAmount(v)
 	return _c
 }
@@ -111,13 +131,13 @@ func (_c *OrderItemCreate) SetNillableSpecInfo(v *string) *OrderItemCreate {
 }
 
 // SetSort sets the "sort" field.
-func (_c *OrderItemCreate) SetSort(v int) *OrderItemCreate {
+func (_c *OrderItemCreate) SetSort(v uint32) *OrderItemCreate {
 	_c.mutation.SetSort(v)
 	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_c *OrderItemCreate) SetNillableSort(v *int) *OrderItemCreate {
+func (_c *OrderItemCreate) SetNillableSort(v *uint32) *OrderItemCreate {
 	if v != nil {
 		_c.SetSort(*v)
 	}
@@ -130,29 +150,9 @@ func (_c *OrderItemCreate) SetID(v uint64) *OrderItemCreate {
 	return _c
 }
 
-// SetOrderID sets the "order" edge to the Order entity by ID.
-func (_c *OrderItemCreate) SetOrderID(id uint64) *OrderItemCreate {
-	_c.mutation.SetOrderID(id)
-	return _c
-}
-
 // SetOrder sets the "order" edge to the Order entity.
 func (_c *OrderItemCreate) SetOrder(v *Order) *OrderItemCreate {
 	return _c.SetOrderID(v.ID)
-}
-
-// SetMenuID sets the "menu" edge to the Menu entity by ID.
-func (_c *OrderItemCreate) SetMenuID(id uint64) *OrderItemCreate {
-	_c.mutation.SetMenuID(id)
-	return _c
-}
-
-// SetNillableMenuID sets the "menu" edge to the Menu entity by ID if the given value is not nil.
-func (_c *OrderItemCreate) SetNillableMenuID(id *uint64) *OrderItemCreate {
-	if id != nil {
-		_c = _c.SetMenuID(*id)
-	}
-	return _c
 }
 
 // SetMenu sets the "menu" edge to the Menu entity.
@@ -237,6 +237,9 @@ func (_c *OrderItemCreate) check() error {
 	if _, ok := _c.mutation.DeleteTs(); !ok {
 		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "OrderItem.delete_ts"`)}
 	}
+	if _, ok := _c.mutation.OrderID(); !ok {
+		return &ValidationError{Name: "order_id", err: errors.New(`ent: missing required field "OrderItem.order_id"`)}
+	}
 	if _, ok := _c.mutation.MenuName(); !ok {
 		return &ValidationError{Name: "menu_name", err: errors.New(`ent: missing required field "OrderItem.menu_name"`)}
 	}
@@ -318,11 +321,11 @@ func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 		_node.Quantity = value
 	}
 	if value, ok := _c.mutation.UnitPrice(); ok {
-		_spec.SetField(orderitem.FieldUnitPrice, field.TypeFloat64, value)
+		_spec.SetField(orderitem.FieldUnitPrice, field.TypeInt64, value)
 		_node.UnitPrice = value
 	}
 	if value, ok := _c.mutation.Amount(); ok {
-		_spec.SetField(orderitem.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(orderitem.FieldAmount, field.TypeInt64, value)
 		_node.Amount = value
 	}
 	if value, ok := _c.mutation.SpecInfo(); ok {
@@ -330,7 +333,7 @@ func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 		_node.SpecInfo = &value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(orderitem.FieldSort, field.TypeInt, value)
+		_spec.SetField(orderitem.FieldSort, field.TypeUint32, value)
 		_node.Sort = value
 	}
 	if nodes := _c.mutation.OrderIDs(); len(nodes) > 0 {
@@ -347,7 +350,7 @@ func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.order_items = &nodes[0]
+		_node.OrderID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.MenuIDs(); len(nodes) > 0 {
@@ -364,7 +367,7 @@ func (_c *OrderItemCreate) createSpec() (*OrderItem, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.menu_order_items = &nodes[0]
+		_node.MenuID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

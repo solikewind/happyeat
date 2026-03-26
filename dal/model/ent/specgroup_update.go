@@ -71,14 +71,14 @@ func (_u *SpecGroupUpdate) SetNillableName(v *string) *SpecGroupUpdate {
 }
 
 // SetSort sets the "sort" field.
-func (_u *SpecGroupUpdate) SetSort(v int) *SpecGroupUpdate {
+func (_u *SpecGroupUpdate) SetSort(v uint32) *SpecGroupUpdate {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *SpecGroupUpdate) SetNillableSort(v *int) *SpecGroupUpdate {
+func (_u *SpecGroupUpdate) SetNillableSort(v *uint32) *SpecGroupUpdate {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -86,7 +86,7 @@ func (_u *SpecGroupUpdate) SetNillableSort(v *int) *SpecGroupUpdate {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *SpecGroupUpdate) AddSort(v int) *SpecGroupUpdate {
+func (_u *SpecGroupUpdate) AddSort(v int32) *SpecGroupUpdate {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -209,10 +209,10 @@ func (_u *SpecGroupUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(specgroup.FieldName, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(specgroup.FieldSort, field.TypeInt, value)
+		_spec.SetField(specgroup.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(specgroup.FieldSort, field.TypeInt, value)
+		_spec.AddField(specgroup.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.SpecItemsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -321,14 +321,14 @@ func (_u *SpecGroupUpdateOne) SetNillableName(v *string) *SpecGroupUpdateOne {
 }
 
 // SetSort sets the "sort" field.
-func (_u *SpecGroupUpdateOne) SetSort(v int) *SpecGroupUpdateOne {
+func (_u *SpecGroupUpdateOne) SetSort(v uint32) *SpecGroupUpdateOne {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *SpecGroupUpdateOne) SetNillableSort(v *int) *SpecGroupUpdateOne {
+func (_u *SpecGroupUpdateOne) SetNillableSort(v *uint32) *SpecGroupUpdateOne {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -336,7 +336,7 @@ func (_u *SpecGroupUpdateOne) SetNillableSort(v *int) *SpecGroupUpdateOne {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *SpecGroupUpdateOne) AddSort(v int) *SpecGroupUpdateOne {
+func (_u *SpecGroupUpdateOne) AddSort(v int32) *SpecGroupUpdateOne {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -489,10 +489,10 @@ func (_u *SpecGroupUpdateOne) sqlSave(ctx context.Context) (_node *SpecGroup, er
 		_spec.SetField(specgroup.FieldName, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(specgroup.FieldSort, field.TypeInt, value)
+		_spec.SetField(specgroup.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(specgroup.FieldSort, field.TypeInt, value)
+		_spec.AddField(specgroup.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.SpecItemsCleared() {
 		edge := &sqlgraph.EdgeSpec{

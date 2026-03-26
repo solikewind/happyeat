@@ -9,11 +9,12 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 )
 
-// 订单
+// 订单表
 type Order struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -25,20 +26,21 @@ type Order struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 删除时间戳
 	DeleteTs int64 `json:"delete_ts,omitempty"`
+	// 餐桌ID
+	TableID *uint64 `json:"table_id,omitempty"`
 	// 订单号
 	OrderNo string `json:"order_no,omitempty"`
 	// dine_in=堂食 takeaway=打包外带
-	OrderType string `json:"order_type,omitempty"`
+	OrderType enum.OrderType `json:"order_type,omitempty"`
 	// created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消
-	Status string `json:"status,omitempty"`
+	Status enum.OrderStatus `json:"status,omitempty"`
 	// 订单总金额
-	TotalAmount float64 `json:"total_amount,omitempty"`
+	TotalAmount int64 `json:"total_amount,omitempty"`
 	// 备注
 	Remark *string `json:"remark,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderQuery when eager-loading is set.
 	Edges        OrderEdges `json:"edges"`
-	table_orders *uint64
 	selectValues sql.SelectValues
 }
 
@@ -78,16 +80,16 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case order.FieldTotalAmount:
-			values[i] = new(sql.NullFloat64)
-		case order.FieldID, order.FieldDeleteTs:
+		case order.FieldStatus:
+			values[i] = new(enum.OrderStatus)
+		case order.FieldOrderType:
+			values[i] = new(enum.OrderType)
+		case order.FieldID, order.FieldDeleteTs, order.FieldTableID, order.FieldTotalAmount:
 			values[i] = new(sql.NullInt64)
-		case order.FieldOrderNo, order.FieldOrderType, order.FieldStatus, order.FieldRemark:
+		case order.FieldOrderNo, order.FieldRemark:
 			values[i] = new(sql.NullString)
 		case order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case order.ForeignKeys[0]: // table_orders
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -127,6 +129,13 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DeleteTs = value.Int64
 			}
+		case order.FieldTableID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field table_id", values[i])
+			} else if value.Valid {
+				_m.TableID = new(uint64)
+				*_m.TableID = uint64(value.Int64)
+			}
 		case order.FieldOrderNo:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field order_no", values[i])
@@ -134,22 +143,22 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 				_m.OrderNo = value.String
 			}
 		case order.FieldOrderType:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*enum.OrderType); !ok {
 				return fmt.Errorf("unexpected type %T for field order_type", values[i])
-			} else if value.Valid {
-				_m.OrderType = value.String
+			} else if value != nil {
+				_m.OrderType = *value
 			}
 		case order.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*enum.OrderStatus); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
-			} else if value.Valid {
-				_m.Status = value.String
+			} else if value != nil {
+				_m.Status = *value
 			}
 		case order.FieldTotalAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_amount", values[i])
 			} else if value.Valid {
-				_m.TotalAmount = value.Float64
+				_m.TotalAmount = value.Int64
 			}
 		case order.FieldRemark:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -157,13 +166,6 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Remark = new(string)
 				*_m.Remark = value.String
-			}
-		case order.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field table_orders", value)
-			} else if value.Valid {
-				_m.table_orders = new(uint64)
-				*_m.table_orders = uint64(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -220,14 +222,19 @@ func (_m *Order) String() string {
 	builder.WriteString("delete_ts=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
 	builder.WriteString(", ")
+	if v := _m.TableID; v != nil {
+		builder.WriteString("table_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("order_no=")
 	builder.WriteString(_m.OrderNo)
 	builder.WriteString(", ")
 	builder.WriteString("order_type=")
-	builder.WriteString(_m.OrderType)
+	builder.WriteString(fmt.Sprintf("%v", _m.OrderType))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(_m.Status)
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteString(", ")
 	builder.WriteString("total_amount=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TotalAmount))

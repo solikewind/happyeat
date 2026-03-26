@@ -1,28 +1,28 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package menutype
+package spec
 
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/menutype"
+	"github.com/solikewind/happyeat/app/internal/logic/spec"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 获取菜单种类
-func GetMenuCategoryHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 获取规格组
+func GetSpecGroupHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.GetMenuCategoryReq
+		var req types.GetSpecGroupReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := menutype.NewGetMenuCategoryLogic(r.Context(), svcCtx)
-		resp, err := l.GetMenuCategory(&req)
+		l := spec.NewGetSpecGroupLogic(r.Context(), svcCtx)
+		resp, err := l.GetSpecGroup(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

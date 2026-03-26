@@ -27,7 +27,6 @@ type CategorySpecQuery struct {
 	predicates    []predicate.CategorySpec
 	withCategory  *MenuCategoryQuery
 	withMenuSpecs *MenuSpecQuery
-	withFKs       bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -407,19 +406,12 @@ func (_q *CategorySpecQuery) prepareQuery(ctx context.Context) error {
 func (_q *CategorySpecQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CategorySpec, error) {
 	var (
 		nodes       = []*CategorySpec{}
-		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
 			_q.withCategory != nil,
 			_q.withMenuSpecs != nil,
 		}
 	)
-	if _q.withCategory != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, categoryspec.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*CategorySpec).scanValues(nil, columns)
 	}
@@ -458,10 +450,7 @@ func (_q *CategorySpecQuery) loadCategory(ctx context.Context, query *MenuCatego
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*CategorySpec)
 	for i := range nodes {
-		if nodes[i].menu_category_category_specs == nil {
-			continue
-		}
-		fk := *nodes[i].menu_category_category_specs
+		fk := nodes[i].MenuCategoryID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -478,7 +467,7 @@ func (_q *CategorySpecQuery) loadCategory(ctx context.Context, query *MenuCatego
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "menu_category_category_specs" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "menu_category_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -544,6 +533,9 @@ func (_q *CategorySpecQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != categoryspec.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withCategory != nil {
+			_spec.Node.AddColumnOnce(categoryspec.FieldMenuCategoryID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

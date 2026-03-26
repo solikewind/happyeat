@@ -100,13 +100,13 @@ func (_c *MenuSpecCreate) SetNillableCategorySpecID(v *uint64) *MenuSpecCreate {
 }
 
 // SetPriceDelta sets the "price_delta" field.
-func (_c *MenuSpecCreate) SetPriceDelta(v float64) *MenuSpecCreate {
+func (_c *MenuSpecCreate) SetPriceDelta(v int64) *MenuSpecCreate {
 	_c.mutation.SetPriceDelta(v)
 	return _c
 }
 
 // SetNillablePriceDelta sets the "price_delta" field if the given value is not nil.
-func (_c *MenuSpecCreate) SetNillablePriceDelta(v *float64) *MenuSpecCreate {
+func (_c *MenuSpecCreate) SetNillablePriceDelta(v *int64) *MenuSpecCreate {
 	if v != nil {
 		_c.SetPriceDelta(*v)
 	}
@@ -114,13 +114,13 @@ func (_c *MenuSpecCreate) SetNillablePriceDelta(v *float64) *MenuSpecCreate {
 }
 
 // SetSort sets the "sort" field.
-func (_c *MenuSpecCreate) SetSort(v int) *MenuSpecCreate {
+func (_c *MenuSpecCreate) SetSort(v uint32) *MenuSpecCreate {
 	_c.mutation.SetSort(v)
 	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_c *MenuSpecCreate) SetNillableSort(v *int) *MenuSpecCreate {
+func (_c *MenuSpecCreate) SetNillableSort(v *uint32) *MenuSpecCreate {
 	if v != nil {
 		_c.SetSort(*v)
 	}
@@ -282,11 +282,11 @@ func (_c *MenuSpecCreate) createSpec() (*MenuSpec, *sqlgraph.CreateSpec) {
 		_node.DeleteTs = value
 	}
 	if value, ok := _c.mutation.PriceDelta(); ok {
-		_spec.SetField(menuspec.FieldPriceDelta, field.TypeFloat64, value)
+		_spec.SetField(menuspec.FieldPriceDelta, field.TypeInt64, value)
 		_node.PriceDelta = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(menuspec.FieldSort, field.TypeInt, value)
+		_spec.SetField(menuspec.FieldSort, field.TypeUint32, value)
 		_node.Sort = value
 	}
 	if nodes := _c.mutation.MenuIDs(); len(nodes) > 0 {
@@ -326,7 +326,7 @@ func (_c *MenuSpecCreate) createSpec() (*MenuSpec, *sqlgraph.CreateSpec) {
 	if nodes := _c.mutation.SpecItemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   menuspec.SpecItemTable,
 			Columns: []string{menuspec.SpecItemColumn},
 			Bidi:    false,

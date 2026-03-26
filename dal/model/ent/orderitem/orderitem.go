@@ -21,6 +21,10 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeleteTs holds the string denoting the delete_ts field in the database.
 	FieldDeleteTs = "delete_ts"
+	// FieldOrderID holds the string denoting the order_id field in the database.
+	FieldOrderID = "order_id"
+	// FieldMenuID holds the string denoting the menu_id field in the database.
+	FieldMenuID = "menu_id"
 	// FieldMenuName holds the string denoting the menu_name field in the database.
 	FieldMenuName = "menu_name"
 	// FieldQuantity holds the string denoting the quantity field in the database.
@@ -45,14 +49,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "order" package.
 	OrderInverseTable = "orders"
 	// OrderColumn is the table column denoting the order relation/edge.
-	OrderColumn = "order_items"
+	OrderColumn = "order_id"
 	// MenuTable is the table that holds the menu relation/edge.
 	MenuTable = "order_items"
 	// MenuInverseTable is the table name for the Menu entity.
 	// It exists in this package in order to avoid circular dependency with the "menu" package.
 	MenuInverseTable = "menus"
 	// MenuColumn is the table column denoting the menu relation/edge.
-	MenuColumn = "menu_order_items"
+	MenuColumn = "menu_id"
 )
 
 // Columns holds all SQL columns for orderitem fields.
@@ -61,6 +65,8 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeleteTs,
+	FieldOrderID,
+	FieldMenuID,
 	FieldMenuName,
 	FieldQuantity,
 	FieldUnitPrice,
@@ -69,22 +75,10 @@ var Columns = []string{
 	FieldSort,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "order_items"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"menu_order_items",
-	"order_items",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -114,7 +108,7 @@ var (
 	// SpecInfoValidator is a validator for the "spec_info" field. It is called by the builders before save.
 	SpecInfoValidator func(string) error
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the OrderItem queries.
@@ -138,6 +132,16 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByDeleteTs orders the results by the delete_ts field.
 func ByDeleteTs(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeleteTs, opts...).ToFunc()
+}
+
+// ByOrderID orders the results by the order_id field.
+func ByOrderID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrderID, opts...).ToFunc()
+}
+
+// ByMenuID orders the results by the menu_id field.
+func ByMenuID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMenuID, opts...).ToFunc()
 }
 
 // ByMenuName orders the results by the menu_name field.

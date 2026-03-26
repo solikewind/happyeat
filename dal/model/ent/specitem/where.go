@@ -330,7 +330,7 @@ func DefaultPriceLTE(v float64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldLTE(FieldDefaultPrice, v))
 }
 
-// HasSpecGroup applies the HasEdge predicate on the "Spec_group" edge.
+// HasSpecGroup applies the HasEdge predicate on the "spec_group" edge.
 func HasSpecGroup() predicate.SpecItem {
 	return predicate.SpecItem(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
@@ -341,7 +341,7 @@ func HasSpecGroup() predicate.SpecItem {
 	})
 }
 
-// HasSpecGroupWith applies the HasEdge predicate on the "Spec_group" edge with a given conditions (other predicates).
+// HasSpecGroupWith applies the HasEdge predicate on the "spec_group" edge with a given conditions (other predicates).
 func HasSpecGroupWith(preds ...predicate.SpecGroup) predicate.SpecItem {
 	return predicate.SpecItem(func(s *sql.Selector) {
 		step := newSpecGroupStep()
@@ -358,7 +358,7 @@ func HasMenuSpecs() predicate.SpecItem {
 	return predicate.SpecItem(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, MenuSpecsTable, MenuSpecsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, MenuSpecsTable, MenuSpecsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

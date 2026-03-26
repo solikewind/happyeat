@@ -1,7 +1,7 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package menutype
+package menucategory
 
 import (
 	"context"
@@ -30,7 +30,7 @@ func NewUpdateMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *UpdateMenuCategoryLogic) UpdateMenuCategory(req *types.UpdateMenuCategoryReq) (*types.UpdateMenuCategoryReply, error) {
-	c := req.MenuCategory
+	c := 		
 	if c.Name == "" {
 		return nil, errors.New("分类名称不能为空")
 	}

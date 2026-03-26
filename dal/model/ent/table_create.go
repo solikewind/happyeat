@@ -64,6 +64,12 @@ func (_c *TableCreate) SetNillableDeleteTs(v *int64) *TableCreate {
 	return _c
 }
 
+// SetTableCategoryID sets the "table_category_id" field.
+func (_c *TableCreate) SetTableCategoryID(v uint64) *TableCreate {
+	_c.mutation.SetTableCategoryID(v)
+	return _c
+}
+
 // SetCode sets the "code" field.
 func (_c *TableCreate) SetCode(v string) *TableCreate {
 	_c.mutation.SetCode(v)
@@ -85,13 +91,13 @@ func (_c *TableCreate) SetNillableStatus(v *string) *TableCreate {
 }
 
 // SetCapacity sets the "capacity" field.
-func (_c *TableCreate) SetCapacity(v int) *TableCreate {
+func (_c *TableCreate) SetCapacity(v uint32) *TableCreate {
 	_c.mutation.SetCapacity(v)
 	return _c
 }
 
 // SetNillableCapacity sets the "capacity" field if the given value is not nil.
-func (_c *TableCreate) SetNillableCapacity(v *int) *TableCreate {
+func (_c *TableCreate) SetNillableCapacity(v *uint32) *TableCreate {
 	if v != nil {
 		_c.SetCapacity(*v)
 	}
@@ -221,6 +227,9 @@ func (_c *TableCreate) check() error {
 	if _, ok := _c.mutation.DeleteTs(); !ok {
 		return &ValidationError{Name: "delete_ts", err: errors.New(`ent: missing required field "Table.delete_ts"`)}
 	}
+	if _, ok := _c.mutation.TableCategoryID(); !ok {
+		return &ValidationError{Name: "table_category_id", err: errors.New(`ent: missing required field "Table.table_category_id"`)}
+	}
 	if _, ok := _c.mutation.Code(); !ok {
 		return &ValidationError{Name: "code", err: errors.New(`ent: missing required field "Table.code"`)}
 	}
@@ -239,6 +248,11 @@ func (_c *TableCreate) check() error {
 	}
 	if _, ok := _c.mutation.Capacity(); !ok {
 		return &ValidationError{Name: "capacity", err: errors.New(`ent: missing required field "Table.capacity"`)}
+	}
+	if v, ok := _c.mutation.Capacity(); ok {
+		if err := table.CapacityValidator(v); err != nil {
+			return &ValidationError{Name: "capacity", err: fmt.Errorf(`ent: validator failed for field "Table.capacity": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.QrCode(); ok {
 		if err := table.QrCodeValidator(v); err != nil {
@@ -301,7 +315,7 @@ func (_c *TableCreate) createSpec() (*Table, *sqlgraph.CreateSpec) {
 		_node.Status = value
 	}
 	if value, ok := _c.mutation.Capacity(); ok {
-		_spec.SetField(table.FieldCapacity, field.TypeInt, value)
+		_spec.SetField(table.FieldCapacity, field.TypeUint32, value)
 		_node.Capacity = value
 	}
 	if value, ok := _c.mutation.QrCode(); ok {
@@ -322,7 +336,7 @@ func (_c *TableCreate) createSpec() (*Table, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.table_category_tables = &nodes[0]
+		_node.TableCategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.OrdersIDs(); len(nodes) > 0 {

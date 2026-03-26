@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
@@ -64,6 +65,20 @@ func (_c *OrderCreate) SetNillableDeleteTs(v *int64) *OrderCreate {
 	return _c
 }
 
+// SetTableID sets the "table_id" field.
+func (_c *OrderCreate) SetTableID(v uint64) *OrderCreate {
+	_c.mutation.SetTableID(v)
+	return _c
+}
+
+// SetNillableTableID sets the "table_id" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableTableID(v *uint64) *OrderCreate {
+	if v != nil {
+		_c.SetTableID(*v)
+	}
+	return _c
+}
+
 // SetOrderNo sets the "order_no" field.
 func (_c *OrderCreate) SetOrderNo(v string) *OrderCreate {
 	_c.mutation.SetOrderNo(v)
@@ -71,41 +86,25 @@ func (_c *OrderCreate) SetOrderNo(v string) *OrderCreate {
 }
 
 // SetOrderType sets the "order_type" field.
-func (_c *OrderCreate) SetOrderType(v string) *OrderCreate {
+func (_c *OrderCreate) SetOrderType(v enum.OrderType) *OrderCreate {
 	_c.mutation.SetOrderType(v)
 	return _c
 }
 
-// SetNillableOrderType sets the "order_type" field if the given value is not nil.
-func (_c *OrderCreate) SetNillableOrderType(v *string) *OrderCreate {
-	if v != nil {
-		_c.SetOrderType(*v)
-	}
-	return _c
-}
-
 // SetStatus sets the "status" field.
-func (_c *OrderCreate) SetStatus(v string) *OrderCreate {
+func (_c *OrderCreate) SetStatus(v enum.OrderStatus) *OrderCreate {
 	_c.mutation.SetStatus(v)
 	return _c
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (_c *OrderCreate) SetNillableStatus(v *string) *OrderCreate {
-	if v != nil {
-		_c.SetStatus(*v)
-	}
-	return _c
-}
-
 // SetTotalAmount sets the "total_amount" field.
-func (_c *OrderCreate) SetTotalAmount(v float64) *OrderCreate {
+func (_c *OrderCreate) SetTotalAmount(v int64) *OrderCreate {
 	_c.mutation.SetTotalAmount(v)
 	return _c
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_c *OrderCreate) SetNillableTotalAmount(v *float64) *OrderCreate {
+func (_c *OrderCreate) SetNillableTotalAmount(v *int64) *OrderCreate {
 	if v != nil {
 		_c.SetTotalAmount(*v)
 	}
@@ -129,20 +128,6 @@ func (_c *OrderCreate) SetNillableRemark(v *string) *OrderCreate {
 // SetID sets the "id" field.
 func (_c *OrderCreate) SetID(v uint64) *OrderCreate {
 	_c.mutation.SetID(v)
-	return _c
-}
-
-// SetTableID sets the "table" edge to the Table entity by ID.
-func (_c *OrderCreate) SetTableID(id uint64) *OrderCreate {
-	_c.mutation.SetTableID(id)
-	return _c
-}
-
-// SetNillableTableID sets the "table" edge to the Table entity by ID if the given value is not nil.
-func (_c *OrderCreate) SetNillableTableID(id *uint64) *OrderCreate {
-	if id != nil {
-		_c = _c.SetTableID(*id)
-	}
 	return _c
 }
 
@@ -220,14 +205,6 @@ func (_c *OrderCreate) defaults() error {
 	if _, ok := _c.mutation.DeleteTs(); !ok {
 		v := order.DefaultDeleteTs
 		_c.mutation.SetDeleteTs(v)
-	}
-	if _, ok := _c.mutation.OrderType(); !ok {
-		v := order.DefaultOrderType
-		_c.mutation.SetOrderType(v)
-	}
-	if _, ok := _c.mutation.Status(); !ok {
-		v := order.DefaultStatus
-		_c.mutation.SetStatus(v)
 	}
 	if _, ok := _c.mutation.TotalAmount(); !ok {
 		v := order.DefaultTotalAmount
@@ -328,15 +305,15 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_node.OrderNo = value
 	}
 	if value, ok := _c.mutation.OrderType(); ok {
-		_spec.SetField(order.FieldOrderType, field.TypeString, value)
+		_spec.SetField(order.FieldOrderType, field.TypeEnum, value)
 		_node.OrderType = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
-		_spec.SetField(order.FieldStatus, field.TypeString, value)
+		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
 	if value, ok := _c.mutation.TotalAmount(); ok {
-		_spec.SetField(order.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldTotalAmount, field.TypeInt64, value)
 		_node.TotalAmount = value
 	}
 	if value, ok := _c.mutation.Remark(); ok {
@@ -357,7 +334,7 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.table_orders = &nodes[0]
+		_node.TableID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.ItemsIDs(); len(nodes) > 0 {

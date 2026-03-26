@@ -1,28 +1,28 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package menutype
+package spec
 
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/menutype"
+	"github.com/solikewind/happyeat/app/internal/logic/spec"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 删除菜单种类
-func DeleteMenuCategoryHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 列出规格组
+func ListSpecGroupsHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.DeleteMenuCategoryReq
+		var req types.ListSpecGroupsReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := menutype.NewDeleteMenuCategoryLogic(r.Context(), svcCtx)
-		resp, err := l.DeleteMenuCategory(&req)
+		l := spec.NewListSpecGroupsLogic(r.Context(), svcCtx)
+		resp, err := l.ListSpecGroups(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

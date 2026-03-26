@@ -21,6 +21,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeleteTs holds the string denoting the delete_ts field in the database.
 	FieldDeleteTs = "delete_ts"
+	// FieldMenuCategoryID holds the string denoting the menu_category_id field in the database.
+	FieldMenuCategoryID = "menu_category_id"
 	// FieldSpecType holds the string denoting the spec_type field in the database.
 	FieldSpecType = "spec_type"
 	// FieldSpecValue holds the string denoting the spec_value field in the database.
@@ -41,7 +43,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "menucategory" package.
 	CategoryInverseTable = "menu_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
-	CategoryColumn = "menu_category_category_specs"
+	CategoryColumn = "menu_category_id"
 	// MenuSpecsTable is the table that holds the menu_specs relation/edge.
 	MenuSpecsTable = "menu_specs"
 	// MenuSpecsInverseTable is the table name for the MenuSpec entity.
@@ -57,27 +59,17 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeleteTs,
+	FieldMenuCategoryID,
 	FieldSpecType,
 	FieldSpecValue,
 	FieldPriceDelta,
 	FieldSort,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "category_specs"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"menu_category_category_specs",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -107,7 +99,7 @@ var (
 	// DefaultPriceDelta holds the default value on creation for the "price_delta" field.
 	DefaultPriceDelta float64
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the CategorySpec queries.
@@ -131,6 +123,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByDeleteTs orders the results by the delete_ts field.
 func ByDeleteTs(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeleteTs, opts...).ToFunc()
+}
+
+// ByMenuCategoryID orders the results by the menu_category_id field.
+func ByMenuCategoryID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMenuCategoryID, opts...).ToFunc()
 }
 
 // BySpecType orders the results by the spec_type field.

@@ -4,11 +4,11 @@ type Table {
 	Id         uint64 `json:"id"`          // 餐桌id
 	Code       string `json:"code"`         // 桌号
 	Status     string `json:"status"`      // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
-	Capacity   int    `json:"capacity"`    // 可坐人数
+	Capacity   uint32    `json:"capacity,optional"`    // 可坐人数
 	CategoryId uint64 `json:"category_id"` // 餐桌分类id
 	QrCode     string `json:"qr_code,optional"` // 二维码
-	CreatedAt  string `json:"create_at"`   // 创建时间
-	UpdatedAt  string `json:"update_at"`   // 更新时间
+	CreatedAt  string `json:"created_at"`   // 创建时间
+	UpdatedAt  string `json:"updated_at"`   // 更新时间
 }
 
 type TableCategory {

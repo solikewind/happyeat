@@ -1,7 +1,7 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package menutype
+package MenuCategory
 
 import (
 	"context"
@@ -35,7 +35,7 @@ func (l *GetMenuCategoryLogic) GetMenuCategory(req *types.GetMenuCategoryReq) (*
 	}
 
 	return &types.GetMenuCategoryReply{
-		MenuCategory: entCategoryToType(cat),
+		Category: entCategoryToType(cat),
 	}, nil
 }
 

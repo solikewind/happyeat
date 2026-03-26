@@ -102,9 +102,9 @@ var (
 	// DefaultDeleteTs holds the default value on creation for the "delete_ts" field.
 	DefaultDeleteTs int64
 	// DefaultPriceDelta holds the default value on creation for the "price_delta" field.
-	DefaultPriceDelta float64
+	DefaultPriceDelta int64
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the MenuSpec queries.
@@ -193,6 +193,6 @@ func newSpecItemStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SpecItemInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, SpecItemTable, SpecItemColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, SpecItemTable, SpecItemColumn),
 	)
 }

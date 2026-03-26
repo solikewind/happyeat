@@ -57,6 +57,20 @@ func (_u *TableUpdate) AddDeleteTs(v int64) *TableUpdate {
 	return _u
 }
 
+// SetTableCategoryID sets the "table_category_id" field.
+func (_u *TableUpdate) SetTableCategoryID(v uint64) *TableUpdate {
+	_u.mutation.SetTableCategoryID(v)
+	return _u
+}
+
+// SetNillableTableCategoryID sets the "table_category_id" field if the given value is not nil.
+func (_u *TableUpdate) SetNillableTableCategoryID(v *uint64) *TableUpdate {
+	if v != nil {
+		_u.SetTableCategoryID(*v)
+	}
+	return _u
+}
+
 // SetCode sets the "code" field.
 func (_u *TableUpdate) SetCode(v string) *TableUpdate {
 	_u.mutation.SetCode(v)
@@ -86,14 +100,14 @@ func (_u *TableUpdate) SetNillableStatus(v *string) *TableUpdate {
 }
 
 // SetCapacity sets the "capacity" field.
-func (_u *TableUpdate) SetCapacity(v int) *TableUpdate {
+func (_u *TableUpdate) SetCapacity(v uint32) *TableUpdate {
 	_u.mutation.ResetCapacity()
 	_u.mutation.SetCapacity(v)
 	return _u
 }
 
 // SetNillableCapacity sets the "capacity" field if the given value is not nil.
-func (_u *TableUpdate) SetNillableCapacity(v *int) *TableUpdate {
+func (_u *TableUpdate) SetNillableCapacity(v *uint32) *TableUpdate {
 	if v != nil {
 		_u.SetCapacity(*v)
 	}
@@ -101,7 +115,7 @@ func (_u *TableUpdate) SetNillableCapacity(v *int) *TableUpdate {
 }
 
 // AddCapacity adds value to the "capacity" field.
-func (_u *TableUpdate) AddCapacity(v int) *TableUpdate {
+func (_u *TableUpdate) AddCapacity(v int32) *TableUpdate {
 	_u.mutation.AddCapacity(v)
 	return _u
 }
@@ -238,6 +252,11 @@ func (_u *TableUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Table.status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Capacity(); ok {
+		if err := table.CapacityValidator(v); err != nil {
+			return &ValidationError{Name: "capacity", err: fmt.Errorf(`ent: validator failed for field "Table.capacity": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.QrCode(); ok {
 		if err := table.QrCodeValidator(v); err != nil {
 			return &ValidationError{Name: "qr_code", err: fmt.Errorf(`ent: validator failed for field "Table.qr_code": %w`, err)}
@@ -277,10 +296,10 @@ func (_u *TableUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(table.FieldStatus, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Capacity(); ok {
-		_spec.SetField(table.FieldCapacity, field.TypeInt, value)
+		_spec.SetField(table.FieldCapacity, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedCapacity(); ok {
-		_spec.AddField(table.FieldCapacity, field.TypeInt, value)
+		_spec.AddField(table.FieldCapacity, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.QrCode(); ok {
 		_spec.SetField(table.FieldQrCode, field.TypeString, value)
@@ -409,6 +428,20 @@ func (_u *TableUpdateOne) AddDeleteTs(v int64) *TableUpdateOne {
 	return _u
 }
 
+// SetTableCategoryID sets the "table_category_id" field.
+func (_u *TableUpdateOne) SetTableCategoryID(v uint64) *TableUpdateOne {
+	_u.mutation.SetTableCategoryID(v)
+	return _u
+}
+
+// SetNillableTableCategoryID sets the "table_category_id" field if the given value is not nil.
+func (_u *TableUpdateOne) SetNillableTableCategoryID(v *uint64) *TableUpdateOne {
+	if v != nil {
+		_u.SetTableCategoryID(*v)
+	}
+	return _u
+}
+
 // SetCode sets the "code" field.
 func (_u *TableUpdateOne) SetCode(v string) *TableUpdateOne {
 	_u.mutation.SetCode(v)
@@ -438,14 +471,14 @@ func (_u *TableUpdateOne) SetNillableStatus(v *string) *TableUpdateOne {
 }
 
 // SetCapacity sets the "capacity" field.
-func (_u *TableUpdateOne) SetCapacity(v int) *TableUpdateOne {
+func (_u *TableUpdateOne) SetCapacity(v uint32) *TableUpdateOne {
 	_u.mutation.ResetCapacity()
 	_u.mutation.SetCapacity(v)
 	return _u
 }
 
 // SetNillableCapacity sets the "capacity" field if the given value is not nil.
-func (_u *TableUpdateOne) SetNillableCapacity(v *int) *TableUpdateOne {
+func (_u *TableUpdateOne) SetNillableCapacity(v *uint32) *TableUpdateOne {
 	if v != nil {
 		_u.SetCapacity(*v)
 	}
@@ -453,7 +486,7 @@ func (_u *TableUpdateOne) SetNillableCapacity(v *int) *TableUpdateOne {
 }
 
 // AddCapacity adds value to the "capacity" field.
-func (_u *TableUpdateOne) AddCapacity(v int) *TableUpdateOne {
+func (_u *TableUpdateOne) AddCapacity(v int32) *TableUpdateOne {
 	_u.mutation.AddCapacity(v)
 	return _u
 }
@@ -603,6 +636,11 @@ func (_u *TableUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Table.status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Capacity(); ok {
+		if err := table.CapacityValidator(v); err != nil {
+			return &ValidationError{Name: "capacity", err: fmt.Errorf(`ent: validator failed for field "Table.capacity": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.QrCode(); ok {
 		if err := table.QrCodeValidator(v); err != nil {
 			return &ValidationError{Name: "qr_code", err: fmt.Errorf(`ent: validator failed for field "Table.qr_code": %w`, err)}
@@ -659,10 +697,10 @@ func (_u *TableUpdateOne) sqlSave(ctx context.Context) (_node *Table, err error)
 		_spec.SetField(table.FieldStatus, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Capacity(); ok {
-		_spec.SetField(table.FieldCapacity, field.TypeInt, value)
+		_spec.SetField(table.FieldCapacity, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedCapacity(); ok {
-		_spec.AddField(table.FieldCapacity, field.TypeInt, value)
+		_spec.AddField(table.FieldCapacity, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.QrCode(); ok {
 		_spec.SetField(table.FieldQrCode, field.TypeString, value)

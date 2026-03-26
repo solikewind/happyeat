@@ -27,7 +27,6 @@ type OrderQuery struct {
 	predicates []predicate.Order
 	withTable  *TableQuery
 	withItems  *OrderItemQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -407,19 +406,12 @@ func (_q *OrderQuery) prepareQuery(ctx context.Context) error {
 func (_q *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order, error) {
 	var (
 		nodes       = []*Order{}
-		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
 			_q.withTable != nil,
 			_q.withItems != nil,
 		}
 	)
-	if _q.withTable != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, order.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Order).scanValues(nil, columns)
 	}
@@ -458,10 +450,10 @@ func (_q *OrderQuery) loadTable(ctx context.Context, query *TableQuery, nodes []
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*Order)
 	for i := range nodes {
-		if nodes[i].table_orders == nil {
+		if nodes[i].TableID == nil {
 			continue
 		}
-		fk := *nodes[i].table_orders
+		fk := *nodes[i].TableID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -478,7 +470,7 @@ func (_q *OrderQuery) loadTable(ctx context.Context, query *TableQuery, nodes []
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "table_orders" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "table_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -496,7 +488,9 @@ func (_q *OrderQuery) loadItems(ctx context.Context, query *OrderItemQuery, node
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(orderitem.FieldOrderID)
+	}
 	query.Where(predicate.OrderItem(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(order.ItemsColumn), fks...))
 	}))
@@ -505,13 +499,10 @@ func (_q *OrderQuery) loadItems(ctx context.Context, query *OrderItemQuery, node
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.order_items
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "order_items" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.OrderID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "order_items" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "order_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -542,6 +533,9 @@ func (_q *OrderQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != order.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withTable != nil {
+			_spec.Node.AddColumnOnce(order.FieldTableID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

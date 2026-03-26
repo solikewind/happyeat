@@ -70,6 +70,16 @@ func DeleteTs(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldDeleteTs, v))
 }
 
+// OrderID applies equality check predicate on the "order_id" field. It's identical to OrderIDEQ.
+func OrderID(v uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldEQ(FieldOrderID, v))
+}
+
+// MenuID applies equality check predicate on the "menu_id" field. It's identical to MenuIDEQ.
+func MenuID(v uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldEQ(FieldMenuID, v))
+}
+
 // MenuName applies equality check predicate on the "menu_name" field. It's identical to MenuNameEQ.
 func MenuName(v string) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldMenuName, v))
@@ -81,12 +91,12 @@ func Quantity(v int) predicate.OrderItem {
 }
 
 // UnitPrice applies equality check predicate on the "unit_price" field. It's identical to UnitPriceEQ.
-func UnitPrice(v float64) predicate.OrderItem {
+func UnitPrice(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldUnitPrice, v))
 }
 
 // Amount applies equality check predicate on the "amount" field. It's identical to AmountEQ.
-func Amount(v float64) predicate.OrderItem {
+func Amount(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldAmount, v))
 }
 
@@ -96,7 +106,7 @@ func SpecInfo(v string) predicate.OrderItem {
 }
 
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
-func Sort(v int) predicate.OrderItem {
+func Sort(v uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldSort, v))
 }
 
@@ -220,6 +230,56 @@ func DeleteTsLTE(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldLTE(FieldDeleteTs, v))
 }
 
+// OrderIDEQ applies the EQ predicate on the "order_id" field.
+func OrderIDEQ(v uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldEQ(FieldOrderID, v))
+}
+
+// OrderIDNEQ applies the NEQ predicate on the "order_id" field.
+func OrderIDNEQ(v uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldNEQ(FieldOrderID, v))
+}
+
+// OrderIDIn applies the In predicate on the "order_id" field.
+func OrderIDIn(vs ...uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldIn(FieldOrderID, vs...))
+}
+
+// OrderIDNotIn applies the NotIn predicate on the "order_id" field.
+func OrderIDNotIn(vs ...uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldNotIn(FieldOrderID, vs...))
+}
+
+// MenuIDEQ applies the EQ predicate on the "menu_id" field.
+func MenuIDEQ(v uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldEQ(FieldMenuID, v))
+}
+
+// MenuIDNEQ applies the NEQ predicate on the "menu_id" field.
+func MenuIDNEQ(v uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldNEQ(FieldMenuID, v))
+}
+
+// MenuIDIn applies the In predicate on the "menu_id" field.
+func MenuIDIn(vs ...uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldIn(FieldMenuID, vs...))
+}
+
+// MenuIDNotIn applies the NotIn predicate on the "menu_id" field.
+func MenuIDNotIn(vs ...uint64) predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldNotIn(FieldMenuID, vs...))
+}
+
+// MenuIDIsNil applies the IsNil predicate on the "menu_id" field.
+func MenuIDIsNil() predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldIsNull(FieldMenuID))
+}
+
+// MenuIDNotNil applies the NotNil predicate on the "menu_id" field.
+func MenuIDNotNil() predicate.OrderItem {
+	return predicate.OrderItem(sql.FieldNotNull(FieldMenuID))
+}
+
 // MenuNameEQ applies the EQ predicate on the "menu_name" field.
 func MenuNameEQ(v string) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldMenuName, v))
@@ -326,82 +386,82 @@ func QuantityLTE(v int) predicate.OrderItem {
 }
 
 // UnitPriceEQ applies the EQ predicate on the "unit_price" field.
-func UnitPriceEQ(v float64) predicate.OrderItem {
+func UnitPriceEQ(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldUnitPrice, v))
 }
 
 // UnitPriceNEQ applies the NEQ predicate on the "unit_price" field.
-func UnitPriceNEQ(v float64) predicate.OrderItem {
+func UnitPriceNEQ(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldNEQ(FieldUnitPrice, v))
 }
 
 // UnitPriceIn applies the In predicate on the "unit_price" field.
-func UnitPriceIn(vs ...float64) predicate.OrderItem {
+func UnitPriceIn(vs ...int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldIn(FieldUnitPrice, vs...))
 }
 
 // UnitPriceNotIn applies the NotIn predicate on the "unit_price" field.
-func UnitPriceNotIn(vs ...float64) predicate.OrderItem {
+func UnitPriceNotIn(vs ...int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldNotIn(FieldUnitPrice, vs...))
 }
 
 // UnitPriceGT applies the GT predicate on the "unit_price" field.
-func UnitPriceGT(v float64) predicate.OrderItem {
+func UnitPriceGT(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldGT(FieldUnitPrice, v))
 }
 
 // UnitPriceGTE applies the GTE predicate on the "unit_price" field.
-func UnitPriceGTE(v float64) predicate.OrderItem {
+func UnitPriceGTE(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldGTE(FieldUnitPrice, v))
 }
 
 // UnitPriceLT applies the LT predicate on the "unit_price" field.
-func UnitPriceLT(v float64) predicate.OrderItem {
+func UnitPriceLT(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldLT(FieldUnitPrice, v))
 }
 
 // UnitPriceLTE applies the LTE predicate on the "unit_price" field.
-func UnitPriceLTE(v float64) predicate.OrderItem {
+func UnitPriceLTE(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldLTE(FieldUnitPrice, v))
 }
 
 // AmountEQ applies the EQ predicate on the "amount" field.
-func AmountEQ(v float64) predicate.OrderItem {
+func AmountEQ(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldAmount, v))
 }
 
 // AmountNEQ applies the NEQ predicate on the "amount" field.
-func AmountNEQ(v float64) predicate.OrderItem {
+func AmountNEQ(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldNEQ(FieldAmount, v))
 }
 
 // AmountIn applies the In predicate on the "amount" field.
-func AmountIn(vs ...float64) predicate.OrderItem {
+func AmountIn(vs ...int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldIn(FieldAmount, vs...))
 }
 
 // AmountNotIn applies the NotIn predicate on the "amount" field.
-func AmountNotIn(vs ...float64) predicate.OrderItem {
+func AmountNotIn(vs ...int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldNotIn(FieldAmount, vs...))
 }
 
 // AmountGT applies the GT predicate on the "amount" field.
-func AmountGT(v float64) predicate.OrderItem {
+func AmountGT(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldGT(FieldAmount, v))
 }
 
 // AmountGTE applies the GTE predicate on the "amount" field.
-func AmountGTE(v float64) predicate.OrderItem {
+func AmountGTE(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldGTE(FieldAmount, v))
 }
 
 // AmountLT applies the LT predicate on the "amount" field.
-func AmountLT(v float64) predicate.OrderItem {
+func AmountLT(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldLT(FieldAmount, v))
 }
 
 // AmountLTE applies the LTE predicate on the "amount" field.
-func AmountLTE(v float64) predicate.OrderItem {
+func AmountLTE(v int64) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldLTE(FieldAmount, v))
 }
 
@@ -481,42 +541,42 @@ func SpecInfoContainsFold(v string) predicate.OrderItem {
 }
 
 // SortEQ applies the EQ predicate on the "sort" field.
-func SortEQ(v int) predicate.OrderItem {
+func SortEQ(v uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldEQ(FieldSort, v))
 }
 
 // SortNEQ applies the NEQ predicate on the "sort" field.
-func SortNEQ(v int) predicate.OrderItem {
+func SortNEQ(v uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldNEQ(FieldSort, v))
 }
 
 // SortIn applies the In predicate on the "sort" field.
-func SortIn(vs ...int) predicate.OrderItem {
+func SortIn(vs ...uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldIn(FieldSort, vs...))
 }
 
 // SortNotIn applies the NotIn predicate on the "sort" field.
-func SortNotIn(vs ...int) predicate.OrderItem {
+func SortNotIn(vs ...uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldNotIn(FieldSort, vs...))
 }
 
 // SortGT applies the GT predicate on the "sort" field.
-func SortGT(v int) predicate.OrderItem {
+func SortGT(v uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldGT(FieldSort, v))
 }
 
 // SortGTE applies the GTE predicate on the "sort" field.
-func SortGTE(v int) predicate.OrderItem {
+func SortGTE(v uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldGTE(FieldSort, v))
 }
 
 // SortLT applies the LT predicate on the "sort" field.
-func SortLT(v int) predicate.OrderItem {
+func SortLT(v uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldLT(FieldSort, v))
 }
 
 // SortLTE applies the LTE predicate on the "sort" field.
-func SortLTE(v int) predicate.OrderItem {
+func SortLTE(v uint32) predicate.OrderItem {
 	return predicate.OrderItem(sql.FieldLTE(FieldSort, v))
 }
 

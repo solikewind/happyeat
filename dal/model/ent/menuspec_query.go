@@ -122,7 +122,7 @@ func (_q *MenuSpecQuery) QuerySpecItem() *SpecItemQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(menuspec.Table, menuspec.FieldID, selector),
 			sqlgraph.To(specitem.Table, specitem.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, menuspec.SpecItemTable, menuspec.SpecItemColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, menuspec.SpecItemTable, menuspec.SpecItemColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil

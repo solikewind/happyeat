@@ -25,6 +25,8 @@ type Menu struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 删除时间戳
 	DeleteTs int64 `json:"delete_ts,omitempty"`
+	// 菜单分类ID
+	MenuCategoryID uint64 `json:"menu_category_id,omitempty"`
 	// 菜名
 	Name string `json:"name,omitempty"`
 	// 描述
@@ -32,12 +34,11 @@ type Menu struct {
 	// 图片URL
 	Image *string `json:"image,omitempty"`
 	// 价格
-	Price float64 `json:"price,omitempty"`
+	Price int64 `json:"price,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuQuery when eager-loading is set.
-	Edges               MenuEdges `json:"edges"`
-	menu_category_menus *uint64
-	selectValues        sql.SelectValues
+	Edges        MenuEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // MenuEdges holds the relations/edges for other nodes in the graph.
@@ -87,16 +88,12 @@ func (*Menu) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case menu.FieldPrice:
-			values[i] = new(sql.NullFloat64)
-		case menu.FieldID, menu.FieldDeleteTs:
+		case menu.FieldID, menu.FieldDeleteTs, menu.FieldMenuCategoryID, menu.FieldPrice:
 			values[i] = new(sql.NullInt64)
 		case menu.FieldName, menu.FieldDescription, menu.FieldImage:
 			values[i] = new(sql.NullString)
 		case menu.FieldCreatedAt, menu.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case menu.ForeignKeys[0]: // menu_category_menus
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -136,6 +133,12 @@ func (_m *Menu) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DeleteTs = value.Int64
 			}
+		case menu.FieldMenuCategoryID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field menu_category_id", values[i])
+			} else if value.Valid {
+				_m.MenuCategoryID = uint64(value.Int64)
+			}
 		case menu.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -157,17 +160,10 @@ func (_m *Menu) assignValues(columns []string, values []any) error {
 				*_m.Image = value.String
 			}
 		case menu.FieldPrice:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field price", values[i])
 			} else if value.Valid {
-				_m.Price = value.Float64
-			}
-		case menu.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field menu_category_menus", value)
-			} else if value.Valid {
-				_m.menu_category_menus = new(uint64)
-				*_m.menu_category_menus = uint64(value.Int64)
+				_m.Price = value.Int64
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -228,6 +224,9 @@ func (_m *Menu) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("delete_ts=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DeleteTs))
+	builder.WriteString(", ")
+	builder.WriteString("menu_category_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MenuCategoryID))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)

@@ -26,7 +26,6 @@ type OrderItemQuery struct {
 	predicates []predicate.OrderItem
 	withOrder  *OrderQuery
 	withMenu   *MenuQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -406,19 +405,12 @@ func (_q *OrderItemQuery) prepareQuery(ctx context.Context) error {
 func (_q *OrderItemQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*OrderItem, error) {
 	var (
 		nodes       = []*OrderItem{}
-		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
 			_q.withOrder != nil,
 			_q.withMenu != nil,
 		}
 	)
-	if _q.withOrder != nil || _q.withMenu != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, orderitem.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*OrderItem).scanValues(nil, columns)
 	}
@@ -456,10 +448,7 @@ func (_q *OrderItemQuery) loadOrder(ctx context.Context, query *OrderQuery, node
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*OrderItem)
 	for i := range nodes {
-		if nodes[i].order_items == nil {
-			continue
-		}
-		fk := *nodes[i].order_items
+		fk := nodes[i].OrderID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -476,7 +465,7 @@ func (_q *OrderItemQuery) loadOrder(ctx context.Context, query *OrderQuery, node
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "order_items" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "order_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -488,10 +477,10 @@ func (_q *OrderItemQuery) loadMenu(ctx context.Context, query *MenuQuery, nodes 
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*OrderItem)
 	for i := range nodes {
-		if nodes[i].menu_order_items == nil {
+		if nodes[i].MenuID == nil {
 			continue
 		}
-		fk := *nodes[i].menu_order_items
+		fk := *nodes[i].MenuID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -508,7 +497,7 @@ func (_q *OrderItemQuery) loadMenu(ctx context.Context, query *MenuQuery, nodes 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "menu_order_items" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "menu_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -541,6 +530,12 @@ func (_q *OrderItemQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != orderitem.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withOrder != nil {
+			_spec.Node.AddColumnOnce(orderitem.FieldOrderID)
+		}
+		if _q.withMenu != nil {
+			_spec.Node.AddColumnOnce(orderitem.FieldMenuID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

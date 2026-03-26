@@ -413,7 +413,9 @@ func (_q *TableCategoryQuery) loadTables(ctx context.Context, query *TableQuery,
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(table.FieldTableCategoryID)
+	}
 	query.Where(predicate.Table(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(tablecategory.TablesColumn), fks...))
 	}))
@@ -422,13 +424,10 @@ func (_q *TableCategoryQuery) loadTables(ctx context.Context, query *TableQuery,
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.table_category_tables
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "table_category_tables" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.TableCategoryID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "table_category_tables" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "table_category_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

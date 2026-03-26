@@ -58,6 +58,20 @@ func (_u *MenuUpdate) AddDeleteTs(v int64) *MenuUpdate {
 	return _u
 }
 
+// SetMenuCategoryID sets the "menu_category_id" field.
+func (_u *MenuUpdate) SetMenuCategoryID(v uint64) *MenuUpdate {
+	_u.mutation.SetMenuCategoryID(v)
+	return _u
+}
+
+// SetNillableMenuCategoryID sets the "menu_category_id" field if the given value is not nil.
+func (_u *MenuUpdate) SetNillableMenuCategoryID(v *uint64) *MenuUpdate {
+	if v != nil {
+		_u.SetMenuCategoryID(*v)
+	}
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *MenuUpdate) SetName(v string) *MenuUpdate {
 	_u.mutation.SetName(v)
@@ -113,14 +127,14 @@ func (_u *MenuUpdate) ClearImage() *MenuUpdate {
 }
 
 // SetPrice sets the "price" field.
-func (_u *MenuUpdate) SetPrice(v float64) *MenuUpdate {
+func (_u *MenuUpdate) SetPrice(v int64) *MenuUpdate {
 	_u.mutation.ResetPrice()
 	_u.mutation.SetPrice(v)
 	return _u
 }
 
 // SetNillablePrice sets the "price" field if the given value is not nil.
-func (_u *MenuUpdate) SetNillablePrice(v *float64) *MenuUpdate {
+func (_u *MenuUpdate) SetNillablePrice(v *int64) *MenuUpdate {
 	if v != nil {
 		_u.SetPrice(*v)
 	}
@@ -128,7 +142,7 @@ func (_u *MenuUpdate) SetNillablePrice(v *float64) *MenuUpdate {
 }
 
 // AddPrice adds value to the "price" field.
-func (_u *MenuUpdate) AddPrice(v float64) *MenuUpdate {
+func (_u *MenuUpdate) AddPrice(v int64) *MenuUpdate {
 	_u.mutation.AddPrice(v)
 	return _u
 }
@@ -324,10 +338,10 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(menu.FieldImage, field.TypeString)
 	}
 	if value, ok := _u.mutation.Price(); ok {
-		_spec.SetField(menu.FieldPrice, field.TypeFloat64, value)
+		_spec.SetField(menu.FieldPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPrice(); ok {
-		_spec.AddField(menu.FieldPrice, field.TypeFloat64, value)
+		_spec.AddField(menu.FieldPrice, field.TypeInt64, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -495,6 +509,20 @@ func (_u *MenuUpdateOne) AddDeleteTs(v int64) *MenuUpdateOne {
 	return _u
 }
 
+// SetMenuCategoryID sets the "menu_category_id" field.
+func (_u *MenuUpdateOne) SetMenuCategoryID(v uint64) *MenuUpdateOne {
+	_u.mutation.SetMenuCategoryID(v)
+	return _u
+}
+
+// SetNillableMenuCategoryID sets the "menu_category_id" field if the given value is not nil.
+func (_u *MenuUpdateOne) SetNillableMenuCategoryID(v *uint64) *MenuUpdateOne {
+	if v != nil {
+		_u.SetMenuCategoryID(*v)
+	}
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *MenuUpdateOne) SetName(v string) *MenuUpdateOne {
 	_u.mutation.SetName(v)
@@ -550,14 +578,14 @@ func (_u *MenuUpdateOne) ClearImage() *MenuUpdateOne {
 }
 
 // SetPrice sets the "price" field.
-func (_u *MenuUpdateOne) SetPrice(v float64) *MenuUpdateOne {
+func (_u *MenuUpdateOne) SetPrice(v int64) *MenuUpdateOne {
 	_u.mutation.ResetPrice()
 	_u.mutation.SetPrice(v)
 	return _u
 }
 
 // SetNillablePrice sets the "price" field if the given value is not nil.
-func (_u *MenuUpdateOne) SetNillablePrice(v *float64) *MenuUpdateOne {
+func (_u *MenuUpdateOne) SetNillablePrice(v *int64) *MenuUpdateOne {
 	if v != nil {
 		_u.SetPrice(*v)
 	}
@@ -565,7 +593,7 @@ func (_u *MenuUpdateOne) SetNillablePrice(v *float64) *MenuUpdateOne {
 }
 
 // AddPrice adds value to the "price" field.
-func (_u *MenuUpdateOne) AddPrice(v float64) *MenuUpdateOne {
+func (_u *MenuUpdateOne) AddPrice(v int64) *MenuUpdateOne {
 	_u.mutation.AddPrice(v)
 	return _u
 }
@@ -791,10 +819,10 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 		_spec.ClearField(menu.FieldImage, field.TypeString)
 	}
 	if value, ok := _u.mutation.Price(); ok {
-		_spec.SetField(menu.FieldPrice, field.TypeFloat64, value)
+		_spec.SetField(menu.FieldPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPrice(); ok {
-		_spec.AddField(menu.FieldPrice, field.TypeFloat64, value)
+		_spec.AddField(menu.FieldPrice, field.TypeInt64, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

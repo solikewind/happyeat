@@ -28,7 +28,7 @@ const (
 	// EdgeSpecItems holds the string denoting the spec_items edge name in mutations.
 	EdgeSpecItems = "spec_items"
 	// Table holds the table name of the specgroup in the database.
-	Table = "spec_group"
+	Table = "spec_groups"
 	// SpecItemsTable is the table that holds the spec_items relation/edge.
 	SpecItemsTable = "spec_items"
 	// SpecItemsInverseTable is the table name for the SpecItem entity.
@@ -77,7 +77,7 @@ var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the SpecGroup queries.

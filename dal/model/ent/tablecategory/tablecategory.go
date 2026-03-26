@@ -35,7 +35,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "table" package.
 	TablesInverseTable = "tables"
 	// TablesColumn is the table column denoting the tables relation/edge.
-	TablesColumn = "table_category_tables"
+	TablesColumn = "table_category_id"
 )
 
 // Columns holds all SQL columns for tablecategory fields.

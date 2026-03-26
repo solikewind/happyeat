@@ -21,6 +21,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeleteTs holds the string denoting the delete_ts field in the database.
 	FieldDeleteTs = "delete_ts"
+	// FieldTableCategoryID holds the string denoting the table_category_id field in the database.
+	FieldTableCategoryID = "table_category_id"
 	// FieldCode holds the string denoting the code field in the database.
 	FieldCode = "code"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -41,14 +43,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "tablecategory" package.
 	CategoryInverseTable = "table_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
-	CategoryColumn = "table_category_tables"
+	CategoryColumn = "table_category_id"
 	// OrdersTable is the table that holds the orders relation/edge.
 	OrdersTable = "orders"
 	// OrdersInverseTable is the table name for the Order entity.
 	// It exists in this package in order to avoid circular dependency with the "order" package.
 	OrdersInverseTable = "orders"
 	// OrdersColumn is the table column denoting the orders relation/edge.
-	OrdersColumn = "table_orders"
+	OrdersColumn = "table_id"
 )
 
 // Columns holds all SQL columns for table fields.
@@ -57,27 +59,17 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeleteTs,
+	FieldTableCategoryID,
 	FieldCode,
 	FieldStatus,
 	FieldCapacity,
 	FieldQrCode,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "tables"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"table_category_tables",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -107,7 +99,9 @@ var (
 	// StatusValidator is a validator for the "status" field. It is called by the builders before save.
 	StatusValidator func(string) error
 	// DefaultCapacity holds the default value on creation for the "capacity" field.
-	DefaultCapacity int
+	DefaultCapacity uint32
+	// CapacityValidator is a validator for the "capacity" field. It is called by the builders before save.
+	CapacityValidator func(uint32) error
 	// QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
 	QrCodeValidator func(string) error
 )
@@ -133,6 +127,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByDeleteTs orders the results by the delete_ts field.
 func ByDeleteTs(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeleteTs, opts...).ToFunc()
+}
+
+// ByTableCategoryID orders the results by the table_category_id field.
+func ByTableCategoryID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTableCategoryID, opts...).ToFunc()
 }
 
 // ByCode orders the results by the code field.

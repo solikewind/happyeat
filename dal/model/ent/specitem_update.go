@@ -106,7 +106,7 @@ func (_u *SpecItemUpdate) AddDefaultPrice(v float64) *SpecItemUpdate {
 	return _u
 }
 
-// SetSpecGroup sets the "Spec_group" edge to the SpecGroup entity.
+// SetSpecGroup sets the "spec_group" edge to the SpecGroup entity.
 func (_u *SpecItemUpdate) SetSpecGroup(v *SpecGroup) *SpecItemUpdate {
 	return _u.SetSpecGroupID(v.ID)
 }
@@ -131,7 +131,7 @@ func (_u *SpecItemUpdate) Mutation() *SpecItemMutation {
 	return _u.mutation
 }
 
-// ClearSpecGroup clears the "Spec_group" edge to the SpecGroup entity.
+// ClearSpecGroup clears the "spec_group" edge to the SpecGroup entity.
 func (_u *SpecItemUpdate) ClearSpecGroup() *SpecItemUpdate {
 	_u.mutation.ClearSpecGroup()
 	return _u
@@ -208,7 +208,7 @@ func (_u *SpecItemUpdate) check() error {
 		}
 	}
 	if _u.mutation.SpecGroupCleared() && len(_u.mutation.SpecGroupIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "SpecItem.Spec_group"`)
+		return errors.New(`ent: clearing a required unique edge "SpecItem.spec_group"`)
 	}
 	return nil
 }
@@ -275,7 +275,7 @@ func (_u *SpecItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   specitem.MenuSpecsTable,
 			Columns: []string{specitem.MenuSpecsColumn},
 			Bidi:    false,
@@ -288,7 +288,7 @@ func (_u *SpecItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if nodes := _u.mutation.RemovedMenuSpecsIDs(); len(nodes) > 0 && !_u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   specitem.MenuSpecsTable,
 			Columns: []string{specitem.MenuSpecsColumn},
 			Bidi:    false,
@@ -304,7 +304,7 @@ func (_u *SpecItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if nodes := _u.mutation.MenuSpecsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   specitem.MenuSpecsTable,
 			Columns: []string{specitem.MenuSpecsColumn},
 			Bidi:    false,
@@ -413,7 +413,7 @@ func (_u *SpecItemUpdateOne) AddDefaultPrice(v float64) *SpecItemUpdateOne {
 	return _u
 }
 
-// SetSpecGroup sets the "Spec_group" edge to the SpecGroup entity.
+// SetSpecGroup sets the "spec_group" edge to the SpecGroup entity.
 func (_u *SpecItemUpdateOne) SetSpecGroup(v *SpecGroup) *SpecItemUpdateOne {
 	return _u.SetSpecGroupID(v.ID)
 }
@@ -438,7 +438,7 @@ func (_u *SpecItemUpdateOne) Mutation() *SpecItemMutation {
 	return _u.mutation
 }
 
-// ClearSpecGroup clears the "Spec_group" edge to the SpecGroup entity.
+// ClearSpecGroup clears the "spec_group" edge to the SpecGroup entity.
 func (_u *SpecItemUpdateOne) ClearSpecGroup() *SpecItemUpdateOne {
 	_u.mutation.ClearSpecGroup()
 	return _u
@@ -528,7 +528,7 @@ func (_u *SpecItemUpdateOne) check() error {
 		}
 	}
 	if _u.mutation.SpecGroupCleared() && len(_u.mutation.SpecGroupIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "SpecItem.Spec_group"`)
+		return errors.New(`ent: clearing a required unique edge "SpecItem.spec_group"`)
 	}
 	return nil
 }
@@ -612,7 +612,7 @@ func (_u *SpecItemUpdateOne) sqlSave(ctx context.Context) (_node *SpecItem, err 
 	if _u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   specitem.MenuSpecsTable,
 			Columns: []string{specitem.MenuSpecsColumn},
 			Bidi:    false,
@@ -625,7 +625,7 @@ func (_u *SpecItemUpdateOne) sqlSave(ctx context.Context) (_node *SpecItem, err 
 	if nodes := _u.mutation.RemovedMenuSpecsIDs(); len(nodes) > 0 && !_u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   specitem.MenuSpecsTable,
 			Columns: []string{specitem.MenuSpecsColumn},
 			Bidi:    false,
@@ -641,7 +641,7 @@ func (_u *SpecItemUpdateOne) sqlSave(ctx context.Context) (_node *SpecItem, err 
 	if nodes := _u.mutation.MenuSpecsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   specitem.MenuSpecsTable,
 			Columns: []string{specitem.MenuSpecsColumn},
 			Bidi:    false,

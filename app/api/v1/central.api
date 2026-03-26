@@ -62,7 +62,7 @@ service HappyEatService {
 	jwt:      Auth
 	authType: Bearer
 	prefix:   /central/v1
-	group:    menutype
+	group:    menucategory
 	timeout:  5s
 )
 service HappyEatService {
@@ -85,6 +85,75 @@ service HappyEatService {
 	@doc "删除菜单种类"
 	@handler DeleteMenuCategory
 	delete /menu/category/:id (DeleteMenuCategoryReq) returns (DeleteMenuCategoryReply)
+}
+
+@server (
+	jwt:      Auth
+	authType: Bearer
+	prefix:   /central/v1
+	group:    spec
+	timeout:  5s
+)
+service HappyEatService {
+	@doc "列出规格组"
+	@handler ListSpecGroups
+	get /spec/groups (ListSpecGroupsReq) returns (ListSpecGroupsReply)
+
+	@doc "获取规格组"
+	@handler GetSpecGroup
+	get /spec/group/:id (GetSpecGroupReq) returns (GetSpecGroupReply)
+
+	@doc "创建规格组"
+	@handler CreateSpecGroup
+	post /spec/group (CreateSpecGroupReq) returns (CreateSpecGroupReply)
+
+	@doc "更新规格组"
+	@handler UpdateSpecGroup
+	put /spec/group/:id (UpdateSpecGroupReq) returns (UpdateSpecGroupReply)
+
+	@doc "删除规格组"
+	@handler DeleteSpecGroup
+	delete /spec/group/:id (DeleteSpecGroupReq) returns (DeleteSpecGroupReply)
+
+	@doc "列出规格项"
+	@handler ListSpecItems
+	get /spec/items (ListSpecItemsReq) returns (ListSpecItemsReply)
+
+	@doc "获取规格项"
+	@handler GetSpecItem
+	get /spec/item/:id (GetSpecItemReq) returns (GetSpecItemReply)
+
+	@doc "创建规格项"
+	@handler CreateSpecItem
+	post /spec/item (CreateSpecItemReq) returns (CreateSpecItemReply)
+
+	@doc "更新规格项"
+	@handler UpdateSpecItem
+	put /spec/item/:id (UpdateSpecItemReq) returns (UpdateSpecItemReply)
+
+	@doc "删除规格项"
+	@handler DeleteSpecItem
+	delete /spec/item/:id (DeleteSpecItemReq) returns (DeleteSpecItemReply)
+
+	@doc "列出分类规格模板"
+	@handler ListCategorySpecs
+	get /spec/category-specs (ListCategorySpecsReq) returns (ListCategorySpecsReply)
+
+	@doc "获取分类规格模板"
+	@handler GetCategorySpec
+	get /spec/category-spec/:id (GetCategorySpecReq) returns (GetCategorySpecReply)
+
+	@doc "创建分类规格模板"
+	@handler CreateCategorySpec
+	post /spec/category-spec (CreateCategorySpecReq) returns (CreateCategorySpecReply)
+
+	@doc "更新分类规格模板"
+	@handler UpdateCategorySpec
+	put /spec/category-spec/:id (UpdateCategorySpecReq) returns (UpdateCategorySpecReply)
+
+	@doc "删除分类规格模板"
+	@handler DeleteCategorySpec
+	delete /spec/category-spec/:id (DeleteCategorySpecReq) returns (DeleteCategorySpecReply)
 }
 
 @server (

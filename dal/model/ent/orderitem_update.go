@@ -57,6 +57,40 @@ func (_u *OrderItemUpdate) AddDeleteTs(v int64) *OrderItemUpdate {
 	return _u
 }
 
+// SetOrderID sets the "order_id" field.
+func (_u *OrderItemUpdate) SetOrderID(v uint64) *OrderItemUpdate {
+	_u.mutation.SetOrderID(v)
+	return _u
+}
+
+// SetNillableOrderID sets the "order_id" field if the given value is not nil.
+func (_u *OrderItemUpdate) SetNillableOrderID(v *uint64) *OrderItemUpdate {
+	if v != nil {
+		_u.SetOrderID(*v)
+	}
+	return _u
+}
+
+// SetMenuID sets the "menu_id" field.
+func (_u *OrderItemUpdate) SetMenuID(v uint64) *OrderItemUpdate {
+	_u.mutation.SetMenuID(v)
+	return _u
+}
+
+// SetNillableMenuID sets the "menu_id" field if the given value is not nil.
+func (_u *OrderItemUpdate) SetNillableMenuID(v *uint64) *OrderItemUpdate {
+	if v != nil {
+		_u.SetMenuID(*v)
+	}
+	return _u
+}
+
+// ClearMenuID clears the value of the "menu_id" field.
+func (_u *OrderItemUpdate) ClearMenuID() *OrderItemUpdate {
+	_u.mutation.ClearMenuID()
+	return _u
+}
+
 // SetMenuName sets the "menu_name" field.
 func (_u *OrderItemUpdate) SetMenuName(v string) *OrderItemUpdate {
 	_u.mutation.SetMenuName(v)
@@ -93,14 +127,14 @@ func (_u *OrderItemUpdate) AddQuantity(v int) *OrderItemUpdate {
 }
 
 // SetUnitPrice sets the "unit_price" field.
-func (_u *OrderItemUpdate) SetUnitPrice(v float64) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetUnitPrice(v int64) *OrderItemUpdate {
 	_u.mutation.ResetUnitPrice()
 	_u.mutation.SetUnitPrice(v)
 	return _u
 }
 
 // SetNillableUnitPrice sets the "unit_price" field if the given value is not nil.
-func (_u *OrderItemUpdate) SetNillableUnitPrice(v *float64) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetNillableUnitPrice(v *int64) *OrderItemUpdate {
 	if v != nil {
 		_u.SetUnitPrice(*v)
 	}
@@ -108,20 +142,20 @@ func (_u *OrderItemUpdate) SetNillableUnitPrice(v *float64) *OrderItemUpdate {
 }
 
 // AddUnitPrice adds value to the "unit_price" field.
-func (_u *OrderItemUpdate) AddUnitPrice(v float64) *OrderItemUpdate {
+func (_u *OrderItemUpdate) AddUnitPrice(v int64) *OrderItemUpdate {
 	_u.mutation.AddUnitPrice(v)
 	return _u
 }
 
 // SetAmount sets the "amount" field.
-func (_u *OrderItemUpdate) SetAmount(v float64) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetAmount(v int64) *OrderItemUpdate {
 	_u.mutation.ResetAmount()
 	_u.mutation.SetAmount(v)
 	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (_u *OrderItemUpdate) SetNillableAmount(v *float64) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetNillableAmount(v *int64) *OrderItemUpdate {
 	if v != nil {
 		_u.SetAmount(*v)
 	}
@@ -129,7 +163,7 @@ func (_u *OrderItemUpdate) SetNillableAmount(v *float64) *OrderItemUpdate {
 }
 
 // AddAmount adds value to the "amount" field.
-func (_u *OrderItemUpdate) AddAmount(v float64) *OrderItemUpdate {
+func (_u *OrderItemUpdate) AddAmount(v int64) *OrderItemUpdate {
 	_u.mutation.AddAmount(v)
 	return _u
 }
@@ -155,14 +189,14 @@ func (_u *OrderItemUpdate) ClearSpecInfo() *OrderItemUpdate {
 }
 
 // SetSort sets the "sort" field.
-func (_u *OrderItemUpdate) SetSort(v int) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetSort(v uint32) *OrderItemUpdate {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *OrderItemUpdate) SetNillableSort(v *int) *OrderItemUpdate {
+func (_u *OrderItemUpdate) SetNillableSort(v *uint32) *OrderItemUpdate {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -170,34 +204,14 @@ func (_u *OrderItemUpdate) SetNillableSort(v *int) *OrderItemUpdate {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *OrderItemUpdate) AddSort(v int) *OrderItemUpdate {
+func (_u *OrderItemUpdate) AddSort(v int32) *OrderItemUpdate {
 	_u.mutation.AddSort(v)
-	return _u
-}
-
-// SetOrderID sets the "order" edge to the Order entity by ID.
-func (_u *OrderItemUpdate) SetOrderID(id uint64) *OrderItemUpdate {
-	_u.mutation.SetOrderID(id)
 	return _u
 }
 
 // SetOrder sets the "order" edge to the Order entity.
 func (_u *OrderItemUpdate) SetOrder(v *Order) *OrderItemUpdate {
 	return _u.SetOrderID(v.ID)
-}
-
-// SetMenuID sets the "menu" edge to the Menu entity by ID.
-func (_u *OrderItemUpdate) SetMenuID(id uint64) *OrderItemUpdate {
-	_u.mutation.SetMenuID(id)
-	return _u
-}
-
-// SetNillableMenuID sets the "menu" edge to the Menu entity by ID if the given value is not nil.
-func (_u *OrderItemUpdate) SetNillableMenuID(id *uint64) *OrderItemUpdate {
-	if id != nil {
-		_u = _u.SetMenuID(*id)
-	}
-	return _u
 }
 
 // SetMenu sets the "menu" edge to the Menu entity.
@@ -313,16 +327,16 @@ func (_u *OrderItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.AddField(orderitem.FieldQuantity, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.UnitPrice(); ok {
-		_spec.SetField(orderitem.FieldUnitPrice, field.TypeFloat64, value)
+		_spec.SetField(orderitem.FieldUnitPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUnitPrice(); ok {
-		_spec.AddField(orderitem.FieldUnitPrice, field.TypeFloat64, value)
+		_spec.AddField(orderitem.FieldUnitPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
-		_spec.SetField(orderitem.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(orderitem.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedAmount(); ok {
-		_spec.AddField(orderitem.FieldAmount, field.TypeFloat64, value)
+		_spec.AddField(orderitem.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SpecInfo(); ok {
 		_spec.SetField(orderitem.FieldSpecInfo, field.TypeString, value)
@@ -331,10 +345,10 @@ func (_u *OrderItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(orderitem.FieldSpecInfo, field.TypeString)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(orderitem.FieldSort, field.TypeInt, value)
+		_spec.SetField(orderitem.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(orderitem.FieldSort, field.TypeInt, value)
+		_spec.AddField(orderitem.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.OrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -441,6 +455,40 @@ func (_u *OrderItemUpdateOne) AddDeleteTs(v int64) *OrderItemUpdateOne {
 	return _u
 }
 
+// SetOrderID sets the "order_id" field.
+func (_u *OrderItemUpdateOne) SetOrderID(v uint64) *OrderItemUpdateOne {
+	_u.mutation.SetOrderID(v)
+	return _u
+}
+
+// SetNillableOrderID sets the "order_id" field if the given value is not nil.
+func (_u *OrderItemUpdateOne) SetNillableOrderID(v *uint64) *OrderItemUpdateOne {
+	if v != nil {
+		_u.SetOrderID(*v)
+	}
+	return _u
+}
+
+// SetMenuID sets the "menu_id" field.
+func (_u *OrderItemUpdateOne) SetMenuID(v uint64) *OrderItemUpdateOne {
+	_u.mutation.SetMenuID(v)
+	return _u
+}
+
+// SetNillableMenuID sets the "menu_id" field if the given value is not nil.
+func (_u *OrderItemUpdateOne) SetNillableMenuID(v *uint64) *OrderItemUpdateOne {
+	if v != nil {
+		_u.SetMenuID(*v)
+	}
+	return _u
+}
+
+// ClearMenuID clears the value of the "menu_id" field.
+func (_u *OrderItemUpdateOne) ClearMenuID() *OrderItemUpdateOne {
+	_u.mutation.ClearMenuID()
+	return _u
+}
+
 // SetMenuName sets the "menu_name" field.
 func (_u *OrderItemUpdateOne) SetMenuName(v string) *OrderItemUpdateOne {
 	_u.mutation.SetMenuName(v)
@@ -477,14 +525,14 @@ func (_u *OrderItemUpdateOne) AddQuantity(v int) *OrderItemUpdateOne {
 }
 
 // SetUnitPrice sets the "unit_price" field.
-func (_u *OrderItemUpdateOne) SetUnitPrice(v float64) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetUnitPrice(v int64) *OrderItemUpdateOne {
 	_u.mutation.ResetUnitPrice()
 	_u.mutation.SetUnitPrice(v)
 	return _u
 }
 
 // SetNillableUnitPrice sets the "unit_price" field if the given value is not nil.
-func (_u *OrderItemUpdateOne) SetNillableUnitPrice(v *float64) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetNillableUnitPrice(v *int64) *OrderItemUpdateOne {
 	if v != nil {
 		_u.SetUnitPrice(*v)
 	}
@@ -492,20 +540,20 @@ func (_u *OrderItemUpdateOne) SetNillableUnitPrice(v *float64) *OrderItemUpdateO
 }
 
 // AddUnitPrice adds value to the "unit_price" field.
-func (_u *OrderItemUpdateOne) AddUnitPrice(v float64) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) AddUnitPrice(v int64) *OrderItemUpdateOne {
 	_u.mutation.AddUnitPrice(v)
 	return _u
 }
 
 // SetAmount sets the "amount" field.
-func (_u *OrderItemUpdateOne) SetAmount(v float64) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetAmount(v int64) *OrderItemUpdateOne {
 	_u.mutation.ResetAmount()
 	_u.mutation.SetAmount(v)
 	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (_u *OrderItemUpdateOne) SetNillableAmount(v *float64) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetNillableAmount(v *int64) *OrderItemUpdateOne {
 	if v != nil {
 		_u.SetAmount(*v)
 	}
@@ -513,7 +561,7 @@ func (_u *OrderItemUpdateOne) SetNillableAmount(v *float64) *OrderItemUpdateOne 
 }
 
 // AddAmount adds value to the "amount" field.
-func (_u *OrderItemUpdateOne) AddAmount(v float64) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) AddAmount(v int64) *OrderItemUpdateOne {
 	_u.mutation.AddAmount(v)
 	return _u
 }
@@ -539,14 +587,14 @@ func (_u *OrderItemUpdateOne) ClearSpecInfo() *OrderItemUpdateOne {
 }
 
 // SetSort sets the "sort" field.
-func (_u *OrderItemUpdateOne) SetSort(v int) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetSort(v uint32) *OrderItemUpdateOne {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *OrderItemUpdateOne) SetNillableSort(v *int) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) SetNillableSort(v *uint32) *OrderItemUpdateOne {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -554,34 +602,14 @@ func (_u *OrderItemUpdateOne) SetNillableSort(v *int) *OrderItemUpdateOne {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *OrderItemUpdateOne) AddSort(v int) *OrderItemUpdateOne {
+func (_u *OrderItemUpdateOne) AddSort(v int32) *OrderItemUpdateOne {
 	_u.mutation.AddSort(v)
-	return _u
-}
-
-// SetOrderID sets the "order" edge to the Order entity by ID.
-func (_u *OrderItemUpdateOne) SetOrderID(id uint64) *OrderItemUpdateOne {
-	_u.mutation.SetOrderID(id)
 	return _u
 }
 
 // SetOrder sets the "order" edge to the Order entity.
 func (_u *OrderItemUpdateOne) SetOrder(v *Order) *OrderItemUpdateOne {
 	return _u.SetOrderID(v.ID)
-}
-
-// SetMenuID sets the "menu" edge to the Menu entity by ID.
-func (_u *OrderItemUpdateOne) SetMenuID(id uint64) *OrderItemUpdateOne {
-	_u.mutation.SetMenuID(id)
-	return _u
-}
-
-// SetNillableMenuID sets the "menu" edge to the Menu entity by ID if the given value is not nil.
-func (_u *OrderItemUpdateOne) SetNillableMenuID(id *uint64) *OrderItemUpdateOne {
-	if id != nil {
-		_u = _u.SetMenuID(*id)
-	}
-	return _u
 }
 
 // SetMenu sets the "menu" edge to the Menu entity.
@@ -727,16 +755,16 @@ func (_u *OrderItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderItem, er
 		_spec.AddField(orderitem.FieldQuantity, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.UnitPrice(); ok {
-		_spec.SetField(orderitem.FieldUnitPrice, field.TypeFloat64, value)
+		_spec.SetField(orderitem.FieldUnitPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUnitPrice(); ok {
-		_spec.AddField(orderitem.FieldUnitPrice, field.TypeFloat64, value)
+		_spec.AddField(orderitem.FieldUnitPrice, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
-		_spec.SetField(orderitem.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(orderitem.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedAmount(); ok {
-		_spec.AddField(orderitem.FieldAmount, field.TypeFloat64, value)
+		_spec.AddField(orderitem.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SpecInfo(); ok {
 		_spec.SetField(orderitem.FieldSpecInfo, field.TypeString, value)
@@ -745,10 +773,10 @@ func (_u *OrderItemUpdateOne) sqlSave(ctx context.Context) (_node *OrderItem, er
 		_spec.ClearField(orderitem.FieldSpecInfo, field.TypeString)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(orderitem.FieldSort, field.TypeInt, value)
+		_spec.SetField(orderitem.FieldSort, field.TypeUint32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(orderitem.FieldSort, field.TypeInt, value)
+		_spec.AddField(orderitem.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.OrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
