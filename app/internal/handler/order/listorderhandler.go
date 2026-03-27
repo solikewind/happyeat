@@ -1,28 +1,28 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package tablecategory
+package order
 
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/tablecategory"
+	"github.com/solikewind/happyeat/app/internal/logic/order"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 列出餐桌类别
-func ListTableCategoriesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 列出订单
+func ListOrderHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ListTableCategoriesReq
+		var req types.ListOrderReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := tablecategory.NewListTableCategoriesLogic(r.Context(), svcCtx)
-		resp, err := l.ListTableCategories(&req)
+		l := order.NewListOrderLogic(r.Context(), svcCtx)
+		resp, err := l.ListOrder(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

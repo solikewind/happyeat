@@ -1,35 +1,32 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package table
+package spec
 
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/table"
+	"github.com/solikewind/happyeat/app/internal/logic/spec"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 列出餐桌
-func ListTablesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 列出规格组
+func ListSpecGroupHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ListTablesReq
+		var req types.ListSpecGroupReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := table.NewListTablesLogic(r.Context(), svcCtx)
-		resp, err := l.ListTables(&req)
+		l := spec.NewListSpecGroupLogic(r.Context(), svcCtx)
+		resp, err := l.ListSpecGroup(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
-			return
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, resp)
 		}
-		if resp == nil {
-			resp = &types.ListTablesReply{Tables: []types.Table{}, Total: 0}
-		}
-		httpx.OkJsonCtx(r.Context(), w, resp)
 	}
 }

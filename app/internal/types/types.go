@@ -213,92 +213,92 @@ type GetTableReq struct {
 	Id uint64 `path:"id"`
 }
 
-type ListCategorySpecsReply struct {
+type ListCategorySpecReply struct {
 	Specs []CategorySpec `json:"specs"`
 	Total int64          `json:"total"`
 }
 
-type ListCategorySpecsReq struct {
+type ListCategorySpecReq struct {
 	PageInfo
 	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"`
 	SpecType   string `json:"spec_type,optional" form:"spec_type,optional"`
 }
 
-type ListMenusCategoriesReply struct {
+type ListMenuCategoryReply struct {
 	Categories []MenuCategory `json:"categories"`
 	Total      int64          `json:"total"`
 }
 
-type ListMenusCategoriesReq struct {
+type ListMenuCategoryReq struct {
 	PageInfo
 	Name string `json:"name,optional" form:"name,optional"`
 }
 
-type ListMenusReply struct {
+type ListMenuReply struct {
 	Menus []Menu `json:"menus"`
 	Total int64  `json:"total"`
 }
 
-type ListMenusReq struct {
+type ListMenuReq struct {
 	PageInfo
 	Name       string `json:"name,optional" form:"name,optional"`
 	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"` // 按分类id筛选
 	Category   string `json:"category,optional" form:"category,optional"`       // 按分类名字筛选
 }
 
-type ListOrdersReply struct {
+type ListOrderReply struct {
 	Orders []Order `json:"orders"`
 	Total  int64   `json:"total"`
 }
 
-type ListOrdersReq struct {
+type ListOrderReq struct {
 	PageInfo
 	Status    string `json:"status,optional" form:"status,optional"`
 	OrderType string `json:"order_type,optional" form:"order_type,optional"` // dine_in | takeaway
 	TableId   uint64 `json:"table_id,optional" form:"table_id,optional"`     // 按餐桌筛选
 }
 
-type ListRolePermissionsReply struct {
-	Roles map[string][]string `json:"roles"`
+type ListRolePermissionReply struct {
+	Roles []RolePermission `json:"roles"`
 }
 
-type ListSpecGroupsReply struct {
+type ListSpecGroupReply struct {
 	Groups []SpecGroup `json:"groups"`
 	Total  int64       `json:"total"`
 }
 
-type ListSpecGroupsReq struct {
+type ListSpecGroupReq struct {
 	PageInfo
 	Name string `json:"name,optional" form:"name,optional"`
 }
 
-type ListSpecItemsReply struct {
+type ListSpecItemReply struct {
 	Items []SpecItem `json:"items"`
 	Total int64      `json:"total"`
 }
 
-type ListSpecItemsReq struct {
+type ListSpecItemReq struct {
 	PageInfo
 	SpecGroupId uint64 `json:"spec_group_id,optional" form:"spec_group_id,optional"`
 	Name        string `json:"name,optional" form:"name,optional"`
 }
 
-type ListTableCategoriesReply struct {
+type ListTableCategoryReply struct {
 	Categories []TableCategory `json:"categories"`
 	Total      int64           `json:"total"`
 }
 
-type ListTableCategoriesReq struct {
+type ListTableCategoryReq struct {
 	PageInfo
 	Name string `json:"name,optional" form:"name,optional"`
 }
 
-type ListTablesReply struct {
+type ListTableReply struct {
 	Tables []Table `json:"tables"`
 	Total  int64   `json:"total"`
 }
 
-type ListTablesReq struct {
+type ListTableReq struct {
 	Current    int64  `json:"current,optional" form:"current,optional"`
 	PageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
 	Code       string `json:"code,optional" form:"code,optional"`
@@ -307,12 +307,12 @@ type ListTablesReq struct {
 	Category   string `json:"category,optional" form:"category,optional"`       // 按分类名字筛选
 }
 
-type ListWorkbenchOrdersReply struct {
+type ListWorkbenchOrderReply struct {
 	Orders []Order `json:"orders"`
 	Total  int64   `json:"total"`
 }
 
-type ListWorkbenchOrdersReq struct {
+type ListWorkbenchOrderReq struct {
 	Current  int64  `json:"current,optional" form:"current,optional"`
 	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
 	Status   string `json:"status,optional" form:"status,optional"` // 不传则默认查 created,paid,preparing
@@ -388,6 +388,11 @@ type ResetRolePermissionsReply struct {
 
 type ResetRolePermissionsReq struct {
 	Role string `json:"role,optional"`
+}
+
+type RolePermission struct {
+	Role        string   `json:"role"`
+	Permissions []string `json:"permissions"`
 }
 
 type SpecGroup struct {

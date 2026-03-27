@@ -21,14 +21,14 @@ import (
 )
 
 type ServiceContext struct {
-	Config config.Config
-	DB     *sql.DB         // 共享连接池，仅用于关闭
-	Casbin *CasbinEnforcer // 权限：model 来自配置内联，policy 来自 DB casbin_rule 表
-	Rbac   *RbacStore
+	Config           config.Config
+	DB               *sql.DB         // 共享连接池，仅用于关闭
+	Casbin           *CasbinEnforcer // 权限：model 来自配置内联，policy 来自 DB casbin_rule 表
+	Rbac             *RbacStore
 	CasbinMiddleware rest.Middleware
-	Agent  *blades.Agent   // 智能体
-	LLM    *agent.LangChainService
-	ASR    *agent.BailianASRClient
+	Agent            *blades.Agent // 智能体
+	LLM              *agent.LangChainService
+	ASR              *agent.BailianASRClient
 
 	Menu     *menu.Menu     // 菜单 data 层
 	MenuType *menu.MenuType // 菜单分类 data 层

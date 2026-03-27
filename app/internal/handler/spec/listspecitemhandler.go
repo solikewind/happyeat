@@ -1,28 +1,28 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package menu
+package spec
 
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/menu"
+	"github.com/solikewind/happyeat/app/internal/logic/spec"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 列出菜单
-func ListMenusHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 列出规格项
+func ListSpecItemHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ListMenusReq
+		var req types.ListSpecItemReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := menu.NewListMenusLogic(r.Context(), svcCtx)
-		resp, err := l.ListMenus(&req)
+		l := spec.NewListSpecItemLogic(r.Context(), svcCtx)
+		resp, err := l.ListSpecItem(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

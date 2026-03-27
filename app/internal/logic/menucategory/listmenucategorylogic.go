@@ -12,22 +12,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListMenusCategoriesLogic struct {
+type ListMenuCategoryLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
 // 列出菜单种类
-func NewListMenusCategoriesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListMenusCategoriesLogic {
-	return &ListMenusCategoriesLogic{
+func NewListMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListMenuCategoryLogic {
+	return &ListMenuCategoryLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ListMenusCategoriesLogic) ListMenusCategories(req *types.ListMenusCategoriesReq) (resp *types.ListMenusCategoriesReply, err error) {
+func (l *ListMenuCategoryLogic) ListMenuCategory(req *types.ListMenuCategoryReq) (resp *types.ListMenuCategoryReply, err error) {
 	// todo: add your logic here and delete this line
 
 	return

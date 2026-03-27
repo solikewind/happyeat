@@ -13,22 +13,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListTableCategoriesLogic struct {
+type ListTableCategoryLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
 // 列出餐桌类别
-func NewListTableCategoriesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListTableCategoriesLogic {
-	return &ListTableCategoriesLogic{
+func NewListTableCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListTableCategoryLogic {
+	return &ListTableCategoryLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ListTableCategoriesLogic) ListTableCategories(req *types.ListTableCategoriesReq) (resp *types.ListTableCategoriesReply, err error) {
+func (l *ListTableCategoryLogic) ListTableCategory(req *types.ListTableCategoryReq) (resp *types.ListTableCategoryReply, err error) {
 	current, pageSize := req.Current, req.PageSize
 	if current <= 0 {
 		current = 1
@@ -48,7 +48,7 @@ func (l *ListTableCategoriesLogic) ListTableCategories(req *types.ListTableCateg
 	for _, c := range categories {
 		list = append(list, entTableCategoryToType(c))
 	}
-	return &types.ListTableCategoriesReply{
+	return &types.ListTableCategoryReply{
 		Categories: list,
 		Total:      total,
 	}, nil

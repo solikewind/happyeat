@@ -61,7 +61,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 列出菜单
 					Method:  http.MethodGet,
 					Path:    "/menus",
-					Handler: menu.ListMenusHandler(serverCtx),
+					Handler: menu.ListMenuHandler(serverCtx),
 				},
 				{
 					// 创建菜单
@@ -84,7 +84,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 列出菜单种类
 					Method:  http.MethodGet,
 					Path:    "/menu/categories",
-					Handler: menucategory.ListMenusCategoriesHandler(serverCtx),
+					Handler: menucategory.ListMenuCategoryHandler(serverCtx),
 				},
 				{
 					// 创建菜单种类
@@ -137,7 +137,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 列出订单
 					Method:  http.MethodGet,
 					Path:    "/orders",
-					Handler: order.ListOrdersHandler(serverCtx),
+					Handler: order.ListOrderHandler(serverCtx),
 				},
 				{
 					// 创建订单
@@ -160,7 +160,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 获取角色权限矩阵
 					Method:  http.MethodGet,
 					Path:    "/rbac/role-permissions",
-					Handler: rbac.ListRolePermissionsHandler(serverCtx),
+					Handler: rbac.ListRolePermissionHandler(serverCtx),
 				},
 				{
 					// 更新角色权限（全量覆盖）
@@ -186,6 +186,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.CasbinMiddleware},
 			[]rest.Route{
 				{
+					// 列出分类规格模板
+					Method:  http.MethodGet,
+					Path:    "/spec/category-spec",
+					Handler: spec.ListCategorySpecHandler(serverCtx),
+				},
+				{
 					// 创建分类规格模板
 					Method:  http.MethodPost,
 					Path:    "/spec/category-spec",
@@ -208,12 +214,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodDelete,
 					Path:    "/spec/category-spec/:id",
 					Handler: spec.DeleteCategorySpecHandler(serverCtx),
-				},
-				{
-					// 列出分类规格模板
-					Method:  http.MethodGet,
-					Path:    "/spec/category-specs",
-					Handler: spec.ListCategorySpecsHandler(serverCtx),
 				},
 				{
 					// 创建规格组
@@ -243,7 +243,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 列出规格组
 					Method:  http.MethodGet,
 					Path:    "/spec/groups",
-					Handler: spec.ListSpecGroupsHandler(serverCtx),
+					Handler: spec.ListSpecGroupHandler(serverCtx),
 				},
 				{
 					// 创建规格项
@@ -273,7 +273,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 列出规格项
 					Method:  http.MethodGet,
 					Path:    "/spec/items",
-					Handler: spec.ListSpecItemsHandler(serverCtx),
+					Handler: spec.ListSpecItemHandler(serverCtx),
 				},
 			}...,
 		),
@@ -308,7 +308,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 列出餐桌
 					Method:  http.MethodGet,
 					Path:    "/tables",
-					Handler: table.ListTablesHandler(serverCtx),
+					Handler: table.ListTableHandler(serverCtx),
 				},
 				{
 					// 创建餐桌
@@ -331,7 +331,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 列出餐桌类别
 					Method:  http.MethodGet,
 					Path:    "/table/categories",
-					Handler: tablecategory.ListTableCategoriesHandler(serverCtx),
+					Handler: tablecategory.ListTableCategoryHandler(serverCtx),
 				},
 				{
 					// 创建餐桌类别
@@ -372,7 +372,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					// 工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed
 					Method:  http.MethodGet,
 					Path:    "/workbench/orders",
-					Handler: workbench.ListWorkbenchOrdersHandler(serverCtx),
+					Handler: workbench.ListWorkbenchOrderHandler(serverCtx),
 				},
 			}...,
 		),

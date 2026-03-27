@@ -12,10 +12,10 @@ import (
 )
 
 // 获取角色权限矩阵
-func ListRolePermissionsHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func ListRolePermissionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		l := rbac.NewListRolePermissionsLogic(r.Context(), svcCtx)
-		resp, err := l.ListRolePermissions()
+		l := rbac.NewListRolePermissionLogic(r.Context(), svcCtx)
+		resp, err := l.ListRolePermission()
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

@@ -1,0 +1,53 @@
+---
+description: HappyEat 后端统一规范（代码风格、架构分层、go-zero 官方流程）
+alwaysApply: true
+---
+
+# HappyEat Backend Rules
+
+## 技术与目录基线
+- 技术栈固定：Go + go-zero(rest) + goctl + ent + Casbin + JWT。
+- 根模块固定为 `github.com/solikewind/happyeat`，禁止使用短路径导入。
+- API 定义放 `app/api/`；服务入口放 `app/`；业务代码放 `app/internal/`；数据层放 `dal/model/`。
+- ent schema 与生成代码统一在 `dal/model/ent/`，业务 data 按 `dal/model/<domain>/` 拆分。
+
+## go-zero 官方开发流程
+- 新增/修改接口时，先改 `.api`，再执行 `make api`（或 goctl 命令），最后补 logic 实现。
+- 不手写绕过 goctl 的路由和 types 结构；以 `.api` 为单一事实来源。
+- 生成文件提示 `exists, ignored generation` 属正常；需要覆盖时按文件维度处理，不做破坏性重置。
+- OpenAPI 文档通过 `make swagger` 生成，主服务统一提供静态访问路径。
+
+## go-zero API 专项细则
+- `v1` API 通过 `import` 聚合 `app/api/base/*.api` 通用类型，避免在业务 API 重复定义。
+- `@server` 重点维护 `jwt`、`prefix`、`group`、`timeout`；同一业务接口保持在同一 `group`。
+- GET 查询参数统一使用 `form` 标签；路径参数统一 `Id uint64 \`path:"id"\``。
+- logic 命名与 `.api` 的 `@handler` 主干一致（如 `ListMenuCategory`）。
+
+## 分层职责（必须遵守）
+- handler 只做参数解析、调用 logic、返回响应；不写业务规则和复杂数据拼装。
+- logic 承载业务编排与校验，依赖 `*svc.ServiceContext`，错误向上返回。
+- data 层只处理持久化与查询，不耦合 HTTP 语义。
+- 涉及多表写入默认使用事务，失败时回滚，成功后提交。
+
+## 命名与类型约束
+- 命名使用单数语义：`ListMenuCategory`，避免 `ListMenusCategories` 这类双重复数。
+- list 接口 request/reply 命名与路由、handler、logic 方法保持同名主干。
+- ID 统一使用 `uint64`（API types / logic / data / ent 外键一致）。
+- 金额统一使用 `int64`（分），禁止在 data/logic 使用 `float` 存储金额。
+- 枚举字段在 data 层使用 ent enum 类型，必要时显式转换，不做隐式 string 混用。
+
+## API 设计细则
+- GET 列表筛选参数使用 `form` 标签；Path 参数统一 `Id uint64 \`path:"id"\``。
+- 全量更新语义下，核心字段设为必填；仅确有业务意义的字段使用 `optional`。
+- 对外 JSON 字段名保持稳定（如 `category_id`、`spec_group_id`），避免无意义重命名。
+
+## ent 关系与迁移约束
+- 每个外键字段只保留一套明确关系定义，避免重复 edge 导致生成冲突。
+- edge 与外键字段类型必须一致（尤其 `uint64`）。
+- 可空外键必须 `Optional().Nillable()` 与业务语义一致（如外带订单无桌台）。
+- schema 改动后先 `generate` 再 `migrate`，并先处理历史数据与非空约束风险。
+
+## 代码风格
+- 函数体按业务步骤分块，块之间留空行，保持可读性。
+- 仅在复杂逻辑前添加简短注释；避免噪音注释。
+- 改动时优先做“最小闭环修改”：API、types、handler、logic、data、文档同步收敛。

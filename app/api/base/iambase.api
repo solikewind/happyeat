@@ -1,0 +1,7 @@
+syntax = "v1"
+
+// IAM: 角色与权限基础模型
+type RolePermission {
+	Role        string   `json:"role"`
+	Permissions []string `json:"permissions"`
+}

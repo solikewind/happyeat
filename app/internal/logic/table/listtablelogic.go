@@ -14,22 +14,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListTablesLogic struct {
+type ListTableLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
 // 列出餐桌
-func NewListTablesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListTablesLogic {
-	return &ListTablesLogic{
+func NewListTableLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListTableLogic {
+	return &ListTableLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ListTablesLogic) ListTables(req *types.ListTablesReq) (resp *types.ListTablesReply, err error) {
+func (l *ListTableLogic) ListTable(req *types.ListTableReq) (resp *types.ListTableReply, err error) {
 	current := req.Current
 	pageSize := req.PageSize
 	if current <= 0 {
@@ -48,7 +48,7 @@ func (l *ListTablesLogic) ListTables(req *types.ListTablesReq) (resp *types.List
 		Limit:        int(pageSize),
 	})
 	if err != nil {
-		l.Errorf("ListTables Table.List err: %v", err)
+		l.Errorf("ListTable Table.List err: %v", err)
 		return nil, err
 	}
 
@@ -69,7 +69,7 @@ func (l *ListTablesLogic) ListTables(req *types.ListTablesReq) (resp *types.List
 			UpdatedAt:  timeutil.TimeToString(e.UpdatedAt),
 		})
 	}
-	return &types.ListTablesReply{Tables: tables, Total: total}, nil
+	return &types.ListTableReply{Tables: tables, Total: total}, nil
 }
 
 func ptrToStr(p *string) string {

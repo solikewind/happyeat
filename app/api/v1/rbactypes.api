@@ -6,8 +6,10 @@ info (
 	version: "v1.0.0"
 )
 
-type ListRolePermissionsReply {
-	Roles map[string][]string `json:"roles"`
+import "../base/iambase.api"
+
+type ListRolePermissionReply {
+	Roles []RolePermission `json:"roles"`
 }
 
 type UpdateRolePermissionsReq {

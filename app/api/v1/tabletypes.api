@@ -9,7 +9,7 @@ info (
 
 import "../base/tablebase.api"
 
-type ListTablesReq {
+type ListTableReq {
 	Current  int64 `json:"current,optional" form:"current,optional"`
 	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
 	Code     string `json:"code,optional" form:"code,optional"`
@@ -17,7 +17,7 @@ type ListTablesReq {
 	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"` // 按分类id筛选
 	Category string `json:"category,optional" form:"category,optional"` // 按分类名字筛选
 }
-type ListTablesReply {
+type ListTableReply {
 	Tables []Table `json:"tables"`
 	Total  int64   `json:"total"`
 }
@@ -53,11 +53,11 @@ type DeleteTableReq {
 }
 type DeleteTableReply {}
 
-type ListTableCategoriesReq {
+type ListTableCategoryReq {
 	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
 }
-type ListTableCategoriesReply {
+type ListTableCategoryReply {
 	Categories []TableCategory `json:"categories"`
 	Total      int64           `json:"total"`
 }

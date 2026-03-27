@@ -22,13 +22,13 @@ type CreateMenuReq {
 type CreateMenuReply {}
 
 // 列表为 GET，参数从 query 解析；current/pageSize 不传时由 logic 默认为 1/10
-type ListMenusReq {
+type ListMenuReq {
 	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
 	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"` // 按分类id筛选
 	Category string `json:"category,optional" form:"category,optional"` // 按分类名字筛选
 }
- type ListMenusReply {
+ type ListMenuReply {
     Menus []Menu `json:"menus"`
     Total int64 `json:"total"`
  }
@@ -66,11 +66,11 @@ type CreateMenuCategoryReq {
 type CreateMenuCategoryReply {}
 
 // 列表为 GET，参数从 query 解析；current/pageSize/name 不传时由 logic 默认或不过滤
-type ListMenusCategoriesReq {
+type ListMenuCategoryReq {
 	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
 }
- type ListMenusCategoriesReply {
+ type ListMenuCategoryReply {
     Categories []MenuCategory `json:"categories"`
     Total int64 `json:"total"`
  }
@@ -101,11 +101,11 @@ type CreateSpecGroupReq {
 }
 type CreateSpecGroupReply {}
 
-type ListSpecGroupsReq {
+type ListSpecGroupReq {
 	PageInfo
 	Name string `json:"name,optional" form:"name,optional"`
 }
-type ListSpecGroupsReply {
+type ListSpecGroupReply {
 	Groups []SpecGroup `json:"groups"`
 	Total  int64       `json:"total"`
 }
@@ -137,12 +137,12 @@ type CreateSpecItemReq {
 }
 type CreateSpecItemReply {}
 
-type ListSpecItemsReq {
+type ListSpecItemReq {
 	PageInfo
 	SpecGroupId uint64 `json:"spec_group_id,optional" form:"spec_group_id,optional"`
 	Name        string `json:"name,optional" form:"name,optional"`
 }
-type ListSpecItemsReply {
+type ListSpecItemReply {
 	Items []SpecItem `json:"items"`
 	Total int64      `json:"total"`
 }
@@ -177,12 +177,12 @@ type CreateCategorySpecReq {
 }
 type CreateCategorySpecReply {}
 
-type ListCategorySpecsReq {
+type ListCategorySpecReq {
 	PageInfo
 	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"`
 	SpecType   string `json:"spec_type,optional" form:"spec_type,optional"`
 }
-type ListCategorySpecsReply {
+type ListCategorySpecReply {
 	Specs []CategorySpec `json:"specs"`
 	Total int64          `json:"total"`
 }

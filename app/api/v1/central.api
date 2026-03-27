@@ -40,8 +40,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "列出菜单"
-	@handler ListMenus
-	get /menus (ListMenusReq) returns (ListMenusReply)
+	@handler ListMenu
+	get /menus (ListMenuReq) returns (ListMenuReply)
 
 	@doc "获取单个菜单"
 	@handler GetMenu
@@ -70,8 +70,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "列出菜单种类"
-	@handler ListMenusCategories
-	get /menu/categories (ListMenusCategoriesReq) returns (ListMenusCategoriesReply)
+	@handler ListMenuCategory
+	get /menu/categories (ListMenuCategoryReq) returns (ListMenuCategoryReply)
 
 	@doc "获取菜单种类"
 	@handler GetMenuCategory
@@ -100,8 +100,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "列出规格组"
-	@handler ListSpecGroups
-	get /spec/groups (ListSpecGroupsReq) returns (ListSpecGroupsReply)
+	@handler ListSpecGroup
+	get /spec/groups (ListSpecGroupReq) returns (ListSpecGroupReply)
 
 	@doc "获取规格组"
 	@handler GetSpecGroup
@@ -120,8 +120,8 @@ service HappyEatService {
 	delete /spec/group/:id (DeleteSpecGroupReq) returns (DeleteSpecGroupReply)
 
 	@doc "列出规格项"
-	@handler ListSpecItems
-	get /spec/items (ListSpecItemsReq) returns (ListSpecItemsReply)
+	@handler ListSpecItem
+	get /spec/items (ListSpecItemReq) returns (ListSpecItemReply)
 
 	@doc "获取规格项"
 	@handler GetSpecItem
@@ -140,8 +140,8 @@ service HappyEatService {
 	delete /spec/item/:id (DeleteSpecItemReq) returns (DeleteSpecItemReply)
 
 	@doc "列出分类规格模板"
-	@handler ListCategorySpecs
-	get /spec/category-specs (ListCategorySpecsReq) returns (ListCategorySpecsReply)
+	@handler ListCategorySpec
+	get /spec/category-spec (ListCategorySpecReq) returns (ListCategorySpecReply)
 
 	@doc "获取分类规格模板"
 	@handler GetCategorySpec
@@ -170,8 +170,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "列出餐桌"
-	@handler ListTables
-	get /tables (ListTablesReq) returns (ListTablesReply)
+	@handler ListTable
+	get /tables (ListTableReq) returns (ListTableReply)
 
 	@doc "获取单个餐桌"
 	@handler GetTable
@@ -200,8 +200,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "列出餐桌类别"
-	@handler ListTableCategories
-	get /table/categories (ListTableCategoriesReq) returns (ListTableCategoriesReply)
+	@handler ListTableCategory
+	get /table/categories (ListTableCategoryReq) returns (ListTableCategoryReply)
 
 	@doc "获取餐桌类别"
 	@handler GetTableCategory
@@ -230,8 +230,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "列出订单"
-	@handler ListOrders
-	get /orders (ListOrdersReq) returns (ListOrdersReply)
+	@handler ListOrder
+	get /orders (ListOrderReq) returns (ListOrderReply)
 
 	@doc "获取单个订单"
 	@handler GetOrder
@@ -256,8 +256,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed"
-	@handler ListWorkbenchOrders
-	get /workbench/orders (ListWorkbenchOrdersReq) returns (ListWorkbenchOrdersReply)
+	@handler ListWorkbenchOrder
+	get /workbench/orders (ListWorkbenchOrderReq) returns (ListWorkbenchOrderReply)
 }
 
 @server (
@@ -270,8 +270,8 @@ service HappyEatService {
 )
 service HappyEatService {
 	@doc "获取角色权限矩阵"
-	@handler ListRolePermissions
-	get /rbac/role-permissions returns (ListRolePermissionsReply)
+	@handler ListRolePermission
+	get /rbac/role-permissions returns (ListRolePermissionReply)
 
 	@doc "更新角色权限（全量覆盖）"
 	@handler UpdateRolePermissions

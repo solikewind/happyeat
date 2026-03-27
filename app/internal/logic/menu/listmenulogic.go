@@ -13,7 +13,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListMenusLogic struct {
+type ListMenuLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
@@ -22,15 +22,15 @@ type ListMenusLogic struct {
 const maxSpecsPerMenuInList = 20
 
 // 列出菜单
-func NewListMenusLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListMenusLogic {
-	return &ListMenusLogic{
+func NewListMenuLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListMenuLogic {
+	return &ListMenuLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusReply, error) {
+func (l *ListMenuLogic) ListMenu(req *types.ListMenuReq) (resp *types.ListMenuReply, err error) {
 	pageSize := int(req.PageSize)
 	if pageSize <= 0 {
 		pageSize = 10
@@ -60,7 +60,7 @@ func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusRep
 		menus = append(menus, menu)
 	}
 
-	return &types.ListMenusReply{
+	return &types.ListMenuReply{
 		Menus: menus,
 		Total: total,
 	}, nil

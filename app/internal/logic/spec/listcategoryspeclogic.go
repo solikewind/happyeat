@@ -12,22 +12,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListSpecGroupsLogic struct {
+type ListCategorySpecLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-// 列出规格组
-func NewListSpecGroupsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListSpecGroupsLogic {
-	return &ListSpecGroupsLogic{
+// 列出分类规格模板
+func NewListCategorySpecLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListCategorySpecLogic {
+	return &ListCategorySpecLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ListSpecGroupsLogic) ListSpecGroups(req *types.ListSpecGroupsReq) (resp *types.ListSpecGroupsReply, err error) {
+func (l *ListCategorySpecLogic) ListCategorySpec(req *types.ListCategorySpecReq) (resp *types.ListCategorySpecReply, err error) {
 	// todo: add your logic here and delete this line
 
 	return

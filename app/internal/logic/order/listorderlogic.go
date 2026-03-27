@@ -14,22 +14,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListOrdersLogic struct {
+type ListOrderLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
 // 列出订单
-func NewListOrdersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListOrdersLogic {
-	return &ListOrdersLogic{
+func NewListOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListOrderLogic {
+	return &ListOrderLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ListOrdersLogic) ListOrders(req *types.ListOrdersReq) (*types.ListOrdersReply, error) {
+func (l *ListOrderLogic) ListOrder(req *types.ListOrderReq) (resp *types.ListOrderReply, err error) {
 	pageSize := int(req.PageSize)
 	if pageSize <= 0 {
 		pageSize = 10
@@ -61,5 +61,5 @@ func (l *ListOrdersLogic) ListOrders(req *types.ListOrdersReq) (*types.ListOrder
 		orders = append(orders, EntOrderToType(e))
 	}
 
-	return &types.ListOrdersReply{Orders: orders, Total: total}, nil
+	return &types.ListOrderReply{Orders: orders, Total: total}, nil
 }

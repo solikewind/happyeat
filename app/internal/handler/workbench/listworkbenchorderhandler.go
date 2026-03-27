@@ -1,28 +1,28 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package menucategory
+package workbench
 
 import (
 	"net/http"
 
-	"github.com/solikewind/happyeat/app/internal/logic/menucategory"
+	"github.com/solikewind/happyeat/app/internal/logic/workbench"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 列出菜单种类
-func ListMenusCategoriesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed
+func ListWorkbenchOrderHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ListMenusCategoriesReq
+		var req types.ListWorkbenchOrderReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := menucategory.NewListMenusCategoriesLogic(r.Context(), svcCtx)
-		resp, err := l.ListMenusCategories(&req)
+		l := workbench.NewListWorkbenchOrderLogic(r.Context(), svcCtx)
+		resp, err := l.ListWorkbenchOrder(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

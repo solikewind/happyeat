@@ -8,13 +8,13 @@ info (
 
 import "../base/orderbase.api"
 
-type ListOrdersReq {
+type ListOrderReq {
 	PageInfo
 	Status    string `json:"status,optional" form:"status,optional"`
 	OrderType string `json:"order_type,optional" form:"order_type,optional"` // dine_in | takeaway
 	TableId   uint64 `json:"table_id,optional" form:"table_id,optional"`     // 按餐桌筛选
 }
-type ListOrdersReply {
+type ListOrderReply {
 	Orders []Order `json:"orders"`
 	Total  int64   `json:"total"`
 }

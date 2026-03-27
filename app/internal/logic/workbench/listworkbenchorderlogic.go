@@ -17,25 +17,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListWorkbenchOrdersLogic struct {
+type ListWorkbenchOrderLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
 // 工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed
-func NewListWorkbenchOrdersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListWorkbenchOrdersLogic {
-	return &ListWorkbenchOrdersLogic{
+func NewListWorkbenchOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListWorkbenchOrderLogic {
+	return &ListWorkbenchOrderLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-// 工作台默认展示的状态
-var workbenchDefaultStatuses = []string{"created", "paid", "preparing"}
-
-func (l *ListWorkbenchOrdersLogic) ListWorkbenchOrders(req *types.ListWorkbenchOrdersReq) (*types.ListWorkbenchOrdersReply, error) {
+func (l *ListWorkbenchOrderLogic) ListWorkbenchOrder(req *types.ListWorkbenchOrderReq) (resp *types.ListWorkbenchOrderReply, err error) {
 	pageSize := int(req.PageSize)
 	if pageSize <= 0 {
 		pageSize = 10
@@ -70,5 +67,5 @@ func (l *ListWorkbenchOrdersLogic) ListWorkbenchOrders(req *types.ListWorkbenchO
 		orders = append(orders, orderlogic.EntOrderToType(e))
 	}
 
-	return &types.ListWorkbenchOrdersReply{Orders: orders, Total: total}, nil
+	return &types.ListWorkbenchOrderReply{Orders: orders, Total: total}, nil
 }
