@@ -38,6 +38,10 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
 	if req.Username != devUsername || req.Password != devPassword {
 		return nil, errors.New("用户名或密码错误")
 	}
+	const subject = "dev-admin"
+	if err := l.svcCtx.Rbac.EnsureUser(subject); err != nil {
+		return nil, err
+	}
 
 	secret := l.svcCtx.Config.Auth.AccessSecret
 	expire := l.svcCtx.Config.Auth.AccessExpire
@@ -50,8 +54,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
 	claims := jwt.MapClaims{
 		"exp": exp,
 		"iat": iat,
-		"sub":  "dev-admin",
-		"role": "super_admin",
+		"sub": subject,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenStr, err := token.SignedString([]byte(secret))

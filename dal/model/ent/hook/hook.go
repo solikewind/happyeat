@@ -21,6 +21,42 @@ func (f CategorySpecFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategorySpecMutation", m)
 }
 
+// The IAMPermissionFunc type is an adapter to allow the use of ordinary
+// function as IAMPermission mutator.
+type IAMPermissionFunc func(context.Context, *ent.IAMPermissionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IAMPermissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.IAMPermissionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IAMPermissionMutation", m)
+}
+
+// The IAMRoleFunc type is an adapter to allow the use of ordinary
+// function as IAMRole mutator.
+type IAMRoleFunc func(context.Context, *ent.IAMRoleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IAMRoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.IAMRoleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IAMRoleMutation", m)
+}
+
+// The IAMUserFunc type is an adapter to allow the use of ordinary
+// function as IAMUser mutator.
+type IAMUserFunc func(context.Context, *ent.IAMUserMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IAMUserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.IAMUserMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IAMUserMutation", m)
+}
+
 // The MenuFunc type is an adapter to allow the use of ordinary
 // function as Menu mutator.
 type MenuFunc func(context.Context, *ent.MenuMutation) (ent.Value, error)

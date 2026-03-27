@@ -6,6 +6,9 @@ import (
 	"time"
 
 	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
+	"github.com/solikewind/happyeat/dal/model/ent/iampermission"
+	"github.com/solikewind/happyeat/dal/model/ent/iamrole"
+	"github.com/solikewind/happyeat/dal/model/ent/iamuser"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
@@ -65,6 +68,111 @@ func init() {
 	categoryspecDescSort := categoryspecFields[4].Descriptor()
 	// categoryspec.DefaultSort holds the default value on creation for the sort field.
 	categoryspec.DefaultSort = categoryspecDescSort.Default.(uint32)
+	iampermissionMixin := schema.IAMPermission{}.Mixin()
+	iampermissionMixinHooks0 := iampermissionMixin[0].Hooks()
+	iampermissionMixinHooks2 := iampermissionMixin[2].Hooks()
+	iampermission.Hooks[0] = iampermissionMixinHooks0[0]
+	iampermission.Hooks[1] = iampermissionMixinHooks2[0]
+	iampermissionMixinInters2 := iampermissionMixin[2].Interceptors()
+	iampermission.Interceptors[0] = iampermissionMixinInters2[0]
+	iampermissionMixinFields1 := iampermissionMixin[1].Fields()
+	_ = iampermissionMixinFields1
+	iampermissionMixinFields2 := iampermissionMixin[2].Fields()
+	_ = iampermissionMixinFields2
+	iampermissionFields := schema.IAMPermission{}.Fields()
+	_ = iampermissionFields
+	// iampermissionDescCreatedAt is the schema descriptor for created_at field.
+	iampermissionDescCreatedAt := iampermissionMixinFields1[0].Descriptor()
+	// iampermission.DefaultCreatedAt holds the default value on creation for the created_at field.
+	iampermission.DefaultCreatedAt = iampermissionDescCreatedAt.Default.(func() time.Time)
+	// iampermissionDescUpdatedAt is the schema descriptor for updated_at field.
+	iampermissionDescUpdatedAt := iampermissionMixinFields1[1].Descriptor()
+	// iampermission.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	iampermission.DefaultUpdatedAt = iampermissionDescUpdatedAt.Default.(func() time.Time)
+	// iampermission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	iampermission.UpdateDefaultUpdatedAt = iampermissionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// iampermissionDescDeleteTs is the schema descriptor for delete_ts field.
+	iampermissionDescDeleteTs := iampermissionMixinFields2[0].Descriptor()
+	// iampermission.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	iampermission.DefaultDeleteTs = iampermissionDescDeleteTs.Default.(int64)
+	// iampermissionDescPermissionCode is the schema descriptor for permission_code field.
+	iampermissionDescPermissionCode := iampermissionFields[0].Descriptor()
+	// iampermission.PermissionCodeValidator is a validator for the "permission_code" field. It is called by the builders before save.
+	iampermission.PermissionCodeValidator = iampermissionDescPermissionCode.Validators[0].(func(string) error)
+	// iampermissionDescDescription is the schema descriptor for description field.
+	iampermissionDescDescription := iampermissionFields[1].Descriptor()
+	// iampermission.DefaultDescription holds the default value on creation for the description field.
+	iampermission.DefaultDescription = iampermissionDescDescription.Default.(string)
+	iamroleMixin := schema.IAMRole{}.Mixin()
+	iamroleMixinHooks0 := iamroleMixin[0].Hooks()
+	iamroleMixinHooks2 := iamroleMixin[2].Hooks()
+	iamrole.Hooks[0] = iamroleMixinHooks0[0]
+	iamrole.Hooks[1] = iamroleMixinHooks2[0]
+	iamroleMixinInters2 := iamroleMixin[2].Interceptors()
+	iamrole.Interceptors[0] = iamroleMixinInters2[0]
+	iamroleMixinFields1 := iamroleMixin[1].Fields()
+	_ = iamroleMixinFields1
+	iamroleMixinFields2 := iamroleMixin[2].Fields()
+	_ = iamroleMixinFields2
+	iamroleFields := schema.IAMRole{}.Fields()
+	_ = iamroleFields
+	// iamroleDescCreatedAt is the schema descriptor for created_at field.
+	iamroleDescCreatedAt := iamroleMixinFields1[0].Descriptor()
+	// iamrole.DefaultCreatedAt holds the default value on creation for the created_at field.
+	iamrole.DefaultCreatedAt = iamroleDescCreatedAt.Default.(func() time.Time)
+	// iamroleDescUpdatedAt is the schema descriptor for updated_at field.
+	iamroleDescUpdatedAt := iamroleMixinFields1[1].Descriptor()
+	// iamrole.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	iamrole.DefaultUpdatedAt = iamroleDescUpdatedAt.Default.(func() time.Time)
+	// iamrole.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	iamrole.UpdateDefaultUpdatedAt = iamroleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// iamroleDescDeleteTs is the schema descriptor for delete_ts field.
+	iamroleDescDeleteTs := iamroleMixinFields2[0].Descriptor()
+	// iamrole.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	iamrole.DefaultDeleteTs = iamroleDescDeleteTs.Default.(int64)
+	// iamroleDescRoleCode is the schema descriptor for role_code field.
+	iamroleDescRoleCode := iamroleFields[0].Descriptor()
+	// iamrole.RoleCodeValidator is a validator for the "role_code" field. It is called by the builders before save.
+	iamrole.RoleCodeValidator = iamroleDescRoleCode.Validators[0].(func(string) error)
+	// iamroleDescRoleName is the schema descriptor for role_name field.
+	iamroleDescRoleName := iamroleFields[1].Descriptor()
+	// iamrole.DefaultRoleName holds the default value on creation for the role_name field.
+	iamrole.DefaultRoleName = iamroleDescRoleName.Default.(string)
+	iamuserMixin := schema.IAMUser{}.Mixin()
+	iamuserMixinHooks0 := iamuserMixin[0].Hooks()
+	iamuserMixinHooks2 := iamuserMixin[2].Hooks()
+	iamuser.Hooks[0] = iamuserMixinHooks0[0]
+	iamuser.Hooks[1] = iamuserMixinHooks2[0]
+	iamuserMixinInters2 := iamuserMixin[2].Interceptors()
+	iamuser.Interceptors[0] = iamuserMixinInters2[0]
+	iamuserMixinFields1 := iamuserMixin[1].Fields()
+	_ = iamuserMixinFields1
+	iamuserMixinFields2 := iamuserMixin[2].Fields()
+	_ = iamuserMixinFields2
+	iamuserFields := schema.IAMUser{}.Fields()
+	_ = iamuserFields
+	// iamuserDescCreatedAt is the schema descriptor for created_at field.
+	iamuserDescCreatedAt := iamuserMixinFields1[0].Descriptor()
+	// iamuser.DefaultCreatedAt holds the default value on creation for the created_at field.
+	iamuser.DefaultCreatedAt = iamuserDescCreatedAt.Default.(func() time.Time)
+	// iamuserDescUpdatedAt is the schema descriptor for updated_at field.
+	iamuserDescUpdatedAt := iamuserMixinFields1[1].Descriptor()
+	// iamuser.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	iamuser.DefaultUpdatedAt = iamuserDescUpdatedAt.Default.(func() time.Time)
+	// iamuser.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	iamuser.UpdateDefaultUpdatedAt = iamuserDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// iamuserDescDeleteTs is the schema descriptor for delete_ts field.
+	iamuserDescDeleteTs := iamuserMixinFields2[0].Descriptor()
+	// iamuser.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	iamuser.DefaultDeleteTs = iamuserDescDeleteTs.Default.(int64)
+	// iamuserDescUserCode is the schema descriptor for user_code field.
+	iamuserDescUserCode := iamuserFields[0].Descriptor()
+	// iamuser.UserCodeValidator is a validator for the "user_code" field. It is called by the builders before save.
+	iamuser.UserCodeValidator = iamuserDescUserCode.Validators[0].(func(string) error)
+	// iamuserDescDisplayName is the schema descriptor for display_name field.
+	iamuserDescDisplayName := iamuserFields[1].Descriptor()
+	// iamuser.DefaultDisplayName holds the default value on creation for the display_name field.
+	iamuser.DefaultDisplayName = iamuserDescDisplayName.Default.(string)
 	menuMixin := schema.Menu{}.Mixin()
 	menuMixinHooks0 := menuMixin[0].Hooks()
 	menuMixinHooks2 := menuMixin[2].Hooks()

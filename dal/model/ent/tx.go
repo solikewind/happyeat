@@ -14,6 +14,12 @@ type Tx struct {
 	config
 	// CategorySpec is the client for interacting with the CategorySpec builders.
 	CategorySpec *CategorySpecClient
+	// IAMPermission is the client for interacting with the IAMPermission builders.
+	IAMPermission *IAMPermissionClient
+	// IAMRole is the client for interacting with the IAMRole builders.
+	IAMRole *IAMRoleClient
+	// IAMUser is the client for interacting with the IAMUser builders.
+	IAMUser *IAMUserClient
 	// Menu is the client for interacting with the Menu builders.
 	Menu *MenuClient
 	// MenuCategory is the client for interacting with the MenuCategory builders.
@@ -164,6 +170,9 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.CategorySpec = NewCategorySpecClient(tx.config)
+	tx.IAMPermission = NewIAMPermissionClient(tx.config)
+	tx.IAMRole = NewIAMRoleClient(tx.config)
+	tx.IAMUser = NewIAMUserClient(tx.config)
 	tx.Menu = NewMenuClient(tx.config)
 	tx.MenuCategory = NewMenuCategoryClient(tx.config)
 	tx.MenuSpec = NewMenuSpecClient(tx.config)

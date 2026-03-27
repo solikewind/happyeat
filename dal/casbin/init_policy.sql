@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS casbin_rule (
   v5     text
 );
 
--- 示例：角色 admin 对任意资源 * 拥有任意操作 *；用户 alice 属于角色 admin（按需执行，避免重复插入）
--- id 可与 adapter 一致：在项目根执行 go run ./app/cmd/genpolicyid p admin '*' '*' 得到 p 策略的 id，下同
-INSERT INTO casbin_rule (id, p_type, v0, v1, v2) VALUES ('p-admin-wildcard', 'p', 'admin', '*', '*');
-INSERT INTO casbin_rule (id, p_type, v0, v1) VALUES ('g-alice-admin', 'g', 'alice', 'admin');
+-- 示例（单租户 RBAC）：user_id=dev-admin 继承 super_admin，并允许访问权限矩阵接口。
+-- 注意：当前 matcher 为严格 obj/act 匹配，不建议使用 '*' 作为通配符。
+INSERT INTO casbin_rule (id, p_type, v0, v1, v2) VALUES ('p-super-admin-role-permissions-get', 'p', 'super_admin', '/central/v1/rbac/role-permissions', 'GET');
+INSERT INTO casbin_rule (id, p_type, v0, v1) VALUES ('g-dev-admin-super-admin', 'g', 'dev-admin', 'super_admin');

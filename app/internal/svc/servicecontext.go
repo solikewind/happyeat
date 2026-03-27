@@ -74,11 +74,16 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		asrSvc = svc
 	}
 
+	rbacStore, err := NewRbacStore(client)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx := &ServiceContext{
 		Config: c,
 		DB:     db,
 		Casbin: ce,
-		Rbac:   NewRbacStore(),
+		Rbac:   rbacStore,
 		Agent:  bladesAgent.Agent,
 		LLM:    llmSvc,
 		ASR:    asrSvc,

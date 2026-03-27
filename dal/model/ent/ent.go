@@ -13,6 +13,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
+	"github.com/solikewind/happyeat/dal/model/ent/iampermission"
+	"github.com/solikewind/happyeat/dal/model/ent/iamrole"
+	"github.com/solikewind/happyeat/dal/model/ent/iamuser"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
@@ -83,6 +86,9 @@ func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			categoryspec.Table:  categoryspec.ValidColumn,
+			iampermission.Table: iampermission.ValidColumn,
+			iamrole.Table:       iamrole.ValidColumn,
+			iamuser.Table:       iamuser.ValidColumn,
 			menu.Table:          menu.ValidColumn,
 			menucategory.Table:  menucategory.ValidColumn,
 			menuspec.Table:      menuspec.ValidColumn,

@@ -29,7 +29,10 @@ func NewListRolePermissionLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *ListRolePermissionLogic) ListRolePermission() (resp *types.ListRolePermissionReply, err error) {
-	roleMap := l.svcCtx.Rbac.List()
+	roleMap, err := l.svcCtx.Rbac.List()
+	if err != nil {
+		return nil, errInvalid("查询角色权限失败")
+	}
 	roles := make([]string, 0, len(roleMap))
 	for role := range roleMap {
 		roles = append(roles, role)

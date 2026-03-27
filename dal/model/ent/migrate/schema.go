@@ -36,6 +36,54 @@ var (
 			},
 		},
 	}
+	// IamPermissionsColumns holds the columns for the "iam_permissions" table.
+	IamPermissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true, Comment: "ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
+		{Name: "permission_code", Type: field.TypeString, Unique: true, Comment: "权限编码"},
+		{Name: "description", Type: field.TypeString, Comment: "权限说明", Default: ""},
+	}
+	// IamPermissionsTable holds the schema information for the "iam_permissions" table.
+	IamPermissionsTable = &schema.Table{
+		Name:       "iam_permissions",
+		Comment:    "RBAC 权限点",
+		Columns:    IamPermissionsColumns,
+		PrimaryKey: []*schema.Column{IamPermissionsColumns[0]},
+	}
+	// IamRolesColumns holds the columns for the "iam_roles" table.
+	IamRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true, Comment: "ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
+		{Name: "role_code", Type: field.TypeString, Unique: true, Comment: "角色编码"},
+		{Name: "role_name", Type: field.TypeString, Comment: "角色名称", Default: ""},
+	}
+	// IamRolesTable holds the schema information for the "iam_roles" table.
+	IamRolesTable = &schema.Table{
+		Name:       "iam_roles",
+		Comment:    "RBAC 角色",
+		Columns:    IamRolesColumns,
+		PrimaryKey: []*schema.Column{IamRolesColumns[0]},
+	}
+	// IamUsersColumns holds the columns for the "iam_users" table.
+	IamUsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true, Comment: "ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
+		{Name: "user_code", Type: field.TypeString, Unique: true, Comment: "用户编码"},
+		{Name: "display_name", Type: field.TypeString, Comment: "展示名", Default: ""},
+	}
+	// IamUsersTable holds the schema information for the "iam_users" table.
+	IamUsersTable = &schema.Table{
+		Name:       "iam_users",
+		Comment:    "RBAC 用户主体",
+		Columns:    IamUsersColumns,
+		PrimaryKey: []*schema.Column{IamUsersColumns[0]},
+	}
 	// MenusColumns holds the columns for the "menus" table.
 	MenusColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true, Comment: "ID"},
@@ -265,9 +313,62 @@ var (
 		Columns:    TableCategoriesColumns,
 		PrimaryKey: []*schema.Column{TableCategoriesColumns[0]},
 	}
+	// IamRolePermissionsColumns holds the columns for the "iam_role_permissions" table.
+	IamRolePermissionsColumns = []*schema.Column{
+		{Name: "iam_role_id", Type: field.TypeUint64},
+		{Name: "iam_permission_id", Type: field.TypeUint64},
+	}
+	// IamRolePermissionsTable holds the schema information for the "iam_role_permissions" table.
+	IamRolePermissionsTable = &schema.Table{
+		Name:       "iam_role_permissions",
+		Columns:    IamRolePermissionsColumns,
+		PrimaryKey: []*schema.Column{IamRolePermissionsColumns[0], IamRolePermissionsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "iam_role_permissions_iam_role_id",
+				Columns:    []*schema.Column{IamRolePermissionsColumns[0]},
+				RefColumns: []*schema.Column{IamRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "iam_role_permissions_iam_permission_id",
+				Columns:    []*schema.Column{IamRolePermissionsColumns[1]},
+				RefColumns: []*schema.Column{IamPermissionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// IamUserRolesColumns holds the columns for the "iam_user_roles" table.
+	IamUserRolesColumns = []*schema.Column{
+		{Name: "iam_user_id", Type: field.TypeUint64},
+		{Name: "iam_role_id", Type: field.TypeUint64},
+	}
+	// IamUserRolesTable holds the schema information for the "iam_user_roles" table.
+	IamUserRolesTable = &schema.Table{
+		Name:       "iam_user_roles",
+		Columns:    IamUserRolesColumns,
+		PrimaryKey: []*schema.Column{IamUserRolesColumns[0], IamUserRolesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "iam_user_roles_iam_user_id",
+				Columns:    []*schema.Column{IamUserRolesColumns[0]},
+				RefColumns: []*schema.Column{IamUsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "iam_user_roles_iam_role_id",
+				Columns:    []*schema.Column{IamUserRolesColumns[1]},
+				RefColumns: []*schema.Column{IamRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CategorySpecsTable,
+		IamPermissionsTable,
+		IamRolesTable,
+		IamUsersTable,
 		MenusTable,
 		MenuCategoriesTable,
 		MenuSpecsTable,
@@ -277,6 +378,8 @@ var (
 		SpecItemsTable,
 		TablesTable,
 		TableCategoriesTable,
+		IamRolePermissionsTable,
+		IamUserRolesTable,
 	}
 )
 
@@ -284,6 +387,15 @@ func init() {
 	CategorySpecsTable.ForeignKeys[0].RefTable = MenuCategoriesTable
 	CategorySpecsTable.Annotation = &entsql.Annotation{
 		Table: "category_specs",
+	}
+	IamPermissionsTable.Annotation = &entsql.Annotation{
+		Table: "iam_permissions",
+	}
+	IamRolesTable.Annotation = &entsql.Annotation{
+		Table: "iam_roles",
+	}
+	IamUsersTable.Annotation = &entsql.Annotation{
+		Table: "iam_users",
 	}
 	MenusTable.ForeignKeys[0].RefTable = MenuCategoriesTable
 	MenusTable.Annotation = &entsql.Annotation{
@@ -321,4 +433,8 @@ func init() {
 	TableCategoriesTable.Annotation = &entsql.Annotation{
 		Table: "table_categories",
 	}
+	IamRolePermissionsTable.ForeignKeys[0].RefTable = IamRolesTable
+	IamRolePermissionsTable.ForeignKeys[1].RefTable = IamPermissionsTable
+	IamUserRolesTable.ForeignKeys[0].RefTable = IamUsersTable
+	IamUserRolesTable.ForeignKeys[1].RefTable = IamRolesTable
 }

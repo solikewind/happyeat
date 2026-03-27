@@ -9,6 +9,15 @@ import (
 // CategorySpec is the predicate function for categoryspec builders.
 type CategorySpec func(*sql.Selector)
 
+// IAMPermission is the predicate function for iampermission builders.
+type IAMPermission func(*sql.Selector)
+
+// IAMRole is the predicate function for iamrole builders.
+type IAMRole func(*sql.Selector)
+
+// IAMUser is the predicate function for iamuser builders.
+type IAMUser func(*sql.Selector)
+
 // Menu is the predicate function for menu builders.
 type Menu func(*sql.Selector)
 

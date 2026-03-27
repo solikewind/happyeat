@@ -13,6 +13,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
+	"github.com/solikewind/happyeat/dal/model/ent/iampermission"
+	"github.com/solikewind/happyeat/dal/model/ent/iamrole"
+	"github.com/solikewind/happyeat/dal/model/ent/iamuser"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
@@ -35,6 +38,9 @@ const (
 
 	// Node types.
 	TypeCategorySpec  = "CategorySpec"
+	TypeIAMPermission = "IAMPermission"
+	TypeIAMRole       = "IAMRole"
+	TypeIAMUser       = "IAMUser"
 	TypeMenu          = "Menu"
 	TypeMenuCategory  = "MenuCategory"
 	TypeMenuSpec      = "MenuSpec"
@@ -1008,6 +1014,2120 @@ func (m *CategorySpecMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown CategorySpec edge %s", name)
+}
+
+// IAMPermissionMutation represents an operation that mutates the IAMPermission nodes in the graph.
+type IAMPermissionMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *uint64
+	created_at      *time.Time
+	updated_at      *time.Time
+	delete_ts       *int64
+	adddelete_ts    *int64
+	permission_code *string
+	description     *string
+	clearedFields   map[string]struct{}
+	roles           map[uint64]struct{}
+	removedroles    map[uint64]struct{}
+	clearedroles    bool
+	done            bool
+	oldValue        func(context.Context) (*IAMPermission, error)
+	predicates      []predicate.IAMPermission
+}
+
+var _ ent.Mutation = (*IAMPermissionMutation)(nil)
+
+// iampermissionOption allows management of the mutation configuration using functional options.
+type iampermissionOption func(*IAMPermissionMutation)
+
+// newIAMPermissionMutation creates new mutation for the IAMPermission entity.
+func newIAMPermissionMutation(c config, op Op, opts ...iampermissionOption) *IAMPermissionMutation {
+	m := &IAMPermissionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeIAMPermission,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withIAMPermissionID sets the ID field of the mutation.
+func withIAMPermissionID(id uint64) iampermissionOption {
+	return func(m *IAMPermissionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *IAMPermission
+		)
+		m.oldValue = func(ctx context.Context) (*IAMPermission, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().IAMPermission.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withIAMPermission sets the old IAMPermission of the mutation.
+func withIAMPermission(node *IAMPermission) iampermissionOption {
+	return func(m *IAMPermissionMutation) {
+		m.oldValue = func(context.Context) (*IAMPermission, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m IAMPermissionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m IAMPermissionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of IAMPermission entities.
+func (m *IAMPermissionMutation) SetID(id uint64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *IAMPermissionMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *IAMPermissionMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().IAMPermission.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *IAMPermissionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *IAMPermissionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the IAMPermission entity.
+// If the IAMPermission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMPermissionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *IAMPermissionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *IAMPermissionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *IAMPermissionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the IAMPermission entity.
+// If the IAMPermission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMPermissionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *IAMPermissionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *IAMPermissionMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *IAMPermissionMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the IAMPermission entity.
+// If the IAMPermission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMPermissionMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *IAMPermissionMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *IAMPermissionMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *IAMPermissionMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
+}
+
+// SetPermissionCode sets the "permission_code" field.
+func (m *IAMPermissionMutation) SetPermissionCode(s string) {
+	m.permission_code = &s
+}
+
+// PermissionCode returns the value of the "permission_code" field in the mutation.
+func (m *IAMPermissionMutation) PermissionCode() (r string, exists bool) {
+	v := m.permission_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPermissionCode returns the old "permission_code" field's value of the IAMPermission entity.
+// If the IAMPermission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMPermissionMutation) OldPermissionCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPermissionCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPermissionCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPermissionCode: %w", err)
+	}
+	return oldValue.PermissionCode, nil
+}
+
+// ResetPermissionCode resets all changes to the "permission_code" field.
+func (m *IAMPermissionMutation) ResetPermissionCode() {
+	m.permission_code = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *IAMPermissionMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *IAMPermissionMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the IAMPermission entity.
+// If the IAMPermission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMPermissionMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *IAMPermissionMutation) ResetDescription() {
+	m.description = nil
+}
+
+// AddRoleIDs adds the "roles" edge to the IAMRole entity by ids.
+func (m *IAMPermissionMutation) AddRoleIDs(ids ...uint64) {
+	if m.roles == nil {
+		m.roles = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.roles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRoles clears the "roles" edge to the IAMRole entity.
+func (m *IAMPermissionMutation) ClearRoles() {
+	m.clearedroles = true
+}
+
+// RolesCleared reports if the "roles" edge to the IAMRole entity was cleared.
+func (m *IAMPermissionMutation) RolesCleared() bool {
+	return m.clearedroles
+}
+
+// RemoveRoleIDs removes the "roles" edge to the IAMRole entity by IDs.
+func (m *IAMPermissionMutation) RemoveRoleIDs(ids ...uint64) {
+	if m.removedroles == nil {
+		m.removedroles = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.roles, ids[i])
+		m.removedroles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRoles returns the removed IDs of the "roles" edge to the IAMRole entity.
+func (m *IAMPermissionMutation) RemovedRolesIDs() (ids []uint64) {
+	for id := range m.removedroles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RolesIDs returns the "roles" edge IDs in the mutation.
+func (m *IAMPermissionMutation) RolesIDs() (ids []uint64) {
+	for id := range m.roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRoles resets all changes to the "roles" edge.
+func (m *IAMPermissionMutation) ResetRoles() {
+	m.roles = nil
+	m.clearedroles = false
+	m.removedroles = nil
+}
+
+// Where appends a list predicates to the IAMPermissionMutation builder.
+func (m *IAMPermissionMutation) Where(ps ...predicate.IAMPermission) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the IAMPermissionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *IAMPermissionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.IAMPermission, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *IAMPermissionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *IAMPermissionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (IAMPermission).
+func (m *IAMPermissionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *IAMPermissionMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, iampermission.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, iampermission.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, iampermission.FieldDeleteTs)
+	}
+	if m.permission_code != nil {
+		fields = append(fields, iampermission.FieldPermissionCode)
+	}
+	if m.description != nil {
+		fields = append(fields, iampermission.FieldDescription)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *IAMPermissionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case iampermission.FieldCreatedAt:
+		return m.CreatedAt()
+	case iampermission.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case iampermission.FieldDeleteTs:
+		return m.DeleteTs()
+	case iampermission.FieldPermissionCode:
+		return m.PermissionCode()
+	case iampermission.FieldDescription:
+		return m.Description()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *IAMPermissionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case iampermission.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case iampermission.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case iampermission.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
+	case iampermission.FieldPermissionCode:
+		return m.OldPermissionCode(ctx)
+	case iampermission.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown IAMPermission field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IAMPermissionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case iampermission.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case iampermission.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case iampermission.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
+	case iampermission.FieldPermissionCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPermissionCode(v)
+		return nil
+	case iampermission.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IAMPermission field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *IAMPermissionMutation) AddedFields() []string {
+	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, iampermission.FieldDeleteTs)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *IAMPermissionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case iampermission.FieldDeleteTs:
+		return m.AddedDeleteTs()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IAMPermissionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case iampermission.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IAMPermission numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *IAMPermissionMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *IAMPermissionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *IAMPermissionMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown IAMPermission nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *IAMPermissionMutation) ResetField(name string) error {
+	switch name {
+	case iampermission.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case iampermission.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case iampermission.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
+	case iampermission.FieldPermissionCode:
+		m.ResetPermissionCode()
+		return nil
+	case iampermission.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown IAMPermission field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *IAMPermissionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.roles != nil {
+		edges = append(edges, iampermission.EdgeRoles)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *IAMPermissionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case iampermission.EdgeRoles:
+		ids := make([]ent.Value, 0, len(m.roles))
+		for id := range m.roles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *IAMPermissionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedroles != nil {
+		edges = append(edges, iampermission.EdgeRoles)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *IAMPermissionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case iampermission.EdgeRoles:
+		ids := make([]ent.Value, 0, len(m.removedroles))
+		for id := range m.removedroles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *IAMPermissionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedroles {
+		edges = append(edges, iampermission.EdgeRoles)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *IAMPermissionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case iampermission.EdgeRoles:
+		return m.clearedroles
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *IAMPermissionMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown IAMPermission unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *IAMPermissionMutation) ResetEdge(name string) error {
+	switch name {
+	case iampermission.EdgeRoles:
+		m.ResetRoles()
+		return nil
+	}
+	return fmt.Errorf("unknown IAMPermission edge %s", name)
+}
+
+// IAMRoleMutation represents an operation that mutates the IAMRole nodes in the graph.
+type IAMRoleMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *uint64
+	created_at         *time.Time
+	updated_at         *time.Time
+	delete_ts          *int64
+	adddelete_ts       *int64
+	role_code          *string
+	role_name          *string
+	clearedFields      map[string]struct{}
+	users              map[uint64]struct{}
+	removedusers       map[uint64]struct{}
+	clearedusers       bool
+	permissions        map[uint64]struct{}
+	removedpermissions map[uint64]struct{}
+	clearedpermissions bool
+	done               bool
+	oldValue           func(context.Context) (*IAMRole, error)
+	predicates         []predicate.IAMRole
+}
+
+var _ ent.Mutation = (*IAMRoleMutation)(nil)
+
+// iamroleOption allows management of the mutation configuration using functional options.
+type iamroleOption func(*IAMRoleMutation)
+
+// newIAMRoleMutation creates new mutation for the IAMRole entity.
+func newIAMRoleMutation(c config, op Op, opts ...iamroleOption) *IAMRoleMutation {
+	m := &IAMRoleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeIAMRole,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withIAMRoleID sets the ID field of the mutation.
+func withIAMRoleID(id uint64) iamroleOption {
+	return func(m *IAMRoleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *IAMRole
+		)
+		m.oldValue = func(ctx context.Context) (*IAMRole, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().IAMRole.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withIAMRole sets the old IAMRole of the mutation.
+func withIAMRole(node *IAMRole) iamroleOption {
+	return func(m *IAMRoleMutation) {
+		m.oldValue = func(context.Context) (*IAMRole, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m IAMRoleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m IAMRoleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of IAMRole entities.
+func (m *IAMRoleMutation) SetID(id uint64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *IAMRoleMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *IAMRoleMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().IAMRole.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *IAMRoleMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *IAMRoleMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the IAMRole entity.
+// If the IAMRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMRoleMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *IAMRoleMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *IAMRoleMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *IAMRoleMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the IAMRole entity.
+// If the IAMRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMRoleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *IAMRoleMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *IAMRoleMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *IAMRoleMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the IAMRole entity.
+// If the IAMRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMRoleMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *IAMRoleMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *IAMRoleMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *IAMRoleMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
+}
+
+// SetRoleCode sets the "role_code" field.
+func (m *IAMRoleMutation) SetRoleCode(s string) {
+	m.role_code = &s
+}
+
+// RoleCode returns the value of the "role_code" field in the mutation.
+func (m *IAMRoleMutation) RoleCode() (r string, exists bool) {
+	v := m.role_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRoleCode returns the old "role_code" field's value of the IAMRole entity.
+// If the IAMRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMRoleMutation) OldRoleCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRoleCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRoleCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRoleCode: %w", err)
+	}
+	return oldValue.RoleCode, nil
+}
+
+// ResetRoleCode resets all changes to the "role_code" field.
+func (m *IAMRoleMutation) ResetRoleCode() {
+	m.role_code = nil
+}
+
+// SetRoleName sets the "role_name" field.
+func (m *IAMRoleMutation) SetRoleName(s string) {
+	m.role_name = &s
+}
+
+// RoleName returns the value of the "role_name" field in the mutation.
+func (m *IAMRoleMutation) RoleName() (r string, exists bool) {
+	v := m.role_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRoleName returns the old "role_name" field's value of the IAMRole entity.
+// If the IAMRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMRoleMutation) OldRoleName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRoleName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRoleName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRoleName: %w", err)
+	}
+	return oldValue.RoleName, nil
+}
+
+// ResetRoleName resets all changes to the "role_name" field.
+func (m *IAMRoleMutation) ResetRoleName() {
+	m.role_name = nil
+}
+
+// AddUserIDs adds the "users" edge to the IAMUser entity by ids.
+func (m *IAMRoleMutation) AddUserIDs(ids ...uint64) {
+	if m.users == nil {
+		m.users = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.users[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUsers clears the "users" edge to the IAMUser entity.
+func (m *IAMRoleMutation) ClearUsers() {
+	m.clearedusers = true
+}
+
+// UsersCleared reports if the "users" edge to the IAMUser entity was cleared.
+func (m *IAMRoleMutation) UsersCleared() bool {
+	return m.clearedusers
+}
+
+// RemoveUserIDs removes the "users" edge to the IAMUser entity by IDs.
+func (m *IAMRoleMutation) RemoveUserIDs(ids ...uint64) {
+	if m.removedusers == nil {
+		m.removedusers = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.users, ids[i])
+		m.removedusers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUsers returns the removed IDs of the "users" edge to the IAMUser entity.
+func (m *IAMRoleMutation) RemovedUsersIDs() (ids []uint64) {
+	for id := range m.removedusers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UsersIDs returns the "users" edge IDs in the mutation.
+func (m *IAMRoleMutation) UsersIDs() (ids []uint64) {
+	for id := range m.users {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUsers resets all changes to the "users" edge.
+func (m *IAMRoleMutation) ResetUsers() {
+	m.users = nil
+	m.clearedusers = false
+	m.removedusers = nil
+}
+
+// AddPermissionIDs adds the "permissions" edge to the IAMPermission entity by ids.
+func (m *IAMRoleMutation) AddPermissionIDs(ids ...uint64) {
+	if m.permissions == nil {
+		m.permissions = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.permissions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPermissions clears the "permissions" edge to the IAMPermission entity.
+func (m *IAMRoleMutation) ClearPermissions() {
+	m.clearedpermissions = true
+}
+
+// PermissionsCleared reports if the "permissions" edge to the IAMPermission entity was cleared.
+func (m *IAMRoleMutation) PermissionsCleared() bool {
+	return m.clearedpermissions
+}
+
+// RemovePermissionIDs removes the "permissions" edge to the IAMPermission entity by IDs.
+func (m *IAMRoleMutation) RemovePermissionIDs(ids ...uint64) {
+	if m.removedpermissions == nil {
+		m.removedpermissions = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.permissions, ids[i])
+		m.removedpermissions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPermissions returns the removed IDs of the "permissions" edge to the IAMPermission entity.
+func (m *IAMRoleMutation) RemovedPermissionsIDs() (ids []uint64) {
+	for id := range m.removedpermissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PermissionsIDs returns the "permissions" edge IDs in the mutation.
+func (m *IAMRoleMutation) PermissionsIDs() (ids []uint64) {
+	for id := range m.permissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPermissions resets all changes to the "permissions" edge.
+func (m *IAMRoleMutation) ResetPermissions() {
+	m.permissions = nil
+	m.clearedpermissions = false
+	m.removedpermissions = nil
+}
+
+// Where appends a list predicates to the IAMRoleMutation builder.
+func (m *IAMRoleMutation) Where(ps ...predicate.IAMRole) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the IAMRoleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *IAMRoleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.IAMRole, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *IAMRoleMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *IAMRoleMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (IAMRole).
+func (m *IAMRoleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *IAMRoleMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, iamrole.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, iamrole.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, iamrole.FieldDeleteTs)
+	}
+	if m.role_code != nil {
+		fields = append(fields, iamrole.FieldRoleCode)
+	}
+	if m.role_name != nil {
+		fields = append(fields, iamrole.FieldRoleName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *IAMRoleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case iamrole.FieldCreatedAt:
+		return m.CreatedAt()
+	case iamrole.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case iamrole.FieldDeleteTs:
+		return m.DeleteTs()
+	case iamrole.FieldRoleCode:
+		return m.RoleCode()
+	case iamrole.FieldRoleName:
+		return m.RoleName()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *IAMRoleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case iamrole.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case iamrole.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case iamrole.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
+	case iamrole.FieldRoleCode:
+		return m.OldRoleCode(ctx)
+	case iamrole.FieldRoleName:
+		return m.OldRoleName(ctx)
+	}
+	return nil, fmt.Errorf("unknown IAMRole field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IAMRoleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case iamrole.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case iamrole.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case iamrole.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
+	case iamrole.FieldRoleCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRoleCode(v)
+		return nil
+	case iamrole.FieldRoleName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRoleName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IAMRole field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *IAMRoleMutation) AddedFields() []string {
+	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, iamrole.FieldDeleteTs)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *IAMRoleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case iamrole.FieldDeleteTs:
+		return m.AddedDeleteTs()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IAMRoleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case iamrole.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IAMRole numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *IAMRoleMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *IAMRoleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *IAMRoleMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown IAMRole nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *IAMRoleMutation) ResetField(name string) error {
+	switch name {
+	case iamrole.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case iamrole.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case iamrole.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
+	case iamrole.FieldRoleCode:
+		m.ResetRoleCode()
+		return nil
+	case iamrole.FieldRoleName:
+		m.ResetRoleName()
+		return nil
+	}
+	return fmt.Errorf("unknown IAMRole field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *IAMRoleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.users != nil {
+		edges = append(edges, iamrole.EdgeUsers)
+	}
+	if m.permissions != nil {
+		edges = append(edges, iamrole.EdgePermissions)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *IAMRoleMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case iamrole.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.users))
+		for id := range m.users {
+			ids = append(ids, id)
+		}
+		return ids
+	case iamrole.EdgePermissions:
+		ids := make([]ent.Value, 0, len(m.permissions))
+		for id := range m.permissions {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *IAMRoleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedusers != nil {
+		edges = append(edges, iamrole.EdgeUsers)
+	}
+	if m.removedpermissions != nil {
+		edges = append(edges, iamrole.EdgePermissions)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *IAMRoleMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case iamrole.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.removedusers))
+		for id := range m.removedusers {
+			ids = append(ids, id)
+		}
+		return ids
+	case iamrole.EdgePermissions:
+		ids := make([]ent.Value, 0, len(m.removedpermissions))
+		for id := range m.removedpermissions {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *IAMRoleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedusers {
+		edges = append(edges, iamrole.EdgeUsers)
+	}
+	if m.clearedpermissions {
+		edges = append(edges, iamrole.EdgePermissions)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *IAMRoleMutation) EdgeCleared(name string) bool {
+	switch name {
+	case iamrole.EdgeUsers:
+		return m.clearedusers
+	case iamrole.EdgePermissions:
+		return m.clearedpermissions
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *IAMRoleMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown IAMRole unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *IAMRoleMutation) ResetEdge(name string) error {
+	switch name {
+	case iamrole.EdgeUsers:
+		m.ResetUsers()
+		return nil
+	case iamrole.EdgePermissions:
+		m.ResetPermissions()
+		return nil
+	}
+	return fmt.Errorf("unknown IAMRole edge %s", name)
+}
+
+// IAMUserMutation represents an operation that mutates the IAMUser nodes in the graph.
+type IAMUserMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uint64
+	created_at    *time.Time
+	updated_at    *time.Time
+	delete_ts     *int64
+	adddelete_ts  *int64
+	user_code     *string
+	display_name  *string
+	clearedFields map[string]struct{}
+	roles         map[uint64]struct{}
+	removedroles  map[uint64]struct{}
+	clearedroles  bool
+	done          bool
+	oldValue      func(context.Context) (*IAMUser, error)
+	predicates    []predicate.IAMUser
+}
+
+var _ ent.Mutation = (*IAMUserMutation)(nil)
+
+// iamuserOption allows management of the mutation configuration using functional options.
+type iamuserOption func(*IAMUserMutation)
+
+// newIAMUserMutation creates new mutation for the IAMUser entity.
+func newIAMUserMutation(c config, op Op, opts ...iamuserOption) *IAMUserMutation {
+	m := &IAMUserMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeIAMUser,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withIAMUserID sets the ID field of the mutation.
+func withIAMUserID(id uint64) iamuserOption {
+	return func(m *IAMUserMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *IAMUser
+		)
+		m.oldValue = func(ctx context.Context) (*IAMUser, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().IAMUser.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withIAMUser sets the old IAMUser of the mutation.
+func withIAMUser(node *IAMUser) iamuserOption {
+	return func(m *IAMUserMutation) {
+		m.oldValue = func(context.Context) (*IAMUser, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m IAMUserMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m IAMUserMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of IAMUser entities.
+func (m *IAMUserMutation) SetID(id uint64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *IAMUserMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *IAMUserMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().IAMUser.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *IAMUserMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *IAMUserMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the IAMUser entity.
+// If the IAMUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMUserMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *IAMUserMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *IAMUserMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *IAMUserMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the IAMUser entity.
+// If the IAMUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMUserMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *IAMUserMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *IAMUserMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *IAMUserMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the IAMUser entity.
+// If the IAMUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMUserMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *IAMUserMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *IAMUserMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *IAMUserMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
+}
+
+// SetUserCode sets the "user_code" field.
+func (m *IAMUserMutation) SetUserCode(s string) {
+	m.user_code = &s
+}
+
+// UserCode returns the value of the "user_code" field in the mutation.
+func (m *IAMUserMutation) UserCode() (r string, exists bool) {
+	v := m.user_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserCode returns the old "user_code" field's value of the IAMUser entity.
+// If the IAMUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMUserMutation) OldUserCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserCode: %w", err)
+	}
+	return oldValue.UserCode, nil
+}
+
+// ResetUserCode resets all changes to the "user_code" field.
+func (m *IAMUserMutation) ResetUserCode() {
+	m.user_code = nil
+}
+
+// SetDisplayName sets the "display_name" field.
+func (m *IAMUserMutation) SetDisplayName(s string) {
+	m.display_name = &s
+}
+
+// DisplayName returns the value of the "display_name" field in the mutation.
+func (m *IAMUserMutation) DisplayName() (r string, exists bool) {
+	v := m.display_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisplayName returns the old "display_name" field's value of the IAMUser entity.
+// If the IAMUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IAMUserMutation) OldDisplayName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisplayName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisplayName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisplayName: %w", err)
+	}
+	return oldValue.DisplayName, nil
+}
+
+// ResetDisplayName resets all changes to the "display_name" field.
+func (m *IAMUserMutation) ResetDisplayName() {
+	m.display_name = nil
+}
+
+// AddRoleIDs adds the "roles" edge to the IAMRole entity by ids.
+func (m *IAMUserMutation) AddRoleIDs(ids ...uint64) {
+	if m.roles == nil {
+		m.roles = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.roles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRoles clears the "roles" edge to the IAMRole entity.
+func (m *IAMUserMutation) ClearRoles() {
+	m.clearedroles = true
+}
+
+// RolesCleared reports if the "roles" edge to the IAMRole entity was cleared.
+func (m *IAMUserMutation) RolesCleared() bool {
+	return m.clearedroles
+}
+
+// RemoveRoleIDs removes the "roles" edge to the IAMRole entity by IDs.
+func (m *IAMUserMutation) RemoveRoleIDs(ids ...uint64) {
+	if m.removedroles == nil {
+		m.removedroles = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.roles, ids[i])
+		m.removedroles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRoles returns the removed IDs of the "roles" edge to the IAMRole entity.
+func (m *IAMUserMutation) RemovedRolesIDs() (ids []uint64) {
+	for id := range m.removedroles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RolesIDs returns the "roles" edge IDs in the mutation.
+func (m *IAMUserMutation) RolesIDs() (ids []uint64) {
+	for id := range m.roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRoles resets all changes to the "roles" edge.
+func (m *IAMUserMutation) ResetRoles() {
+	m.roles = nil
+	m.clearedroles = false
+	m.removedroles = nil
+}
+
+// Where appends a list predicates to the IAMUserMutation builder.
+func (m *IAMUserMutation) Where(ps ...predicate.IAMUser) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the IAMUserMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *IAMUserMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.IAMUser, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *IAMUserMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *IAMUserMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (IAMUser).
+func (m *IAMUserMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *IAMUserMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, iamuser.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, iamuser.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, iamuser.FieldDeleteTs)
+	}
+	if m.user_code != nil {
+		fields = append(fields, iamuser.FieldUserCode)
+	}
+	if m.display_name != nil {
+		fields = append(fields, iamuser.FieldDisplayName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *IAMUserMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case iamuser.FieldCreatedAt:
+		return m.CreatedAt()
+	case iamuser.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case iamuser.FieldDeleteTs:
+		return m.DeleteTs()
+	case iamuser.FieldUserCode:
+		return m.UserCode()
+	case iamuser.FieldDisplayName:
+		return m.DisplayName()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *IAMUserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case iamuser.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case iamuser.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case iamuser.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
+	case iamuser.FieldUserCode:
+		return m.OldUserCode(ctx)
+	case iamuser.FieldDisplayName:
+		return m.OldDisplayName(ctx)
+	}
+	return nil, fmt.Errorf("unknown IAMUser field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IAMUserMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case iamuser.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case iamuser.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case iamuser.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
+	case iamuser.FieldUserCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserCode(v)
+		return nil
+	case iamuser.FieldDisplayName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisplayName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IAMUser field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *IAMUserMutation) AddedFields() []string {
+	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, iamuser.FieldDeleteTs)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *IAMUserMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case iamuser.FieldDeleteTs:
+		return m.AddedDeleteTs()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IAMUserMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case iamuser.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IAMUser numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *IAMUserMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *IAMUserMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *IAMUserMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown IAMUser nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *IAMUserMutation) ResetField(name string) error {
+	switch name {
+	case iamuser.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case iamuser.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case iamuser.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
+	case iamuser.FieldUserCode:
+		m.ResetUserCode()
+		return nil
+	case iamuser.FieldDisplayName:
+		m.ResetDisplayName()
+		return nil
+	}
+	return fmt.Errorf("unknown IAMUser field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *IAMUserMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.roles != nil {
+		edges = append(edges, iamuser.EdgeRoles)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *IAMUserMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case iamuser.EdgeRoles:
+		ids := make([]ent.Value, 0, len(m.roles))
+		for id := range m.roles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *IAMUserMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedroles != nil {
+		edges = append(edges, iamuser.EdgeRoles)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *IAMUserMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case iamuser.EdgeRoles:
+		ids := make([]ent.Value, 0, len(m.removedroles))
+		for id := range m.removedroles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *IAMUserMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedroles {
+		edges = append(edges, iamuser.EdgeRoles)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *IAMUserMutation) EdgeCleared(name string) bool {
+	switch name {
+	case iamuser.EdgeRoles:
+		return m.clearedroles
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *IAMUserMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown IAMUser unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *IAMUserMutation) ResetEdge(name string) error {
+	switch name {
+	case iamuser.EdgeRoles:
+		m.ResetRoles()
+		return nil
+	}
+	return fmt.Errorf("unknown IAMUser edge %s", name)
 }
 
 // MenuMutation represents an operation that mutates the Menu nodes in the graph.

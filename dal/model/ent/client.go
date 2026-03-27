@@ -16,6 +16,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
+	"github.com/solikewind/happyeat/dal/model/ent/iampermission"
+	"github.com/solikewind/happyeat/dal/model/ent/iamrole"
+	"github.com/solikewind/happyeat/dal/model/ent/iamuser"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
@@ -34,6 +37,12 @@ type Client struct {
 	Schema *migrate.Schema
 	// CategorySpec is the client for interacting with the CategorySpec builders.
 	CategorySpec *CategorySpecClient
+	// IAMPermission is the client for interacting with the IAMPermission builders.
+	IAMPermission *IAMPermissionClient
+	// IAMRole is the client for interacting with the IAMRole builders.
+	IAMRole *IAMRoleClient
+	// IAMUser is the client for interacting with the IAMUser builders.
+	IAMUser *IAMUserClient
 	// Menu is the client for interacting with the Menu builders.
 	Menu *MenuClient
 	// MenuCategory is the client for interacting with the MenuCategory builders.
@@ -64,6 +73,9 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.CategorySpec = NewCategorySpecClient(c.config)
+	c.IAMPermission = NewIAMPermissionClient(c.config)
+	c.IAMRole = NewIAMRoleClient(c.config)
+	c.IAMUser = NewIAMUserClient(c.config)
 	c.Menu = NewMenuClient(c.config)
 	c.MenuCategory = NewMenuCategoryClient(c.config)
 	c.MenuSpec = NewMenuSpecClient(c.config)
@@ -166,6 +178,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:           ctx,
 		config:        cfg,
 		CategorySpec:  NewCategorySpecClient(cfg),
+		IAMPermission: NewIAMPermissionClient(cfg),
+		IAMRole:       NewIAMRoleClient(cfg),
+		IAMUser:       NewIAMUserClient(cfg),
 		Menu:          NewMenuClient(cfg),
 		MenuCategory:  NewMenuCategoryClient(cfg),
 		MenuSpec:      NewMenuSpecClient(cfg),
@@ -195,6 +210,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:           ctx,
 		config:        cfg,
 		CategorySpec:  NewCategorySpecClient(cfg),
+		IAMPermission: NewIAMPermissionClient(cfg),
+		IAMRole:       NewIAMRoleClient(cfg),
+		IAMUser:       NewIAMUserClient(cfg),
 		Menu:          NewMenuClient(cfg),
 		MenuCategory:  NewMenuCategoryClient(cfg),
 		MenuSpec:      NewMenuSpecClient(cfg),
@@ -233,8 +251,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.CategorySpec, c.Menu, c.MenuCategory, c.MenuSpec, c.Order, c.OrderItem,
-		c.SpecGroup, c.SpecItem, c.Table, c.TableCategory,
+		c.CategorySpec, c.IAMPermission, c.IAMRole, c.IAMUser, c.Menu, c.MenuCategory,
+		c.MenuSpec, c.Order, c.OrderItem, c.SpecGroup, c.SpecItem, c.Table,
+		c.TableCategory,
 	} {
 		n.Use(hooks...)
 	}
@@ -244,8 +263,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.CategorySpec, c.Menu, c.MenuCategory, c.MenuSpec, c.Order, c.OrderItem,
-		c.SpecGroup, c.SpecItem, c.Table, c.TableCategory,
+		c.CategorySpec, c.IAMPermission, c.IAMRole, c.IAMUser, c.Menu, c.MenuCategory,
+		c.MenuSpec, c.Order, c.OrderItem, c.SpecGroup, c.SpecItem, c.Table,
+		c.TableCategory,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -256,6 +276,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *CategorySpecMutation:
 		return c.CategorySpec.mutate(ctx, m)
+	case *IAMPermissionMutation:
+		return c.IAMPermission.mutate(ctx, m)
+	case *IAMRoleMutation:
+		return c.IAMRole.mutate(ctx, m)
+	case *IAMUserMutation:
+		return c.IAMUser.mutate(ctx, m)
 	case *MenuMutation:
 		return c.Menu.mutate(ctx, m)
 	case *MenuCategoryMutation:
@@ -443,6 +469,475 @@ func (c *CategorySpecClient) mutate(ctx context.Context, m *CategorySpecMutation
 		return (&CategorySpecDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown CategorySpec mutation op: %q", m.Op())
+	}
+}
+
+// IAMPermissionClient is a client for the IAMPermission schema.
+type IAMPermissionClient struct {
+	config
+}
+
+// NewIAMPermissionClient returns a client for the IAMPermission from the given config.
+func NewIAMPermissionClient(c config) *IAMPermissionClient {
+	return &IAMPermissionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `iampermission.Hooks(f(g(h())))`.
+func (c *IAMPermissionClient) Use(hooks ...Hook) {
+	c.hooks.IAMPermission = append(c.hooks.IAMPermission, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `iampermission.Intercept(f(g(h())))`.
+func (c *IAMPermissionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IAMPermission = append(c.inters.IAMPermission, interceptors...)
+}
+
+// Create returns a builder for creating a IAMPermission entity.
+func (c *IAMPermissionClient) Create() *IAMPermissionCreate {
+	mutation := newIAMPermissionMutation(c.config, OpCreate)
+	return &IAMPermissionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IAMPermission entities.
+func (c *IAMPermissionClient) CreateBulk(builders ...*IAMPermissionCreate) *IAMPermissionCreateBulk {
+	return &IAMPermissionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *IAMPermissionClient) MapCreateBulk(slice any, setFunc func(*IAMPermissionCreate, int)) *IAMPermissionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &IAMPermissionCreateBulk{err: fmt.Errorf("calling to IAMPermissionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*IAMPermissionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &IAMPermissionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IAMPermission.
+func (c *IAMPermissionClient) Update() *IAMPermissionUpdate {
+	mutation := newIAMPermissionMutation(c.config, OpUpdate)
+	return &IAMPermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IAMPermissionClient) UpdateOne(_m *IAMPermission) *IAMPermissionUpdateOne {
+	mutation := newIAMPermissionMutation(c.config, OpUpdateOne, withIAMPermission(_m))
+	return &IAMPermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IAMPermissionClient) UpdateOneID(id uint64) *IAMPermissionUpdateOne {
+	mutation := newIAMPermissionMutation(c.config, OpUpdateOne, withIAMPermissionID(id))
+	return &IAMPermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IAMPermission.
+func (c *IAMPermissionClient) Delete() *IAMPermissionDelete {
+	mutation := newIAMPermissionMutation(c.config, OpDelete)
+	return &IAMPermissionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *IAMPermissionClient) DeleteOne(_m *IAMPermission) *IAMPermissionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *IAMPermissionClient) DeleteOneID(id uint64) *IAMPermissionDeleteOne {
+	builder := c.Delete().Where(iampermission.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IAMPermissionDeleteOne{builder}
+}
+
+// Query returns a query builder for IAMPermission.
+func (c *IAMPermissionClient) Query() *IAMPermissionQuery {
+	return &IAMPermissionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeIAMPermission},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a IAMPermission entity by its id.
+func (c *IAMPermissionClient) Get(ctx context.Context, id uint64) (*IAMPermission, error) {
+	return c.Query().Where(iampermission.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IAMPermissionClient) GetX(ctx context.Context, id uint64) *IAMPermission {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRoles queries the roles edge of a IAMPermission.
+func (c *IAMPermissionClient) QueryRoles(_m *IAMPermission) *IAMRoleQuery {
+	query := (&IAMRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(iampermission.Table, iampermission.FieldID, id),
+			sqlgraph.To(iamrole.Table, iamrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, iampermission.RolesTable, iampermission.RolesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *IAMPermissionClient) Hooks() []Hook {
+	hooks := c.hooks.IAMPermission
+	return append(hooks[:len(hooks):len(hooks)], iampermission.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *IAMPermissionClient) Interceptors() []Interceptor {
+	inters := c.inters.IAMPermission
+	return append(inters[:len(inters):len(inters)], iampermission.Interceptors[:]...)
+}
+
+func (c *IAMPermissionClient) mutate(ctx context.Context, m *IAMPermissionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&IAMPermissionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&IAMPermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&IAMPermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&IAMPermissionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown IAMPermission mutation op: %q", m.Op())
+	}
+}
+
+// IAMRoleClient is a client for the IAMRole schema.
+type IAMRoleClient struct {
+	config
+}
+
+// NewIAMRoleClient returns a client for the IAMRole from the given config.
+func NewIAMRoleClient(c config) *IAMRoleClient {
+	return &IAMRoleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `iamrole.Hooks(f(g(h())))`.
+func (c *IAMRoleClient) Use(hooks ...Hook) {
+	c.hooks.IAMRole = append(c.hooks.IAMRole, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `iamrole.Intercept(f(g(h())))`.
+func (c *IAMRoleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IAMRole = append(c.inters.IAMRole, interceptors...)
+}
+
+// Create returns a builder for creating a IAMRole entity.
+func (c *IAMRoleClient) Create() *IAMRoleCreate {
+	mutation := newIAMRoleMutation(c.config, OpCreate)
+	return &IAMRoleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IAMRole entities.
+func (c *IAMRoleClient) CreateBulk(builders ...*IAMRoleCreate) *IAMRoleCreateBulk {
+	return &IAMRoleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *IAMRoleClient) MapCreateBulk(slice any, setFunc func(*IAMRoleCreate, int)) *IAMRoleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &IAMRoleCreateBulk{err: fmt.Errorf("calling to IAMRoleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*IAMRoleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &IAMRoleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IAMRole.
+func (c *IAMRoleClient) Update() *IAMRoleUpdate {
+	mutation := newIAMRoleMutation(c.config, OpUpdate)
+	return &IAMRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IAMRoleClient) UpdateOne(_m *IAMRole) *IAMRoleUpdateOne {
+	mutation := newIAMRoleMutation(c.config, OpUpdateOne, withIAMRole(_m))
+	return &IAMRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IAMRoleClient) UpdateOneID(id uint64) *IAMRoleUpdateOne {
+	mutation := newIAMRoleMutation(c.config, OpUpdateOne, withIAMRoleID(id))
+	return &IAMRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IAMRole.
+func (c *IAMRoleClient) Delete() *IAMRoleDelete {
+	mutation := newIAMRoleMutation(c.config, OpDelete)
+	return &IAMRoleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *IAMRoleClient) DeleteOne(_m *IAMRole) *IAMRoleDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *IAMRoleClient) DeleteOneID(id uint64) *IAMRoleDeleteOne {
+	builder := c.Delete().Where(iamrole.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IAMRoleDeleteOne{builder}
+}
+
+// Query returns a query builder for IAMRole.
+func (c *IAMRoleClient) Query() *IAMRoleQuery {
+	return &IAMRoleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeIAMRole},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a IAMRole entity by its id.
+func (c *IAMRoleClient) Get(ctx context.Context, id uint64) (*IAMRole, error) {
+	return c.Query().Where(iamrole.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IAMRoleClient) GetX(ctx context.Context, id uint64) *IAMRole {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUsers queries the users edge of a IAMRole.
+func (c *IAMRoleClient) QueryUsers(_m *IAMRole) *IAMUserQuery {
+	query := (&IAMUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(iamrole.Table, iamrole.FieldID, id),
+			sqlgraph.To(iamuser.Table, iamuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, iamrole.UsersTable, iamrole.UsersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPermissions queries the permissions edge of a IAMRole.
+func (c *IAMRoleClient) QueryPermissions(_m *IAMRole) *IAMPermissionQuery {
+	query := (&IAMPermissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(iamrole.Table, iamrole.FieldID, id),
+			sqlgraph.To(iampermission.Table, iampermission.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, iamrole.PermissionsTable, iamrole.PermissionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *IAMRoleClient) Hooks() []Hook {
+	hooks := c.hooks.IAMRole
+	return append(hooks[:len(hooks):len(hooks)], iamrole.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *IAMRoleClient) Interceptors() []Interceptor {
+	inters := c.inters.IAMRole
+	return append(inters[:len(inters):len(inters)], iamrole.Interceptors[:]...)
+}
+
+func (c *IAMRoleClient) mutate(ctx context.Context, m *IAMRoleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&IAMRoleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&IAMRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&IAMRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&IAMRoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown IAMRole mutation op: %q", m.Op())
+	}
+}
+
+// IAMUserClient is a client for the IAMUser schema.
+type IAMUserClient struct {
+	config
+}
+
+// NewIAMUserClient returns a client for the IAMUser from the given config.
+func NewIAMUserClient(c config) *IAMUserClient {
+	return &IAMUserClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `iamuser.Hooks(f(g(h())))`.
+func (c *IAMUserClient) Use(hooks ...Hook) {
+	c.hooks.IAMUser = append(c.hooks.IAMUser, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `iamuser.Intercept(f(g(h())))`.
+func (c *IAMUserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IAMUser = append(c.inters.IAMUser, interceptors...)
+}
+
+// Create returns a builder for creating a IAMUser entity.
+func (c *IAMUserClient) Create() *IAMUserCreate {
+	mutation := newIAMUserMutation(c.config, OpCreate)
+	return &IAMUserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IAMUser entities.
+func (c *IAMUserClient) CreateBulk(builders ...*IAMUserCreate) *IAMUserCreateBulk {
+	return &IAMUserCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *IAMUserClient) MapCreateBulk(slice any, setFunc func(*IAMUserCreate, int)) *IAMUserCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &IAMUserCreateBulk{err: fmt.Errorf("calling to IAMUserClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*IAMUserCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &IAMUserCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IAMUser.
+func (c *IAMUserClient) Update() *IAMUserUpdate {
+	mutation := newIAMUserMutation(c.config, OpUpdate)
+	return &IAMUserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IAMUserClient) UpdateOne(_m *IAMUser) *IAMUserUpdateOne {
+	mutation := newIAMUserMutation(c.config, OpUpdateOne, withIAMUser(_m))
+	return &IAMUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IAMUserClient) UpdateOneID(id uint64) *IAMUserUpdateOne {
+	mutation := newIAMUserMutation(c.config, OpUpdateOne, withIAMUserID(id))
+	return &IAMUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IAMUser.
+func (c *IAMUserClient) Delete() *IAMUserDelete {
+	mutation := newIAMUserMutation(c.config, OpDelete)
+	return &IAMUserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *IAMUserClient) DeleteOne(_m *IAMUser) *IAMUserDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *IAMUserClient) DeleteOneID(id uint64) *IAMUserDeleteOne {
+	builder := c.Delete().Where(iamuser.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IAMUserDeleteOne{builder}
+}
+
+// Query returns a query builder for IAMUser.
+func (c *IAMUserClient) Query() *IAMUserQuery {
+	return &IAMUserQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeIAMUser},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a IAMUser entity by its id.
+func (c *IAMUserClient) Get(ctx context.Context, id uint64) (*IAMUser, error) {
+	return c.Query().Where(iamuser.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IAMUserClient) GetX(ctx context.Context, id uint64) *IAMUser {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRoles queries the roles edge of a IAMUser.
+func (c *IAMUserClient) QueryRoles(_m *IAMUser) *IAMRoleQuery {
+	query := (&IAMRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(iamuser.Table, iamuser.FieldID, id),
+			sqlgraph.To(iamrole.Table, iamrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, iamuser.RolesTable, iamuser.RolesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *IAMUserClient) Hooks() []Hook {
+	hooks := c.hooks.IAMUser
+	return append(hooks[:len(hooks):len(hooks)], iamuser.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *IAMUserClient) Interceptors() []Interceptor {
+	inters := c.inters.IAMUser
+	return append(inters[:len(inters):len(inters)], iamuser.Interceptors[:]...)
+}
+
+func (c *IAMUserClient) mutate(ctx context.Context, m *IAMUserMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&IAMUserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&IAMUserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&IAMUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&IAMUserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown IAMUser mutation op: %q", m.Op())
 	}
 }
 
@@ -1952,11 +2447,11 @@ func (c *TableCategoryClient) mutate(ctx context.Context, m *TableCategoryMutati
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		CategorySpec, Menu, MenuCategory, MenuSpec, Order, OrderItem, SpecGroup,
-		SpecItem, Table, TableCategory []ent.Hook
+		CategorySpec, IAMPermission, IAMRole, IAMUser, Menu, MenuCategory, MenuSpec,
+		Order, OrderItem, SpecGroup, SpecItem, Table, TableCategory []ent.Hook
 	}
 	inters struct {
-		CategorySpec, Menu, MenuCategory, MenuSpec, Order, OrderItem, SpecGroup,
-		SpecItem, Table, TableCategory []ent.Interceptor
+		CategorySpec, IAMPermission, IAMRole, IAMUser, Menu, MenuCategory, MenuSpec,
+		Order, OrderItem, SpecGroup, SpecItem, Table, TableCategory []ent.Interceptor
 	}
 )

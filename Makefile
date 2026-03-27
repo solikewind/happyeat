@@ -1,4 +1,4 @@
-.PHONY: api migrate run swagger swagger-serve air
+.PHONY: api migrate run swagger swagger-serve air routecheck
 # 统一入口：一次生成  types、handler、logic
 api:
 	goctl api go --api app/api/v1/central.api --dir app
@@ -34,3 +34,7 @@ swagger-serve:
 # 后端服务热加载air
 air:
 	air
+
+# Casbin 保护路由与 casbinrules.PermissionRules 一致性检查（在模块根执行）
+routecheck:
+	go run ./app/cmd/routecheck

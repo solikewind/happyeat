@@ -9,6 +9,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
+	"github.com/solikewind/happyeat/dal/model/ent/iampermission"
+	"github.com/solikewind/happyeat/dal/model/ent/iamrole"
+	"github.com/solikewind/happyeat/dal/model/ent/iamuser"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
@@ -102,6 +105,87 @@ func (f TraverseCategorySpec) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.CategorySpecQuery", q)
+}
+
+// The IAMPermissionFunc type is an adapter to allow the use of ordinary function as a Querier.
+type IAMPermissionFunc func(context.Context, *ent.IAMPermissionQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f IAMPermissionFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.IAMPermissionQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.IAMPermissionQuery", q)
+}
+
+// The TraverseIAMPermission type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseIAMPermission func(context.Context, *ent.IAMPermissionQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseIAMPermission) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseIAMPermission) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.IAMPermissionQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.IAMPermissionQuery", q)
+}
+
+// The IAMRoleFunc type is an adapter to allow the use of ordinary function as a Querier.
+type IAMRoleFunc func(context.Context, *ent.IAMRoleQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f IAMRoleFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.IAMRoleQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.IAMRoleQuery", q)
+}
+
+// The TraverseIAMRole type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseIAMRole func(context.Context, *ent.IAMRoleQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseIAMRole) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseIAMRole) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.IAMRoleQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.IAMRoleQuery", q)
+}
+
+// The IAMUserFunc type is an adapter to allow the use of ordinary function as a Querier.
+type IAMUserFunc func(context.Context, *ent.IAMUserQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f IAMUserFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.IAMUserQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.IAMUserQuery", q)
+}
+
+// The TraverseIAMUser type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseIAMUser func(context.Context, *ent.IAMUserQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseIAMUser) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseIAMUser) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.IAMUserQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.IAMUserQuery", q)
 }
 
 // The MenuFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -352,6 +436,12 @@ func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.CategorySpecQuery:
 		return &query[*ent.CategorySpecQuery, predicate.CategorySpec, categoryspec.OrderOption]{typ: ent.TypeCategorySpec, tq: q}, nil
+	case *ent.IAMPermissionQuery:
+		return &query[*ent.IAMPermissionQuery, predicate.IAMPermission, iampermission.OrderOption]{typ: ent.TypeIAMPermission, tq: q}, nil
+	case *ent.IAMRoleQuery:
+		return &query[*ent.IAMRoleQuery, predicate.IAMRole, iamrole.OrderOption]{typ: ent.TypeIAMRole, tq: q}, nil
+	case *ent.IAMUserQuery:
+		return &query[*ent.IAMUserQuery, predicate.IAMUser, iamuser.OrderOption]{typ: ent.TypeIAMUser, tq: q}, nil
 	case *ent.MenuQuery:
 		return &query[*ent.MenuQuery, predicate.Menu, menu.OrderOption]{typ: ent.TypeMenu, tq: q}, nil
 	case *ent.MenuCategoryQuery:
