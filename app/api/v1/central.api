@@ -16,6 +16,7 @@ import "tabletypes.api"
 import "ordertypes.api"
 import "workbenchtypes.api"
 import "authtypes.api"
+import "rbactypes.api"
 
 // 登录接口（无需 JWT），获取 token 后用于其他接口的 Authorization: Bearer <token>
 @server (
@@ -30,11 +31,12 @@ service HappyEatService {
 }
 
 @server (
-	jwt:      Auth
-	authType: Bearer
-	prefix:   /central/v1
-	group:    menu
-	timeout:  5s
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      menu
+	timeout:    5s
 )
 service HappyEatService {
 	@doc "列出菜单"
@@ -59,11 +61,12 @@ service HappyEatService {
 }
 
 @server (
-	jwt:      Auth
-	authType: Bearer
-	prefix:   /central/v1
-	group:    menucategory
-	timeout:  5s
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      menucategory
+	timeout:    5s
 )
 service HappyEatService {
 	@doc "列出菜单种类"
@@ -88,11 +91,12 @@ service HappyEatService {
 }
 
 @server (
-	jwt:      Auth
-	authType: Bearer
-	prefix:   /central/v1
-	group:    spec
-	timeout:  5s
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      spec
+	timeout:    5s
 )
 service HappyEatService {
 	@doc "列出规格组"
@@ -157,11 +161,12 @@ service HappyEatService {
 }
 
 @server (
-	jwt:      Auth
-	authType: Bearer
-	prefix:   /central/v1
-	group:    table
-	timeout:  5s
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      table
+	timeout:    5s
 )
 service HappyEatService {
 	@doc "列出餐桌"
@@ -186,11 +191,12 @@ service HappyEatService {
 }
 
 @server (
-	jwt:      Auth
-	authType: Bearer
-	prefix:   /central/v1
-	group:    tablecategory
-	timeout:  5s
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      tablecategory
+	timeout:    5s
 )
 service HappyEatService {
 	@doc "列出餐桌类别"
@@ -215,11 +221,12 @@ service HappyEatService {
 }
 
 @server (
-	jwt:      Auth
-	authType: Bearer
-	prefix:   /central/v1
-	group:    order
-	timeout:  5s
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      order
+	timeout:    5s
 )
 service HappyEatService {
 	@doc "列出订单"
@@ -240,15 +247,38 @@ service HappyEatService {
 }
 
 @server (
-	jwt:      Auth
-	authType: Bearer
-	prefix:   /central/v1
-	group:    workbench
-	timeout:  5s
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      workbench
+	timeout:    5s
 )
 service HappyEatService {
 	@doc "工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed"
 	@handler ListWorkbenchOrders
 	get /workbench/orders (ListWorkbenchOrdersReq) returns (ListWorkbenchOrdersReply)
+}
+
+@server (
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      rbac
+	timeout:    5s
+)
+service HappyEatService {
+	@doc "获取角色权限矩阵"
+	@handler ListRolePermissions
+	get /rbac/role-permissions returns (ListRolePermissionsReply)
+
+	@doc "更新角色权限（全量覆盖）"
+	@handler UpdateRolePermissions
+	put /rbac/role-permissions/:role (UpdateRolePermissionsReq) returns (UpdateRolePermissionsReply)
+
+	@doc "重置角色权限（可单角色）"
+	@handler ResetRolePermissions
+	post /rbac/role-permissions/reset (ResetRolePermissionsReq) returns (ResetRolePermissionsReply)
 }
 

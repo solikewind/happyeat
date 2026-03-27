@@ -8,7 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
-	menudata "github.com/solikewind/happyeat/dal/model/menu"
+	"github.com/solikewind/happyeat/dal/model/menu"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -41,7 +41,7 @@ func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusRep
 	}
 	offset := (current - 1) * pageSize
 
-	list, total, err := l.svcCtx.Menu.List(l.ctx, menudata.ListMenusFilter{
+	list, total, err := l.svcCtx.Menu.List(l.ctx, menu.ListMenusFilter{
 		Name:         req.Name,
 		CategoryName: req.Category,
 		Offset:       offset,

@@ -9,7 +9,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
-	tabledata "github.com/solikewind/happyeat/dal/model/table"
+	"github.com/solikewind/happyeat/dal/model/table"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,7 +34,7 @@ func (l *CreateTableCategoryLogic) CreateTableCategory(req *types.CreateTableCat
 		return nil, errors.New("分类名称不能为空")
 	}
 
-	_, err := l.svcCtx.TableType.Create(l.ctx, tabledata.CreateTableCategoryInput{
+	_, err := l.svcCtx.TableType.Create(l.ctx, table.CreateTableCategoryInput{
 		Name:        req.Name,
 		Description: req.Description,
 	})

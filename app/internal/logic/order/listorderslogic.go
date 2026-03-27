@@ -9,7 +9,7 @@ import (
 	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
-	orderdata "github.com/solikewind/happyeat/dal/model/order"
+	"github.com/solikewind/happyeat/dal/model/order"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -40,7 +40,7 @@ func (l *ListOrdersLogic) ListOrders(req *types.ListOrdersReq) (*types.ListOrder
 	}
 	offset := (current - 1) * pageSize
 
-	filter := orderdata.ListOrdersFilter{
+	filter := order.ListOrdersFilter{
 		Status:    enum.OrderStatus(req.Status),
 		OrderType: enum.OrderType(req.OrderType),
 		Offset:    offset,

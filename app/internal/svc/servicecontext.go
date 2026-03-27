@@ -17,12 +17,15 @@ import (
 	"github.com/solikewind/happyeat/dal/model/menu"
 	"github.com/solikewind/happyeat/dal/model/order"
 	"github.com/solikewind/happyeat/dal/model/table"
+	"github.com/zeromicro/go-zero/rest"
 )
 
 type ServiceContext struct {
 	Config config.Config
 	DB     *sql.DB         // 共享连接池，仅用于关闭
 	Casbin *CasbinEnforcer // 权限：model 来自配置内联，policy 来自 DB casbin_rule 表
+	Rbac   *RbacStore
+	CasbinMiddleware rest.Middleware
 	Agent  *blades.Agent   // 智能体
 	LLM    *agent.LangChainService
 	ASR    *agent.BailianASRClient
@@ -34,6 +37,7 @@ type ServiceContext struct {
 	TableType *table.TableType // 餐桌分类 data 层
 
 	Order *order.Order // 订单 data 层
+
 }
 
 func NewServiceContext(c config.Config) (*ServiceContext, error) {
@@ -70,10 +74,11 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		asrSvc = svc
 	}
 
-	return &ServiceContext{
+	ctx := &ServiceContext{
 		Config: c,
 		DB:     db,
 		Casbin: ce,
+		Rbac:   NewRbacStore(),
 		Agent:  bladesAgent.Agent,
 		LLM:    llmSvc,
 		ASR:    asrSvc,
@@ -83,5 +88,10 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		Table:     table.NewTable(client),
 		TableType: table.NewTableType(client),
 		Order:     order.NewOrder(client),
-	}, nil
+	}
+	ctx.CasbinMiddleware = NewCasbinMiddleware(ctx)
+	if err := SyncRolePoliciesToCasbin(ctx.Rbac, ctx.Casbin); err != nil {
+		return nil, err
+	}
+	return ctx, nil
 }

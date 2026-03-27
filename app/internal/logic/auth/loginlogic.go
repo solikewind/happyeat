@@ -50,6 +50,8 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
 	claims := jwt.MapClaims{
 		"exp": exp,
 		"iat": iat,
+		"sub":  "dev-admin",
+		"role": "super_admin",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenStr, err := token.SignedString([]byte(secret))

@@ -10,7 +10,7 @@ import (
 	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
-	orderdata "github.com/solikewind/happyeat/dal/model/order"
+	"github.com/solikewind/happyeat/dal/model/order"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -38,9 +38,9 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		return nil, errors.New("order_type 应为 dine_in 或 takeaway")
 	}
 
-	items := make([]orderdata.ItemInput, 0, len(req.Items))
+	items := make([]order.ItemInput, 0, len(req.Items))
 	for _, it := range req.Items {
-		items = append(items, orderdata.ItemInput{
+		items = append(items, order.ItemInput{
 			MenuName:  it.MenuName,
 			Quantity:  it.Quantity,
 			UnitPrice: it.UnitPrice,
@@ -54,12 +54,17 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		tableID = &tid
 	}
 
-	entOrder, err := l.svcCtx.Order.Create(l.ctx, orderdata.CreateOrderInput{
+	entOrder, err := l.svcCtx.Order.Create(l.ctx, order.CreateOrderInput{
 		OrderType:   enum.OrderType(req.OrderType),
 		TableID:     tableID,
 		Items:       items,
 		TotalAmount: req.TotalAmount,	
 		Remark:      req.Remark,
+
+
+
+
+		
 	})
 	if err != nil {
 		return nil, err

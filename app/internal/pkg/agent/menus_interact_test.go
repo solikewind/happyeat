@@ -499,9 +499,9 @@ func TestSearchMenusWithPromptFallback(t *testing.T) {
 
 				// 验证结果格式（模拟 SearchMenusWithPrompt 的格式化逻辑）
 				resultText := ""
-				totalPrice := 0.0
+				totalPrice := int64(0)
 				for _, item := range items {
-					price := item.Menu.Price * float64(item.Quantity)
+					price := item.Menu.Price * int64(item.Quantity)
 					totalPrice += price
 					resultText += item.Menu.Name
 				}

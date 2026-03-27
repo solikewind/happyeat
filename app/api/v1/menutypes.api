@@ -61,7 +61,7 @@ type ListMenusReq {
 // 创建分类
 type CreateMenuCategoryReq {
 	Name        string `json:"name"`
-	Description string `json:"description"`
+	Description string `json:"description,optional"`
 }
 type CreateMenuCategoryReply {}
 

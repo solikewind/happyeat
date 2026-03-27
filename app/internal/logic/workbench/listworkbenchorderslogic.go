@@ -7,12 +7,12 @@ import (
 	"context"
 	"strings"
 
-	"github.com/solikewind/happyeat/app/internal/logic/order"
+	orderlogic "github.com/solikewind/happyeat/app/internal/logic/order"
 	"github.com/solikewind/happyeat/app/internal/pkg/status"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/common/consts/enum"
-	orderdata "github.com/solikewind/happyeat/dal/model/order"
+	"github.com/solikewind/happyeat/dal/model/order"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -46,7 +46,7 @@ func (l *ListWorkbenchOrdersLogic) ListWorkbenchOrders(req *types.ListWorkbenchO
 	}
 	offset := (current - 1) * pageSize
 
-	filter := orderdata.ListOrdersFilter{
+	filter := order.ListOrdersFilter{
 		Offset: offset,
 		Limit:  pageSize,
 	}
@@ -67,7 +67,7 @@ func (l *ListWorkbenchOrdersLogic) ListWorkbenchOrders(req *types.ListWorkbenchO
 
 	orders := make([]types.Order, 0, len(list))
 	for _, e := range list {
-		orders = append(orders, order.EntOrderToType(e))
+		orders = append(orders, orderlogic.EntOrderToType(e))
 	}
 
 	return &types.ListWorkbenchOrdersReply{Orders: orders, Total: total}, nil

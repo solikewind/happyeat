@@ -1,0 +1,26 @@
+syntax = "v1"
+
+info (
+	title:   "HappyEat权限管理APITypes"
+	author:  "Goxny"
+	version: "v1.0.0"
+)
+
+type ListRolePermissionsReply {
+	Roles map[string][]string `json:"roles"`
+}
+
+type UpdateRolePermissionsReq {
+	Role string `path:"role"`
+	Permissions []string `json:"permissions"`
+}
+
+type UpdateRolePermissionsReply {
+}
+
+type ResetRolePermissionsReq {
+	Role string `json:"role,optional"`
+}
+
+type ResetRolePermissionsReply {
+}

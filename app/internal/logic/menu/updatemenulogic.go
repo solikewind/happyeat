@@ -10,7 +10,7 @@ import (
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/dal/model/ent"
-	menudata "github.com/solikewind/happyeat/dal/model/menu"
+	"github.com/solikewind/happyeat/dal/model/menu"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -46,9 +46,9 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		return nil, err
 	}
 
-	specs := make([]menudata.SpecInput, 0, len(req.Specs))
+	specs := make([]menu.SpecInput, 0, len(req.Specs))
 	for _, s := range req.Specs {
-		specs = append(specs, menudata.SpecInput{
+		specs = append(specs, menu.SpecInput{
 			SpecItemID:     s.SpecItemId,
 			CategorySpecID: s.CategorySpecId,
 			PriceDelta:     s.PriceDelta,
@@ -56,7 +56,7 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		})
 	}
 
-	err = l.svcCtx.Menu.Update(l.ctx, req.Id, menudata.UpdateMenuInput{
+	err = l.svcCtx.Menu.Update(l.ctx, req.Id, menu.UpdateMenuInput{
 		Name:        req.Name,
 		Description: req.Description,
 		Image:       req.Image,

@@ -30,7 +30,7 @@ type CreateMenuCategoryReply struct {
 
 type CreateMenuCategoryReq struct {
 	Name        string `json:"name"`
-	Description string `json:"description"`
+	Description string `json:"description,optional"`
 }
 
 type CreateMenuReply struct {
@@ -258,6 +258,10 @@ type ListOrdersReq struct {
 	TableId   uint64 `json:"table_id,optional" form:"table_id,optional"`     // 按餐桌筛选
 }
 
+type ListRolePermissionsReply struct {
+	Roles map[string][]string `json:"roles"`
+}
+
 type ListSpecGroupsReply struct {
 	Groups []SpecGroup `json:"groups"`
 	Total  int64       `json:"total"`
@@ -379,6 +383,13 @@ type PageInfo struct {
 	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
 }
 
+type ResetRolePermissionsReply struct {
+}
+
+type ResetRolePermissionsReq struct {
+	Role string `json:"role,optional"`
+}
+
 type SpecGroup struct {
 	Id        uint64 `json:"id"`
 	Name      string `json:"name"`
@@ -453,6 +464,14 @@ type UpdateOrderStatusReply struct {
 type UpdateOrderStatusReq struct {
 	Id     uint64 `path:"id"`
 	Status string `json:"status"` // paid/preparing/completed/cancelled
+}
+
+type UpdateRolePermissionsReply struct {
+}
+
+type UpdateRolePermissionsReq struct {
+	Role        string   `path:"role"`
+	Permissions []string `json:"permissions"`
 }
 
 type UpdateSpecGroupReply struct {

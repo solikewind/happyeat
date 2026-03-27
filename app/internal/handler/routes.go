@@ -11,6 +11,7 @@ import (
 	menu "github.com/solikewind/happyeat/app/internal/handler/menu"
 	menucategory "github.com/solikewind/happyeat/app/internal/handler/menucategory"
 	order "github.com/solikewind/happyeat/app/internal/handler/order"
+	rbac "github.com/solikewind/happyeat/app/internal/handler/rbac"
 	spec "github.com/solikewind/happyeat/app/internal/handler/spec"
 	table "github.com/solikewind/happyeat/app/internal/handler/table"
 	tablecategory "github.com/solikewind/happyeat/app/internal/handler/tablecategory"
@@ -35,296 +36,346 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 获取单个菜单
-				Method:  http.MethodGet,
-				Path:    "/menu/:id",
-				Handler: menu.GetMenuHandler(serverCtx),
-			},
-			{
-				// 更新菜单
-				Method:  http.MethodPut,
-				Path:    "/menu/:id",
-				Handler: menu.UpdateMenuHandler(serverCtx),
-			},
-			{
-				// 删除菜单
-				Method:  http.MethodDelete,
-				Path:    "/menu/:id",
-				Handler: menu.DeleteMenuHandler(serverCtx),
-			},
-			{
-				// 列出菜单
-				Method:  http.MethodGet,
-				Path:    "/menus",
-				Handler: menu.ListMenusHandler(serverCtx),
-			},
-			{
-				// 创建菜单
-				Method:  http.MethodPost,
-				Path:    "/menus",
-				Handler: menu.CreateMenuHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 获取单个菜单
+					Method:  http.MethodGet,
+					Path:    "/menu/:id",
+					Handler: menu.GetMenuHandler(serverCtx),
+				},
+				{
+					// 更新菜单
+					Method:  http.MethodPut,
+					Path:    "/menu/:id",
+					Handler: menu.UpdateMenuHandler(serverCtx),
+				},
+				{
+					// 删除菜单
+					Method:  http.MethodDelete,
+					Path:    "/menu/:id",
+					Handler: menu.DeleteMenuHandler(serverCtx),
+				},
+				{
+					// 列出菜单
+					Method:  http.MethodGet,
+					Path:    "/menus",
+					Handler: menu.ListMenusHandler(serverCtx),
+				},
+				{
+					// 创建菜单
+					Method:  http.MethodPost,
+					Path:    "/menus",
+					Handler: menu.CreateMenuHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 列出菜单种类
-				Method:  http.MethodGet,
-				Path:    "/menu/categories",
-				Handler: menucategory.ListMenusCategoriesHandler(serverCtx),
-			},
-			{
-				// 创建菜单种类
-				Method:  http.MethodPost,
-				Path:    "/menu/category",
-				Handler: menucategory.CreateMenuCategoryHandler(serverCtx),
-			},
-			{
-				// 获取菜单种类
-				Method:  http.MethodGet,
-				Path:    "/menu/category/:id",
-				Handler: menucategory.GetMenuCategoryHandler(serverCtx),
-			},
-			{
-				// 更新菜单种类
-				Method:  http.MethodPut,
-				Path:    "/menu/category/:id",
-				Handler: menucategory.UpdateMenuCategoryHandler(serverCtx),
-			},
-			{
-				// 删除菜单种类
-				Method:  http.MethodDelete,
-				Path:    "/menu/category/:id",
-				Handler: menucategory.DeleteMenuCategoryHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 列出菜单种类
+					Method:  http.MethodGet,
+					Path:    "/menu/categories",
+					Handler: menucategory.ListMenusCategoriesHandler(serverCtx),
+				},
+				{
+					// 创建菜单种类
+					Method:  http.MethodPost,
+					Path:    "/menu/category",
+					Handler: menucategory.CreateMenuCategoryHandler(serverCtx),
+				},
+				{
+					// 获取菜单种类
+					Method:  http.MethodGet,
+					Path:    "/menu/category/:id",
+					Handler: menucategory.GetMenuCategoryHandler(serverCtx),
+				},
+				{
+					// 更新菜单种类
+					Method:  http.MethodPut,
+					Path:    "/menu/category/:id",
+					Handler: menucategory.UpdateMenuCategoryHandler(serverCtx),
+				},
+				{
+					// 删除菜单种类
+					Method:  http.MethodDelete,
+					Path:    "/menu/category/:id",
+					Handler: menucategory.DeleteMenuCategoryHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 获取单个订单
-				Method:  http.MethodGet,
-				Path:    "/order/:id",
-				Handler: order.GetOrderHandler(serverCtx),
-			},
-			{
-				// 更新订单状态
-				Method:  http.MethodPut,
-				Path:    "/order/:id/status",
-				Handler: order.UpdateOrderStatusHandler(serverCtx),
-			},
-			{
-				// 列出订单
-				Method:  http.MethodGet,
-				Path:    "/orders",
-				Handler: order.ListOrdersHandler(serverCtx),
-			},
-			{
-				// 创建订单
-				Method:  http.MethodPost,
-				Path:    "/orders",
-				Handler: order.CreateOrderHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 获取单个订单
+					Method:  http.MethodGet,
+					Path:    "/order/:id",
+					Handler: order.GetOrderHandler(serverCtx),
+				},
+				{
+					// 更新订单状态
+					Method:  http.MethodPut,
+					Path:    "/order/:id/status",
+					Handler: order.UpdateOrderStatusHandler(serverCtx),
+				},
+				{
+					// 列出订单
+					Method:  http.MethodGet,
+					Path:    "/orders",
+					Handler: order.ListOrdersHandler(serverCtx),
+				},
+				{
+					// 创建订单
+					Method:  http.MethodPost,
+					Path:    "/orders",
+					Handler: order.CreateOrderHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 创建分类规格模板
-				Method:  http.MethodPost,
-				Path:    "/spec/category-spec",
-				Handler: spec.CreateCategorySpecHandler(serverCtx),
-			},
-			{
-				// 获取分类规格模板
-				Method:  http.MethodGet,
-				Path:    "/spec/category-spec/:id",
-				Handler: spec.GetCategorySpecHandler(serverCtx),
-			},
-			{
-				// 更新分类规格模板
-				Method:  http.MethodPut,
-				Path:    "/spec/category-spec/:id",
-				Handler: spec.UpdateCategorySpecHandler(serverCtx),
-			},
-			{
-				// 删除分类规格模板
-				Method:  http.MethodDelete,
-				Path:    "/spec/category-spec/:id",
-				Handler: spec.DeleteCategorySpecHandler(serverCtx),
-			},
-			{
-				// 列出分类规格模板
-				Method:  http.MethodGet,
-				Path:    "/spec/category-specs",
-				Handler: spec.ListCategorySpecsHandler(serverCtx),
-			},
-			{
-				// 创建规格组
-				Method:  http.MethodPost,
-				Path:    "/spec/group",
-				Handler: spec.CreateSpecGroupHandler(serverCtx),
-			},
-			{
-				// 获取规格组
-				Method:  http.MethodGet,
-				Path:    "/spec/group/:id",
-				Handler: spec.GetSpecGroupHandler(serverCtx),
-			},
-			{
-				// 更新规格组
-				Method:  http.MethodPut,
-				Path:    "/spec/group/:id",
-				Handler: spec.UpdateSpecGroupHandler(serverCtx),
-			},
-			{
-				// 删除规格组
-				Method:  http.MethodDelete,
-				Path:    "/spec/group/:id",
-				Handler: spec.DeleteSpecGroupHandler(serverCtx),
-			},
-			{
-				// 列出规格组
-				Method:  http.MethodGet,
-				Path:    "/spec/groups",
-				Handler: spec.ListSpecGroupsHandler(serverCtx),
-			},
-			{
-				// 创建规格项
-				Method:  http.MethodPost,
-				Path:    "/spec/item",
-				Handler: spec.CreateSpecItemHandler(serverCtx),
-			},
-			{
-				// 获取规格项
-				Method:  http.MethodGet,
-				Path:    "/spec/item/:id",
-				Handler: spec.GetSpecItemHandler(serverCtx),
-			},
-			{
-				// 更新规格项
-				Method:  http.MethodPut,
-				Path:    "/spec/item/:id",
-				Handler: spec.UpdateSpecItemHandler(serverCtx),
-			},
-			{
-				// 删除规格项
-				Method:  http.MethodDelete,
-				Path:    "/spec/item/:id",
-				Handler: spec.DeleteSpecItemHandler(serverCtx),
-			},
-			{
-				// 列出规格项
-				Method:  http.MethodGet,
-				Path:    "/spec/items",
-				Handler: spec.ListSpecItemsHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 获取角色权限矩阵
+					Method:  http.MethodGet,
+					Path:    "/rbac/role-permissions",
+					Handler: rbac.ListRolePermissionsHandler(serverCtx),
+				},
+				{
+					// 更新角色权限（全量覆盖）
+					Method:  http.MethodPut,
+					Path:    "/rbac/role-permissions/:role",
+					Handler: rbac.UpdateRolePermissionsHandler(serverCtx),
+				},
+				{
+					// 重置角色权限（可单角色）
+					Method:  http.MethodPost,
+					Path:    "/rbac/role-permissions/reset",
+					Handler: rbac.ResetRolePermissionsHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 获取单个餐桌
-				Method:  http.MethodGet,
-				Path:    "/table/:id",
-				Handler: table.GetTableHandler(serverCtx),
-			},
-			{
-				// 更新餐桌
-				Method:  http.MethodPut,
-				Path:    "/table/:id",
-				Handler: table.UpdateTableHandler(serverCtx),
-			},
-			{
-				// 删除餐桌
-				Method:  http.MethodDelete,
-				Path:    "/table/:id",
-				Handler: table.DeleteTableHandler(serverCtx),
-			},
-			{
-				// 列出餐桌
-				Method:  http.MethodGet,
-				Path:    "/tables",
-				Handler: table.ListTablesHandler(serverCtx),
-			},
-			{
-				// 创建餐桌
-				Method:  http.MethodPost,
-				Path:    "/tables",
-				Handler: table.CreateTableHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 创建分类规格模板
+					Method:  http.MethodPost,
+					Path:    "/spec/category-spec",
+					Handler: spec.CreateCategorySpecHandler(serverCtx),
+				},
+				{
+					// 获取分类规格模板
+					Method:  http.MethodGet,
+					Path:    "/spec/category-spec/:id",
+					Handler: spec.GetCategorySpecHandler(serverCtx),
+				},
+				{
+					// 更新分类规格模板
+					Method:  http.MethodPut,
+					Path:    "/spec/category-spec/:id",
+					Handler: spec.UpdateCategorySpecHandler(serverCtx),
+				},
+				{
+					// 删除分类规格模板
+					Method:  http.MethodDelete,
+					Path:    "/spec/category-spec/:id",
+					Handler: spec.DeleteCategorySpecHandler(serverCtx),
+				},
+				{
+					// 列出分类规格模板
+					Method:  http.MethodGet,
+					Path:    "/spec/category-specs",
+					Handler: spec.ListCategorySpecsHandler(serverCtx),
+				},
+				{
+					// 创建规格组
+					Method:  http.MethodPost,
+					Path:    "/spec/group",
+					Handler: spec.CreateSpecGroupHandler(serverCtx),
+				},
+				{
+					// 获取规格组
+					Method:  http.MethodGet,
+					Path:    "/spec/group/:id",
+					Handler: spec.GetSpecGroupHandler(serverCtx),
+				},
+				{
+					// 更新规格组
+					Method:  http.MethodPut,
+					Path:    "/spec/group/:id",
+					Handler: spec.UpdateSpecGroupHandler(serverCtx),
+				},
+				{
+					// 删除规格组
+					Method:  http.MethodDelete,
+					Path:    "/spec/group/:id",
+					Handler: spec.DeleteSpecGroupHandler(serverCtx),
+				},
+				{
+					// 列出规格组
+					Method:  http.MethodGet,
+					Path:    "/spec/groups",
+					Handler: spec.ListSpecGroupsHandler(serverCtx),
+				},
+				{
+					// 创建规格项
+					Method:  http.MethodPost,
+					Path:    "/spec/item",
+					Handler: spec.CreateSpecItemHandler(serverCtx),
+				},
+				{
+					// 获取规格项
+					Method:  http.MethodGet,
+					Path:    "/spec/item/:id",
+					Handler: spec.GetSpecItemHandler(serverCtx),
+				},
+				{
+					// 更新规格项
+					Method:  http.MethodPut,
+					Path:    "/spec/item/:id",
+					Handler: spec.UpdateSpecItemHandler(serverCtx),
+				},
+				{
+					// 删除规格项
+					Method:  http.MethodDelete,
+					Path:    "/spec/item/:id",
+					Handler: spec.DeleteSpecItemHandler(serverCtx),
+				},
+				{
+					// 列出规格项
+					Method:  http.MethodGet,
+					Path:    "/spec/items",
+					Handler: spec.ListSpecItemsHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 列出餐桌类别
-				Method:  http.MethodGet,
-				Path:    "/table/categories",
-				Handler: tablecategory.ListTableCategoriesHandler(serverCtx),
-			},
-			{
-				// 创建餐桌类别
-				Method:  http.MethodPost,
-				Path:    "/table/category",
-				Handler: tablecategory.CreateTableCategoryHandler(serverCtx),
-			},
-			{
-				// 获取餐桌类别
-				Method:  http.MethodGet,
-				Path:    "/table/category/:id",
-				Handler: tablecategory.GetTableCategoryHandler(serverCtx),
-			},
-			{
-				// 更新餐桌类别
-				Method:  http.MethodPut,
-				Path:    "/table/category/:id",
-				Handler: tablecategory.UpdateTableCategoryHandler(serverCtx),
-			},
-			{
-				// 删除餐桌类别
-				Method:  http.MethodDelete,
-				Path:    "/table/category/:id",
-				Handler: tablecategory.DeleteTableCategoryHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 获取单个餐桌
+					Method:  http.MethodGet,
+					Path:    "/table/:id",
+					Handler: table.GetTableHandler(serverCtx),
+				},
+				{
+					// 更新餐桌
+					Method:  http.MethodPut,
+					Path:    "/table/:id",
+					Handler: table.UpdateTableHandler(serverCtx),
+				},
+				{
+					// 删除餐桌
+					Method:  http.MethodDelete,
+					Path:    "/table/:id",
+					Handler: table.DeleteTableHandler(serverCtx),
+				},
+				{
+					// 列出餐桌
+					Method:  http.MethodGet,
+					Path:    "/tables",
+					Handler: table.ListTablesHandler(serverCtx),
+				},
+				{
+					// 创建餐桌
+					Method:  http.MethodPost,
+					Path:    "/tables",
+					Handler: table.CreateTableHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed
-				Method:  http.MethodGet,
-				Path:    "/workbench/orders",
-				Handler: workbench.ListWorkbenchOrdersHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 列出餐桌类别
+					Method:  http.MethodGet,
+					Path:    "/table/categories",
+					Handler: tablecategory.ListTableCategoriesHandler(serverCtx),
+				},
+				{
+					// 创建餐桌类别
+					Method:  http.MethodPost,
+					Path:    "/table/category",
+					Handler: tablecategory.CreateTableCategoryHandler(serverCtx),
+				},
+				{
+					// 获取餐桌类别
+					Method:  http.MethodGet,
+					Path:    "/table/category/:id",
+					Handler: tablecategory.GetTableCategoryHandler(serverCtx),
+				},
+				{
+					// 更新餐桌类别
+					Method:  http.MethodPut,
+					Path:    "/table/category/:id",
+					Handler: tablecategory.UpdateTableCategoryHandler(serverCtx),
+				},
+				{
+					// 删除餐桌类别
+					Method:  http.MethodDelete,
+					Path:    "/table/category/:id",
+					Handler: tablecategory.DeleteTableCategoryHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 工作台订单列表（默认待处理：created/paid/preparing）；出单用 更新订单状态 置为 completed
+					Method:  http.MethodGet,
+					Path:    "/workbench/orders",
+					Handler: workbench.ListWorkbenchOrdersHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
