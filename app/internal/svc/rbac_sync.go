@@ -6,8 +6,15 @@ func SyncRolePoliciesToCasbin(store *RbacStore, ce *CasbinEnforcer) error {
 	if err != nil {
 		return err
 	}
-	if _, err = enforcer.RemoveFilteredPolicy(0); err != nil {
+	// Casbin v2.135+：RemoveFilteredPolicy 必须带 fieldValues，不能再用 (0) 表示「删全部」。
+	policies, err := enforcer.GetPolicy()
+	if err != nil {
 		return err
+	}
+	if len(policies) > 0 {
+		if _, err = enforcer.RemovePolicies(policies); err != nil {
+			return err
+		}
 	}
 	for role, permissions := range roles {
 		policies := BuildPoliciesForPermissions(permissions)
@@ -21,8 +28,14 @@ func SyncRolePoliciesToCasbin(store *RbacStore, ce *CasbinEnforcer) error {
 	if err != nil {
 		return err
 	}
-	if _, err = enforcer.RemoveFilteredGroupingPolicy(0); err != nil {
+	grouping, err := enforcer.GetGroupingPolicy()
+	if err != nil {
 		return err
+	}
+	if len(grouping) > 0 {
+		if _, err = enforcer.RemoveGroupingPolicies(grouping); err != nil {
+			return err
+		}
 	}
 	for userID, userRoles := range users {
 		for _, role := range userRoles {
