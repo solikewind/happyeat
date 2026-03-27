@@ -3,6 +3,14 @@
 
 package types
 
+type AssignIAMUserRoleReply struct {
+}
+
+type AssignIAMUserRoleReq struct {
+	UserCode string `json:"user_code"`
+	RoleCode string `json:"role_code"`
+}
+
 type CategorySpec struct {
 	Id         uint64 `json:"id"`
 	CategoryId uint64 `json:"category_id"`
@@ -213,6 +221,17 @@ type GetTableReq struct {
 	Id uint64 `path:"id"`
 }
 
+type IAMRoleItem struct {
+	RoleCode string `json:"role_code"`
+	RoleName string `json:"role_name"`
+}
+
+type IAMUserItem struct {
+	UserCode    string   `json:"user_code"`
+	DisplayName string   `json:"display_name"`
+	Roles       []string `json:"roles"`
+}
+
 type ListCategorySpecReply struct {
 	Specs []CategorySpec `json:"specs"`
 	Total int64          `json:"total"`
@@ -222,6 +241,36 @@ type ListCategorySpecReq struct {
 	PageInfo
 	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"`
 	SpecType   string `json:"spec_type,optional" form:"spec_type,optional"`
+}
+
+type ListIAMPermissionsReply struct {
+	Permissions []PermissionItem `json:"permissions"`
+	Total       int64            `json:"total"`
+}
+
+type ListIAMPermissionsReq struct {
+	PageInfo
+	Keyword string `json:"keyword,optional" form:"keyword,optional"` // 可选：按 code/description 模糊筛
+}
+
+type ListIAMRolesReply struct {
+	Roles []IAMRoleItem `json:"roles"`
+	Total int64         `json:"total"`
+}
+
+type ListIAMRolesReq struct {
+	PageInfo
+	Keyword string `json:"keyword,optional" form:"keyword,optional"`
+}
+
+type ListIAMUsersReply struct {
+	Users []IAMUserItem `json:"users"`
+	Total int64         `json:"total"`
+}
+
+type ListIAMUsersReq struct {
+	PageInfo
+	Keyword string `json:"keyword,optional" form:"keyword,optional"` // 可选：user_code / display_name
 }
 
 type ListMenuCategoryReply struct {
@@ -381,6 +430,19 @@ type OrderItem struct {
 type PageInfo struct {
 	Current  int64 `json:"current,optional" form:"current,optional"`
 	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
+}
+
+type PermissionItem struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+}
+
+type RemoveIAMUserRoleReply struct {
+}
+
+type RemoveIAMUserRoleReq struct {
+	UserCode string `form:"user_code"`
+	RoleCode string `form:"role_code"`
 }
 
 type ResetRolePermissionsReply struct {

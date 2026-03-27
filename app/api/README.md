@@ -15,13 +15,16 @@ api/
 ├── base/                 # 实体类型（被 types 引用）
 │   ├── menubase.api      # Menu, MenuCategory, MenuSpec
 │   ├── tablebase.api     # Table, TableCategory
-│   └── orderbase.api     # Order, OrderItem
+│   ├── orderbase.api     # Order, OrderItem
+│   └── iambase.api       # RolePermission, PermissionItem, IAMRoleItem, IAMUserItem
 ├── v1/
 │   ├── central.api       # 统一入口：import 各 types + 所有 @server 路由
 │   ├── menutypes.api     # 菜单 req/reply
 │   ├── tabletypes.api    # 餐桌 req/reply
 │   ├── ordertypes.api    # 订单 req/reply
-│   └── workbenchtypes.api # 工作台 req/reply
+│   ├── workbenchtypes.api # 工作台 req/reply
+│   ├── rbactypes.api     # 角色-权限矩阵
+│   └── iamtypes.api      # IAM 目录与用户-角色绑定（与 rbac 互补）
 └── README.md
 ```
 
@@ -35,6 +38,8 @@ api/
 | tablecategory | /table/categories, /table/category/:id | 餐桌分类 CRUD |
 | order | /orders, /order/:id, /order/:id/status | 订单列表/详情/创建/更新状态 |
 | workbench | /workbench/orders | 工作台订单列表（默认 created/paid/preparing）；出单用 更新订单状态 置为 completed |
+| rbac | /rbac/role-permissions* | 角色权限矩阵查询/更新/重置 |
+| iam | /iam/permissions, /iam/roles, /iam/users, /iam/user-roles | 权限点/角色/用户目录；用户-角色绑定（POST body / DELETE query） |
 
 ## 后续扩展
 

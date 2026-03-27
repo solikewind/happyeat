@@ -17,6 +17,7 @@ import "ordertypes.api"
 import "workbenchtypes.api"
 import "authtypes.api"
 import "rbactypes.api"
+import "iamtypes.api"
 
 // 登录接口（无需 JWT），获取 token 后用于其他接口的 Authorization: Bearer <token>
 @server (
@@ -280,5 +281,36 @@ service HappyEatService {
 	@doc "重置角色权限（可单角色）"
 	@handler ResetRolePermissions
 	post /rbac/role-permissions/reset (ResetRolePermissionsReq) returns (ResetRolePermissionsReply)
+}
+
+// IAM：权限点/角色/用户目录与用户-角色维护（与 /rbac/* 矩阵配置互补）
+@server (
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      iam
+	timeout:    5s
+)
+service HappyEatService {
+	@doc "分页列出权限点（iam_permissions）"
+	@handler ListIAMPermissions
+	get /iam/permissions (ListIAMPermissionsReq) returns (ListIAMPermissionsReply)
+
+	@doc "分页列出角色（iam_roles）"
+	@handler ListIAMRoles
+	get /iam/roles (ListIAMRolesReq) returns (ListIAMRolesReply)
+
+	@doc "分页列出用户及其角色"
+	@handler ListIAMUsers
+	get /iam/users (ListIAMUsersReq) returns (ListIAMUsersReply)
+
+	@doc "为用户绑定角色（幂等：已绑定则成功）；path 固定便于 Casbin obj 精确匹配"
+	@handler AssignIAMUserRole
+	post /iam/user-roles (AssignIAMUserRoleReq) returns (AssignIAMUserRoleReply)
+
+	@doc "移除用户的某个角色；使用 query：?user_code=&role_code="
+	@handler RemoveIAMUserRole
+	delete /iam/user-roles (RemoveIAMUserRoleReq) returns (RemoveIAMUserRoleReply)
 }
 

@@ -1,0 +1,63 @@
+syntax = "v1"
+
+info (
+	title:   "HappyEat IAM 模块 APITypes"
+	author:  "Goxny"
+	version: "v1.0.0"
+)
+
+import "../base/iambase.api"
+import "../base/base.api"
+
+// ---------- 权限点目录 ----------
+
+type ListIAMPermissionsReq {
+	PageInfo
+	Keyword string `json:"keyword,optional" form:"keyword,optional"` // 可选：按 code/description 模糊筛
+}
+
+type ListIAMPermissionsReply {
+	Permissions []PermissionItem `json:"permissions"`
+	Total       int64            `json:"total"`
+}
+
+// ---------- 角色目录 ----------
+
+type ListIAMRolesReq {
+	PageInfo
+	Keyword string `json:"keyword,optional" form:"keyword,optional"`
+}
+
+type ListIAMRolesReply {
+	Roles []IAMRoleItem `json:"roles"`
+	Total int64         `json:"total"`
+}
+
+// ---------- 用户与角色绑定 ----------
+
+type ListIAMUsersReq {
+	PageInfo
+	Keyword string `json:"keyword,optional" form:"keyword,optional"` // 可选：user_code / display_name
+}
+
+type ListIAMUsersReply {
+	Users []IAMUserItem `json:"users"`
+	Total int64         `json:"total"`
+}
+
+// 使用固定 path + body，避免 Casbin obj 与「字面量 user_code 路径」无法按模板匹配的问题（matcher 为 r.obj == p.obj）。
+type AssignIAMUserRoleReq {
+	UserCode string `json:"user_code"`
+	RoleCode string `json:"role_code"`
+}
+
+type AssignIAMUserRoleReply {
+}
+
+type RemoveIAMUserRoleReq {
+	UserCode string `form:"user_code"`
+	RoleCode string `form:"role_code"`
+}
+
+type RemoveIAMUserRoleReply {
+}

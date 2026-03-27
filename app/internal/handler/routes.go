@@ -8,6 +8,7 @@ import (
 	"time"
 
 	auth "github.com/solikewind/happyeat/app/internal/handler/auth"
+	iam "github.com/solikewind/happyeat/app/internal/handler/iam"
 	menu "github.com/solikewind/happyeat/app/internal/handler/menu"
 	menucategory "github.com/solikewind/happyeat/app/internal/handler/menucategory"
 	order "github.com/solikewind/happyeat/app/internal/handler/order"
@@ -31,6 +32,47 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: auth.LoginHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 分页列出权限点（iam_permissions）
+					Method:  http.MethodGet,
+					Path:    "/iam/permissions",
+					Handler: iam.ListIAMPermissionsHandler(serverCtx),
+				},
+				{
+					// 分页列出角色（iam_roles）
+					Method:  http.MethodGet,
+					Path:    "/iam/roles",
+					Handler: iam.ListIAMRolesHandler(serverCtx),
+				},
+				{
+					// 为用户绑定角色（幂等：已绑定则成功）；path 固定便于 Casbin obj 精确匹配
+					Method:  http.MethodPost,
+					Path:    "/iam/user-roles",
+					Handler: iam.AssignIAMUserRoleHandler(serverCtx),
+				},
+				{
+					// 移除用户的某个角色；使用 query：?user_code=&role_code=
+					Method:  http.MethodDelete,
+					Path:    "/iam/user-roles",
+					Handler: iam.RemoveIAMUserRoleHandler(serverCtx),
+				},
+				{
+					// 分页列出用户及其角色
+					Method:  http.MethodGet,
+					Path:    "/iam/users",
+					Handler: iam.ListIAMUsersHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
 	)
