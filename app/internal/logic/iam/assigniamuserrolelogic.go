@@ -5,6 +5,7 @@ package iam
 
 import (
 	"context"
+	"strings"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -28,7 +29,16 @@ func NewAssignIAMUserRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 }
 
 func (l *AssignIAMUserRoleLogic) AssignIAMUserRole(req *types.AssignIAMUserRoleReq) (resp *types.AssignIAMUserRoleReply, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	userCode := strings.TrimSpace(req.UserCode)
+	roleCode := strings.TrimSpace(req.RoleCode)
+	if userCode == "" || roleCode == "" {
+		return nil, errInvalid("user_code 与 role_code 均不能为空")
+	}
+	if err := l.svcCtx.Rbac.AssignUserRole(userCode, roleCode); err != nil {
+		return nil, errInvalid(err.Error())
+	}
+	if err := svc.SyncRolePoliciesToCasbin(l.svcCtx.Rbac, l.svcCtx.Casbin); err != nil {
+		return nil, errInvalid("同步 Casbin 策略失败")
+	}
+	return &types.AssignIAMUserRoleReply{}, nil
 }
