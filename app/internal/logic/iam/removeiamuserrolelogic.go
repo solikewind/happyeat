@@ -37,8 +37,8 @@ func (l *RemoveIAMUserRoleLogic) RemoveIAMUserRole(req *types.RemoveIAMUserRoleR
 	if err := l.svcCtx.Rbac.RemoveUserRole(userCode, roleCode); err != nil {
 		return nil, errInvalid(err.Error())
 	}
-	if err := svc.SyncRolePoliciesToCasbin(l.svcCtx.Rbac, l.svcCtx.Casbin); err != nil {
-		return nil, errInvalid("同步 Casbin 策略失败")
+	if err := svc.SyncUserRoleGroupingRemove(l.svcCtx.Casbin, userCode, roleCode); err != nil {
+		return nil, errInvalid("同步 Casbin 用户角色失败")
 	}
 	return &types.RemoveIAMUserRoleReply{}, nil
 }

@@ -274,6 +274,10 @@ service HappyEatService {
 	@handler ListRolePermission
 	get /rbac/role-permissions returns (ListRolePermissionReply)
 
+	@doc "获取单个角色的权限列表"
+	@handler GetRolePermission
+	get /rbac/role-permissions/:role (GetRolePermissionReq) returns (GetRolePermissionReply)
+
 	@doc "更新角色权限（全量覆盖）"
 	@handler UpdateRolePermissions
 	put /rbac/role-permissions/:role (UpdateRolePermissionsReq) returns (UpdateRolePermissionsReply)
@@ -297,13 +301,49 @@ service HappyEatService {
 	@handler ListIAMPermissions
 	get /iam/permissions (ListIAMPermissionsReq) returns (ListIAMPermissionsReply)
 
+	@doc "获取单个权限点"
+	@handler GetIAMPermission
+	get /iam/permissions/:id (GetIAMPermissionReq) returns (GetIAMPermissionReply)
+
 	@doc "分页列出角色（iam_roles）"
 	@handler ListIAMRoles
 	get /iam/roles (ListIAMRolesReq) returns (ListIAMRolesReply)
 
+	@doc "创建角色（无权限点，需再通过 RBAC 矩阵配置）"
+	@handler CreateIAMRole
+	post /iam/roles (CreateIAMRoleReq) returns (CreateIAMRoleReply)
+
+	@doc "获取单个角色"
+	@handler GetIAMRole
+	get /iam/roles/:id (GetIAMRoleReq) returns (GetIAMRoleReply)
+
+	@doc "更新角色展示名（role_code 不可改）"
+	@handler UpdateIAMRole
+	put /iam/roles/:id (UpdateIAMRoleReq) returns (UpdateIAMRoleReply)
+
+	@doc "删除角色（软删；系统预置角色不可删；删除后全量同步 Casbin）"
+	@handler DeleteIAMRole
+	delete /iam/roles/:id (DeleteIAMRoleReq) returns (DeleteIAMRoleReply)
+
 	@doc "分页列出用户及其角色"
 	@handler ListIAMUsers
 	get /iam/users (ListIAMUsersReq) returns (ListIAMUsersReply)
+
+	@doc "创建用户（仅主体档案，分配角色用 user-roles 接口）"
+	@handler CreateIAMUser
+	post /iam/users (CreateIAMUserReq) returns (CreateIAMUserReply)
+
+	@doc "获取单个用户及角色列表"
+	@handler GetIAMUser
+	get /iam/users/:id (GetIAMUserReq) returns (GetIAMUserReply)
+
+	@doc "更新用户展示名"
+	@handler UpdateIAMUser
+	put /iam/users/:id (UpdateIAMUserReq) returns (UpdateIAMUserReply)
+
+	@doc "删除用户（软删，并清除 Casbin 中该用户全部分组）"
+	@handler DeleteIAMUser
+	delete /iam/users/:id (DeleteIAMUserReq) returns (DeleteIAMUserReply)
 
 	@doc "为用户绑定角色（幂等：已绑定则成功）；path 固定便于 Casbin obj 精确匹配"
 	@handler AssignIAMUserRole

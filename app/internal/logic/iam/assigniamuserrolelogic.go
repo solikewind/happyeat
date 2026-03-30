@@ -37,8 +37,8 @@ func (l *AssignIAMUserRoleLogic) AssignIAMUserRole(req *types.AssignIAMUserRoleR
 	if err := l.svcCtx.Rbac.AssignUserRole(userCode, roleCode); err != nil {
 		return nil, errInvalid(err.Error())
 	}
-	if err := svc.SyncRolePoliciesToCasbin(l.svcCtx.Rbac, l.svcCtx.Casbin); err != nil {
-		return nil, errInvalid("同步 Casbin 策略失败")
+	if err := svc.SyncUserRoleGroupingAdd(l.svcCtx.Casbin, userCode, roleCode); err != nil {
+		return nil, errInvalid("同步 Casbin 用户角色失败")
 	}
 	return &types.AssignIAMUserRoleReply{}, nil
 }
