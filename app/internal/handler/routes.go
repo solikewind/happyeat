@@ -47,10 +47,40 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: iam.ListIAMPermissionsHandler(serverCtx),
 				},
 				{
+					// 获取单个权限点
+					Method:  http.MethodGet,
+					Path:    "/iam/permissions/:id",
+					Handler: iam.GetIAMPermissionHandler(serverCtx),
+				},
+				{
 					// 分页列出角色（iam_roles）
 					Method:  http.MethodGet,
 					Path:    "/iam/roles",
 					Handler: iam.ListIAMRolesHandler(serverCtx),
+				},
+				{
+					// 创建角色（无权限点，需再通过 RBAC 矩阵配置）
+					Method:  http.MethodPost,
+					Path:    "/iam/roles",
+					Handler: iam.CreateIAMRoleHandler(serverCtx),
+				},
+				{
+					// 获取单个角色
+					Method:  http.MethodGet,
+					Path:    "/iam/roles/:id",
+					Handler: iam.GetIAMRoleHandler(serverCtx),
+				},
+				{
+					// 更新角色展示名（role_code 不可改）
+					Method:  http.MethodPut,
+					Path:    "/iam/roles/:id",
+					Handler: iam.UpdateIAMRoleHandler(serverCtx),
+				},
+				{
+					// 删除角色（软删；系统预置角色不可删；删除后全量同步 Casbin）
+					Method:  http.MethodDelete,
+					Path:    "/iam/roles/:id",
+					Handler: iam.DeleteIAMRoleHandler(serverCtx),
 				},
 				{
 					// 为用户绑定角色（幂等：已绑定则成功）；path 固定便于 Casbin obj 精确匹配
@@ -69,6 +99,30 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/iam/users",
 					Handler: iam.ListIAMUsersHandler(serverCtx),
+				},
+				{
+					// 创建用户（仅主体档案，分配角色用 user-roles 接口）
+					Method:  http.MethodPost,
+					Path:    "/iam/users",
+					Handler: iam.CreateIAMUserHandler(serverCtx),
+				},
+				{
+					// 获取单个用户及角色列表
+					Method:  http.MethodGet,
+					Path:    "/iam/users/:id",
+					Handler: iam.GetIAMUserHandler(serverCtx),
+				},
+				{
+					// 更新用户展示名
+					Method:  http.MethodPut,
+					Path:    "/iam/users/:id",
+					Handler: iam.UpdateIAMUserHandler(serverCtx),
+				},
+				{
+					// 删除用户（软删，并清除 Casbin 中该用户全部分组）
+					Method:  http.MethodDelete,
+					Path:    "/iam/users/:id",
+					Handler: iam.DeleteIAMUserHandler(serverCtx),
 				},
 			}...,
 		),
@@ -203,6 +257,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/rbac/role-permissions",
 					Handler: rbac.ListRolePermissionHandler(serverCtx),
+				},
+				{
+					// 获取单个角色的权限列表
+					Method:  http.MethodGet,
+					Path:    "/rbac/role-permissions/:role",
+					Handler: rbac.GetRolePermissionHandler(serverCtx),
 				},
 				{
 					// 更新角色权限（全量覆盖）
