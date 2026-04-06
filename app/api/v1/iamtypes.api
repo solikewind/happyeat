@@ -61,3 +61,81 @@ type RemoveIAMUserRoleReq {
 
 type RemoveIAMUserRoleReply {
 }
+
+// ---------- 权限点详情（只读，权限码集合以代码与库表为准）----------
+
+type GetIAMPermissionReq {
+	Id uint64 `path:"id"`
+}
+
+type GetIAMPermissionReply {
+	Permission PermissionItem `json:"permission"`
+}
+
+// ---------- 角色 CRUD ----------
+
+type CreateIAMRoleReq {
+	RoleCode string `json:"role_code"`
+	RoleName string `json:"role_name,optional"`
+}
+
+type CreateIAMRoleReply {
+	Id uint64 `json:"id"`
+}
+
+type GetIAMRoleReq {
+	Id uint64 `path:"id"`
+}
+
+type GetIAMRoleReply {
+	Role IAMRoleItem `json:"role"`
+}
+
+type UpdateIAMRoleReq {
+	Id       uint64 `path:"id"`
+	RoleName string `json:"role_name"`
+}
+
+type UpdateIAMRoleReply {
+}
+
+type DeleteIAMRoleReq {
+	Id uint64 `path:"id"`
+}
+
+type DeleteIAMRoleReply {
+}
+
+// ---------- 用户 CRUD（user_code 创建后不可改，与 JWT sub 对齐）----------
+
+type CreateIAMUserReq {
+	UserCode    string `json:"user_code"`
+	DisplayName string `json:"display_name,optional"`
+}
+
+type CreateIAMUserReply {
+	Id uint64 `json:"id"`
+}
+
+type GetIAMUserReq {
+	Id uint64 `path:"id"`
+}
+
+type GetIAMUserReply {
+	User IAMUserItem `json:"user"`
+}
+
+type UpdateIAMUserReq {
+	Id          uint64 `path:"id"`
+	DisplayName string `json:"display_name"`
+}
+
+type UpdateIAMUserReply {
+}
+
+type DeleteIAMUserReq {
+	Id uint64 `path:"id"`
+}
+
+type DeleteIAMUserReply {
+}

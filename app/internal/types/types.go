@@ -33,6 +33,24 @@ type CreateCategorySpecReq struct {
 	Sort       uint32 `json:"sort,optional"`
 }
 
+type CreateIAMRoleReply struct {
+	Id uint64 `json:"id"`
+}
+
+type CreateIAMRoleReq struct {
+	RoleCode string `json:"role_code"`
+	RoleName string `json:"role_name,optional"`
+}
+
+type CreateIAMUserReply struct {
+	Id uint64 `json:"id"`
+}
+
+type CreateIAMUserReq struct {
+	UserCode    string `json:"user_code"`
+	DisplayName string `json:"display_name,optional"`
+}
+
 type CreateMenuCategoryReply struct {
 }
 
@@ -115,6 +133,20 @@ type DeleteCategorySpecReq struct {
 	Id uint64 `path:"id"`
 }
 
+type DeleteIAMRoleReply struct {
+}
+
+type DeleteIAMRoleReq struct {
+	Id uint64 `path:"id"`
+}
+
+type DeleteIAMUserReply struct {
+}
+
+type DeleteIAMUserReq struct {
+	Id uint64 `path:"id"`
+}
+
 type DeleteMenuCategoryReply struct {
 }
 
@@ -165,6 +197,30 @@ type GetCategorySpecReq struct {
 	Id uint64 `path:"id"`
 }
 
+type GetIAMPermissionReply struct {
+	Permission PermissionItem `json:"permission"`
+}
+
+type GetIAMPermissionReq struct {
+	Id uint64 `path:"id"`
+}
+
+type GetIAMRoleReply struct {
+	Role IAMRoleItem `json:"role"`
+}
+
+type GetIAMRoleReq struct {
+	Id uint64 `path:"id"`
+}
+
+type GetIAMUserReply struct {
+	User IAMUserItem `json:"user"`
+}
+
+type GetIAMUserReq struct {
+	Id uint64 `path:"id"`
+}
+
 type GetMenuCategoryReply struct {
 	Category MenuCategory `json:"category"`
 }
@@ -187,6 +243,14 @@ type GetOrderReply struct {
 
 type GetOrderReq struct {
 	Id uint64 `path:"id"`
+}
+
+type GetRolePermissionReply struct {
+	RolePermission RolePermission `json:"role_permission"`
+}
+
+type GetRolePermissionReq struct {
+	Role string `path:"role"`
 }
 
 type GetSpecGroupReply struct {
@@ -222,11 +286,13 @@ type GetTableReq struct {
 }
 
 type IAMRoleItem struct {
+	Id       uint64 `json:"id"`
 	RoleCode string `json:"role_code"`
 	RoleName string `json:"role_name"`
 }
 
 type IAMUserItem struct {
+	Id          uint64   `json:"id"`
 	UserCode    string   `json:"user_code"`
 	DisplayName string   `json:"display_name"`
 	Roles       []string `json:"roles"`
@@ -433,6 +499,7 @@ type PageInfo struct {
 }
 
 type PermissionItem struct {
+	Id          uint64 `json:"id"`
 	Code        string `json:"code"`
 	Description string `json:"description"`
 }
@@ -507,6 +574,22 @@ type UpdateCategorySpecReq struct {
 	SpecValue  string `json:"spec_value"`
 	PriceDelta int64  `json:"price_delta,optional"`
 	Sort       uint32 `json:"sort,optional"`
+}
+
+type UpdateIAMRoleReply struct {
+}
+
+type UpdateIAMRoleReq struct {
+	Id       uint64 `path:"id"`
+	RoleName string `json:"role_name"`
+}
+
+type UpdateIAMUserReply struct {
+}
+
+type UpdateIAMUserReq struct {
+	Id          uint64 `path:"id"`
+	DisplayName string `json:"display_name"`
 }
 
 type UpdateMenuCategoryReply struct {

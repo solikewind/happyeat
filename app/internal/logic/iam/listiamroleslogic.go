@@ -28,7 +28,29 @@ func NewListIAMRolesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *List
 }
 
 func (l *ListIAMRolesLogic) ListIAMRoles(req *types.ListIAMRolesReq) (resp *types.ListIAMRolesReply, err error) {
-	// todo: add your logic here and delete this line
+	pageSize := int(req.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	current := int(req.Current)
+	if current <= 0 {
+		current = 1
+	}
+	offset := (current - 1) * pageSize
 
-	return
+	rows, total, err := l.svcCtx.Rbac.ListIAMRolesPage(l.ctx, offset, pageSize, req.Keyword)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]types.IAMRoleItem, 0, len(rows))
+	for _, row := range rows {
+		items = append(items, types.IAMRoleItem{
+			RoleCode: row.RoleCode,
+			RoleName: row.RoleName,
+		})
+	}
+	return &types.ListIAMRolesReply{
+		Roles: items,
+		Total: total,
+	}, nil
 }

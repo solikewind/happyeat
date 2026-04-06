@@ -8,18 +8,21 @@ type RolePermission {
 
 // 权限点目录项（与 iam_permissions 对齐）
 type PermissionItem {
+	Id          uint64 `json:"id"`
 	Code        string `json:"code"`
 	Description string `json:"description"`
 }
 
 // 角色目录项（与 iam_roles 对齐）
 type IAMRoleItem {
+	Id       uint64 `json:"id"`
 	RoleCode string `json:"role_code"`
 	RoleName string `json:"role_name"`
 }
 
 // 用户及其角色（与 iam_users + iam_user_roles 对齐）
 type IAMUserItem {
+	Id          uint64   `json:"id"`
 	UserCode    string   `json:"user_code"`
 	DisplayName string   `json:"display_name"`
 	Roles       []string `json:"roles"`
