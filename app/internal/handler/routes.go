@@ -199,6 +199,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.CasbinMiddleware},
 			[]rest.Route{
 				{
+					// 将 IAM 同步到 Casbin（刷新 casbin_rule，供管理端按钮触发）
+					Method:  http.MethodPost,
+					Path:    "/rbac/casbin/sync",
+					Handler: rbac.SyncCasbinPoliciesHandler(serverCtx),
+				},
+				{
 					// 获取角色权限矩阵
 					Method:  http.MethodGet,
 					Path:    "/rbac/role-permissions",

@@ -26,3 +26,9 @@ type ResetRolePermissionsReq {
 
 type ResetRolePermissionsReply {
 }
+
+type SyncCasbinPoliciesReq {
+}
+
+type SyncCasbinPoliciesReply {
+}

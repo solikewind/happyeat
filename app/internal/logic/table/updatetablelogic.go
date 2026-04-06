@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/solikewind/happyeat/app/internal/pkg/dberr"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/dal/model/ent"
@@ -40,6 +41,9 @@ func (l *UpdateTableLogic) UpdateTable(req *types.UpdateTableReq) (resp *types.U
 	if req.Capacity <= 0 {
 		return nil, errors.New("餐桌容量不能小于等于0")
 	}
+	if req.CategoryId == 0 {
+		return nil, errors.New("请选择餐桌分类")
+	}
 
 	_, err = l.svcCtx.TableType.GetByID(l.ctx, req.CategoryId)
 	if err != nil {
@@ -59,6 +63,9 @@ func (l *UpdateTableLogic) UpdateTable(req *types.UpdateTableReq) (resp *types.U
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errors.New("餐桌不存在")
+		}
+		if dberr.IsForeignKeyViolation(err) {
+			return nil, errors.New("餐桌分类不存在或已被删除，请刷新分类列表后重选")
 		}
 		return nil, err
 	}

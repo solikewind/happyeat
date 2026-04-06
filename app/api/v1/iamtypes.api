@@ -55,8 +55,8 @@ type AssignIAMUserRoleReply {
 }
 
 type RemoveIAMUserRoleReq {
-	UserCode string `form:"user_code"`
-	RoleCode string `form:"role_code"`
+	UserCode string `json:"user_code,optional" form:"user_code"`
+	RoleCode string `json:"role_code,optional" form:"role_code"`
 }
 
 type RemoveIAMUserRoleReply {

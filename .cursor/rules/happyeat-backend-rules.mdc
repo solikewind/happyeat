@@ -16,6 +16,7 @@ alwaysApply: true
 - 不手写绕过 goctl 的路由和 types 结构；以 `.api` 为单一事实来源。
 - 生成文件提示 `exists, ignored generation` 属正常；需要覆盖时按文件维度处理，不做破坏性重置。
 - OpenAPI 文档通过 `make swagger` 生成，主服务统一提供静态访问路径。
+- `make swagger` 末尾会执行 `node scripts/swagger-id-string.mjs`：把 OpenAPI 里实体 ID 类字段从 `integer` 改为 `string`，与 `.api` 中 `json:,string` 及前端/JavaScript 大整数语义一致（工具链用 Node，与 happyeat-web 同生态，无需 Python）。
 
 ## go-zero API 专项细则
 - `v1` API 通过 `import` 聚合 `app/api/base/*.api` 通用类型，避免在业务 API 重复定义。

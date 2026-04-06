@@ -24,8 +24,10 @@ run-l:
 	cd app && go run . -f etc/happyeatservice.local.yaml
 
 # 根据 central.api 生成 Swagger 接口文档（JSON 默认生成到项目根目录 happyeat.json；需 goctl >= 1.8.2）
+# 生成后用 Node 脚本把 ID 类字段改为 string，与运行时 json:,string 及前端一致（需本机 Node）
 swagger:
 	goctl api swagger --api app/api/v1/central.api --dir . --filename happyeat
+	node scripts/swagger-id-string.mjs
 
 # 启动静态服务供 Swagger 预览：执行后浏览器打开 https://editor.swagger.io 并填入 http://localhost:3780/happyeat.json
 swagger-serve:

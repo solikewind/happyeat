@@ -13,6 +13,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/config"
 	"github.com/solikewind/happyeat/app/internal/handler"
+	"github.com/solikewind/happyeat/app/internal/pkg/authresp"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/common/consts/code/errorx"
 
@@ -29,7 +30,9 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
-	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(
+	server := rest.MustNewServer(c.RestConf,
+		rest.WithUnauthorizedCallback(authresp.UnauthorizedCallback),
+		rest.WithCustomCors(
 		func(h http.Header) {
 			h.Set("Access-Control-Allow-Origin", "*")
 			h.Add("Access-Control-Allow-Headers", "Content-Type, Authorization")
@@ -39,7 +42,8 @@ func main() {
 		func(w http.ResponseWriter) {
 			w.WriteHeader(http.StatusForbidden)
 			w.Write([]byte(`{"error": "CORS 拒绝"}`))
-		}, "*"))
+		}, "*"),
+	)
 	defer server.Stop()
 
 	// 服务从 app 目录启动时，Swagger JSON 位于项目根目录。

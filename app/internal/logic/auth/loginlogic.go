@@ -39,6 +39,8 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
 		return nil, errors.New("用户名或密码错误")
 	}
 	const subject = "dev-admin"
+	// 与 seedDefaultMappings 中 dev-admin 绑定的一致；前端 AuthContext 解析 JWT 的 role 做菜单/路由权限
+	const primaryRole = "super_admin"
 	if err := l.svcCtx.Rbac.EnsureUser(subject); err != nil {
 		return nil, err
 	}
@@ -51,10 +53,13 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
 	iat := time.Now().Unix()
 	exp := iat + expire
 
+	// user_code：Casbin 主体；role：非标准 claim，供前端解析（go-zero 会写入 context，与 Casbin 的 g 策略无关）
 	claims := jwt.MapClaims{
-		"exp": exp,
-		"iat": iat,
-		"sub": subject,
+		"exp":        exp,
+		"iat":        iat,
+		"sub":        subject,
+		"user_code": subject,
+		"role":       primaryRole,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenStr, err := token.SignedString([]byte(secret))

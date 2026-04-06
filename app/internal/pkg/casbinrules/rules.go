@@ -56,6 +56,7 @@ var PermissionRules = map[string][]PolicyRule{
 		{Obj: "/central/v1/rbac/role-permissions", Act: "GET"},
 		{Obj: "/central/v1/rbac/role-permissions/:id", Act: "PUT"},
 		{Obj: "/central/v1/rbac/role-permissions/reset", Act: "POST"},
+		{Obj: "/central/v1/rbac/casbin/sync", Act: "POST"},
 		{Obj: "/central/v1/iam/permissions", Act: "GET"},
 		{Obj: "/central/v1/iam/roles", Act: "GET"},
 		{Obj: "/central/v1/iam/users", Act: "GET"},

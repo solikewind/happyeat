@@ -281,6 +281,10 @@ service HappyEatService {
 	@doc "重置角色权限（可单角色）"
 	@handler ResetRolePermissions
 	post /rbac/role-permissions/reset (ResetRolePermissionsReq) returns (ResetRolePermissionsReply)
+
+	@doc "将 IAM 同步到 Casbin（刷新 casbin_rule，供管理端按钮触发）"
+	@handler SyncCasbinPolicies
+	post /rbac/casbin/sync (SyncCasbinPoliciesReq) returns (SyncCasbinPoliciesReply)
 }
 
 // IAM：权限点/角色/用户目录与用户-角色维护（与 /rbac/* 矩阵配置互补）
