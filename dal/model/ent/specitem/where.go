@@ -85,6 +85,11 @@ func DefaultPrice(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldEQ(FieldDefaultPrice, v))
 }
 
+// Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
+func Sort(v uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldEQ(FieldSort, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldEQ(FieldCreatedAt, v))
@@ -330,6 +335,46 @@ func DefaultPriceLTE(v int64) predicate.SpecItem {
 	return predicate.SpecItem(sql.FieldLTE(FieldDefaultPrice, v))
 }
 
+// SortEQ applies the EQ predicate on the "sort" field.
+func SortEQ(v uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldEQ(FieldSort, v))
+}
+
+// SortNEQ applies the NEQ predicate on the "sort" field.
+func SortNEQ(v uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldNEQ(FieldSort, v))
+}
+
+// SortIn applies the In predicate on the "sort" field.
+func SortIn(vs ...uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldIn(FieldSort, vs...))
+}
+
+// SortNotIn applies the NotIn predicate on the "sort" field.
+func SortNotIn(vs ...uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldNotIn(FieldSort, vs...))
+}
+
+// SortGT applies the GT predicate on the "sort" field.
+func SortGT(v uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldGT(FieldSort, v))
+}
+
+// SortGTE applies the GTE predicate on the "sort" field.
+func SortGTE(v uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldGTE(FieldSort, v))
+}
+
+// SortLT applies the LT predicate on the "sort" field.
+func SortLT(v uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldLT(FieldSort, v))
+}
+
+// SortLTE applies the LTE predicate on the "sort" field.
+func SortLTE(v uint32) predicate.SpecItem {
+	return predicate.SpecItem(sql.FieldLTE(FieldSort, v))
+}
+
 // HasSpecGroup applies the HasEdge predicate on the "spec_group" edge.
 func HasSpecGroup() predicate.SpecItem {
 	return predicate.SpecItem(func(s *sql.Selector) {
@@ -345,6 +390,29 @@ func HasSpecGroup() predicate.SpecItem {
 func HasSpecGroupWith(preds ...predicate.SpecGroup) predicate.SpecItem {
 	return predicate.SpecItem(func(s *sql.Selector) {
 		step := newSpecGroupStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCategorySpecs applies the HasEdge predicate on the "category_specs" edge.
+func HasCategorySpecs() predicate.SpecItem {
+	return predicate.SpecItem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CategorySpecsTable, CategorySpecsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCategorySpecsWith applies the HasEdge predicate on the "category_specs" edge with a given conditions (other predicates).
+func HasCategorySpecsWith(preds ...predicate.CategorySpec) predicate.SpecItem {
+	return predicate.SpecItem(func(s *sql.Selector) {
+		step := newCategorySpecsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

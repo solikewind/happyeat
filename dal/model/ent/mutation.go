@@ -71,6 +71,8 @@ type CategorySpecMutation struct {
 	clearedFields     map[string]struct{}
 	category          *uint64
 	clearedcategory   bool
+	spec_item         *uint64
+	clearedspec_item  bool
 	menu_specs        map[uint64]struct{}
 	removedmenu_specs map[uint64]struct{}
 	clearedmenu_specs bool
@@ -347,6 +349,55 @@ func (m *CategorySpecMutation) ResetMenuCategoryID() {
 	m.category = nil
 }
 
+// SetSpecItemID sets the "spec_item_id" field.
+func (m *CategorySpecMutation) SetSpecItemID(u uint64) {
+	m.spec_item = &u
+}
+
+// SpecItemID returns the value of the "spec_item_id" field in the mutation.
+func (m *CategorySpecMutation) SpecItemID() (r uint64, exists bool) {
+	v := m.spec_item
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpecItemID returns the old "spec_item_id" field's value of the CategorySpec entity.
+// If the CategorySpec object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CategorySpecMutation) OldSpecItemID(ctx context.Context) (v *uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpecItemID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpecItemID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpecItemID: %w", err)
+	}
+	return oldValue.SpecItemID, nil
+}
+
+// ClearSpecItemID clears the value of the "spec_item_id" field.
+func (m *CategorySpecMutation) ClearSpecItemID() {
+	m.spec_item = nil
+	m.clearedFields[categoryspec.FieldSpecItemID] = struct{}{}
+}
+
+// SpecItemIDCleared returns if the "spec_item_id" field was cleared in this mutation.
+func (m *CategorySpecMutation) SpecItemIDCleared() bool {
+	_, ok := m.clearedFields[categoryspec.FieldSpecItemID]
+	return ok
+}
+
+// ResetSpecItemID resets all changes to the "spec_item_id" field.
+func (m *CategorySpecMutation) ResetSpecItemID() {
+	m.spec_item = nil
+	delete(m.clearedFields, categoryspec.FieldSpecItemID)
+}
+
 // SetSpecType sets the "spec_type" field.
 func (m *CategorySpecMutation) SetSpecType(s string) {
 	m.spec_type = &s
@@ -571,6 +622,33 @@ func (m *CategorySpecMutation) ResetCategory() {
 	m.clearedcategory = false
 }
 
+// ClearSpecItem clears the "spec_item" edge to the SpecItem entity.
+func (m *CategorySpecMutation) ClearSpecItem() {
+	m.clearedspec_item = true
+	m.clearedFields[categoryspec.FieldSpecItemID] = struct{}{}
+}
+
+// SpecItemCleared reports if the "spec_item" edge to the SpecItem entity was cleared.
+func (m *CategorySpecMutation) SpecItemCleared() bool {
+	return m.SpecItemIDCleared() || m.clearedspec_item
+}
+
+// SpecItemIDs returns the "spec_item" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SpecItemID instead. It exists only for internal usage by the builders.
+func (m *CategorySpecMutation) SpecItemIDs() (ids []uint64) {
+	if id := m.spec_item; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSpecItem resets all changes to the "spec_item" edge.
+func (m *CategorySpecMutation) ResetSpecItem() {
+	m.spec_item = nil
+	m.clearedspec_item = false
+}
+
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by ids.
 func (m *CategorySpecMutation) AddMenuSpecIDs(ids ...uint64) {
 	if m.menu_specs == nil {
@@ -659,7 +737,7 @@ func (m *CategorySpecMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CategorySpecMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, categoryspec.FieldCreatedAt)
 	}
@@ -671,6 +749,9 @@ func (m *CategorySpecMutation) Fields() []string {
 	}
 	if m.category != nil {
 		fields = append(fields, categoryspec.FieldMenuCategoryID)
+	}
+	if m.spec_item != nil {
+		fields = append(fields, categoryspec.FieldSpecItemID)
 	}
 	if m.spec_type != nil {
 		fields = append(fields, categoryspec.FieldSpecType)
@@ -700,6 +781,8 @@ func (m *CategorySpecMutation) Field(name string) (ent.Value, bool) {
 		return m.DeleteTs()
 	case categoryspec.FieldMenuCategoryID:
 		return m.MenuCategoryID()
+	case categoryspec.FieldSpecItemID:
+		return m.SpecItemID()
 	case categoryspec.FieldSpecType:
 		return m.SpecType()
 	case categoryspec.FieldSpecValue:
@@ -725,6 +808,8 @@ func (m *CategorySpecMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldDeleteTs(ctx)
 	case categoryspec.FieldMenuCategoryID:
 		return m.OldMenuCategoryID(ctx)
+	case categoryspec.FieldSpecItemID:
+		return m.OldSpecItemID(ctx)
 	case categoryspec.FieldSpecType:
 		return m.OldSpecType(ctx)
 	case categoryspec.FieldSpecValue:
@@ -769,6 +854,13 @@ func (m *CategorySpecMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMenuCategoryID(v)
+		return nil
+	case categoryspec.FieldSpecItemID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpecItemID(v)
 		return nil
 	case categoryspec.FieldSpecType:
 		v, ok := value.(string)
@@ -866,7 +958,11 @@ func (m *CategorySpecMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CategorySpecMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(categoryspec.FieldSpecItemID) {
+		fields = append(fields, categoryspec.FieldSpecItemID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -879,6 +975,11 @@ func (m *CategorySpecMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CategorySpecMutation) ClearField(name string) error {
+	switch name {
+	case categoryspec.FieldSpecItemID:
+		m.ClearSpecItemID()
+		return nil
+	}
 	return fmt.Errorf("unknown CategorySpec nullable field %s", name)
 }
 
@@ -898,6 +999,9 @@ func (m *CategorySpecMutation) ResetField(name string) error {
 	case categoryspec.FieldMenuCategoryID:
 		m.ResetMenuCategoryID()
 		return nil
+	case categoryspec.FieldSpecItemID:
+		m.ResetSpecItemID()
+		return nil
 	case categoryspec.FieldSpecType:
 		m.ResetSpecType()
 		return nil
@@ -916,9 +1020,12 @@ func (m *CategorySpecMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CategorySpecMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.category != nil {
 		edges = append(edges, categoryspec.EdgeCategory)
+	}
+	if m.spec_item != nil {
+		edges = append(edges, categoryspec.EdgeSpecItem)
 	}
 	if m.menu_specs != nil {
 		edges = append(edges, categoryspec.EdgeMenuSpecs)
@@ -934,6 +1041,10 @@ func (m *CategorySpecMutation) AddedIDs(name string) []ent.Value {
 		if id := m.category; id != nil {
 			return []ent.Value{*id}
 		}
+	case categoryspec.EdgeSpecItem:
+		if id := m.spec_item; id != nil {
+			return []ent.Value{*id}
+		}
 	case categoryspec.EdgeMenuSpecs:
 		ids := make([]ent.Value, 0, len(m.menu_specs))
 		for id := range m.menu_specs {
@@ -946,7 +1057,7 @@ func (m *CategorySpecMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CategorySpecMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedmenu_specs != nil {
 		edges = append(edges, categoryspec.EdgeMenuSpecs)
 	}
@@ -969,9 +1080,12 @@ func (m *CategorySpecMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CategorySpecMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedcategory {
 		edges = append(edges, categoryspec.EdgeCategory)
+	}
+	if m.clearedspec_item {
+		edges = append(edges, categoryspec.EdgeSpecItem)
 	}
 	if m.clearedmenu_specs {
 		edges = append(edges, categoryspec.EdgeMenuSpecs)
@@ -985,6 +1099,8 @@ func (m *CategorySpecMutation) EdgeCleared(name string) bool {
 	switch name {
 	case categoryspec.EdgeCategory:
 		return m.clearedcategory
+	case categoryspec.EdgeSpecItem:
+		return m.clearedspec_item
 	case categoryspec.EdgeMenuSpecs:
 		return m.clearedmenu_specs
 	}
@@ -998,6 +1114,9 @@ func (m *CategorySpecMutation) ClearEdge(name string) error {
 	case categoryspec.EdgeCategory:
 		m.ClearCategory()
 		return nil
+	case categoryspec.EdgeSpecItem:
+		m.ClearSpecItem()
+		return nil
 	}
 	return fmt.Errorf("unknown CategorySpec unique edge %s", name)
 }
@@ -1008,6 +1127,9 @@ func (m *CategorySpecMutation) ResetEdge(name string) error {
 	switch name {
 	case categoryspec.EdgeCategory:
 		m.ResetCategory()
+		return nil
+	case categoryspec.EdgeSpecItem:
+		m.ResetSpecItem()
 		return nil
 	case categoryspec.EdgeMenuSpecs:
 		m.ResetMenuSpecs()
@@ -4197,6 +4319,8 @@ type MenuCategoryMutation struct {
 	adddelete_ts          *int64
 	name                  *string
 	description           *string
+	sort                  *uint32
+	addsort               *int32
 	clearedFields         map[string]struct{}
 	menus                 map[uint64]struct{}
 	removedmenus          map[uint64]struct{}
@@ -4526,6 +4650,62 @@ func (m *MenuCategoryMutation) ResetDescription() {
 	delete(m.clearedFields, menucategory.FieldDescription)
 }
 
+// SetSort sets the "sort" field.
+func (m *MenuCategoryMutation) SetSort(u uint32) {
+	m.sort = &u
+	m.addsort = nil
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *MenuCategoryMutation) Sort() (r uint32, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the MenuCategory entity.
+// If the MenuCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuCategoryMutation) OldSort(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// AddSort adds u to the "sort" field.
+func (m *MenuCategoryMutation) AddSort(u int32) {
+	if m.addsort != nil {
+		*m.addsort += u
+	} else {
+		m.addsort = &u
+	}
+}
+
+// AddedSort returns the value that was added to the "sort" field in this mutation.
+func (m *MenuCategoryMutation) AddedSort() (r int32, exists bool) {
+	v := m.addsort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *MenuCategoryMutation) ResetSort() {
+	m.sort = nil
+	m.addsort = nil
+}
+
 // AddMenuIDs adds the "menus" edge to the Menu entity by ids.
 func (m *MenuCategoryMutation) AddMenuIDs(ids ...uint64) {
 	if m.menus == nil {
@@ -4668,7 +4848,7 @@ func (m *MenuCategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuCategoryMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, menucategory.FieldCreatedAt)
 	}
@@ -4683,6 +4863,9 @@ func (m *MenuCategoryMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, menucategory.FieldDescription)
+	}
+	if m.sort != nil {
+		fields = append(fields, menucategory.FieldSort)
 	}
 	return fields
 }
@@ -4702,6 +4885,8 @@ func (m *MenuCategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case menucategory.FieldDescription:
 		return m.Description()
+	case menucategory.FieldSort:
+		return m.Sort()
 	}
 	return nil, false
 }
@@ -4721,6 +4906,8 @@ func (m *MenuCategoryMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldName(ctx)
 	case menucategory.FieldDescription:
 		return m.OldDescription(ctx)
+	case menucategory.FieldSort:
+		return m.OldSort(ctx)
 	}
 	return nil, fmt.Errorf("unknown MenuCategory field %s", name)
 }
@@ -4765,6 +4952,13 @@ func (m *MenuCategoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case menucategory.FieldSort:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
+		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory field %s", name)
 }
@@ -4776,6 +4970,9 @@ func (m *MenuCategoryMutation) AddedFields() []string {
 	if m.adddelete_ts != nil {
 		fields = append(fields, menucategory.FieldDeleteTs)
 	}
+	if m.addsort != nil {
+		fields = append(fields, menucategory.FieldSort)
+	}
 	return fields
 }
 
@@ -4786,6 +4983,8 @@ func (m *MenuCategoryMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case menucategory.FieldDeleteTs:
 		return m.AddedDeleteTs()
+	case menucategory.FieldSort:
+		return m.AddedSort()
 	}
 	return nil, false
 }
@@ -4801,6 +5000,13 @@ func (m *MenuCategoryMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDeleteTs(v)
+		return nil
+	case menucategory.FieldSort:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSort(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory numeric field %s", name)
@@ -4852,6 +5058,9 @@ func (m *MenuCategoryMutation) ResetField(name string) error {
 		return nil
 	case menucategory.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case menucategory.FieldSort:
+		m.ResetSort()
 		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory field %s", name)
@@ -8873,25 +9082,30 @@ func (m *SpecGroupMutation) ResetEdge(name string) error {
 // SpecItemMutation represents an operation that mutates the SpecItem nodes in the graph.
 type SpecItemMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *uint64
-	created_at        *time.Time
-	updated_at        *time.Time
-	delete_ts         *int64
-	adddelete_ts      *int64
-	name              *string
-	default_price     *int64
-	adddefault_price  *int64
-	clearedFields     map[string]struct{}
-	spec_group        *uint64
-	clearedspec_group bool
-	menu_specs        map[uint64]struct{}
-	removedmenu_specs map[uint64]struct{}
-	clearedmenu_specs bool
-	done              bool
-	oldValue          func(context.Context) (*SpecItem, error)
-	predicates        []predicate.SpecItem
+	op                    Op
+	typ                   string
+	id                    *uint64
+	created_at            *time.Time
+	updated_at            *time.Time
+	delete_ts             *int64
+	adddelete_ts          *int64
+	name                  *string
+	default_price         *int64
+	adddefault_price      *int64
+	sort                  *uint32
+	addsort               *int32
+	clearedFields         map[string]struct{}
+	spec_group            *uint64
+	clearedspec_group     bool
+	category_specs        map[uint64]struct{}
+	removedcategory_specs map[uint64]struct{}
+	clearedcategory_specs bool
+	menu_specs            map[uint64]struct{}
+	removedmenu_specs     map[uint64]struct{}
+	clearedmenu_specs     bool
+	done                  bool
+	oldValue              func(context.Context) (*SpecItem, error)
+	predicates            []predicate.SpecItem
 }
 
 var _ ent.Mutation = (*SpecItemMutation)(nil)
@@ -9254,6 +9468,62 @@ func (m *SpecItemMutation) ResetDefaultPrice() {
 	m.adddefault_price = nil
 }
 
+// SetSort sets the "sort" field.
+func (m *SpecItemMutation) SetSort(u uint32) {
+	m.sort = &u
+	m.addsort = nil
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *SpecItemMutation) Sort() (r uint32, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the SpecItem entity.
+// If the SpecItem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SpecItemMutation) OldSort(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// AddSort adds u to the "sort" field.
+func (m *SpecItemMutation) AddSort(u int32) {
+	if m.addsort != nil {
+		*m.addsort += u
+	} else {
+		m.addsort = &u
+	}
+}
+
+// AddedSort returns the value that was added to the "sort" field in this mutation.
+func (m *SpecItemMutation) AddedSort() (r int32, exists bool) {
+	v := m.addsort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *SpecItemMutation) ResetSort() {
+	m.sort = nil
+	m.addsort = nil
+}
+
 // ClearSpecGroup clears the "spec_group" edge to the SpecGroup entity.
 func (m *SpecItemMutation) ClearSpecGroup() {
 	m.clearedspec_group = true
@@ -9279,6 +9549,60 @@ func (m *SpecItemMutation) SpecGroupIDs() (ids []uint64) {
 func (m *SpecItemMutation) ResetSpecGroup() {
 	m.spec_group = nil
 	m.clearedspec_group = false
+}
+
+// AddCategorySpecIDs adds the "category_specs" edge to the CategorySpec entity by ids.
+func (m *SpecItemMutation) AddCategorySpecIDs(ids ...uint64) {
+	if m.category_specs == nil {
+		m.category_specs = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.category_specs[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCategorySpecs clears the "category_specs" edge to the CategorySpec entity.
+func (m *SpecItemMutation) ClearCategorySpecs() {
+	m.clearedcategory_specs = true
+}
+
+// CategorySpecsCleared reports if the "category_specs" edge to the CategorySpec entity was cleared.
+func (m *SpecItemMutation) CategorySpecsCleared() bool {
+	return m.clearedcategory_specs
+}
+
+// RemoveCategorySpecIDs removes the "category_specs" edge to the CategorySpec entity by IDs.
+func (m *SpecItemMutation) RemoveCategorySpecIDs(ids ...uint64) {
+	if m.removedcategory_specs == nil {
+		m.removedcategory_specs = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.category_specs, ids[i])
+		m.removedcategory_specs[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCategorySpecs returns the removed IDs of the "category_specs" edge to the CategorySpec entity.
+func (m *SpecItemMutation) RemovedCategorySpecsIDs() (ids []uint64) {
+	for id := range m.removedcategory_specs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CategorySpecsIDs returns the "category_specs" edge IDs in the mutation.
+func (m *SpecItemMutation) CategorySpecsIDs() (ids []uint64) {
+	for id := range m.category_specs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCategorySpecs resets all changes to the "category_specs" edge.
+func (m *SpecItemMutation) ResetCategorySpecs() {
+	m.category_specs = nil
+	m.clearedcategory_specs = false
+	m.removedcategory_specs = nil
 }
 
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by ids.
@@ -9369,7 +9693,7 @@ func (m *SpecItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SpecItemMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, specitem.FieldCreatedAt)
 	}
@@ -9387,6 +9711,9 @@ func (m *SpecItemMutation) Fields() []string {
 	}
 	if m.default_price != nil {
 		fields = append(fields, specitem.FieldDefaultPrice)
+	}
+	if m.sort != nil {
+		fields = append(fields, specitem.FieldSort)
 	}
 	return fields
 }
@@ -9408,6 +9735,8 @@ func (m *SpecItemMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case specitem.FieldDefaultPrice:
 		return m.DefaultPrice()
+	case specitem.FieldSort:
+		return m.Sort()
 	}
 	return nil, false
 }
@@ -9429,6 +9758,8 @@ func (m *SpecItemMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldName(ctx)
 	case specitem.FieldDefaultPrice:
 		return m.OldDefaultPrice(ctx)
+	case specitem.FieldSort:
+		return m.OldSort(ctx)
 	}
 	return nil, fmt.Errorf("unknown SpecItem field %s", name)
 }
@@ -9480,6 +9811,13 @@ func (m *SpecItemMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDefaultPrice(v)
 		return nil
+	case specitem.FieldSort:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
+		return nil
 	}
 	return fmt.Errorf("unknown SpecItem field %s", name)
 }
@@ -9494,6 +9832,9 @@ func (m *SpecItemMutation) AddedFields() []string {
 	if m.adddefault_price != nil {
 		fields = append(fields, specitem.FieldDefaultPrice)
 	}
+	if m.addsort != nil {
+		fields = append(fields, specitem.FieldSort)
+	}
 	return fields
 }
 
@@ -9506,6 +9847,8 @@ func (m *SpecItemMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedDeleteTs()
 	case specitem.FieldDefaultPrice:
 		return m.AddedDefaultPrice()
+	case specitem.FieldSort:
+		return m.AddedSort()
 	}
 	return nil, false
 }
@@ -9528,6 +9871,13 @@ func (m *SpecItemMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDefaultPrice(v)
+		return nil
+	case specitem.FieldSort:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSort(v)
 		return nil
 	}
 	return fmt.Errorf("unknown SpecItem numeric field %s", name)
@@ -9574,15 +9924,21 @@ func (m *SpecItemMutation) ResetField(name string) error {
 	case specitem.FieldDefaultPrice:
 		m.ResetDefaultPrice()
 		return nil
+	case specitem.FieldSort:
+		m.ResetSort()
+		return nil
 	}
 	return fmt.Errorf("unknown SpecItem field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *SpecItemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.spec_group != nil {
 		edges = append(edges, specitem.EdgeSpecGroup)
+	}
+	if m.category_specs != nil {
+		edges = append(edges, specitem.EdgeCategorySpecs)
 	}
 	if m.menu_specs != nil {
 		edges = append(edges, specitem.EdgeMenuSpecs)
@@ -9598,6 +9954,12 @@ func (m *SpecItemMutation) AddedIDs(name string) []ent.Value {
 		if id := m.spec_group; id != nil {
 			return []ent.Value{*id}
 		}
+	case specitem.EdgeCategorySpecs:
+		ids := make([]ent.Value, 0, len(m.category_specs))
+		for id := range m.category_specs {
+			ids = append(ids, id)
+		}
+		return ids
 	case specitem.EdgeMenuSpecs:
 		ids := make([]ent.Value, 0, len(m.menu_specs))
 		for id := range m.menu_specs {
@@ -9610,7 +9972,10 @@ func (m *SpecItemMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SpecItemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedcategory_specs != nil {
+		edges = append(edges, specitem.EdgeCategorySpecs)
+	}
 	if m.removedmenu_specs != nil {
 		edges = append(edges, specitem.EdgeMenuSpecs)
 	}
@@ -9621,6 +9986,12 @@ func (m *SpecItemMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *SpecItemMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case specitem.EdgeCategorySpecs:
+		ids := make([]ent.Value, 0, len(m.removedcategory_specs))
+		for id := range m.removedcategory_specs {
+			ids = append(ids, id)
+		}
+		return ids
 	case specitem.EdgeMenuSpecs:
 		ids := make([]ent.Value, 0, len(m.removedmenu_specs))
 		for id := range m.removedmenu_specs {
@@ -9633,9 +10004,12 @@ func (m *SpecItemMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *SpecItemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedspec_group {
 		edges = append(edges, specitem.EdgeSpecGroup)
+	}
+	if m.clearedcategory_specs {
+		edges = append(edges, specitem.EdgeCategorySpecs)
 	}
 	if m.clearedmenu_specs {
 		edges = append(edges, specitem.EdgeMenuSpecs)
@@ -9649,6 +10023,8 @@ func (m *SpecItemMutation) EdgeCleared(name string) bool {
 	switch name {
 	case specitem.EdgeSpecGroup:
 		return m.clearedspec_group
+	case specitem.EdgeCategorySpecs:
+		return m.clearedcategory_specs
 	case specitem.EdgeMenuSpecs:
 		return m.clearedmenu_specs
 	}
@@ -9672,6 +10048,9 @@ func (m *SpecItemMutation) ResetEdge(name string) error {
 	switch name {
 	case specitem.EdgeSpecGroup:
 		m.ResetSpecGroup()
+		return nil
+	case specitem.EdgeCategorySpecs:
+		m.ResetCategorySpecs()
 		return nil
 	case specitem.EdgeMenuSpecs:
 		m.ResetMenuSpecs()

@@ -23,6 +23,8 @@ const (
 	FieldDeleteTs = "delete_ts"
 	// FieldMenuCategoryID holds the string denoting the menu_category_id field in the database.
 	FieldMenuCategoryID = "menu_category_id"
+	// FieldSpecItemID holds the string denoting the spec_item_id field in the database.
+	FieldSpecItemID = "spec_item_id"
 	// FieldSpecType holds the string denoting the spec_type field in the database.
 	FieldSpecType = "spec_type"
 	// FieldSpecValue holds the string denoting the spec_value field in the database.
@@ -33,6 +35,8 @@ const (
 	FieldSort = "sort"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
+	// EdgeSpecItem holds the string denoting the spec_item edge name in mutations.
+	EdgeSpecItem = "spec_item"
 	// EdgeMenuSpecs holds the string denoting the menu_specs edge name in mutations.
 	EdgeMenuSpecs = "menu_specs"
 	// Table holds the table name of the categoryspec in the database.
@@ -44,6 +48,13 @@ const (
 	CategoryInverseTable = "menu_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "menu_category_id"
+	// SpecItemTable is the table that holds the spec_item relation/edge.
+	SpecItemTable = "category_specs"
+	// SpecItemInverseTable is the table name for the SpecItem entity.
+	// It exists in this package in order to avoid circular dependency with the "specitem" package.
+	SpecItemInverseTable = "spec_items"
+	// SpecItemColumn is the table column denoting the spec_item relation/edge.
+	SpecItemColumn = "spec_item_id"
 	// MenuSpecsTable is the table that holds the menu_specs relation/edge.
 	MenuSpecsTable = "menu_specs"
 	// MenuSpecsInverseTable is the table name for the MenuSpec entity.
@@ -60,6 +71,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeleteTs,
 	FieldMenuCategoryID,
+	FieldSpecItemID,
 	FieldSpecType,
 	FieldSpecValue,
 	FieldPriceDelta,
@@ -130,6 +142,11 @@ func ByMenuCategoryID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMenuCategoryID, opts...).ToFunc()
 }
 
+// BySpecItemID orders the results by the spec_item_id field.
+func BySpecItemID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpecItemID, opts...).ToFunc()
+}
+
 // BySpecType orders the results by the spec_type field.
 func BySpecType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSpecType, opts...).ToFunc()
@@ -157,6 +174,13 @@ func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// BySpecItemField orders the results by spec_item field.
+func BySpecItemField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSpecItemStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByMenuSpecsCount orders the results by menu_specs count.
 func ByMenuSpecsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -175,6 +199,13 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+	)
+}
+func newSpecItemStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SpecItemInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SpecItemTable, SpecItemColumn),
 	)
 }
 func newMenuSpecsStep() *sqlgraph.Step {

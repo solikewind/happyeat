@@ -53,19 +53,19 @@ func init() {
 	// categoryspec.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	categoryspec.DefaultDeleteTs = categoryspecDescDeleteTs.Default.(int64)
 	// categoryspecDescSpecType is the schema descriptor for spec_type field.
-	categoryspecDescSpecType := categoryspecFields[1].Descriptor()
+	categoryspecDescSpecType := categoryspecFields[2].Descriptor()
 	// categoryspec.SpecTypeValidator is a validator for the "spec_type" field. It is called by the builders before save.
 	categoryspec.SpecTypeValidator = categoryspecDescSpecType.Validators[0].(func(string) error)
 	// categoryspecDescSpecValue is the schema descriptor for spec_value field.
-	categoryspecDescSpecValue := categoryspecFields[2].Descriptor()
+	categoryspecDescSpecValue := categoryspecFields[3].Descriptor()
 	// categoryspec.SpecValueValidator is a validator for the "spec_value" field. It is called by the builders before save.
 	categoryspec.SpecValueValidator = categoryspecDescSpecValue.Validators[0].(func(string) error)
 	// categoryspecDescPriceDelta is the schema descriptor for price_delta field.
-	categoryspecDescPriceDelta := categoryspecFields[3].Descriptor()
+	categoryspecDescPriceDelta := categoryspecFields[4].Descriptor()
 	// categoryspec.DefaultPriceDelta holds the default value on creation for the price_delta field.
 	categoryspec.DefaultPriceDelta = categoryspecDescPriceDelta.Default.(int64)
 	// categoryspecDescSort is the schema descriptor for sort field.
-	categoryspecDescSort := categoryspecFields[4].Descriptor()
+	categoryspecDescSort := categoryspecFields[5].Descriptor()
 	// categoryspec.DefaultSort holds the default value on creation for the sort field.
 	categoryspec.DefaultSort = categoryspecDescSort.Default.(uint32)
 	iampermissionMixin := schema.IAMPermission{}.Mixin()
@@ -239,6 +239,10 @@ func init() {
 	menucategoryDescName := menucategoryFields[0].Descriptor()
 	// menucategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	menucategory.NameValidator = menucategoryDescName.Validators[0].(func(string) error)
+	// menucategoryDescSort is the schema descriptor for sort field.
+	menucategoryDescSort := menucategoryFields[2].Descriptor()
+	// menucategory.DefaultSort holds the default value on creation for the sort field.
+	menucategory.DefaultSort = menucategoryDescSort.Default.(uint32)
 	menuspecMixin := schema.MenuSpec{}.Mixin()
 	menuspecMixinHooks0 := menuspecMixin[0].Hooks()
 	menuspecMixinHooks2 := menuspecMixin[2].Hooks()
@@ -422,6 +426,10 @@ func init() {
 	specitemDescName := specitemFields[1].Descriptor()
 	// specitem.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	specitem.NameValidator = specitemDescName.Validators[0].(func(string) error)
+	// specitemDescSort is the schema descriptor for sort field.
+	specitemDescSort := specitemFields[3].Descriptor()
+	// specitem.DefaultSort holds the default value on creation for the sort field.
+	specitem.DefaultSort = specitemDescSort.Default.(uint32)
 	tableMixin := schema.Table{}.Mixin()
 	tableMixinHooks0 := tableMixin[0].Hooks()
 	tableMixinHooks2 := tableMixin[2].Hooks()

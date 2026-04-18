@@ -36,6 +36,9 @@ func (SpecItem) Fields() []ent.Field {
 			Comment("规格项名"),
 		field.Int64("default_price").
 			Comment("默认价格"),
+		field.Uint32("sort").
+			Default(0).
+			Comment("排序权重，越小越靠前"),
 	}
 }
 
@@ -46,6 +49,7 @@ func (SpecItem) Edges() []ent.Edge {
 			Field("spec_group_id").
 			Unique().
 			Required(),
+		edge.To("category_specs", CategorySpec.Type),
 		edge.To("menu_specs", MenuSpec.Type),
 	}
 }

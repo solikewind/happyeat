@@ -429,6 +429,22 @@ func (c *CategorySpecClient) QueryCategory(_m *CategorySpec) *MenuCategoryQuery 
 	return query
 }
 
+// QuerySpecItem queries the spec_item edge of a CategorySpec.
+func (c *CategorySpecClient) QuerySpecItem(_m *CategorySpec) *SpecItemQuery {
+	query := (&SpecItemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(categoryspec.Table, categoryspec.FieldID, id),
+			sqlgraph.To(specitem.Table, specitem.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, categoryspec.SpecItemTable, categoryspec.SpecItemColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryMenuSpecs queries the menu_specs edge of a CategorySpec.
 func (c *CategorySpecClient) QueryMenuSpecs(_m *CategorySpec) *MenuSpecQuery {
 	query := (&MenuSpecClient{config: c.config}).Query()
@@ -2076,6 +2092,22 @@ func (c *SpecItemClient) QuerySpecGroup(_m *SpecItem) *SpecGroupQuery {
 			sqlgraph.From(specitem.Table, specitem.FieldID, id),
 			sqlgraph.To(specgroup.Table, specgroup.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, specitem.SpecGroupTable, specitem.SpecGroupColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCategorySpecs queries the category_specs edge of a SpecItem.
+func (c *SpecItemClient) QueryCategorySpecs(_m *SpecItem) *CategorySpecQuery {
+	query := (&CategorySpecClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(specitem.Table, specitem.FieldID, id),
+			sqlgraph.To(categoryspec.Table, categoryspec.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, specitem.CategorySpecsTable, specitem.CategorySpecsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil

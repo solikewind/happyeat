@@ -75,6 +75,11 @@ func MenuCategoryID(v uint64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldMenuCategoryID, v))
 }
 
+// SpecItemID applies equality check predicate on the "spec_item_id" field. It's identical to SpecItemIDEQ.
+func SpecItemID(v uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldEQ(FieldSpecItemID, v))
+}
+
 // SpecType applies equality check predicate on the "spec_type" field. It's identical to SpecTypeEQ.
 func SpecType(v string) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldEQ(FieldSpecType, v))
@@ -233,6 +238,36 @@ func MenuCategoryIDIn(vs ...uint64) predicate.CategorySpec {
 // MenuCategoryIDNotIn applies the NotIn predicate on the "menu_category_id" field.
 func MenuCategoryIDNotIn(vs ...uint64) predicate.CategorySpec {
 	return predicate.CategorySpec(sql.FieldNotIn(FieldMenuCategoryID, vs...))
+}
+
+// SpecItemIDEQ applies the EQ predicate on the "spec_item_id" field.
+func SpecItemIDEQ(v uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldEQ(FieldSpecItemID, v))
+}
+
+// SpecItemIDNEQ applies the NEQ predicate on the "spec_item_id" field.
+func SpecItemIDNEQ(v uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldNEQ(FieldSpecItemID, v))
+}
+
+// SpecItemIDIn applies the In predicate on the "spec_item_id" field.
+func SpecItemIDIn(vs ...uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldIn(FieldSpecItemID, vs...))
+}
+
+// SpecItemIDNotIn applies the NotIn predicate on the "spec_item_id" field.
+func SpecItemIDNotIn(vs ...uint64) predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldNotIn(FieldSpecItemID, vs...))
+}
+
+// SpecItemIDIsNil applies the IsNil predicate on the "spec_item_id" field.
+func SpecItemIDIsNil() predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldIsNull(FieldSpecItemID))
+}
+
+// SpecItemIDNotNil applies the NotNil predicate on the "spec_item_id" field.
+func SpecItemIDNotNil() predicate.CategorySpec {
+	return predicate.CategorySpec(sql.FieldNotNull(FieldSpecItemID))
 }
 
 // SpecTypeEQ applies the EQ predicate on the "spec_type" field.
@@ -460,6 +495,29 @@ func HasCategory() predicate.CategorySpec {
 func HasCategoryWith(preds ...predicate.MenuCategory) predicate.CategorySpec {
 	return predicate.CategorySpec(func(s *sql.Selector) {
 		step := newCategoryStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSpecItem applies the HasEdge predicate on the "spec_item" edge.
+func HasSpecItem() predicate.CategorySpec {
+	return predicate.CategorySpec(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SpecItemTable, SpecItemColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSpecItemWith applies the HasEdge predicate on the "spec_item" edge with a given conditions (other predicates).
+func HasSpecItemWith(preds ...predicate.SpecItem) predicate.CategorySpec {
+	return predicate.CategorySpec(func(s *sql.Selector) {
+		step := newSpecItemStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

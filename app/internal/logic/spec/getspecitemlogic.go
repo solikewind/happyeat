@@ -5,9 +5,11 @@ package spec
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +30,15 @@ func NewGetSpecItemLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetSp
 }
 
 func (l *GetSpecItemLogic) GetSpecItem(req *types.GetSpecItemReq) (resp *types.GetSpecItemReply, err error) {
-	// todo: add your logic here and delete this line
+	item, err := l.svcCtx.SpecItem.GetByID(l.ctx, req.Id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("规格项不存在")
+		}
+		return nil, err
+	}
 
-	return
+	return &types.GetSpecItemReply{
+		Item: toSpecItem(item),
+	}, nil
 }

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
+	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 )
 
 // 菜单分类的规格模板
@@ -27,6 +28,8 @@ type CategorySpec struct {
 	DeleteTs int64 `json:"delete_ts,omitempty"`
 	// 菜单分类ID
 	MenuCategoryID uint64 `json:"menu_category_id,omitempty"`
+	// 引用的全局规格项ID
+	SpecItemID *uint64 `json:"spec_item_id,omitempty"`
 	// 规格类型，如辣度、容量
 	SpecType string `json:"spec_type,omitempty"`
 	// 规格选项，如微辣、大杯
@@ -45,11 +48,13 @@ type CategorySpec struct {
 type CategorySpecEdges struct {
 	// Category holds the value of the category edge.
 	Category *MenuCategory `json:"category,omitempty"`
+	// SpecItem holds the value of the spec_item edge.
+	SpecItem *SpecItem `json:"spec_item,omitempty"`
 	// MenuSpecs holds the value of the menu_specs edge.
 	MenuSpecs []*MenuSpec `json:"menu_specs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -63,10 +68,21 @@ func (e CategorySpecEdges) CategoryOrErr() (*MenuCategory, error) {
 	return nil, &NotLoadedError{edge: "category"}
 }
 
+// SpecItemOrErr returns the SpecItem value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CategorySpecEdges) SpecItemOrErr() (*SpecItem, error) {
+	if e.SpecItem != nil {
+		return e.SpecItem, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: specitem.Label}
+	}
+	return nil, &NotLoadedError{edge: "spec_item"}
+}
+
 // MenuSpecsOrErr returns the MenuSpecs value or an error if the edge
 // was not loaded in eager-loading.
 func (e CategorySpecEdges) MenuSpecsOrErr() ([]*MenuSpec, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.MenuSpecs, nil
 	}
 	return nil, &NotLoadedError{edge: "menu_specs"}
@@ -77,7 +93,7 @@ func (*CategorySpec) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case categoryspec.FieldID, categoryspec.FieldDeleteTs, categoryspec.FieldMenuCategoryID, categoryspec.FieldPriceDelta, categoryspec.FieldSort:
+		case categoryspec.FieldID, categoryspec.FieldDeleteTs, categoryspec.FieldMenuCategoryID, categoryspec.FieldSpecItemID, categoryspec.FieldPriceDelta, categoryspec.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case categoryspec.FieldSpecType, categoryspec.FieldSpecValue:
 			values[i] = new(sql.NullString)
@@ -128,6 +144,13 @@ func (_m *CategorySpec) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.MenuCategoryID = uint64(value.Int64)
 			}
+		case categoryspec.FieldSpecItemID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spec_item_id", values[i])
+			} else if value.Valid {
+				_m.SpecItemID = new(uint64)
+				*_m.SpecItemID = uint64(value.Int64)
+			}
 		case categoryspec.FieldSpecType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field spec_type", values[i])
@@ -170,6 +193,11 @@ func (_m *CategorySpec) QueryCategory() *MenuCategoryQuery {
 	return NewCategorySpecClient(_m.config).QueryCategory(_m)
 }
 
+// QuerySpecItem queries the "spec_item" edge of the CategorySpec entity.
+func (_m *CategorySpec) QuerySpecItem() *SpecItemQuery {
+	return NewCategorySpecClient(_m.config).QuerySpecItem(_m)
+}
+
 // QueryMenuSpecs queries the "menu_specs" edge of the CategorySpec entity.
 func (_m *CategorySpec) QueryMenuSpecs() *MenuSpecQuery {
 	return NewCategorySpecClient(_m.config).QueryMenuSpecs(_m)
@@ -209,6 +237,11 @@ func (_m *CategorySpec) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("menu_category_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.MenuCategoryID))
+	builder.WriteString(", ")
+	if v := _m.SpecItemID; v != nil {
+		builder.WriteString("spec_item_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("spec_type=")
 	builder.WriteString(_m.SpecType)

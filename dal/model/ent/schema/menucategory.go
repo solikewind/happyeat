@@ -38,6 +38,9 @@ func (MenuCategory) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("描述"),
+		field.Uint32("sort").
+			Default(0).
+			Comment("排序，越小越靠前"),
 	}
 }
 

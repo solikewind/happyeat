@@ -46,22 +46,9 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 		return nil, err
 	}
 
-	exist, err := l.svcCtx.MenuType.Exist(l.ctx, req.CategoryId)
+	specs, err := resolveMenuSpecs(l.ctx, l.svcCtx, req.CategoryId, req.Specs)
 	if err != nil {
 		return nil, err
-	}
-	if !exist {
-		return nil, errors.New("分类不存在")
-	}
-
-	specs := make([]menu.SpecInput, 0, len(req.Specs))
-	for _, s := range req.Specs {
-		specs = append(specs, menu.SpecInput{
-			SpecItemID:     s.SpecItemId,
-			CategorySpecID: s.CategorySpecId,
-			PriceDelta:     s.PriceDelta,
-			Sort:           s.Sort,
-		})
 	}
 
 	_, err = l.svcCtx.Menu.Create(l.ctx, menu.CreateMenuInput{

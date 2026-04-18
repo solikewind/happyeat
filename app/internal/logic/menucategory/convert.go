@@ -10,6 +10,7 @@ func entMenuCategoryToType(e *ent.MenuCategory) types.MenuCategory {
 	out := types.MenuCategory{
 		Id:        uint64(e.ID),
 		Name:      e.Name,
+		Sort:      e.Sort,
 		CreatedAt: timeutil.TimeToString(e.CreatedAt),
 		UpdatedAt: timeutil.TimeToString(e.UpdatedAt),
 	}

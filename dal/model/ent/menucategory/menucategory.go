@@ -25,6 +25,8 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldSort holds the string denoting the sort field in the database.
+	FieldSort = "sort"
 	// EdgeMenus holds the string denoting the menus edge name in mutations.
 	EdgeMenus = "menus"
 	// EdgeCategorySpecs holds the string denoting the category_specs edge name in mutations.
@@ -55,6 +57,7 @@ var Columns = []string{
 	FieldDeleteTs,
 	FieldName,
 	FieldDescription,
+	FieldSort,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -85,6 +88,8 @@ var (
 	DefaultDeleteTs int64
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultSort holds the default value on creation for the "sort" field.
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the MenuCategory queries.
@@ -118,6 +123,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
 }
 
 // ByMenusCount orders the results by menus count.

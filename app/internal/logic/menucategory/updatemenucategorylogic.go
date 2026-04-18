@@ -44,7 +44,7 @@ func (l *UpdateMenuCategoryLogic) UpdateMenuCategory(req *types.UpdateMenuCatego
 	if name == "" {
 		return nil, errors.New("分类名称不能为空")
 	}
-	err = l.svcCtx.MenuType.Update(l.ctx, req.Id, name, req.Description)
+	err = l.svcCtx.MenuType.Update(l.ctx, req.Id, name, req.Description, req.Sort)
 	if err != nil {
 		return nil, err
 	}

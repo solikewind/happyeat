@@ -14,10 +14,11 @@ type AssignIAMUserRoleReq struct {
 type CategorySpec struct {
 	Id         uint64 `json:"id,string"`
 	CategoryId uint64 `json:"category_id,string"`
+	SpecItemId uint64 `json:"spec_item_id,optional,string"`
 	SpecType   string `json:"spec_type"`
 	SpecValue  string `json:"spec_value"`
 	PriceDelta int64  `json:"price_delta"`
-	Sort       uint32 `json:"sort"`
+	Sort       uint32 `json:"sort,optional"` // 排序（不传默认0）
 	CreatedAt  string `json:"created_at"`
 	UpdatedAt  string `json:"updated_at"`
 }
@@ -27,6 +28,7 @@ type CreateCategorySpecReply struct {
 
 type CreateCategorySpecReq struct {
 	CategoryId uint64 `json:"category_id,string"`
+	SpecItemId uint64 `json:"spec_item_id,optional,string"`
 	SpecType   string `json:"spec_type"`
 	SpecValue  string `json:"spec_value"`
 	PriceDelta int64  `json:"price_delta,optional"`
@@ -57,6 +59,7 @@ type CreateMenuCategoryReply struct {
 type CreateMenuCategoryReq struct {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
+	Sort        uint32 `json:"sort,optional"`
 }
 
 type CreateMenuReply struct {
@@ -451,14 +454,15 @@ type Menu struct {
 	Price       int64      `json:"price"`                // 菜单价格（分）
 	CategoryId  uint64     `json:"category_id,string"`   // 菜单分类id
 	Specs       []MenuSpec `json:"specs,optional"`       // 规格列表
-	CreatedAt   string     `json:"created_at"`           // 创建时间
-	UpdatedAt   string     `json:"updated_at"`           // 更新时间
+	CreatedAt   string     `json:"created_at"`           // 创建时间，RFC3339（UTC），列表与详情均返回
+	UpdatedAt   string     `json:"updated_at"`           // 更新时间，RFC3339（UTC），列表与详情均返回
 }
 
 type MenuCategory struct {
 	Id          uint64 `json:"id,string"`            // 分类id
 	Name        string `json:"name"`                 // 分类名称
 	Description string `json:"description,optional"` // 描述
+	Sort        uint32 `json:"sort,optional"`        // 排序，越小越靠前
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }
@@ -466,8 +470,11 @@ type MenuCategory struct {
 type MenuSpec struct {
 	SpecItemId     uint64 `json:"spec_item_id,optional,string"`     // 规格项id
 	CategorySpecId uint64 `json:"category_spec_id,optional,string"` // 分类规格项id
+	Source         string `json:"source,optional"`                  // category=分类规格 library=基础规格 custom=菜单自定义
+	SpecType       string `json:"spec_type,optional"`               // 规格类型，如辣度
+	SpecValue      string `json:"spec_value,optional"`              // 规格值，如微辣
 	PriceDelta     int64  `json:"price_delta"`                      // 加价
-	Sort           uint32 `json:"sort"`                             // 排序
+	Sort           uint32 `json:"sort,optional"`                    // 排序（不传默认0）
 }
 
 type Order struct {
@@ -527,7 +534,7 @@ type RolePermission struct {
 type SpecGroup struct {
 	Id        uint64 `json:"id,string"`
 	Name      string `json:"name"`
-	Sort      uint32 `json:"sort"`
+	Sort      uint32 `json:"sort,optional"` // 排序（不传默认0）
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
@@ -570,6 +577,7 @@ type UpdateCategorySpecReply struct {
 type UpdateCategorySpecReq struct {
 	Id         uint64 `path:"id"`
 	CategoryId uint64 `json:"category_id,string"`
+	SpecItemId uint64 `json:"spec_item_id,optional,string"`
 	SpecType   string `json:"spec_type"`
 	SpecValue  string `json:"spec_value"`
 	PriceDelta int64  `json:"price_delta,optional"`
@@ -596,9 +604,10 @@ type UpdateMenuCategoryReply struct {
 }
 
 type UpdateMenuCategoryReq struct {
-	Id          uint64 `path:"id"`
-	Name        string `json:"name,optional"`
-	Description string `json:"description,optional"`
+	Id          uint64  `path:"id"`
+	Name        string  `json:"name,optional"`
+	Description *string `json:"description,omitempty"`
+	Sort        uint32  `json:"sort,optional"`
 }
 
 type UpdateMenuReply struct {

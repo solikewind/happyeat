@@ -36,6 +36,7 @@ func (l *CreateMenuCategoryLogic) CreateMenuCategory(req *types.CreateMenuCatego
 	_, err = l.svcCtx.MenuType.Create(l.ctx, menu.CreateMenuCategoryInput{
 		Name:        req.Name,
 		Description: req.Description,
+		Sort:        req.Sort,
 	})
 	if err != nil {
 		return nil, err

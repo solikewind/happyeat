@@ -6,6 +6,7 @@ package menucategory
 import (
 	"net/http"
 
+	"github.com/solikewind/happyeat/app/internal/handler/jsonbody"
 	"github.com/solikewind/happyeat/app/internal/logic/menucategory"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -16,7 +17,11 @@ import (
 func UpdateMenuCategoryHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.UpdateMenuCategoryReq
-		if err := httpx.Parse(r, &req); err != nil {
+		if err := httpx.ParsePath(r, &req); err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
+		if err := jsonbody.Decode(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
