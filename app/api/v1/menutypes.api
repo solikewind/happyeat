@@ -83,11 +83,12 @@ type ListMenuCategoryReq {
     Category MenuCategory `json:"category"`
  }
 
+ // 全量更新：与编辑表单一致，先 Get 再提交；description 传空串表示清空备注
  type UpdateMenuCategoryReq {
-    Id          uint64	`path:"id"`
-    Name        string `json:"name,optional"`
-	Description string `json:"description,optional"`
-	Sort        uint32 `json:"sort,optional"`
+    Id          uint64 `path:"id"`
+    Name        string `json:"name"`
+	Description string `json:"description"`
+	Sort        uint32 `json:"sort"`
  }
  type UpdateMenuCategoryReply {}
 

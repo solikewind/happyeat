@@ -12,7 +12,7 @@ type Order {
 	Id            uint64      `json:"id,string"`             // 订单id
 	OrderNo       string      `json:"order_no"`              // 订单号
 	OrderType     string      `json:"order_type"`            // dine_in=堂食 takeaway=打包外带
-	Status        string      `json:"status"`                // created/paid/preparing/completed/cancelled
+	Status        string      `json:"status"`                // CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）
 	TotalAmount   int64       `json:"total_amount"`          // 总金额
 	TableId       uint64      `json:"table_id,optional,string"` // 堂食时关联餐桌id
 	TableCode     string      `json:"table_code,optional"`   // 桌号（堂食时显示，外带为空）

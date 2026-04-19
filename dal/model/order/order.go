@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -34,11 +35,12 @@ type ItemInput struct {
 
 // CreateOrderInput 创建订单入参。
 type CreateOrderInput struct {
-	OrderType   enum.OrderType // dine_in | takeaway
-	TableID     *uint64     // 堂食时必填，外带为 nil
-	Items       []ItemInput // 至少一项
+	OrderType   enum.OrderType   // dine_in | takeaway
+	TableID     *uint64          // 堂食时必填，外带为 nil
+	Items       []ItemInput      // 至少一项
 	TotalAmount int64
 	Remark      string
+	Status      enum.OrderStatus // 初始状态，新建订单为 OrderStatusCreated（与状态机 NONE→create 一致）
 }
 
 // genOrderNo 生成订单号（简单示例：ORD+毫秒时间戳+3位随机）
@@ -46,10 +48,32 @@ func genOrderNo() string {
 	return fmt.Sprintf("ORD%d%03d", time.Now().UnixMilli(), rand.Intn(1000))
 }
 
+// normalizeOrderStatus 统一为 ent 枚举大写（兼容历史/错误路径传入的 created 等小写）。
+func normalizeOrderStatus(s enum.OrderStatus) enum.OrderStatus {
+	u := strings.ToUpper(strings.TrimSpace(string(s)))
+	switch u {
+	case "CREATED":
+		return enum.OrderStatusCreated
+	case "PAID":
+		return enum.OrderStatusPaid
+	case "PREPARING":
+		return enum.OrderStatusPreparing
+	case "COMPLETED":
+		return enum.OrderStatusCompleted
+	case "CANCELLED":
+		return enum.OrderStatusCancelled
+	default:
+		return s
+	}
+}
+
 // Create 创建订单及明细（事务内）。业务规则（order_type、堂食必填桌台等）由调用方 Logic 校验。
 func (o *Order) Create(ctx context.Context, in CreateOrderInput) (*ent.Order, error) {
 	if len(in.Items) == 0 {
 		return nil, fmt.Errorf("items required")
+	}
+	if in.Status == "" {
+		return nil, fmt.Errorf("status required")
 	}
 
 	tx, err := o.c.Tx(ctx)
@@ -61,7 +85,7 @@ func (o *Order) Create(ctx context.Context, in CreateOrderInput) (*ent.Order, er
 	create := tx.Order.Create().
 		SetOrderNo(genOrderNo()).
 		SetOrderType(in.OrderType).
-		SetStatus("created").
+		SetStatus(normalizeOrderStatus(in.Status)).
 		SetTotalAmount(in.TotalAmount)
 	if in.TableID != nil && *in.TableID > 0 {
 		create = create.SetTableID(*in.TableID)
@@ -156,6 +180,6 @@ func (o *Order) List(ctx context.Context, f ListOrdersFilter) ([]*ent.Order, int
 
 // UpdateStatus 更新订单状态。
 func (o *Order) UpdateStatus(ctx context.Context, id uint64, status enum.OrderStatus) error {
-	_, err := o.c.Order.UpdateOneID(id).SetStatus(status).Save(ctx)
+	_, err := o.c.Order.UpdateOneID(id).SetStatus(normalizeOrderStatus(status)).Save(ctx)
 	return err
 }

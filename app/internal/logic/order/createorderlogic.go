@@ -54,17 +54,14 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		tableID = &tid
 	}
 
+	// 初始状态：CREATED（与 pkg/status 状态机 NONE→TriggerCreate 一致；此处直接写枚举，避免请求内再 Fire 一遍）
 	entOrder, err := l.svcCtx.Order.Create(l.ctx, order.CreateOrderInput{
 		OrderType:   enum.OrderType(req.OrderType),
 		TableID:     tableID,
 		Items:       items,
-		TotalAmount: req.TotalAmount,	
+		TotalAmount: req.TotalAmount,
 		Remark:      req.Remark,
-
-
-
-
-		
+		Status:      enum.OrderStatusCreated,
 	})
 	if err != nil {
 		return nil, err

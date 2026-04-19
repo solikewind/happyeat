@@ -108,6 +108,7 @@ type CreateSpecItemReq struct {
 	SpecGroupId  uint64 `json:"spec_group_id,string"`
 	Name         string `json:"name"`
 	DefaultPrice int64  `json:"default_price,optional"`
+	Sort         uint32 `json:"sort,optional"`
 }
 
 type CreateTableCategoryReply struct {
@@ -420,6 +421,7 @@ type ListTableReq struct {
 	Current    int64  `json:"current,optional" form:"current,optional"`
 	PageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
 	Code       string `json:"code,optional" form:"code,optional"`
+	Name       string `json:"name,optional" form:"name,optional"` // 按桌号模糊搜索（与 code 字段一致，子串匹配）
 	Status     string `json:"status,optional" form:"status,optional"`
 	CategoryId uint64 `json:"category_id,optional,string" form:"category_id,optional"` // 按分类id筛选
 	Category   string `json:"category,optional" form:"category,optional"`              // 按分类名字筛选
@@ -544,6 +546,7 @@ type SpecItem struct {
 	SpecGroupId  uint64 `json:"spec_group_id,string"`
 	Name         string `json:"name"`
 	DefaultPrice int64  `json:"default_price"`
+	Sort         uint32 `json:"sort,optional"`
 	CreatedAt    string `json:"created_at"`
 	UpdatedAt    string `json:"updated_at"`
 }
@@ -604,10 +607,10 @@ type UpdateMenuCategoryReply struct {
 }
 
 type UpdateMenuCategoryReq struct {
-	Id          uint64  `path:"id"`
-	Name        string  `json:"name,optional"`
-	Description *string `json:"description,omitempty"`
-	Sort        uint32  `json:"sort,optional"`
+	Id          uint64 `path:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Sort        uint32 `json:"sort"`
 }
 
 type UpdateMenuReply struct {
@@ -656,6 +659,7 @@ type UpdateSpecItemReq struct {
 	SpecGroupId  uint64 `json:"spec_group_id,string"`
 	Name         string `json:"name"`
 	DefaultPrice int64  `json:"default_price,optional"`
+	Sort         uint32 `json:"sort,optional"`
 }
 
 type UpdateTableCategoryInput struct {

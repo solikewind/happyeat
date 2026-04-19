@@ -13,7 +13,7 @@ import (
 func TestDecodeMergePathAndBody(t *testing.T) {
 	var req types.UpdateMenuCategoryReq
 	req.Id = 7
-	body := `{"name":"热菜","sort":3}`
+	body := `{"name":"热菜","description":"","sort":3}`
 	dec := json.NewDecoder(strings.NewReader(body))
 	dec.UseNumber()
 	if err := dec.Decode(&req); err != nil {
@@ -22,7 +22,7 @@ func TestDecodeMergePathAndBody(t *testing.T) {
 	if req.Id != 7 {
 		t.Fatalf("Id was reset: got %d want 7", req.Id)
 	}
-	if req.Name != "热菜" || req.Sort != 3 {
+	if req.Name != "热菜" || req.Description != "" || req.Sort != 3 {
 		t.Fatalf("body fields: %+v", req)
 	}
 }

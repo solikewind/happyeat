@@ -45,6 +45,6 @@ type CreateOrderReply {
 
 type UpdateOrderStatusReq {
 	Id     uint64 `path:"id"`
-	Status string `json:"status"` // paid/preparing/completed/cancelled
+	Status string `json:"status"` // 目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）
 }
 type UpdateOrderStatusReply {}

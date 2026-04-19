@@ -1,7 +1,8 @@
 package status
 
 import (
-	"log"
+	"context"
+	"fmt"
 
 	"github.com/qmuntal/stateless"
 	"github.com/solikewind/happyeat/dal/model/ent"
@@ -40,10 +41,21 @@ func NewOrderStateMachine(currentStatus string, order ent.Order) *OrderStateMach
 		Permit(TriggerComplete, OrderStatusCompleted).
 		Permit(TriggerCancel, OrderStatusCancelled)
 
-	graph := sm.ToGraph()
-	log.Printf("Order State Machine Graph: %v", graph)
-
 	return &OrderStateMachine{
 		sm: sm,
 	}
+}
+
+// FireCtx 触发一次迁移（trigger 为 TriggerPay / TriggerPrepare 等常量）。
+func (m *OrderStateMachine) FireCtx(ctx context.Context, trigger string) error {
+	return m.sm.FireCtx(ctx, trigger)
+}
+
+// CurrentMachineState 返回状态机当前状态字符串（大写，与 enum / OrderStatus* 一致）。
+func (m *OrderStateMachine) CurrentMachineState(ctx context.Context) (string, error) {
+	st, err := m.sm.State(ctx)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprint(st), nil
 }

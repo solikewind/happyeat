@@ -84,15 +84,13 @@ func (mt *MenuType) List(ctx context.Context, f ListMenuCategoriesFilter) ([]*en
 	return list, int64(total), nil
 }
 
-// Update 更新分类。description 为 nil 时不修改描述字段；非空则写入，指向空串则清空描述。
-func (mt *MenuType) Update(ctx context.Context, id uint64, name string, description *string, sort uint32) error {
+// Update 更新分类（全量字段）。description 为空串时清空数据库中的描述。
+func (mt *MenuType) Update(ctx context.Context, id uint64, name, description string, sort uint32) error {
 	upd := mt.c.MenuCategory.UpdateOneID(id).SetName(name).SetSort(sort)
-	if description != nil {
-		if *description != "" {
-			upd = upd.SetDescription(*description)
-		} else {
-			upd = upd.ClearDescription()
-		}
+	if description != "" {
+		upd = upd.SetDescription(description)
+	} else {
+		upd = upd.ClearDescription()
 	}
 
 	_, err := upd.Save(ctx)
