@@ -86,11 +86,12 @@ type CreateOrderReply struct {
 }
 
 type CreateOrderReq struct {
-	OrderType   string               `json:"order_type"`               // dine_in | takeaway
-	TableId     uint64               `json:"table_id,optional,string"` // 堂食必填
-	Items       []CreateOrderItemReq `json:"items"`
-	TotalAmount int64                `json:"total_amount"`
-	Remark      string               `json:"remark,optional"`
+	OrderType    string               `json:"order_type"`               // dine_in | takeaway
+	TableId      uint64               `json:"table_id,optional,string"` // 堂食必填
+	Items        []CreateOrderItemReq `json:"items"`
+	TotalAmount  int64                `json:"total_amount"`
+	ActualAmount int64                `json:"actual_amount,optional"` // 实收（分）；不传默认 0
+	Remark       string               `json:"remark,optional"`
 }
 
 type CreateSpecGroupReply struct {
@@ -435,7 +436,7 @@ type ListWorkbenchOrderReply struct {
 type ListWorkbenchOrderReq struct {
 	Current  int64  `json:"current,optional" form:"current,optional"`
 	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
-	Status   string `json:"status,optional" form:"status,optional"` // 不传则默认查 created,paid,preparing
+	Status   string `json:"status,optional" form:"status,optional"` // 不传则默认查 CREATED/PAID/PREPARING
 }
 
 type LoginReply struct {
@@ -483,8 +484,9 @@ type Order struct {
 	Id            uint64      `json:"id,string"`                // 订单id
 	OrderNo       string      `json:"order_no"`                 // 订单号
 	OrderType     string      `json:"order_type"`               // dine_in=堂食 takeaway=打包外带
-	Status        string      `json:"status"`                   // created/paid/preparing/completed/cancelled
-	TotalAmount   int64       `json:"total_amount"`             // 总金额
+	Status        string      `json:"status"`                   // CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）
+	TotalAmount   int64       `json:"total_amount"`             // 总金额（分，应收）
+	ActualAmount  int64       `json:"actual_amount"`            // 实收金额（分）
 	TableId       uint64      `json:"table_id,optional,string"` // 堂食时关联餐桌id
 	TableCode     string      `json:"table_code,optional"`      // 桌号（堂食时显示，外带为空）
 	TableCategory string      `json:"table_category,optional"`  // 餐桌类别（如大厅、包间）
@@ -631,7 +633,7 @@ type UpdateOrderStatusReply struct {
 
 type UpdateOrderStatusReq struct {
 	Id     uint64 `path:"id"`
-	Status string `json:"status"` // paid/preparing/completed/cancelled
+	Status string `json:"status"` // 目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）
 }
 
 type UpdateRolePermissionsReply struct {

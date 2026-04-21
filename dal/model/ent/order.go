@@ -36,6 +36,8 @@ type Order struct {
 	Status enum.OrderStatus `json:"status,omitempty"`
 	// 订单总金额
 	TotalAmount int64 `json:"total_amount,omitempty"`
+	// 实收金额（分），可与总金额不同（抹零、优惠等）；未收款时可为 0
+	ActualAmount int64 `json:"actual_amount,omitempty"`
 	// 备注
 	Remark *string `json:"remark,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -84,7 +86,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 			values[i] = new(enum.OrderStatus)
 		case order.FieldOrderType:
 			values[i] = new(enum.OrderType)
-		case order.FieldID, order.FieldDeleteTs, order.FieldTableID, order.FieldTotalAmount:
+		case order.FieldID, order.FieldDeleteTs, order.FieldTableID, order.FieldTotalAmount, order.FieldActualAmount:
 			values[i] = new(sql.NullInt64)
 		case order.FieldOrderNo, order.FieldRemark:
 			values[i] = new(sql.NullString)
@@ -159,6 +161,12 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field total_amount", values[i])
 			} else if value.Valid {
 				_m.TotalAmount = value.Int64
+			}
+		case order.FieldActualAmount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field actual_amount", values[i])
+			} else if value.Valid {
+				_m.ActualAmount = value.Int64
 			}
 		case order.FieldRemark:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -238,6 +246,9 @@ func (_m *Order) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("total_amount=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TotalAmount))
+	builder.WriteString(", ")
+	builder.WriteString("actual_amount=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ActualAmount))
 	builder.WriteString(", ")
 	if v := _m.Remark; v != nil {
 		builder.WriteString("remark=")

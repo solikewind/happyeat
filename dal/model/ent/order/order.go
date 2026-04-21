@@ -33,6 +33,8 @@ const (
 	FieldStatus = "status"
 	// FieldTotalAmount holds the string denoting the total_amount field in the database.
 	FieldTotalAmount = "total_amount"
+	// FieldActualAmount holds the string denoting the actual_amount field in the database.
+	FieldActualAmount = "actual_amount"
 	// FieldRemark holds the string denoting the remark field in the database.
 	FieldRemark = "remark"
 	// EdgeTable holds the string denoting the table edge name in mutations.
@@ -68,6 +70,7 @@ var Columns = []string{
 	FieldOrderType,
 	FieldStatus,
 	FieldTotalAmount,
+	FieldActualAmount,
 	FieldRemark,
 }
 
@@ -101,6 +104,8 @@ var (
 	OrderNoValidator func(string) error
 	// DefaultTotalAmount holds the default value on creation for the "total_amount" field.
 	DefaultTotalAmount int64
+	// DefaultActualAmount holds the default value on creation for the "actual_amount" field.
+	DefaultActualAmount int64
 	// RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
 	RemarkValidator func(string) error
 )
@@ -171,6 +176,11 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByTotalAmount orders the results by the total_amount field.
 func ByTotalAmount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotalAmount, opts...).ToFunc()
+}
+
+// ByActualAmount orders the results by the actual_amount field.
+func ByActualAmount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActualAmount, opts...).ToFunc()
 }
 
 // ByRemark orders the results by the remark field.

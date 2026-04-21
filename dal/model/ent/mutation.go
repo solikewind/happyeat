@@ -6178,28 +6178,30 @@ func (m *MenuSpecMutation) ResetEdge(name string) error {
 // OrderMutation represents an operation that mutates the Order nodes in the graph.
 type OrderMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *uint64
-	created_at      *time.Time
-	updated_at      *time.Time
-	delete_ts       *int64
-	adddelete_ts    *int64
-	order_no        *string
-	order_type      *enum.OrderType
-	status          *enum.OrderStatus
-	total_amount    *int64
-	addtotal_amount *int64
-	remark          *string
-	clearedFields   map[string]struct{}
-	table           *uint64
-	clearedtable    bool
-	items           map[uint64]struct{}
-	removeditems    map[uint64]struct{}
-	cleareditems    bool
-	done            bool
-	oldValue        func(context.Context) (*Order, error)
-	predicates      []predicate.Order
+	op               Op
+	typ              string
+	id               *uint64
+	created_at       *time.Time
+	updated_at       *time.Time
+	delete_ts        *int64
+	adddelete_ts     *int64
+	order_no         *string
+	order_type       *enum.OrderType
+	status           *enum.OrderStatus
+	total_amount     *int64
+	addtotal_amount  *int64
+	actual_amount    *int64
+	addactual_amount *int64
+	remark           *string
+	clearedFields    map[string]struct{}
+	table            *uint64
+	clearedtable     bool
+	items            map[uint64]struct{}
+	removeditems     map[uint64]struct{}
+	cleareditems     bool
+	done             bool
+	oldValue         func(context.Context) (*Order, error)
+	predicates       []predicate.Order
 }
 
 var _ ent.Mutation = (*OrderMutation)(nil)
@@ -6647,6 +6649,62 @@ func (m *OrderMutation) ResetTotalAmount() {
 	m.addtotal_amount = nil
 }
 
+// SetActualAmount sets the "actual_amount" field.
+func (m *OrderMutation) SetActualAmount(i int64) {
+	m.actual_amount = &i
+	m.addactual_amount = nil
+}
+
+// ActualAmount returns the value of the "actual_amount" field in the mutation.
+func (m *OrderMutation) ActualAmount() (r int64, exists bool) {
+	v := m.actual_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActualAmount returns the old "actual_amount" field's value of the Order entity.
+// If the Order object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderMutation) OldActualAmount(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActualAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActualAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActualAmount: %w", err)
+	}
+	return oldValue.ActualAmount, nil
+}
+
+// AddActualAmount adds i to the "actual_amount" field.
+func (m *OrderMutation) AddActualAmount(i int64) {
+	if m.addactual_amount != nil {
+		*m.addactual_amount += i
+	} else {
+		m.addactual_amount = &i
+	}
+}
+
+// AddedActualAmount returns the value that was added to the "actual_amount" field in this mutation.
+func (m *OrderMutation) AddedActualAmount() (r int64, exists bool) {
+	v := m.addactual_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetActualAmount resets all changes to the "actual_amount" field.
+func (m *OrderMutation) ResetActualAmount() {
+	m.actual_amount = nil
+	m.addactual_amount = nil
+}
+
 // SetRemark sets the "remark" field.
 func (m *OrderMutation) SetRemark(s string) {
 	m.remark = &s
@@ -6811,7 +6869,7 @@ func (m *OrderMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, order.FieldCreatedAt)
 	}
@@ -6835,6 +6893,9 @@ func (m *OrderMutation) Fields() []string {
 	}
 	if m.total_amount != nil {
 		fields = append(fields, order.FieldTotalAmount)
+	}
+	if m.actual_amount != nil {
+		fields = append(fields, order.FieldActualAmount)
 	}
 	if m.remark != nil {
 		fields = append(fields, order.FieldRemark)
@@ -6863,6 +6924,8 @@ func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case order.FieldTotalAmount:
 		return m.TotalAmount()
+	case order.FieldActualAmount:
+		return m.ActualAmount()
 	case order.FieldRemark:
 		return m.Remark()
 	}
@@ -6890,6 +6953,8 @@ func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStatus(ctx)
 	case order.FieldTotalAmount:
 		return m.OldTotalAmount(ctx)
+	case order.FieldActualAmount:
+		return m.OldActualAmount(ctx)
 	case order.FieldRemark:
 		return m.OldRemark(ctx)
 	}
@@ -6957,6 +7022,13 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTotalAmount(v)
 		return nil
+	case order.FieldActualAmount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActualAmount(v)
+		return nil
 	case order.FieldRemark:
 		v, ok := value.(string)
 		if !ok {
@@ -6978,6 +7050,9 @@ func (m *OrderMutation) AddedFields() []string {
 	if m.addtotal_amount != nil {
 		fields = append(fields, order.FieldTotalAmount)
 	}
+	if m.addactual_amount != nil {
+		fields = append(fields, order.FieldActualAmount)
+	}
 	return fields
 }
 
@@ -6990,6 +7065,8 @@ func (m *OrderMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedDeleteTs()
 	case order.FieldTotalAmount:
 		return m.AddedTotalAmount()
+	case order.FieldActualAmount:
+		return m.AddedActualAmount()
 	}
 	return nil, false
 }
@@ -7012,6 +7089,13 @@ func (m *OrderMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTotalAmount(v)
+		return nil
+	case order.FieldActualAmount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddActualAmount(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Order numeric field %s", name)
@@ -7078,6 +7162,9 @@ func (m *OrderMutation) ResetField(name string) error {
 		return nil
 	case order.FieldTotalAmount:
 		m.ResetTotalAmount()
+		return nil
+	case order.FieldActualAmount:
+		m.ResetActualAmount()
 		return nil
 	case order.FieldRemark:
 		m.ResetRemark()

@@ -37,6 +37,9 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 	if req.OrderType != "dine_in" && req.OrderType != "takeaway" {
 		return nil, errors.New("order_type 应为 dine_in 或 takeaway")
 	}
+	if req.ActualAmount < 0 {
+		return nil, errors.New("实收金额不能为负")
+	}
 
 	items := make([]order.ItemInput, 0, len(req.Items))
 	for _, it := range req.Items {
@@ -56,12 +59,13 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 
 	// 初始状态：CREATED（与 pkg/status 状态机 NONE→TriggerCreate 一致；此处直接写枚举，避免请求内再 Fire 一遍）
 	entOrder, err := l.svcCtx.Order.Create(l.ctx, order.CreateOrderInput{
-		OrderType:   enum.OrderType(req.OrderType),
-		TableID:     tableID,
-		Items:       items,
-		TotalAmount: req.TotalAmount,
-		Remark:      req.Remark,
-		Status:      enum.OrderStatusCreated,
+		OrderType:    enum.OrderType(req.OrderType),
+		TableID:      tableID,
+		Items:        items,
+		TotalAmount:  req.TotalAmount,
+		ActualAmount: req.ActualAmount,
+		Remark:       req.Remark,
+		Status:       enum.OrderStatusCreated,
 	})
 	if err != nil {
 		return nil, err

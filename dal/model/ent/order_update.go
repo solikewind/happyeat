@@ -141,6 +141,27 @@ func (_u *OrderUpdate) AddTotalAmount(v int64) *OrderUpdate {
 	return _u
 }
 
+// SetActualAmount sets the "actual_amount" field.
+func (_u *OrderUpdate) SetActualAmount(v int64) *OrderUpdate {
+	_u.mutation.ResetActualAmount()
+	_u.mutation.SetActualAmount(v)
+	return _u
+}
+
+// SetNillableActualAmount sets the "actual_amount" field if the given value is not nil.
+func (_u *OrderUpdate) SetNillableActualAmount(v *int64) *OrderUpdate {
+	if v != nil {
+		_u.SetActualAmount(*v)
+	}
+	return _u
+}
+
+// AddActualAmount adds value to the "actual_amount" field.
+func (_u *OrderUpdate) AddActualAmount(v int64) *OrderUpdate {
+	_u.mutation.AddActualAmount(v)
+	return _u
+}
+
 // SetRemark sets the "remark" field.
 func (_u *OrderUpdate) SetRemark(v string) *OrderUpdate {
 	_u.mutation.SetRemark(v)
@@ -315,6 +336,12 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
 		_spec.AddField(order.FieldTotalAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.ActualAmount(); ok {
+		_spec.SetField(order.FieldActualAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedActualAmount(); ok {
+		_spec.AddField(order.FieldActualAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Remark(); ok {
 		_spec.SetField(order.FieldRemark, field.TypeString, value)
@@ -526,6 +553,27 @@ func (_u *OrderUpdateOne) AddTotalAmount(v int64) *OrderUpdateOne {
 	return _u
 }
 
+// SetActualAmount sets the "actual_amount" field.
+func (_u *OrderUpdateOne) SetActualAmount(v int64) *OrderUpdateOne {
+	_u.mutation.ResetActualAmount()
+	_u.mutation.SetActualAmount(v)
+	return _u
+}
+
+// SetNillableActualAmount sets the "actual_amount" field if the given value is not nil.
+func (_u *OrderUpdateOne) SetNillableActualAmount(v *int64) *OrderUpdateOne {
+	if v != nil {
+		_u.SetActualAmount(*v)
+	}
+	return _u
+}
+
+// AddActualAmount adds value to the "actual_amount" field.
+func (_u *OrderUpdateOne) AddActualAmount(v int64) *OrderUpdateOne {
+	_u.mutation.AddActualAmount(v)
+	return _u
+}
+
 // SetRemark sets the "remark" field.
 func (_u *OrderUpdateOne) SetRemark(v string) *OrderUpdateOne {
 	_u.mutation.SetRemark(v)
@@ -730,6 +778,12 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
 		_spec.AddField(order.FieldTotalAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.ActualAmount(); ok {
+		_spec.SetField(order.FieldActualAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedActualAmount(); ok {
+		_spec.AddField(order.FieldActualAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Remark(); ok {
 		_spec.SetField(order.FieldRemark, field.TypeString, value)

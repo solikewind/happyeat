@@ -313,8 +313,12 @@ func init() {
 	orderDescTotalAmount := orderFields[4].Descriptor()
 	// order.DefaultTotalAmount holds the default value on creation for the total_amount field.
 	order.DefaultTotalAmount = orderDescTotalAmount.Default.(int64)
+	// orderDescActualAmount is the schema descriptor for actual_amount field.
+	orderDescActualAmount := orderFields[5].Descriptor()
+	// order.DefaultActualAmount holds the default value on creation for the actual_amount field.
+	order.DefaultActualAmount = orderDescActualAmount.Default.(int64)
 	// orderDescRemark is the schema descriptor for remark field.
-	orderDescRemark := orderFields[5].Descriptor()
+	orderDescRemark := orderFields[6].Descriptor()
 	// order.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
 	order.RemarkValidator = orderDescRemark.Validators[0].(func(string) error)
 	orderitemMixin := schema.OrderItem{}.Mixin()

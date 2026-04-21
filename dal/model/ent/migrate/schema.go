@@ -184,6 +184,7 @@ var (
 		{Name: "order_type", Type: field.TypeEnum, Comment: "dine_in=堂食 takeaway=打包外带", Enums: []string{"dine_in", "takeaway"}, Default: "dine_in"},
 		{Name: "status", Type: field.TypeEnum, Comment: "created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消", Enums: []string{"CREATED", "PAID", "PREPARING", "COMPLETED", "CANCELLED"}, Default: "CREATED"},
 		{Name: "total_amount", Type: field.TypeInt64, Comment: "订单总金额", Default: 0},
+		{Name: "actual_amount", Type: field.TypeInt64, Comment: "实收金额（分），可与总金额不同（抹零、优惠等）；未收款时可为 0", Default: 0},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注"},
 		{Name: "table_id", Type: field.TypeUint64, Nullable: true, Comment: "餐桌ID"},
 	}
@@ -196,7 +197,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "orders_tables_orders",
-				Columns:    []*schema.Column{OrdersColumns[9]},
+				Columns:    []*schema.Column{OrdersColumns[10]},
 				RefColumns: []*schema.Column{TablesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

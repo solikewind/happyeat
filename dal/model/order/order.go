@@ -35,12 +35,13 @@ type ItemInput struct {
 
 // CreateOrderInput 创建订单入参。
 type CreateOrderInput struct {
-	OrderType   enum.OrderType   // dine_in | takeaway
-	TableID     *uint64          // 堂食时必填，外带为 nil
-	Items       []ItemInput      // 至少一项
-	TotalAmount int64
-	Remark      string
-	Status      enum.OrderStatus // 初始状态，新建订单为 OrderStatusCreated（与状态机 NONE→create 一致）
+	OrderType    enum.OrderType   // dine_in | takeaway
+	TableID      *uint64          // 堂食时必填，外带为 nil
+	Items        []ItemInput      // 至少一项
+	TotalAmount  int64
+	ActualAmount int64 // 实收（分）；未收可为 0
+	Remark       string
+	Status       enum.OrderStatus // 初始状态，新建订单为 OrderStatusCreated（与状态机 NONE→create 一致）
 }
 
 // genOrderNo 生成订单号（简单示例：ORD+毫秒时间戳+3位随机）
@@ -86,7 +87,8 @@ func (o *Order) Create(ctx context.Context, in CreateOrderInput) (*ent.Order, er
 		SetOrderNo(genOrderNo()).
 		SetOrderType(in.OrderType).
 		SetStatus(normalizeOrderStatus(in.Status)).
-		SetTotalAmount(in.TotalAmount)
+		SetTotalAmount(in.TotalAmount).
+		SetActualAmount(in.ActualAmount)
 	if in.TableID != nil && *in.TableID > 0 {
 		create = create.SetTableID(*in.TableID)
 	}
