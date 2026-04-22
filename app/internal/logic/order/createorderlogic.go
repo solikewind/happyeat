@@ -40,6 +40,10 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 	if req.ActualAmount < 0 {
 		return nil, errors.New("实收金额不能为负")
 	}
+	actualAmount := req.ActualAmount
+	if actualAmount == 0 && req.TotalAmount > 0 {
+		actualAmount = req.TotalAmount
+	}
 
 	items := make([]order.ItemInput, 0, len(req.Items))
 	for _, it := range req.Items {
@@ -63,7 +67,7 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		TableID:      tableID,
 		Items:        items,
 		TotalAmount:  req.TotalAmount,
-		ActualAmount: req.ActualAmount,
+		ActualAmount: actualAmount,
 		Remark:       req.Remark,
 		Status:       enum.OrderStatusCreated,
 	})
