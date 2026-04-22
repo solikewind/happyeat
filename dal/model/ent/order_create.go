@@ -111,6 +111,20 @@ func (_c *OrderCreate) SetNillableTotalAmount(v *int64) *OrderCreate {
 	return _c
 }
 
+// SetActualAmount sets the "actual_amount" field.
+func (_c *OrderCreate) SetActualAmount(v int64) *OrderCreate {
+	_c.mutation.SetActualAmount(v)
+	return _c
+}
+
+// SetNillableActualAmount sets the "actual_amount" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableActualAmount(v *int64) *OrderCreate {
+	if v != nil {
+		_c.SetActualAmount(*v)
+	}
+	return _c
+}
+
 // SetRemark sets the "remark" field.
 func (_c *OrderCreate) SetRemark(v string) *OrderCreate {
 	_c.mutation.SetRemark(v)
@@ -210,6 +224,10 @@ func (_c *OrderCreate) defaults() error {
 		v := order.DefaultTotalAmount
 		_c.mutation.SetTotalAmount(v)
 	}
+	if _, ok := _c.mutation.ActualAmount(); !ok {
+		v := order.DefaultActualAmount
+		_c.mutation.SetActualAmount(v)
+	}
 	return nil
 }
 
@@ -250,6 +268,9 @@ func (_c *OrderCreate) check() error {
 	}
 	if _, ok := _c.mutation.TotalAmount(); !ok {
 		return &ValidationError{Name: "total_amount", err: errors.New(`ent: missing required field "Order.total_amount"`)}
+	}
+	if _, ok := _c.mutation.ActualAmount(); !ok {
+		return &ValidationError{Name: "actual_amount", err: errors.New(`ent: missing required field "Order.actual_amount"`)}
 	}
 	if v, ok := _c.mutation.Remark(); ok {
 		if err := order.RemarkValidator(v); err != nil {
@@ -315,6 +336,10 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.TotalAmount(); ok {
 		_spec.SetField(order.FieldTotalAmount, field.TypeInt64, value)
 		_node.TotalAmount = value
+	}
+	if value, ok := _c.mutation.ActualAmount(); ok {
+		_spec.SetField(order.FieldActualAmount, field.TypeInt64, value)
+		_node.ActualAmount = value
 	}
 	if value, ok := _c.mutation.Remark(); ok {
 		_spec.SetField(order.FieldRemark, field.TypeString, value)

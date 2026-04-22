@@ -41,7 +41,6 @@ func (MenuSpec) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("菜单种类下的规格项ID"),
-		// field.Uint64("")
 		field.Int64("price_delta").
 			Default(0).
 			Comment("特殊加价"),

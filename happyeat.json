@@ -71,6 +71,837 @@
         }
       }
     },
+    "/central/v1/iam/permissions": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "分页列出权限点（iam_permissions）",
+        "operationId": "iamListIAMPermissions",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "description": "可选：按 code/description 模糊筛",
+            "name": "keyword",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current": {
+                  "type": "integer"
+                },
+                "keyword": {
+                  "description": "可选：按 code/description 模糊筛",
+                  "type": "string"
+                },
+                "pageSize": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "code",
+                      "description"
+                    ],
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/permissions/{id}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个权限点",
+        "operationId": "iamGetIAMPermission",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "permission": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "code",
+                    "description"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/roles": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "分页列出角色（iam_roles）",
+        "operationId": "iamListIAMRoles",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "keyword",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current": {
+                  "type": "integer"
+                },
+                "keyword": {
+                  "type": "string"
+                },
+                "pageSize": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "role_code",
+                      "role_name"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "role_code": {
+                        "type": "string"
+                      },
+                      "role_name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "创建角色（无权限点，需再通过 RBAC 矩阵配置）",
+        "operationId": "iamCreateIAMRole",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "role_code"
+              ],
+              "properties": {
+                "role_code": {
+                  "type": "string"
+                },
+                "role_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/roles/{id}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个角色",
+        "operationId": "iamGetIAMRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "role_code",
+                    "role_name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "role_code": {
+                      "type": "string"
+                    },
+                    "role_name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "更新角色展示名（role_code 不可改）",
+        "operationId": "iamUpdateIAMRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "role_name"
+              ],
+              "properties": {
+                "role_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "删除角色（软删；系统预置角色不可删；删除后全量同步 Casbin）",
+        "operationId": "iamDeleteIAMRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/user-roles": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "为用户绑定角色（幂等：已绑定则成功）；path 固定便于 Casbin obj 精确匹配",
+        "operationId": "iamAssignIAMUserRole",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "user_code",
+                "role_code"
+              ],
+              "properties": {
+                "role_code": {
+                  "type": "string"
+                },
+                "user_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "移除用户的某个角色；使用 query：?user_code=&role_code=",
+        "operationId": "iamRemoveIAMUserRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "user_code",
+            "in": "formData",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "name": "role_code",
+            "in": "formData",
+            "allowEmptyValue": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role_code": {
+                  "type": "string"
+                },
+                "user_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/users": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "分页列出用户及其角色",
+        "operationId": "iamListIAMUsers",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "current",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
+            "name": "pageSize",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "string",
+            "description": "可选：user_code / display_name",
+            "name": "keyword",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current": {
+                  "type": "integer"
+                },
+                "keyword": {
+                  "description": "可选：user_code / display_name",
+                  "type": "string"
+                },
+                "pageSize": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "user_code",
+                      "display_name",
+                      "roles"
+                    ],
+                    "properties": {
+                      "display_name": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "roles": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "user_code": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "创建用户（仅主体档案，分配角色用 user-roles 接口）",
+        "operationId": "iamCreateIAMUser",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "user_code"
+              ],
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "user_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/users/{id}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个用户及角色列表",
+        "operationId": "iamGetIAMUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "user_code",
+                    "display_name",
+                    "roles"
+                  ],
+                  "properties": {
+                    "display_name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "user_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "更新用户展示名",
+        "operationId": "iamUpdateIAMUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "display_name"
+              ],
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "删除用户（软删，并清除 Casbin 中该用户全部分组）",
+        "operationId": "iamDeleteIAMUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/central/v1/menu/categories": {
       "get": {
         "security": [
@@ -151,11 +982,15 @@
                       },
                       "id": {
                         "description": "分类id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "name": {
                         "description": "分类名称",
                         "type": "string"
+                      },
+                      "sort": {
+                        "description": "排序，越小越靠前",
+                        "type": "integer"
                       },
                       "updated_at": {
                         "type": "string"
@@ -206,6 +1041,9 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "sort": {
+                  "type": "integer"
                 }
               }
             }
@@ -238,7 +1076,7 @@
         "operationId": "menucategoryGetMenuCategory",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -268,11 +1106,15 @@
                     },
                     "id": {
                       "description": "分类id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "name": {
                       "description": "分类名称",
                       "type": "string"
+                    },
+                    "sort": {
+                      "description": "排序，越小越靠前",
+                      "type": "integer"
                     },
                     "updated_at": {
                       "type": "string"
@@ -303,7 +1145,7 @@
         "operationId": "menucategoryUpdateMenuCategory",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -314,12 +1156,20 @@
             "required": true,
             "schema": {
               "type": "object",
+              "required": [
+                "name",
+                "description",
+                "sort"
+              ],
               "properties": {
                 "description": {
                   "type": "string"
                 },
                 "name": {
                   "type": "string"
+                },
+                "sort": {
+                  "type": "integer"
                 }
               }
             }
@@ -353,7 +1203,7 @@
         "operationId": "menucategoryDeleteMenuCategory",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -386,7 +1236,7 @@
         "operationId": "menuGetMenu",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -411,10 +1261,10 @@
                   "properties": {
                     "category_id": {
                       "description": "菜单分类id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "created_at": {
-                      "description": "创建时间",
+                      "description": "创建时间，RFC3339（UTC），列表与详情均返回",
                       "type": "string"
                     },
                     "description": {
@@ -423,7 +1273,7 @@
                     },
                     "id": {
                       "description": "菜单id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "image": {
                       "description": "菜单图片",
@@ -443,31 +1293,42 @@
                       "items": {
                         "type": "object",
                         "required": [
-                          "price_delta",
-                          "sort"
+                          "price_delta"
                         ],
                         "properties": {
                           "category_spec_id": {
                             "description": "分类规格项id",
-                            "type": "integer"
+                            "type": "string"
                           },
                           "price_delta": {
                             "description": "加价",
                             "type": "integer"
                           },
                           "sort": {
-                            "description": "排序",
+                            "description": "排序（不传默认0）",
                             "type": "integer"
+                          },
+                          "source": {
+                            "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                            "type": "string"
                           },
                           "spec_item_id": {
                             "description": "规格项id",
-                            "type": "integer"
+                            "type": "string"
+                          },
+                          "spec_type": {
+                            "description": "规格类型，如辣度",
+                            "type": "string"
+                          },
+                          "spec_value": {
+                            "description": "规格值，如微辣",
+                            "type": "string"
                           }
                         }
                       }
                     },
                     "updated_at": {
-                      "description": "更新时间",
+                      "description": "更新时间，RFC3339（UTC），列表与详情均返回",
                       "type": "string"
                     }
                   }
@@ -496,7 +1357,7 @@
         "operationId": "menuUpdateMenu",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -512,7 +1373,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "description": {
                   "type": "string"
@@ -531,25 +1392,36 @@
                   "items": {
                     "type": "object",
                     "required": [
-                      "price_delta",
-                      "sort"
+                      "price_delta"
                     ],
                     "properties": {
                       "category_spec_id": {
                         "description": "分类规格项id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "price_delta": {
                         "description": "加价",
                         "type": "integer"
                       },
                       "sort": {
-                        "description": "排序",
+                        "description": "排序（不传默认0）",
                         "type": "integer"
+                      },
+                      "source": {
+                        "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                        "type": "string"
                       },
                       "spec_item_id": {
                         "description": "规格项id",
-                        "type": "integer"
+                        "type": "string"
+                      },
+                      "spec_type": {
+                        "description": "规格类型，如辣度",
+                        "type": "string"
+                      },
+                      "spec_value": {
+                        "description": "规格值，如微辣",
+                        "type": "string"
                       }
                     }
                   }
@@ -586,7 +1458,7 @@
         "operationId": "menuDeleteMenu",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -637,7 +1509,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "integer",
+            "type": "string",
             "description": "按分类id筛选",
             "name": "category_id",
             "in": "query",
@@ -663,7 +1535,7 @@
                 },
                 "category_id": {
                   "description": "按分类id筛选",
-                  "type": "integer"
+                  "type": "string"
                 },
                 "current": {
                   "type": "integer"
@@ -699,10 +1571,10 @@
                     "properties": {
                       "category_id": {
                         "description": "菜单分类id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "created_at": {
-                        "description": "创建时间",
+                        "description": "创建时间，RFC3339（UTC），列表与详情均返回",
                         "type": "string"
                       },
                       "description": {
@@ -711,7 +1583,7 @@
                       },
                       "id": {
                         "description": "菜单id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "image": {
                         "description": "菜单图片",
@@ -731,31 +1603,42 @@
                         "items": {
                           "type": "object",
                           "required": [
-                            "price_delta",
-                            "sort"
+                            "price_delta"
                           ],
                           "properties": {
                             "category_spec_id": {
                               "description": "分类规格项id",
-                              "type": "integer"
+                              "type": "string"
                             },
                             "price_delta": {
                               "description": "加价",
                               "type": "integer"
                             },
                             "sort": {
-                              "description": "排序",
+                              "description": "排序（不传默认0）",
                               "type": "integer"
+                            },
+                            "source": {
+                              "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                              "type": "string"
                             },
                             "spec_item_id": {
                               "description": "规格项id",
-                              "type": "integer"
+                              "type": "string"
+                            },
+                            "spec_type": {
+                              "description": "规格类型，如辣度",
+                              "type": "string"
+                            },
+                            "spec_value": {
+                              "description": "规格值，如微辣",
+                              "type": "string"
                             }
                           }
                         }
                       },
                       "updated_at": {
-                        "description": "更新时间",
+                        "description": "更新时间，RFC3339（UTC），列表与详情均返回",
                         "type": "string"
                       }
                     }
@@ -800,7 +1683,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "description": {
                   "type": "string"
@@ -820,25 +1703,36 @@
                   "items": {
                     "type": "object",
                     "required": [
-                      "price_delta",
-                      "sort"
+                      "price_delta"
                     ],
                     "properties": {
                       "category_spec_id": {
                         "description": "分类规格项id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "price_delta": {
                         "description": "加价",
                         "type": "integer"
                       },
                       "sort": {
-                        "description": "排序",
+                        "description": "排序（不传默认0）",
                         "type": "integer"
+                      },
+                      "source": {
+                        "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                        "type": "string"
                       },
                       "spec_item_id": {
                         "description": "规格项id",
-                        "type": "integer"
+                        "type": "string"
+                      },
+                      "spec_type": {
+                        "description": "规格类型，如辣度",
+                        "type": "string"
+                      },
+                      "spec_value": {
+                        "description": "规格值，如微辣",
+                        "type": "string"
                       }
                     }
                   }
@@ -874,7 +1768,7 @@
         "operationId": "orderGetOrder",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -904,7 +1798,7 @@
                     },
                     "id": {
                       "description": "订单id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "items": {
                       "description": "订单明细",
@@ -967,7 +1861,7 @@
                     },
                     "table_id": {
                       "description": "堂食时关联餐桌id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "total_amount": {
                       "description": "总金额",
@@ -1005,7 +1899,7 @@
         "operationId": "orderUpdateOrderStatus",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -1080,7 +1974,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "integer",
+            "type": "string",
             "description": "按餐桌筛选",
             "name": "table_id",
             "in": "query",
@@ -1108,7 +2002,7 @@
                 },
                 "table_id": {
                   "description": "按餐桌筛选",
-                  "type": "integer"
+                  "type": "string"
                 }
               }
             }
@@ -1140,7 +2034,7 @@
                       },
                       "id": {
                         "description": "订单id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "items": {
                         "description": "订单明细",
@@ -1203,7 +2097,7 @@
                       },
                       "table_id": {
                         "description": "堂食时关联餐桌id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "total_amount": {
                         "description": "总金额",
@@ -1288,7 +2182,7 @@
                 },
                 "table_id": {
                   "description": "堂食必填",
-                  "type": "integer"
+                  "type": "string"
                 },
                 "total_amount": {
                   "type": "integer"
@@ -1321,7 +2215,7 @@
                     },
                     "id": {
                       "description": "订单id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "items": {
                       "description": "订单明细",
@@ -1384,7 +2278,7 @@
                     },
                     "table_id": {
                       "description": "堂食时关联餐桌id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "total_amount": {
                       "description": "总金额",
@@ -1397,6 +2291,34 @@
                   }
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/rbac/casbin/sync": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "将 IAM 同步到 Casbin（刷新 casbin_rule，供管理端按钮触发）",
+        "operationId": "rbacSyncCasbinPolicies",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
             }
           }
         }
@@ -1494,6 +2416,57 @@
       }
     },
     "/central/v1/rbac/role-permissions/{role}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个角色的权限列表",
+        "operationId": "rbacGetRolePermission",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "role",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role_permission": {
+                  "type": "object",
+                  "required": [
+                    "role",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "security": [
           {
@@ -1577,7 +2550,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "integer",
+            "type": "string",
             "name": "category_id",
             "in": "query",
             "allowEmptyValue": true
@@ -1596,7 +2569,7 @@
               "type": "object",
               "properties": {
                 "category_id": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "current": {
                   "type": "integer"
@@ -1627,25 +2600,28 @@
                       "spec_type",
                       "spec_value",
                       "price_delta",
-                      "sort",
                       "created_at",
                       "updated_at"
                     ],
                     "properties": {
                       "category_id": {
-                        "type": "integer"
+                        "type": "string"
                       },
                       "created_at": {
                         "type": "string"
                       },
                       "id": {
-                        "type": "integer"
+                        "type": "string"
                       },
                       "price_delta": {
                         "type": "integer"
                       },
                       "sort": {
+                        "description": "排序（不传默认0）",
                         "type": "integer"
+                      },
+                      "spec_item_id": {
+                        "type": "string"
                       },
                       "spec_type": {
                         "type": "string"
@@ -1698,13 +2674,16 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "price_delta": {
                   "type": "integer"
                 },
                 "sort": {
                   "type": "integer"
+                },
+                "spec_item_id": {
+                  "type": "string"
                 },
                 "spec_type": {
                   "type": "string"
@@ -1743,7 +2722,7 @@
         "operationId": "specGetCategorySpec",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -1763,25 +2742,28 @@
                     "spec_type",
                     "spec_value",
                     "price_delta",
-                    "sort",
                     "created_at",
                     "updated_at"
                   ],
                   "properties": {
                     "category_id": {
-                      "type": "integer"
+                      "type": "string"
                     },
                     "created_at": {
                       "type": "string"
                     },
                     "id": {
-                      "type": "integer"
+                      "type": "string"
                     },
                     "price_delta": {
                       "type": "integer"
                     },
                     "sort": {
+                      "description": "排序（不传默认0）",
                       "type": "integer"
+                    },
+                    "spec_item_id": {
+                      "type": "string"
                     },
                     "spec_type": {
                       "type": "string"
@@ -1818,7 +2800,7 @@
         "operationId": "specUpdateCategorySpec",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -1836,13 +2818,16 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "price_delta": {
                   "type": "integer"
                 },
                 "sort": {
                   "type": "integer"
+                },
+                "spec_item_id": {
+                  "type": "string"
                 },
                 "spec_type": {
                   "type": "string"
@@ -1882,7 +2867,7 @@
         "operationId": "specDeleteCategorySpec",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -1964,7 +2949,7 @@
         "operationId": "specGetSpecGroup",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -1981,7 +2966,6 @@
                   "required": [
                     "id",
                     "name",
-                    "sort",
                     "created_at",
                     "updated_at"
                   ],
@@ -1990,12 +2974,13 @@
                       "type": "string"
                     },
                     "id": {
-                      "type": "integer"
+                      "type": "string"
                     },
                     "name": {
                       "type": "string"
                     },
                     "sort": {
+                      "description": "排序（不传默认0）",
                       "type": "integer"
                     },
                     "updated_at": {
@@ -2027,7 +3012,7 @@
         "operationId": "specUpdateSpecGroup",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2080,7 +3065,7 @@
         "operationId": "specDeleteSpecGroup",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2163,7 +3148,6 @@
                     "required": [
                       "id",
                       "name",
-                      "sort",
                       "created_at",
                       "updated_at"
                     ],
@@ -2172,12 +3156,13 @@
                         "type": "string"
                       },
                       "id": {
-                        "type": "integer"
+                        "type": "string"
                       },
                       "name": {
                         "type": "string"
                       },
                       "sort": {
+                        "description": "排序（不传默认0）",
                         "type": "integer"
                       },
                       "updated_at": {
@@ -2231,8 +3216,11 @@
                 "name": {
                   "type": "string"
                 },
-                "spec_group_id": {
+                "sort": {
                   "type": "integer"
+                },
+                "spec_group_id": {
+                  "type": "string"
                 }
               }
             }
@@ -2265,7 +3253,7 @@
         "operationId": "specGetSpecItem",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2295,13 +3283,16 @@
                       "type": "integer"
                     },
                     "id": {
-                      "type": "integer"
+                      "type": "string"
                     },
                     "name": {
                       "type": "string"
                     },
-                    "spec_group_id": {
+                    "sort": {
                       "type": "integer"
+                    },
+                    "spec_group_id": {
+                      "type": "string"
                     },
                     "updated_at": {
                       "type": "string"
@@ -2332,7 +3323,7 @@
         "operationId": "specUpdateSpecItem",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2354,8 +3345,11 @@
                 "name": {
                   "type": "string"
                 },
-                "spec_group_id": {
+                "sort": {
                   "type": "integer"
+                },
+                "spec_group_id": {
+                  "type": "string"
                 }
               }
             }
@@ -2389,7 +3383,7 @@
         "operationId": "specDeleteSpecItem",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2434,7 +3428,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "integer",
+            "type": "string",
             "name": "spec_group_id",
             "in": "query",
             "allowEmptyValue": true
@@ -2462,7 +3456,7 @@
                   "type": "integer"
                 },
                 "spec_group_id": {
-                  "type": "integer"
+                  "type": "string"
                 }
               }
             }
@@ -2494,13 +3488,16 @@
                         "type": "integer"
                       },
                       "id": {
-                        "type": "integer"
+                        "type": "string"
                       },
                       "name": {
                         "type": "string"
                       },
-                      "spec_group_id": {
+                      "sort": {
                         "type": "integer"
+                      },
+                      "spec_group_id": {
+                        "type": "string"
                       },
                       "updated_at": {
                         "type": "string"
@@ -2592,7 +3589,7 @@
                       },
                       "id": {
                         "description": "分类id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "name": {
                         "description": "分类名称",
@@ -2676,7 +3673,7 @@
         "operationId": "tablecategoryGetTableCategory",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2701,7 +3698,7 @@
                     },
                     "id": {
                       "description": "分类id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "name": {
                       "description": "分类名称",
@@ -2733,7 +3730,7 @@
         "operationId": "tablecategoryUpdateTableCategory",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2794,7 +3791,7 @@
         "operationId": "tablecategoryDeleteTableCategory",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2827,7 +3824,7 @@
         "operationId": "tableGetTable",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2856,7 +3853,7 @@
                     },
                     "category_id": {
                       "description": "餐桌分类id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "code": {
                       "description": "桌号",
@@ -2868,7 +3865,7 @@
                     },
                     "id": {
                       "description": "餐桌id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "qr_code": {
                       "description": "二维码",
@@ -2908,7 +3905,7 @@
         "operationId": "tableUpdateTable",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -2929,7 +3926,7 @@
                   "type": "integer"
                 },
                 "category_id": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "code": {
                   "type": "string"
@@ -2972,7 +3969,7 @@
         "operationId": "tableDeleteTable",
         "parameters": [
           {
-            "type": "integer",
+            "type": "string",
             "name": "id",
             "in": "path",
             "required": true
@@ -3029,7 +4026,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "integer",
+            "type": "string",
             "description": "按分类id筛选",
             "name": "category_id",
             "in": "query",
@@ -3055,7 +4052,7 @@
                 },
                 "category_id": {
                   "description": "按分类id筛选",
-                  "type": "integer"
+                  "type": "string"
                 },
                 "code": {
                   "type": "string"
@@ -3098,7 +4095,7 @@
                       },
                       "category_id": {
                         "description": "餐桌分类id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "code": {
                         "description": "桌号",
@@ -3110,7 +4107,7 @@
                       },
                       "id": {
                         "description": "餐桌id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "qr_code": {
                         "description": "二维码",
@@ -3169,7 +4166,7 @@
                   "type": "integer"
                 },
                 "category_id": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "code": {
                   "type": "string"
@@ -3276,7 +4273,7 @@
                       },
                       "id": {
                         "description": "订单id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "items": {
                         "description": "订单明细",
@@ -3339,7 +4336,7 @@
                       },
                       "table_id": {
                         "description": "堂食时关联餐桌id",
-                        "type": "integer"
+                        "type": "string"
                       },
                       "total_amount": {
                         "description": "总金额",
@@ -3369,7 +4366,7 @@
       "in": "header"
     }
   },
-  "x-date": "2026-03-27 23:54:04",
+  "x-date": "2026-04-19 08:34:45",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

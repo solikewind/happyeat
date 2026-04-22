@@ -5,9 +5,11 @@ package menucategory
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +30,14 @@ func NewGetMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 }
 
 func (l *GetMenuCategoryLogic) GetMenuCategory(req *types.GetMenuCategoryReq) (resp *types.GetMenuCategoryReply, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	category, err := l.svcCtx.MenuType.GetByID(l.ctx, req.Id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("菜单分类不存在")
+		}
+		return nil, err
+	}
+	return &types.GetMenuCategoryReply{
+		Category: entMenuCategoryToType(category),
+	}, nil
 }

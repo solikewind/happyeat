@@ -86,6 +86,11 @@ func TotalAmount(v int64) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldTotalAmount, v))
 }
 
+// ActualAmount applies equality check predicate on the "actual_amount" field. It's identical to ActualAmountEQ.
+func ActualAmount(v int64) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldActualAmount, v))
+}
+
 // Remark applies equality check predicate on the "remark" field. It's identical to RemarkEQ.
 func Remark(v string) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldRemark, v))
@@ -384,6 +389,46 @@ func TotalAmountLT(v int64) predicate.Order {
 // TotalAmountLTE applies the LTE predicate on the "total_amount" field.
 func TotalAmountLTE(v int64) predicate.Order {
 	return predicate.Order(sql.FieldLTE(FieldTotalAmount, v))
+}
+
+// ActualAmountEQ applies the EQ predicate on the "actual_amount" field.
+func ActualAmountEQ(v int64) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldActualAmount, v))
+}
+
+// ActualAmountNEQ applies the NEQ predicate on the "actual_amount" field.
+func ActualAmountNEQ(v int64) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldActualAmount, v))
+}
+
+// ActualAmountIn applies the In predicate on the "actual_amount" field.
+func ActualAmountIn(vs ...int64) predicate.Order {
+	return predicate.Order(sql.FieldIn(FieldActualAmount, vs...))
+}
+
+// ActualAmountNotIn applies the NotIn predicate on the "actual_amount" field.
+func ActualAmountNotIn(vs ...int64) predicate.Order {
+	return predicate.Order(sql.FieldNotIn(FieldActualAmount, vs...))
+}
+
+// ActualAmountGT applies the GT predicate on the "actual_amount" field.
+func ActualAmountGT(v int64) predicate.Order {
+	return predicate.Order(sql.FieldGT(FieldActualAmount, v))
+}
+
+// ActualAmountGTE applies the GTE predicate on the "actual_amount" field.
+func ActualAmountGTE(v int64) predicate.Order {
+	return predicate.Order(sql.FieldGTE(FieldActualAmount, v))
+}
+
+// ActualAmountLT applies the LT predicate on the "actual_amount" field.
+func ActualAmountLT(v int64) predicate.Order {
+	return predicate.Order(sql.FieldLT(FieldActualAmount, v))
+}
+
+// ActualAmountLTE applies the LTE predicate on the "actual_amount" field.
+func ActualAmountLTE(v int64) predicate.Order {
+	return predicate.Order(sql.FieldLTE(FieldActualAmount, v))
 }
 
 // RemarkEQ applies the EQ predicate on the "remark" field.

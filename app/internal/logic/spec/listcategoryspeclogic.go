@@ -8,6 +8,7 @@ import (
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	specmodel "github.com/solikewind/happyeat/dal/model/spec"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +29,30 @@ func NewListCategorySpecLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *ListCategorySpecLogic) ListCategorySpec(req *types.ListCategorySpecReq) (resp *types.ListCategorySpecReply, err error) {
-	// todo: add your logic here and delete this line
+	offset, limit := normalizePage(req.Current, req.PageSize)
+	list, total, err := l.svcCtx.CategorySpec.List(l.ctx, specmodel.ListCategorySpecsFilter{
+		CategoryID: req.CategoryId,
+		SpecType:   req.SpecType,
+		Offset:     offset,
+		Limit:      limit,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if total == 0 {
+		return &types.ListCategorySpecReply{
+			Specs: []types.CategorySpec{},
+			Total: 0,
+		}, nil
+	}
 
-	return
+	specs := make([]types.CategorySpec, 0, len(list))
+	for _, item := range list {
+		specs = append(specs, toCategorySpec(item))
+	}
+
+	return &types.ListCategorySpecReply{
+		Specs: specs,
+		Total: int64(total),
+	}, nil
 }

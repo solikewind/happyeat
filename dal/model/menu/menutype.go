@@ -24,11 +24,12 @@ func NewMenuType(c *ent.Client) *MenuType {
 type CreateMenuCategoryInput struct {
 	Name        string
 	Description string
+	Sort        uint32
 }
 
 // Create 创建菜单分类。
 func (mt *MenuType) Create(ctx context.Context, in CreateMenuCategoryInput) (*ent.MenuCategory, error) {
-	create := mt.c.MenuCategory.Create().SetName(in.Name)
+	create := mt.c.MenuCategory.Create().SetName(in.Name).SetSort(in.Sort)
 	if in.Description != "" {
 		create = create.SetDescription(in.Description)
 	}
@@ -72,7 +73,10 @@ func (mt *MenuType) List(ctx context.Context, f ListMenuCategoriesFilter) ([]*en
 		f.Limit = 10
 	}
 
-	list, err := q.Order(menucategory.ByID(sql.OrderDesc())).Limit(f.Limit).Offset(f.Offset).All(ctx)
+	list, err := q.Order(
+		menucategory.BySort(sql.OrderAsc()),
+		menucategory.ByID(sql.OrderAsc()),
+	).Limit(f.Limit).Offset(f.Offset).All(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -80,9 +84,9 @@ func (mt *MenuType) List(ctx context.Context, f ListMenuCategoriesFilter) ([]*en
 	return list, int64(total), nil
 }
 
-// Update 更新分类。
-func (mt *MenuType) Update(ctx context.Context, id uint64, name, description string) error {
-	upd := mt.c.MenuCategory.UpdateOneID(id).SetName(name)
+// Update 更新分类（全量字段）。description 为空串时清空数据库中的描述。
+func (mt *MenuType) Update(ctx context.Context, id uint64, name, description string, sort uint32) error {
+	upd := mt.c.MenuCategory.UpdateOneID(id).SetName(name).SetSort(sort)
 	if description != "" {
 		upd = upd.SetDescription(description)
 	} else {

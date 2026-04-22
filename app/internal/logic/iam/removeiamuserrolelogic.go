@@ -5,6 +5,7 @@ package iam
 
 import (
 	"context"
+	"strings"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -28,7 +29,16 @@ func NewRemoveIAMUserRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 }
 
 func (l *RemoveIAMUserRoleLogic) RemoveIAMUserRole(req *types.RemoveIAMUserRoleReq) (resp *types.RemoveIAMUserRoleReply, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	userCode := strings.TrimSpace(req.UserCode)
+	roleCode := strings.TrimSpace(req.RoleCode)
+	if userCode == "" || roleCode == "" {
+		return nil, errInvalid("user_code 与 role_code 均不能为空")
+	}
+	if err := l.svcCtx.Rbac.RemoveUserRole(userCode, roleCode); err != nil {
+		return nil, errInvalid(err.Error())
+	}
+	if err := svc.SyncUserRoleGroupingRemove(l.svcCtx.Casbin, userCode, roleCode); err != nil {
+		return nil, errInvalid("同步 Casbin 用户角色失败")
+	}
+	return &types.RemoveIAMUserRoleReply{}, nil
 }

@@ -1,5 +1,18 @@
 package svc
 
+// SyncUserRoleGroupingAdd 在业务库已写入用户–角色后，仅向 Casbin 增加一条 g(user, role)。
+// 与 SyncRolePoliciesToCasbin 全量相比：不触碰 p 策略，也不重写其他用户的 g。
+func SyncUserRoleGroupingAdd(ce *CasbinEnforcer, userCode, roleCode string) error {
+	_, err := ce.Enforcer.AddGroupingPolicy(userCode, roleCode)
+	return err
+}
+
+// SyncUserRoleGroupingRemove 在业务库已解除绑定后，仅从 Casbin 移除对应 g(user, role)。
+func SyncUserRoleGroupingRemove(ce *CasbinEnforcer, userCode, roleCode string) error {
+	_, err := ce.Enforcer.RemoveGroupingPolicy(userCode, roleCode)
+	return err
+}
+
 func SyncRolePoliciesToCasbin(store *RbacStore, ce *CasbinEnforcer) error {
 	enforcer := ce.Enforcer
 	roles, err := store.List()

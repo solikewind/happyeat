@@ -42,6 +42,7 @@ func (l *ListTableLogic) ListTable(req *types.ListTableReq) (resp *types.ListTab
 
 	list, total, err := l.svcCtx.Table.List(l.ctx, daltable.ListTablesFilter{
 		Code:         req.Code,
+		Name:         req.Name,
 		Status:       req.Status,
 		CategoryName: req.Category,
 		Offset:       int(offset),

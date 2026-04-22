@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	orderlogic "github.com/solikewind/happyeat/app/internal/logic/order"
-	"github.com/solikewind/happyeat/app/internal/pkg/status"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/common/consts/enum"
@@ -51,9 +50,9 @@ func (l *ListWorkbenchOrderLogic) ListWorkbenchOrder(req *types.ListWorkbenchOrd
 		filter.Status = enum.OrderStatus(strings.TrimSpace(req.Status))
 	} else {
 		filter.Statuses = []enum.OrderStatus{
-			enum.OrderStatus(status.OrderStatusCreated),
-			enum.OrderStatus(status.OrderStatusPaid),
-			enum.OrderStatus(status.OrderStatusPreparing),
+			enum.OrderStatusCreated,
+			enum.OrderStatusPaid,
+			enum.OrderStatusPreparing,
 		}
 	}
 

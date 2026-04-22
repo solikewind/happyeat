@@ -15,7 +15,8 @@ alwaysApply: true
 - 新增/修改接口时，先改 `.api`，再执行 `make api`（或 goctl 命令），最后补 logic 实现。
 - 不手写绕过 goctl 的路由和 types 结构；以 `.api` 为单一事实来源。
 - 生成文件提示 `exists, ignored generation` 属正常；需要覆盖时按文件维度处理，不做破坏性重置。
-- OpenAPI 文档通过 `make swagger` 生成，主服务统一提供静态访问路径。
+- OpenAPI 文档通过 `make swagger`（仅 `goctl api swagger`）生成到项目根 `happyeat.json`，主服务统一提供静态访问路径。
+- goctl 生成的 schema 里 ID 可能仍为 `integer`，而运行时 JSON 多为 `json:,string`；若前端强依赖 OpenAPI 生成类型且要与线上一致，需在客户端约定 ID 为 string，或另行后处理文档，不作为默认流水线步骤。
 
 ## go-zero API 专项细则
 - `v1` API 通过 `import` 聚合 `app/api/base/*.api` 通用类型，避免在业务 API 重复定义。
@@ -51,3 +52,8 @@ alwaysApply: true
 - 函数体按业务步骤分块，块之间留空行，保持可读性。
 - 仅在复杂逻辑前添加简短注释；避免噪音注释。
 - 改动时优先做“最小闭环修改”：API、types、handler、logic、data、文档同步收敛。
+
+## 缺陷与踩坑记录（任务）
+- **登记规则**：每次修复或确认一类「非显而易见」的 bug（枚举/序列化/迁移/权限/与前端约定不一致等），在 `docs/bug-log.md` **表尾追加一行**（日期、模块、现象、根因、处理）。
+- **何时写**：合并修复前或联调通过后补记即可；避免只改代码不留痕。
+- **索引文件**：`docs/bug-log.md`（与 `docs/数据库迁移.md` 等并列）。

@@ -28,7 +28,29 @@ func NewListIAMPermissionsLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *ListIAMPermissionsLogic) ListIAMPermissions(req *types.ListIAMPermissionsReq) (resp *types.ListIAMPermissionsReply, err error) {
-	// todo: add your logic here and delete this line
+	pageSize := int(req.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	current := int(req.Current)
+	if current <= 0 {
+		current = 1
+	}
+	offset := (current - 1) * pageSize
 
-	return
+	rows, total, err := l.svcCtx.Rbac.ListIAMPermissionsPage(l.ctx, offset, pageSize, req.Keyword)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]types.PermissionItem, 0, len(rows))
+	for _, row := range rows {
+		items = append(items, types.PermissionItem{
+			Code:        row.Code,
+			Description: row.Description,
+		})
+	}
+	return &types.ListIAMPermissionsReply{
+		Permissions: items,
+		Total:       total,
+	}, nil
 }

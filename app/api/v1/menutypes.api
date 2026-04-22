@@ -16,7 +16,7 @@ type CreateMenuReq {
 	Description string     `json:"description,optional"`
 	Image       string     `json:"image,optional"`
 	Price       int64    `json:"price"`	// 以分为单位，避免前端浮点数问题，展示/100
-	CategoryId  uint64     `json:"category_id"`
+	CategoryId  uint64     `json:"category_id,string"`
 	Specs       []MenuSpec `json:"specs,optional"`
 }
 type CreateMenuReply {}
@@ -25,7 +25,7 @@ type CreateMenuReply {}
 type ListMenuReq {
 	PageInfo
 	Name     string `json:"name,optional" form:"name,optional"`
-	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"` // 按分类id筛选
+	CategoryId uint64 `json:"category_id,optional,string" form:"category_id,optional"` // 按分类id筛选
 	Category string `json:"category,optional" form:"category,optional"` // 按分类名字筛选
 }
  type ListMenuReply {
@@ -47,7 +47,7 @@ type ListMenuReq {
 	Description string     `json:"description,optional"`
 	Image       string     `json:"image,optional"`
 	Price       int64	    `json:"price,optional"`
-	CategoryId  uint64     `json:"category_id,optional"`
+	CategoryId  uint64     `json:"category_id,optional,string"`
 	Specs       []MenuSpec `json:"specs,optional"`
  }
  type UpdateMenuReply {}
@@ -62,6 +62,7 @@ type ListMenuReq {
 type CreateMenuCategoryReq {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
+	Sort        uint32 `json:"sort,optional"`
 }
 type CreateMenuCategoryReply {}
 
@@ -82,10 +83,12 @@ type ListMenuCategoryReq {
     Category MenuCategory `json:"category"`
  }
 
+ // 全量更新：与编辑表单一致，先 Get 再提交；description 传空串表示清空备注
  type UpdateMenuCategoryReq {
-    Id          uint64	`path:"id"`
-    Name        string `json:"name,optional"`
-	Description string `json:"description,optional"`
+    Id          uint64 `path:"id"`
+    Name        string `json:"name"`
+	Description string `json:"description"`
+	Sort        uint32 `json:"sort"`
  }
  type UpdateMenuCategoryReply {}
 
@@ -131,15 +134,16 @@ type DeleteSpecGroupReply {}
 
 // 【规格项接口】
 type CreateSpecItemReq {
-	SpecGroupId  uint64 `json:"spec_group_id"`
+	SpecGroupId  uint64 `json:"spec_group_id,string"`
 	Name         string `json:"name"`
 	DefaultPrice int64  `json:"default_price,optional"`
+	Sort         uint32 `json:"sort,optional"`
 }
 type CreateSpecItemReply {}
 
 type ListSpecItemReq {
 	PageInfo
-	SpecGroupId uint64 `json:"spec_group_id,optional" form:"spec_group_id,optional"`
+	SpecGroupId uint64 `json:"spec_group_id,optional,string" form:"spec_group_id,optional"`
 	Name        string `json:"name,optional" form:"name,optional"`
 }
 type ListSpecItemReply {
@@ -156,9 +160,10 @@ type GetSpecItemReply {
 
 type UpdateSpecItemReq {
 	Id           uint64 `path:"id"`
-	SpecGroupId  uint64 `json:"spec_group_id"`
+	SpecGroupId  uint64 `json:"spec_group_id,string"`
 	Name         string `json:"name"`
 	DefaultPrice int64  `json:"default_price,optional"`
+	Sort         uint32 `json:"sort,optional"`
 }
 type UpdateSpecItemReply {}
 
@@ -169,7 +174,8 @@ type DeleteSpecItemReply {}
 
 // 【分类规格模板接口】
 type CreateCategorySpecReq {
-	CategoryId uint64 `json:"category_id"`
+	CategoryId uint64 `json:"category_id,string"`
+	SpecItemId uint64 `json:"spec_item_id,optional,string"`
 	SpecType   string `json:"spec_type"`
 	SpecValue  string `json:"spec_value"`
 	PriceDelta int64  `json:"price_delta,optional"`
@@ -179,7 +185,7 @@ type CreateCategorySpecReply {}
 
 type ListCategorySpecReq {
 	PageInfo
-	CategoryId uint64 `json:"category_id,optional" form:"category_id,optional"`
+	CategoryId uint64 `json:"category_id,optional,string" form:"category_id,optional"`
 	SpecType   string `json:"spec_type,optional" form:"spec_type,optional"`
 }
 type ListCategorySpecReply {
@@ -196,7 +202,8 @@ type GetCategorySpecReply {
 
 type UpdateCategorySpecReq {
 	Id         uint64 `path:"id"`
-	CategoryId uint64 `json:"category_id"`
+	CategoryId uint64 `json:"category_id,string"`
+	SpecItemId uint64 `json:"spec_item_id,optional,string"`
 	SpecType   string `json:"spec_type"`
 	SpecValue  string `json:"spec_value"`
 	PriceDelta int64  `json:"price_delta,optional"`

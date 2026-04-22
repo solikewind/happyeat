@@ -27,8 +27,12 @@ const (
 	FieldName = "name"
 	// FieldDefaultPrice holds the string denoting the default_price field in the database.
 	FieldDefaultPrice = "default_price"
+	// FieldSort holds the string denoting the sort field in the database.
+	FieldSort = "sort"
 	// EdgeSpecGroup holds the string denoting the spec_group edge name in mutations.
 	EdgeSpecGroup = "spec_group"
+	// EdgeCategorySpecs holds the string denoting the category_specs edge name in mutations.
+	EdgeCategorySpecs = "category_specs"
 	// EdgeMenuSpecs holds the string denoting the menu_specs edge name in mutations.
 	EdgeMenuSpecs = "menu_specs"
 	// Table holds the table name of the specitem in the database.
@@ -40,6 +44,13 @@ const (
 	SpecGroupInverseTable = "spec_groups"
 	// SpecGroupColumn is the table column denoting the spec_group relation/edge.
 	SpecGroupColumn = "spec_group_id"
+	// CategorySpecsTable is the table that holds the category_specs relation/edge.
+	CategorySpecsTable = "category_specs"
+	// CategorySpecsInverseTable is the table name for the CategorySpec entity.
+	// It exists in this package in order to avoid circular dependency with the "categoryspec" package.
+	CategorySpecsInverseTable = "category_specs"
+	// CategorySpecsColumn is the table column denoting the category_specs relation/edge.
+	CategorySpecsColumn = "spec_item_id"
 	// MenuSpecsTable is the table that holds the menu_specs relation/edge.
 	MenuSpecsTable = "menu_specs"
 	// MenuSpecsInverseTable is the table name for the MenuSpec entity.
@@ -58,6 +69,7 @@ var Columns = []string{
 	FieldSpecGroupID,
 	FieldName,
 	FieldDefaultPrice,
+	FieldSort,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -88,6 +100,8 @@ var (
 	DefaultDeleteTs int64
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultSort holds the default value on creation for the "sort" field.
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the SpecItem queries.
@@ -128,10 +142,29 @@ func ByDefaultPrice(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDefaultPrice, opts...).ToFunc()
 }
 
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
+}
+
 // BySpecGroupField orders the results by spec_group field.
 func BySpecGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newSpecGroupStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByCategorySpecsCount orders the results by category_specs count.
+func ByCategorySpecsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCategorySpecsStep(), opts...)
+	}
+}
+
+// ByCategorySpecs orders the results by category_specs terms.
+func ByCategorySpecs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategorySpecsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -153,6 +186,13 @@ func newSpecGroupStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SpecGroupInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, SpecGroupTable, SpecGroupColumn),
+	)
+}
+func newCategorySpecsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategorySpecsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CategorySpecsTable, CategorySpecsColumn),
 	)
 }
 func newMenuSpecsStep() *sqlgraph.Step {

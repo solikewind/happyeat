@@ -28,7 +28,34 @@ func NewListIAMUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *List
 }
 
 func (l *ListIAMUsersLogic) ListIAMUsers(req *types.ListIAMUsersReq) (resp *types.ListIAMUsersReply, err error) {
-	// todo: add your logic here and delete this line
+	pageSize := int(req.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	current := int(req.Current)
+	if current <= 0 {
+		current = 1
+	}
+	offset := (current - 1) * pageSize
 
-	return
+	rows, total, err := l.svcCtx.Rbac.ListIAMUsersPage(l.ctx, offset, pageSize, req.Keyword)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]types.IAMUserItem, 0, len(rows))
+	for _, row := range rows {
+		roles := row.Roles
+		if roles == nil {
+			roles = []string{}
+		}
+		items = append(items, types.IAMUserItem{
+			UserCode:    row.UserCode,
+			DisplayName: row.DisplayName,
+			Roles:       roles,
+		})
+	}
+	return &types.ListIAMUsersReply{
+		Users: items,
+		Total: total,
+	}, nil
 }

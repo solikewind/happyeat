@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
@@ -21,12 +22,13 @@ import (
 // SpecItemQuery is the builder for querying SpecItem entities.
 type SpecItemQuery struct {
 	config
-	ctx           *QueryContext
-	order         []specitem.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.SpecItem
-	withSpecGroup *SpecGroupQuery
-	withMenuSpecs *MenuSpecQuery
+	ctx               *QueryContext
+	order             []specitem.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.SpecItem
+	withSpecGroup     *SpecGroupQuery
+	withCategorySpecs *CategorySpecQuery
+	withMenuSpecs     *MenuSpecQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,6 +80,28 @@ func (_q *SpecItemQuery) QuerySpecGroup() *SpecGroupQuery {
 			sqlgraph.From(specitem.Table, specitem.FieldID, selector),
 			sqlgraph.To(specgroup.Table, specgroup.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, specitem.SpecGroupTable, specitem.SpecGroupColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCategorySpecs chains the current query on the "category_specs" edge.
+func (_q *SpecItemQuery) QueryCategorySpecs() *CategorySpecQuery {
+	query := (&CategorySpecClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(specitem.Table, specitem.FieldID, selector),
+			sqlgraph.To(categoryspec.Table, categoryspec.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, specitem.CategorySpecsTable, specitem.CategorySpecsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -294,13 +318,14 @@ func (_q *SpecItemQuery) Clone() *SpecItemQuery {
 		return nil
 	}
 	return &SpecItemQuery{
-		config:        _q.config,
-		ctx:           _q.ctx.Clone(),
-		order:         append([]specitem.OrderOption{}, _q.order...),
-		inters:        append([]Interceptor{}, _q.inters...),
-		predicates:    append([]predicate.SpecItem{}, _q.predicates...),
-		withSpecGroup: _q.withSpecGroup.Clone(),
-		withMenuSpecs: _q.withMenuSpecs.Clone(),
+		config:            _q.config,
+		ctx:               _q.ctx.Clone(),
+		order:             append([]specitem.OrderOption{}, _q.order...),
+		inters:            append([]Interceptor{}, _q.inters...),
+		predicates:        append([]predicate.SpecItem{}, _q.predicates...),
+		withSpecGroup:     _q.withSpecGroup.Clone(),
+		withCategorySpecs: _q.withCategorySpecs.Clone(),
+		withMenuSpecs:     _q.withMenuSpecs.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -315,6 +340,17 @@ func (_q *SpecItemQuery) WithSpecGroup(opts ...func(*SpecGroupQuery)) *SpecItemQ
 		opt(query)
 	}
 	_q.withSpecGroup = query
+	return _q
+}
+
+// WithCategorySpecs tells the query-builder to eager-load the nodes that are connected to
+// the "category_specs" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *SpecItemQuery) WithCategorySpecs(opts ...func(*CategorySpecQuery)) *SpecItemQuery {
+	query := (&CategorySpecClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withCategorySpecs = query
 	return _q
 }
 
@@ -407,8 +443,9 @@ func (_q *SpecItemQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Spe
 	var (
 		nodes       = []*SpecItem{}
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withSpecGroup != nil,
+			_q.withCategorySpecs != nil,
 			_q.withMenuSpecs != nil,
 		}
 	)
@@ -433,6 +470,13 @@ func (_q *SpecItemQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Spe
 	if query := _q.withSpecGroup; query != nil {
 		if err := _q.loadSpecGroup(ctx, query, nodes, nil,
 			func(n *SpecItem, e *SpecGroup) { n.Edges.SpecGroup = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withCategorySpecs; query != nil {
+		if err := _q.loadCategorySpecs(ctx, query, nodes,
+			func(n *SpecItem) { n.Edges.CategorySpecs = []*CategorySpec{} },
+			func(n *SpecItem, e *CategorySpec) { n.Edges.CategorySpecs = append(n.Edges.CategorySpecs, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -472,6 +516,39 @@ func (_q *SpecItemQuery) loadSpecGroup(ctx context.Context, query *SpecGroupQuer
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (_q *SpecItemQuery) loadCategorySpecs(ctx context.Context, query *CategorySpecQuery, nodes []*SpecItem, init func(*SpecItem), assign func(*SpecItem, *CategorySpec)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*SpecItem)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(categoryspec.FieldSpecItemID)
+	}
+	query.Where(predicate.CategorySpec(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(specitem.CategorySpecsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.SpecItemID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "spec_item_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "spec_item_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

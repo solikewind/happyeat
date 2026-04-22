@@ -70,6 +70,24 @@ func entMenuToType(e *ent.Menu) types.Menu {
 		}
 		if s.CategorySpecID != nil {
 			spec.CategorySpecId = *s.CategorySpecID
+			spec.Source = "category"
+		}
+		if categorySpec, err := s.Edges.CategorySpecOrErr(); err == nil && categorySpec != nil {
+			spec.SpecType = categorySpec.SpecType
+			spec.SpecValue = categorySpec.SpecValue
+		}
+		if specItem, err := s.Edges.SpecItemOrErr(); err == nil && specItem != nil {
+			if spec.Source == "" {
+				spec.Source = "library"
+			}
+			if spec.SpecValue == "" {
+				spec.SpecValue = specItem.Name
+			}
+			if spec.SpecType == "" {
+				if group, groupErr := specItem.Edges.SpecGroupOrErr(); groupErr == nil && group != nil {
+					spec.SpecType = group.Name
+				}
+			}
 		}
 		out.Specs = append(out.Specs, spec)
 	}

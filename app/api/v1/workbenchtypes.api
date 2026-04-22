@@ -8,11 +8,11 @@ info (
 
 import "../base/orderbase.api"
 
-// 工作台展示待处理订单（默认 created/paid/preparing）；出单用 PUT /order/:id/status { "status": "completed" }
+// 工作台展示待处理订单（默认 CREATED/PAID/PREPARING）；出单用 PUT /order/:id/status
 type ListWorkbenchOrderReq {
 	Current  int64 `json:"current,optional" form:"current,optional"`
 	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
-	Status   string `json:"status,optional" form:"status,optional"` // 不传则默认查 created,paid,preparing
+	Status   string `json:"status,optional" form:"status,optional"` // 不传则默认查 CREATED/PAID/PREPARING
 }
 type ListWorkbenchOrderReply {
 	Orders []Order `json:"orders"`

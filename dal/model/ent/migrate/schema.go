@@ -20,6 +20,7 @@ var (
 		{Name: "price_delta", Type: field.TypeInt64, Comment: "加价", Default: 0},
 		{Name: "sort", Type: field.TypeUint32, Comment: "排序", Default: 0},
 		{Name: "menu_category_id", Type: field.TypeUint64, Comment: "菜单分类ID"},
+		{Name: "spec_item_id", Type: field.TypeUint64, Nullable: true, Comment: "引用的全局规格项ID"},
 	}
 	// CategorySpecsTable holds the schema information for the "category_specs" table.
 	CategorySpecsTable = &schema.Table{
@@ -33,6 +34,12 @@ var (
 				Columns:    []*schema.Column{CategorySpecsColumns[8]},
 				RefColumns: []*schema.Column{MenuCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "category_specs_spec_items_category_specs",
+				Columns:    []*schema.Column{CategorySpecsColumns[9]},
+				RefColumns: []*schema.Column{SpecItemsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -119,6 +126,7 @@ var (
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "分类名称"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序，越小越靠前", Default: 0},
 	}
 	// MenuCategoriesTable holds the schema information for the "menu_categories" table.
 	MenuCategoriesTable = &schema.Table{
@@ -176,6 +184,7 @@ var (
 		{Name: "order_type", Type: field.TypeEnum, Comment: "dine_in=堂食 takeaway=打包外带", Enums: []string{"dine_in", "takeaway"}, Default: "dine_in"},
 		{Name: "status", Type: field.TypeEnum, Comment: "created=待支付 paid=已支付 preparing=制作中 completed=已完成 cancelled=已取消", Enums: []string{"CREATED", "PAID", "PREPARING", "COMPLETED", "CANCELLED"}, Default: "CREATED"},
 		{Name: "total_amount", Type: field.TypeInt64, Comment: "订单总金额", Default: 0},
+		{Name: "actual_amount", Type: field.TypeInt64, Comment: "实收金额（分），可与总金额不同（抹零、优惠等）；未收款时可为 0", Default: 0},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注"},
 		{Name: "table_id", Type: field.TypeUint64, Nullable: true, Comment: "餐桌ID"},
 	}
@@ -188,7 +197,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "orders_tables_orders",
-				Columns:    []*schema.Column{OrdersColumns[9]},
+				Columns:    []*schema.Column{OrdersColumns[10]},
 				RefColumns: []*schema.Column{TablesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -254,6 +263,7 @@ var (
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "规格项名"},
 		{Name: "default_price", Type: field.TypeInt64, Comment: "默认价格"},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序权重，越小越靠前", Default: 0},
 		{Name: "spec_group_id", Type: field.TypeUint64, Comment: "所属规格组ID"},
 	}
 	// SpecItemsTable holds the schema information for the "spec_items" table.
@@ -264,7 +274,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "spec_items_spec_groups_spec_items",
-				Columns:    []*schema.Column{SpecItemsColumns[6]},
+				Columns:    []*schema.Column{SpecItemsColumns[7]},
 				RefColumns: []*schema.Column{SpecGroupsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -385,6 +395,7 @@ var (
 
 func init() {
 	CategorySpecsTable.ForeignKeys[0].RefTable = MenuCategoriesTable
+	CategorySpecsTable.ForeignKeys[1].RefTable = SpecItemsTable
 	CategorySpecsTable.Annotation = &entsql.Annotation{
 		Table: "category_specs",
 	}

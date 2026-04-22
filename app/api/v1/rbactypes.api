@@ -12,6 +12,14 @@ type ListRolePermissionReply {
 	Roles []RolePermission `json:"roles"`
 }
 
+type GetRolePermissionReq {
+	Role string `path:"role"`
+}
+
+type GetRolePermissionReply {
+	RolePermission RolePermission `json:"role_permission"`
+}
+
 type UpdateRolePermissionsReq {
 	Role string `path:"role"`
 	Permissions []string `json:"permissions"`
@@ -25,4 +33,10 @@ type ResetRolePermissionsReq {
 }
 
 type ResetRolePermissionsReply {
+}
+
+type SyncCasbinPoliciesReq {
+}
+
+type SyncCasbinPoliciesReply {
 }
