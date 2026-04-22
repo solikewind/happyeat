@@ -19,9 +19,35 @@ if [ ! -f docker-compose-prod.yml ]; then
 fi
 
 # 2. 检查数据库是否在线 (Migration 必须依赖运行中的 DB)
-if ! compose_cmd -f docker-compose-prod.yml ps -q postgres | grep -q .; then
-  echo "❌ Error: postgres container is not running. Please deploy first."
-  exit 1
+# 优先看当前 compose 项目里的 postgres；若为空，再认固定容器名（避免用别的 yml/目录启动后 ps 对不上）
+postgres_container_id() {
+  compose_cmd -f docker-compose-prod.yml ps -q postgres 2>/dev/null || true
+}
+
+if ! postgres_container_id | grep -q .; then
+  if ! docker ps -q -f name=happyeat-postgres -f status=running | grep -q .; then
+    echo "❌ Error: postgres is not running (compose service postgres or container happyeat-postgres)."
+    echo "   Start DB first, e.g.: docker compose -f docker-compose-prod.yml up -d postgres"
+    echo "   Wait until health is healthy, then run: ./migrate.sh"
+    exit 1
+  fi
+  echo "ℹ️ Postgres container happyeat-postgres is running (not listed under this compose ps; continuing)."
+fi
+
+# 刚启动时可能仍在 health: starting，避免 migrate 立刻连库失败
+if docker ps -q -f name=happyeat-postgres -f status=running | grep -q .; then
+  echo "⏳ Waiting for Postgres to accept connections..."
+  for i in $(seq 1 30); do
+    if docker exec happyeat-postgres pg_isready -U "${DB_USER:-postgres}" -d "${DB_NAME:-happyeat}" >/dev/null 2>&1; then
+      echo "✅ Postgres is ready."
+      break
+    fi
+    if [ "$i" -eq 30 ]; then
+      echo "❌ Postgres did not become ready in time (pg_isready failed)."
+      exit 1
+    fi
+    sleep 2
+  done
 fi
 
 echo "🚀 Starting database migration..."
