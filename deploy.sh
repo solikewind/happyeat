@@ -103,25 +103,28 @@ compose_cmd -f docker-compose-prod.yml up -d happyeat-api
 echo "📊 当前容器状态:"
 docker compose -f docker-compose-prod.yml ps
 
-echo "⏳ 正在验证 API 响应状况 (最多等待 30 秒)..."
+# 与 docker-compose-prod.yml 中 happyeat-api healthcheck.start_period（40s）对齐，留余量
+API_CHECK_PORT="${API_PORT:-8888}"
+HEALTH_URL="http://127.0.0.1:${API_CHECK_PORT}/health"
+MAX_ATTEMPTS=15
+SLEEP_SECS=4
+echo "⏳ 正在验证 API 响应状况 (最多等待约 $((MAX_ATTEMPTS * SLEEP_SECS)) 秒, GET ${HEALTH_URL})..."
 
 SUCCESS=0
-# 循环 6 次，每次休眠 5 秒 = 30 秒
-for i in {1..6}; do
-  # 探测 localhost:8888。只要返回了 HTTP 状态码（无论是 200 还是 404），都说明 Web 服务活了
-  if curl -s --head --request GET http://localhost:8888 | grep "HTTP/" > /dev/null; then
+for i in $(seq 1 "$MAX_ATTEMPTS"); do
+  if curl -sf --connect-timeout 2 --max-time 5 "$HEALTH_URL" >/dev/null; then
     echo "✅ API 已就绪，连接正常!"
     SUCCESS=1
     break
   fi
-  echo "🔄 尝试中 ($i/6)... API 暂无响应"
-  sleep 5
+  echo "🔄 尝试中 ($i/${MAX_ATTEMPTS})... API 暂无响应"
+  sleep "$SLEEP_SECS"
 done
 
 if [ $SUCCESS -eq 1 ]; then
   echo "🚀 部署圆满成功！"
   exit 0
 else
-  echo "❌ 错误: API 在启动后 30 秒内未能建立响应，请检查日志 (docker logs happyeat-api)"
+  echo "❌ 错误: API 在启动后约 $((MAX_ATTEMPTS * SLEEP_SECS)) 秒内未能通过 ${HEALTH_URL} 健康检查，请检查日志 (docker logs happyeat-api)"
   exit 1
 fi
