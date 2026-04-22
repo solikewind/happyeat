@@ -5,9 +5,11 @@ package spec
 
 import (
 	"context"
+	"errors"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +30,15 @@ func NewGetCategorySpecLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 }
 
 func (l *GetCategorySpecLogic) GetCategorySpec(req *types.GetCategorySpecReq) (resp *types.GetCategorySpecReply, err error) {
-	// todo: add your logic here and delete this line
+	item, err := l.svcCtx.CategorySpec.GetByID(l.ctx, req.Id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("分类规格不存在")
+		}
+		return nil, err
+	}
 
-	return
+	return &types.GetCategorySpecReply{
+		Spec: toCategorySpec(item),
+	}, nil
 }

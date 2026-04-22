@@ -55,6 +55,9 @@ func (Order) Fields() []ent.Field {
 		field.Int64("total_amount").
 			Default(0).
 			Comment("订单总金额"),
+		field.Int64("actual_amount").
+			Default(0).
+			Comment("实收金额（分），可与总金额不同（抹零、优惠等）；未收款时可为 0"),
 		field.String("remark").
 			MaxLen(512).
 			Optional().

@@ -28,6 +28,8 @@ type MenuCategory struct {
 	Name string `json:"name,omitempty"`
 	// 描述
 	Description *string `json:"description,omitempty"`
+	// 排序，越小越靠前
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuCategoryQuery when eager-loading is set.
 	Edges        MenuCategoryEdges `json:"edges"`
@@ -68,7 +70,7 @@ func (*MenuCategory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case menucategory.FieldID, menucategory.FieldDeleteTs:
+		case menucategory.FieldID, menucategory.FieldDeleteTs, menucategory.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case menucategory.FieldName, menucategory.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -125,6 +127,12 @@ func (_m *MenuCategory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Description = new(string)
 				*_m.Description = value.String
+			}
+		case menucategory.FieldSort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				_m.Sort = uint32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -188,6 +196,9 @@ func (_m *MenuCategory) String() string {
 		builder.WriteString("description=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteByte(')')
 	return builder.String()
 }

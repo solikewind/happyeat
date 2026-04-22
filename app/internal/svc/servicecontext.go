@@ -16,6 +16,7 @@ import (
 	_ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 	"github.com/solikewind/happyeat/dal/model/menu"
 	"github.com/solikewind/happyeat/dal/model/order"
+	specmodel "github.com/solikewind/happyeat/dal/model/spec"
 	"github.com/solikewind/happyeat/dal/model/table"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -30,8 +31,11 @@ type ServiceContext struct {
 	LLM              *agent.LangChainService
 	ASR              *agent.BailianASRClient
 
-	Menu     *menu.Menu     // 菜单 data 层
-	MenuType *menu.MenuType // 菜单分类 data 层
+	Menu         *menu.Menu              // 菜单 data 层
+	MenuType     *menu.MenuType          // 菜单分类 data 层
+	CategorySpec *specmodel.CategorySpec // 分类规格模板 data 层
+	SpecGroup    *specmodel.SpecGroup    // 规格组 data 层
+	SpecItem     *specmodel.SpecItem     // 规格项 data 层
 
 	Table     *table.Table     // 餐桌 data 层
 	TableType *table.TableType // 餐桌分类 data 层
@@ -88,11 +92,14 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		LLM:    llmSvc,
 		ASR:    asrSvc,
 
-		Menu:      menu.NewMenu(client),
-		MenuType:  menu.NewMenuType(client),
-		Table:     table.NewTable(client),
-		TableType: table.NewTableType(client),
-		Order:     order.NewOrder(client),
+		Menu:         menu.NewMenu(client),
+		MenuType:     menu.NewMenuType(client),
+		CategorySpec: specmodel.NewCategorySpec(client),
+		SpecGroup:    specmodel.NewSpecGroup(client),
+		SpecItem:     specmodel.NewSpecItem(client),
+		Table:        table.NewTable(client),
+		TableType:    table.NewTableType(client),
+		Order:        order.NewOrder(client),
 	}
 	ctx.CasbinMiddleware = NewCasbinMiddleware(ctx)
 	if err := SyncRolePoliciesToCasbin(ctx.Rbac, ctx.Casbin); err != nil {

@@ -13,6 +13,7 @@ type ListTableReq {
 	Current  int64 `json:"current,optional" form:"current,optional"`
 	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
 	Code     string `json:"code,optional" form:"code,optional"`
+	Name     string `json:"name,optional" form:"name,optional"` // 按桌号模糊搜索（与 code 字段一致，子串匹配）
 	Status   string `json:"status,optional" form:"status,optional"`
 	CategoryId uint64 `json:"category_id,optional,string" form:"category_id,optional"` // 按分类id筛选
 	Category string `json:"category,optional" form:"category,optional"` // 按分类名字筛选

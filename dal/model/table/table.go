@@ -60,6 +60,7 @@ func (t *Table) GetByID(ctx context.Context, id uint64) (*ent.Table, error) {
 // ListTablesFilter 列表筛选。
 type ListTablesFilter struct {
 	Code         string
+	Name         string // 桌号 code 模糊（与 Code 可同时存在，均为 Contains）
 	Status       string
 	CategoryName string
 	Offset       int
@@ -71,6 +72,9 @@ func (t *Table) List(ctx context.Context, f ListTablesFilter) ([]*ent.Table, int
 	q := t.c.Table.Query().WithCategory()
 	if f.Code != "" {
 		q = q.Where(enttable.CodeContains(f.Code))
+	}
+	if f.Name != "" {
+		q = q.Where(enttable.CodeContains(f.Name))
 	}
 	if f.Status != "" {
 		q = q.Where(enttable.StatusEQ(f.Status))

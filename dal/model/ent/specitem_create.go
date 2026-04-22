@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
 	"github.com/solikewind/happyeat/dal/model/ent/specitem"
@@ -82,6 +83,20 @@ func (_c *SpecItemCreate) SetDefaultPrice(v int64) *SpecItemCreate {
 	return _c
 }
 
+// SetSort sets the "sort" field.
+func (_c *SpecItemCreate) SetSort(v uint32) *SpecItemCreate {
+	_c.mutation.SetSort(v)
+	return _c
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_c *SpecItemCreate) SetNillableSort(v *uint32) *SpecItemCreate {
+	if v != nil {
+		_c.SetSort(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *SpecItemCreate) SetID(v uint64) *SpecItemCreate {
 	_c.mutation.SetID(v)
@@ -91,6 +106,21 @@ func (_c *SpecItemCreate) SetID(v uint64) *SpecItemCreate {
 // SetSpecGroup sets the "spec_group" edge to the SpecGroup entity.
 func (_c *SpecItemCreate) SetSpecGroup(v *SpecGroup) *SpecItemCreate {
 	return _c.SetSpecGroupID(v.ID)
+}
+
+// AddCategorySpecIDs adds the "category_specs" edge to the CategorySpec entity by IDs.
+func (_c *SpecItemCreate) AddCategorySpecIDs(ids ...uint64) *SpecItemCreate {
+	_c.mutation.AddCategorySpecIDs(ids...)
+	return _c
+}
+
+// AddCategorySpecs adds the "category_specs" edges to the CategorySpec entity.
+func (_c *SpecItemCreate) AddCategorySpecs(v ...*CategorySpec) *SpecItemCreate {
+	ids := make([]uint64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddCategorySpecIDs(ids...)
 }
 
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
@@ -163,6 +193,10 @@ func (_c *SpecItemCreate) defaults() error {
 		v := specitem.DefaultDeleteTs
 		_c.mutation.SetDeleteTs(v)
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		v := specitem.DefaultSort
+		_c.mutation.SetSort(v)
+	}
 	return nil
 }
 
@@ -190,6 +224,9 @@ func (_c *SpecItemCreate) check() error {
 	}
 	if _, ok := _c.mutation.DefaultPrice(); !ok {
 		return &ValidationError{Name: "default_price", err: errors.New(`ent: missing required field "SpecItem.default_price"`)}
+	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "SpecItem.sort"`)}
 	}
 	if len(_c.mutation.SpecGroupIDs()) == 0 {
 		return &ValidationError{Name: "spec_group", err: errors.New(`ent: missing required edge "SpecItem.spec_group"`)}
@@ -246,6 +283,10 @@ func (_c *SpecItemCreate) createSpec() (*SpecItem, *sqlgraph.CreateSpec) {
 		_spec.SetField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 		_node.DefaultPrice = value
 	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(specitem.FieldSort, field.TypeUint32, value)
+		_node.Sort = value
+	}
 	if nodes := _c.mutation.SpecGroupIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -261,6 +302,22 @@ func (_c *SpecItemCreate) createSpec() (*SpecItem, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.SpecGroupID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CategorySpecsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   specitem.CategorySpecsTable,
+			Columns: []string{specitem.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.MenuSpecsIDs(); len(nodes) > 0 {

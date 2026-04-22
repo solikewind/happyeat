@@ -138,6 +138,7 @@
                   "items": {
                     "type": "object",
                     "required": [
+                      "id",
                       "code",
                       "description"
                     ],
@@ -147,12 +148,69 @@
                       },
                       "description": {
                         "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
                       }
                     }
                   }
                 },
                 "total": {
                   "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/permissions/{id}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个权限点",
+        "operationId": "iamGetIAMPermission",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "permission": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "code",
+                    "description"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -225,10 +283,14 @@
                   "items": {
                     "type": "object",
                     "required": [
+                      "id",
                       "role_code",
                       "role_name"
                     ],
                     "properties": {
+                      "id": {
+                        "type": "string"
+                      },
                       "role_code": {
                         "type": "string"
                       },
@@ -242,6 +304,196 @@
                   "type": "integer"
                 }
               }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "创建角色（无权限点，需再通过 RBAC 矩阵配置）",
+        "operationId": "iamCreateIAMRole",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "role_code"
+              ],
+              "properties": {
+                "role_code": {
+                  "type": "string"
+                },
+                "role_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/roles/{id}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个角色",
+        "operationId": "iamGetIAMRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "role_code",
+                    "role_name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "role_code": {
+                      "type": "string"
+                    },
+                    "role_name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "更新角色展示名（role_code 不可改）",
+        "operationId": "iamUpdateIAMRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "role_name"
+              ],
+              "properties": {
+                "role_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "删除角色（软删；系统预置角色不可删；删除后全量同步 Casbin）",
+        "operationId": "iamDeleteIAMRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
             }
           }
         }
@@ -423,12 +675,16 @@
                   "items": {
                     "type": "object",
                     "required": [
+                      "id",
                       "user_code",
                       "display_name",
                       "roles"
                     ],
                     "properties": {
                       "display_name": {
+                        "type": "string"
+                      },
+                      "id": {
                         "type": "string"
                       },
                       "roles": {
@@ -444,6 +700,203 @@
                   }
                 }
               }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "创建用户（仅主体档案，分配角色用 user-roles 接口）",
+        "operationId": "iamCreateIAMUser",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "user_code"
+              ],
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                },
+                "user_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/iam/users/{id}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个用户及角色列表",
+        "operationId": "iamGetIAMUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "user_code",
+                    "display_name",
+                    "roles"
+                  ],
+                  "properties": {
+                    "display_name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "user_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "更新用户展示名",
+        "operationId": "iamUpdateIAMUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "display_name"
+              ],
+              "properties": {
+                "display_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "删除用户（软删，并清除 Casbin 中该用户全部分组）",
+        "operationId": "iamDeleteIAMUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
             }
           }
         }
@@ -535,6 +988,10 @@
                         "description": "分类名称",
                         "type": "string"
                       },
+                      "sort": {
+                        "description": "排序，越小越靠前",
+                        "type": "integer"
+                      },
                       "updated_at": {
                         "type": "string"
                       }
@@ -584,6 +1041,9 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "sort": {
+                  "type": "integer"
                 }
               }
             }
@@ -619,8 +1079,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -652,6 +1111,10 @@
                     "name": {
                       "description": "分类名称",
                       "type": "string"
+                    },
+                    "sort": {
+                      "description": "排序，越小越靠前",
+                      "type": "integer"
                     },
                     "updated_at": {
                       "type": "string"
@@ -685,8 +1148,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -694,12 +1156,20 @@
             "required": true,
             "schema": {
               "type": "object",
+              "required": [
+                "name",
+                "description",
+                "sort"
+              ],
               "properties": {
                 "description": {
                   "type": "string"
                 },
                 "name": {
                   "type": "string"
+                },
+                "sort": {
+                  "type": "integer"
                 }
               }
             }
@@ -736,8 +1206,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -770,8 +1239,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -796,7 +1264,7 @@
                       "type": "string"
                     },
                     "created_at": {
-                      "description": "创建时间",
+                      "description": "创建时间，RFC3339（UTC），列表与详情均返回",
                       "type": "string"
                     },
                     "description": {
@@ -825,8 +1293,7 @@
                       "items": {
                         "type": "object",
                         "required": [
-                          "price_delta",
-                          "sort"
+                          "price_delta"
                         ],
                         "properties": {
                           "category_spec_id": {
@@ -838,18 +1305,30 @@
                             "type": "integer"
                           },
                           "sort": {
-                            "description": "排序",
+                            "description": "排序（不传默认0）",
                             "type": "integer"
+                          },
+                          "source": {
+                            "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                            "type": "string"
                           },
                           "spec_item_id": {
                             "description": "规格项id",
+                            "type": "string"
+                          },
+                          "spec_type": {
+                            "description": "规格类型，如辣度",
+                            "type": "string"
+                          },
+                          "spec_value": {
+                            "description": "规格值，如微辣",
                             "type": "string"
                           }
                         }
                       }
                     },
                     "updated_at": {
-                      "description": "更新时间",
+                      "description": "更新时间，RFC3339（UTC），列表与详情均返回",
                       "type": "string"
                     }
                   }
@@ -881,8 +1360,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -895,8 +1373,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 },
                 "description": {
                   "type": "string"
@@ -915,8 +1392,7 @@
                   "items": {
                     "type": "object",
                     "required": [
-                      "price_delta",
-                      "sort"
+                      "price_delta"
                     ],
                     "properties": {
                       "category_spec_id": {
@@ -928,11 +1404,23 @@
                         "type": "integer"
                       },
                       "sort": {
-                        "description": "排序",
+                        "description": "排序（不传默认0）",
                         "type": "integer"
+                      },
+                      "source": {
+                        "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                        "type": "string"
                       },
                       "spec_item_id": {
                         "description": "规格项id",
+                        "type": "string"
+                      },
+                      "spec_type": {
+                        "description": "规格类型，如辣度",
+                        "type": "string"
+                      },
+                      "spec_value": {
+                        "description": "规格值，如微辣",
                         "type": "string"
                       }
                     }
@@ -973,8 +1461,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -1087,7 +1574,7 @@
                         "type": "string"
                       },
                       "created_at": {
-                        "description": "创建时间",
+                        "description": "创建时间，RFC3339（UTC），列表与详情均返回",
                         "type": "string"
                       },
                       "description": {
@@ -1116,8 +1603,7 @@
                         "items": {
                           "type": "object",
                           "required": [
-                            "price_delta",
-                            "sort"
+                            "price_delta"
                           ],
                           "properties": {
                             "category_spec_id": {
@@ -1129,18 +1615,30 @@
                               "type": "integer"
                             },
                             "sort": {
-                              "description": "排序",
+                              "description": "排序（不传默认0）",
                               "type": "integer"
+                            },
+                            "source": {
+                              "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                              "type": "string"
                             },
                             "spec_item_id": {
                               "description": "规格项id",
+                              "type": "string"
+                            },
+                            "spec_type": {
+                              "description": "规格类型，如辣度",
+                              "type": "string"
+                            },
+                            "spec_value": {
+                              "description": "规格值，如微辣",
                               "type": "string"
                             }
                           }
                         }
                       },
                       "updated_at": {
-                        "description": "更新时间",
+                        "description": "更新时间，RFC3339（UTC），列表与详情均返回",
                         "type": "string"
                       }
                     }
@@ -1185,8 +1683,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 },
                 "description": {
                   "type": "string"
@@ -1206,8 +1703,7 @@
                   "items": {
                     "type": "object",
                     "required": [
-                      "price_delta",
-                      "sort"
+                      "price_delta"
                     ],
                     "properties": {
                       "category_spec_id": {
@@ -1219,11 +1715,23 @@
                         "type": "integer"
                       },
                       "sort": {
-                        "description": "排序",
+                        "description": "排序（不传默认0）",
                         "type": "integer"
+                      },
+                      "source": {
+                        "description": "category=分类规格 library=基础规格 custom=菜单自定义",
+                        "type": "string"
                       },
                       "spec_item_id": {
                         "description": "规格项id",
+                        "type": "string"
+                      },
+                      "spec_type": {
+                        "description": "规格类型，如辣度",
+                        "type": "string"
+                      },
+                      "spec_value": {
+                        "description": "规格值，如微辣",
                         "type": "string"
                       }
                     }
@@ -1263,8 +1771,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -1395,8 +1902,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -1910,6 +2416,57 @@
       }
     },
     "/central/v1/rbac/role-permissions/{role}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取单个角色的权限列表",
+        "operationId": "rbacGetRolePermission",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "role",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role_permission": {
+                  "type": "object",
+                  "required": [
+                    "role",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "security": [
           {
@@ -1996,8 +2553,7 @@
             "type": "string",
             "name": "category_id",
             "in": "query",
-            "allowEmptyValue": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "allowEmptyValue": true
           },
           {
             "type": "string",
@@ -2013,8 +2569,7 @@
               "type": "object",
               "properties": {
                 "category_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 },
                 "current": {
                   "type": "integer"
@@ -2045,27 +2600,28 @@
                       "spec_type",
                       "spec_value",
                       "price_delta",
-                      "sort",
                       "created_at",
                       "updated_at"
                     ],
                     "properties": {
                       "category_id": {
-                        "type": "string",
-                        "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                        "type": "string"
                       },
                       "created_at": {
                         "type": "string"
                       },
                       "id": {
-                        "type": "string",
-                        "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                        "type": "string"
                       },
                       "price_delta": {
                         "type": "integer"
                       },
                       "sort": {
+                        "description": "排序（不传默认0）",
                         "type": "integer"
+                      },
+                      "spec_item_id": {
+                        "type": "string"
                       },
                       "spec_type": {
                         "type": "string"
@@ -2118,14 +2674,16 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 },
                 "price_delta": {
                   "type": "integer"
                 },
                 "sort": {
                   "type": "integer"
+                },
+                "spec_item_id": {
+                  "type": "string"
                 },
                 "spec_type": {
                   "type": "string"
@@ -2167,8 +2725,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -2185,27 +2742,28 @@
                     "spec_type",
                     "spec_value",
                     "price_delta",
-                    "sort",
                     "created_at",
                     "updated_at"
                   ],
                   "properties": {
                     "category_id": {
-                      "type": "string",
-                      "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                      "type": "string"
                     },
                     "created_at": {
                       "type": "string"
                     },
                     "id": {
-                      "type": "string",
-                      "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                      "type": "string"
                     },
                     "price_delta": {
                       "type": "integer"
                     },
                     "sort": {
+                      "description": "排序（不传默认0）",
                       "type": "integer"
+                    },
+                    "spec_item_id": {
+                      "type": "string"
                     },
                     "spec_type": {
                       "type": "string"
@@ -2245,8 +2803,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -2261,14 +2818,16 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 },
                 "price_delta": {
                   "type": "integer"
                 },
                 "sort": {
                   "type": "integer"
+                },
+                "spec_item_id": {
+                  "type": "string"
                 },
                 "spec_type": {
                   "type": "string"
@@ -2311,8 +2870,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -2394,8 +2952,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -2409,7 +2966,6 @@
                   "required": [
                     "id",
                     "name",
-                    "sort",
                     "created_at",
                     "updated_at"
                   ],
@@ -2418,13 +2974,13 @@
                       "type": "string"
                     },
                     "id": {
-                      "type": "string",
-                      "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                      "type": "string"
                     },
                     "name": {
                       "type": "string"
                     },
                     "sort": {
+                      "description": "排序（不传默认0）",
                       "type": "integer"
                     },
                     "updated_at": {
@@ -2459,8 +3015,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -2513,8 +3068,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -2594,7 +3148,6 @@
                     "required": [
                       "id",
                       "name",
-                      "sort",
                       "created_at",
                       "updated_at"
                     ],
@@ -2603,13 +3156,13 @@
                         "type": "string"
                       },
                       "id": {
-                        "type": "string",
-                        "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                        "type": "string"
                       },
                       "name": {
                         "type": "string"
                       },
                       "sort": {
+                        "description": "排序（不传默认0）",
                         "type": "integer"
                       },
                       "updated_at": {
@@ -2663,9 +3216,11 @@
                 "name": {
                   "type": "string"
                 },
+                "sort": {
+                  "type": "integer"
+                },
                 "spec_group_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 }
               }
             }
@@ -2701,8 +3256,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -2729,15 +3283,16 @@
                       "type": "integer"
                     },
                     "id": {
-                      "type": "string",
-                      "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                      "type": "string"
                     },
                     "name": {
                       "type": "string"
                     },
+                    "sort": {
+                      "type": "integer"
+                    },
                     "spec_group_id": {
-                      "type": "string",
-                      "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                      "type": "string"
                     },
                     "updated_at": {
                       "type": "string"
@@ -2771,8 +3326,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -2791,9 +3345,11 @@
                 "name": {
                   "type": "string"
                 },
+                "sort": {
+                  "type": "integer"
+                },
                 "spec_group_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 }
               }
             }
@@ -2830,8 +3386,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -2876,8 +3431,7 @@
             "type": "string",
             "name": "spec_group_id",
             "in": "query",
-            "allowEmptyValue": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "allowEmptyValue": true
           },
           {
             "type": "string",
@@ -2902,8 +3456,7 @@
                   "type": "integer"
                 },
                 "spec_group_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 }
               }
             }
@@ -2935,15 +3488,16 @@
                         "type": "integer"
                       },
                       "id": {
-                        "type": "string",
-                        "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                        "type": "string"
                       },
                       "name": {
                         "type": "string"
                       },
+                      "sort": {
+                        "type": "integer"
+                      },
                       "spec_group_id": {
-                        "type": "string",
-                        "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                        "type": "string"
                       },
                       "updated_at": {
                         "type": "string"
@@ -3122,8 +3676,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -3180,8 +3733,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -3242,8 +3794,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -3276,8 +3827,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -3358,8 +3908,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           },
           {
             "name": "body",
@@ -3377,8 +3926,7 @@
                   "type": "integer"
                 },
                 "category_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 },
                 "code": {
                   "type": "string"
@@ -3424,8 +3972,7 @@
             "type": "string",
             "name": "id",
             "in": "path",
-            "required": true,
-            "description": "十进制整数字符串（路径/查询参数）"
+            "required": true
           }
         ],
         "responses": {
@@ -3619,8 +4166,7 @@
                   "type": "integer"
                 },
                 "category_id": {
-                  "type": "string",
-                  "description": "十进制整数字符串（uint64，避免 JS Number 精度丢失）"
+                  "type": "string"
                 },
                 "code": {
                   "type": "string"
@@ -3820,7 +4366,7 @@
       "in": "header"
     }
   },
-  "x-date": "2026-04-06 21:51:24",
+  "x-date": "2026-04-19 08:34:45",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

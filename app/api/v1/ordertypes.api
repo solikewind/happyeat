@@ -33,10 +33,11 @@ type CreateOrderItemReq {
 	SpecInfo  string  `json:"spec_info,optional"`
 }
 type CreateOrderReq {
-	OrderType   string             `json:"order_type"`   // dine_in | takeaway
+	OrderType    string             `json:"order_type"`   // dine_in | takeaway
 	TableId     uint64 `json:"table_id,optional,string"` // 堂食必填
 	Items       []CreateOrderItemReq `json:"items"`
 	TotalAmount int64            `json:"total_amount"`
+	ActualAmount int64           `json:"actual_amount,optional"` // 实收（分）；不传默认 0
 	Remark      string             `json:"remark,optional"`
 }
 type CreateOrderReply {
@@ -45,6 +46,6 @@ type CreateOrderReply {
 
 type UpdateOrderStatusReq {
 	Id     uint64 `path:"id"`
-	Status string `json:"status"` // paid/preparing/completed/cancelled
+	Status string `json:"status"` // 目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）
 }
 type UpdateOrderStatusReply {}

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/solikewind/happyeat/dal/model/ent/categoryspec"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
@@ -106,9 +107,45 @@ func (_u *SpecItemUpdate) AddDefaultPrice(v int64) *SpecItemUpdate {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *SpecItemUpdate) SetSort(v uint32) *SpecItemUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *SpecItemUpdate) SetNillableSort(v *uint32) *SpecItemUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *SpecItemUpdate) AddSort(v int32) *SpecItemUpdate {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetSpecGroup sets the "spec_group" edge to the SpecGroup entity.
 func (_u *SpecItemUpdate) SetSpecGroup(v *SpecGroup) *SpecItemUpdate {
 	return _u.SetSpecGroupID(v.ID)
+}
+
+// AddCategorySpecIDs adds the "category_specs" edge to the CategorySpec entity by IDs.
+func (_u *SpecItemUpdate) AddCategorySpecIDs(ids ...uint64) *SpecItemUpdate {
+	_u.mutation.AddCategorySpecIDs(ids...)
+	return _u
+}
+
+// AddCategorySpecs adds the "category_specs" edges to the CategorySpec entity.
+func (_u *SpecItemUpdate) AddCategorySpecs(v ...*CategorySpec) *SpecItemUpdate {
+	ids := make([]uint64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCategorySpecIDs(ids...)
 }
 
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
@@ -135,6 +172,27 @@ func (_u *SpecItemUpdate) Mutation() *SpecItemMutation {
 func (_u *SpecItemUpdate) ClearSpecGroup() *SpecItemUpdate {
 	_u.mutation.ClearSpecGroup()
 	return _u
+}
+
+// ClearCategorySpecs clears all "category_specs" edges to the CategorySpec entity.
+func (_u *SpecItemUpdate) ClearCategorySpecs() *SpecItemUpdate {
+	_u.mutation.ClearCategorySpecs()
+	return _u
+}
+
+// RemoveCategorySpecIDs removes the "category_specs" edge to CategorySpec entities by IDs.
+func (_u *SpecItemUpdate) RemoveCategorySpecIDs(ids ...uint64) *SpecItemUpdate {
+	_u.mutation.RemoveCategorySpecIDs(ids...)
+	return _u
+}
+
+// RemoveCategorySpecs removes "category_specs" edges to CategorySpec entities.
+func (_u *SpecItemUpdate) RemoveCategorySpecs(v ...*CategorySpec) *SpecItemUpdate {
+	ids := make([]uint64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCategorySpecIDs(ids...)
 }
 
 // ClearMenuSpecs clears all "menu_specs" edges to the MenuSpec entity.
@@ -243,6 +301,12 @@ func (_u *SpecItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.AddedDefaultPrice(); ok {
 		_spec.AddField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(specitem.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(specitem.FieldSort, field.TypeUint32, value)
+	}
 	if _u.mutation.SpecGroupCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -265,6 +329,51 @@ func (_u *SpecItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(specgroup.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CategorySpecsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   specitem.CategorySpecsTable,
+			Columns: []string{specitem.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCategorySpecsIDs(); len(nodes) > 0 && !_u.mutation.CategorySpecsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   specitem.CategorySpecsTable,
+			Columns: []string{specitem.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CategorySpecsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   specitem.CategorySpecsTable,
+			Columns: []string{specitem.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -413,9 +522,45 @@ func (_u *SpecItemUpdateOne) AddDefaultPrice(v int64) *SpecItemUpdateOne {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *SpecItemUpdateOne) SetSort(v uint32) *SpecItemUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *SpecItemUpdateOne) SetNillableSort(v *uint32) *SpecItemUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *SpecItemUpdateOne) AddSort(v int32) *SpecItemUpdateOne {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetSpecGroup sets the "spec_group" edge to the SpecGroup entity.
 func (_u *SpecItemUpdateOne) SetSpecGroup(v *SpecGroup) *SpecItemUpdateOne {
 	return _u.SetSpecGroupID(v.ID)
+}
+
+// AddCategorySpecIDs adds the "category_specs" edge to the CategorySpec entity by IDs.
+func (_u *SpecItemUpdateOne) AddCategorySpecIDs(ids ...uint64) *SpecItemUpdateOne {
+	_u.mutation.AddCategorySpecIDs(ids...)
+	return _u
+}
+
+// AddCategorySpecs adds the "category_specs" edges to the CategorySpec entity.
+func (_u *SpecItemUpdateOne) AddCategorySpecs(v ...*CategorySpec) *SpecItemUpdateOne {
+	ids := make([]uint64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCategorySpecIDs(ids...)
 }
 
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
@@ -442,6 +587,27 @@ func (_u *SpecItemUpdateOne) Mutation() *SpecItemMutation {
 func (_u *SpecItemUpdateOne) ClearSpecGroup() *SpecItemUpdateOne {
 	_u.mutation.ClearSpecGroup()
 	return _u
+}
+
+// ClearCategorySpecs clears all "category_specs" edges to the CategorySpec entity.
+func (_u *SpecItemUpdateOne) ClearCategorySpecs() *SpecItemUpdateOne {
+	_u.mutation.ClearCategorySpecs()
+	return _u
+}
+
+// RemoveCategorySpecIDs removes the "category_specs" edge to CategorySpec entities by IDs.
+func (_u *SpecItemUpdateOne) RemoveCategorySpecIDs(ids ...uint64) *SpecItemUpdateOne {
+	_u.mutation.RemoveCategorySpecIDs(ids...)
+	return _u
+}
+
+// RemoveCategorySpecs removes "category_specs" edges to CategorySpec entities.
+func (_u *SpecItemUpdateOne) RemoveCategorySpecs(v ...*CategorySpec) *SpecItemUpdateOne {
+	ids := make([]uint64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCategorySpecIDs(ids...)
 }
 
 // ClearMenuSpecs clears all "menu_specs" edges to the MenuSpec entity.
@@ -580,6 +746,12 @@ func (_u *SpecItemUpdateOne) sqlSave(ctx context.Context) (_node *SpecItem, err 
 	if value, ok := _u.mutation.AddedDefaultPrice(); ok {
 		_spec.AddField(specitem.FieldDefaultPrice, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(specitem.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(specitem.FieldSort, field.TypeUint32, value)
+	}
 	if _u.mutation.SpecGroupCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -602,6 +774,51 @@ func (_u *SpecItemUpdateOne) sqlSave(ctx context.Context) (_node *SpecItem, err 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(specgroup.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CategorySpecsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   specitem.CategorySpecsTable,
+			Columns: []string{specitem.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCategorySpecsIDs(); len(nodes) > 0 && !_u.mutation.CategorySpecsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   specitem.CategorySpecsTable,
+			Columns: []string{specitem.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CategorySpecsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   specitem.CategorySpecsTable,
+			Columns: []string{specitem.CategorySpecsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(categoryspec.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

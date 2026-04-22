@@ -31,6 +31,8 @@ type SpecItem struct {
 	Name string `json:"name,omitempty"`
 	// 默认价格
 	DefaultPrice int64 `json:"default_price,omitempty"`
+	// 排序权重，越小越靠前
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SpecItemQuery when eager-loading is set.
 	Edges        SpecItemEdges `json:"edges"`
@@ -41,11 +43,13 @@ type SpecItem struct {
 type SpecItemEdges struct {
 	// SpecGroup holds the value of the spec_group edge.
 	SpecGroup *SpecGroup `json:"spec_group,omitempty"`
+	// CategorySpecs holds the value of the category_specs edge.
+	CategorySpecs []*CategorySpec `json:"category_specs,omitempty"`
 	// MenuSpecs holds the value of the menu_specs edge.
 	MenuSpecs []*MenuSpec `json:"menu_specs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // SpecGroupOrErr returns the SpecGroup value or an error if the edge
@@ -59,10 +63,19 @@ func (e SpecItemEdges) SpecGroupOrErr() (*SpecGroup, error) {
 	return nil, &NotLoadedError{edge: "spec_group"}
 }
 
+// CategorySpecsOrErr returns the CategorySpecs value or an error if the edge
+// was not loaded in eager-loading.
+func (e SpecItemEdges) CategorySpecsOrErr() ([]*CategorySpec, error) {
+	if e.loadedTypes[1] {
+		return e.CategorySpecs, nil
+	}
+	return nil, &NotLoadedError{edge: "category_specs"}
+}
+
 // MenuSpecsOrErr returns the MenuSpecs value or an error if the edge
 // was not loaded in eager-loading.
 func (e SpecItemEdges) MenuSpecsOrErr() ([]*MenuSpec, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.MenuSpecs, nil
 	}
 	return nil, &NotLoadedError{edge: "menu_specs"}
@@ -73,7 +86,7 @@ func (*SpecItem) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case specitem.FieldID, specitem.FieldDeleteTs, specitem.FieldSpecGroupID, specitem.FieldDefaultPrice:
+		case specitem.FieldID, specitem.FieldDeleteTs, specitem.FieldSpecGroupID, specitem.FieldDefaultPrice, specitem.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case specitem.FieldName:
 			values[i] = new(sql.NullString)
@@ -136,6 +149,12 @@ func (_m *SpecItem) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DefaultPrice = value.Int64
 			}
+		case specitem.FieldSort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				_m.Sort = uint32(value.Int64)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -152,6 +171,11 @@ func (_m *SpecItem) Value(name string) (ent.Value, error) {
 // QuerySpecGroup queries the "spec_group" edge of the SpecItem entity.
 func (_m *SpecItem) QuerySpecGroup() *SpecGroupQuery {
 	return NewSpecItemClient(_m.config).QuerySpecGroup(_m)
+}
+
+// QueryCategorySpecs queries the "category_specs" edge of the SpecItem entity.
+func (_m *SpecItem) QueryCategorySpecs() *CategorySpecQuery {
+	return NewSpecItemClient(_m.config).QueryCategorySpecs(_m)
 }
 
 // QueryMenuSpecs queries the "menu_specs" edge of the SpecItem entity.
@@ -199,6 +223,9 @@ func (_m *SpecItem) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("default_price=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DefaultPrice))
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteByte(')')
 	return builder.String()
 }

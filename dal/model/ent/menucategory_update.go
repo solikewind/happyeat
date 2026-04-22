@@ -91,6 +91,27 @@ func (_u *MenuCategoryUpdate) ClearDescription() *MenuCategoryUpdate {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *MenuCategoryUpdate) SetSort(v uint32) *MenuCategoryUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *MenuCategoryUpdate) SetNillableSort(v *uint32) *MenuCategoryUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *MenuCategoryUpdate) AddSort(v int32) *MenuCategoryUpdate {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // AddMenuIDs adds the "menus" edge to the Menu entity by IDs.
 func (_u *MenuCategoryUpdate) AddMenuIDs(ids ...uint64) *MenuCategoryUpdate {
 	_u.mutation.AddMenuIDs(ids...)
@@ -249,6 +270,12 @@ func (_u *MenuCategoryUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(menucategory.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(menucategory.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(menucategory.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.MenusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -418,6 +445,27 @@ func (_u *MenuCategoryUpdateOne) SetNillableDescription(v *string) *MenuCategory
 // ClearDescription clears the value of the "description" field.
 func (_u *MenuCategoryUpdateOne) ClearDescription() *MenuCategoryUpdateOne {
 	_u.mutation.ClearDescription()
+	return _u
+}
+
+// SetSort sets the "sort" field.
+func (_u *MenuCategoryUpdateOne) SetSort(v uint32) *MenuCategoryUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *MenuCategoryUpdateOne) SetNillableSort(v *uint32) *MenuCategoryUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *MenuCategoryUpdateOne) AddSort(v int32) *MenuCategoryUpdateOne {
+	_u.mutation.AddSort(v)
 	return _u
 }
 
@@ -609,6 +657,12 @@ func (_u *MenuCategoryUpdateOne) sqlSave(ctx context.Context) (_node *MenuCatego
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(menucategory.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(menucategory.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(menucategory.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.MenusCleared() {
 		edge := &sqlgraph.EdgeSpec{

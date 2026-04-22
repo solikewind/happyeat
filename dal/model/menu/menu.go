@@ -22,6 +22,8 @@ func NewMenu(c *ent.Client) *Menu {
 type SpecInput struct {
 	SpecItemID     uint64
 	CategorySpecID uint64
+	SpecType       string
+	SpecValue      string
 	PriceDelta     int64
 	Sort           uint32
 }
@@ -90,12 +92,13 @@ func (m *Menu) GetByID(ctx context.Context, id uint64) (*ent.Menu, error) {
 }
 
 func (m *Menu) Exist(ctx context.Context, id uint64) (bool, error) {
-	return m.withMenuEdges(m.c.Menu.Query().Where(entmenu.IDEQ(id))).Exist(ctx)
+	return m.c.Menu.Query().Where(entmenu.IDEQ(id)).Exist(ctx)
 }
 
 type ListMenusFilter struct {
 	Name         string
 	CategoryName string
+	CategoryID   uint64
 	Offset       int
 	Limit        int
 }
@@ -114,6 +117,9 @@ func (m *Menu) List(ctx context.Context, f ListMenusFilter) ([]*ent.Menu, int64,
 		q := m.c.Menu.Query()
 		if f.CategoryName != "" {
 			q = q.Where(entmenu.HasCategoryWith(menucategory.NameEQ(f.CategoryName)))
+		}
+		if f.CategoryID > 0 {
+			q = q.Where(entmenu.MenuCategoryIDEQ(f.CategoryID))
 		}
 		return q
 	}
@@ -267,5 +273,9 @@ func (m *Menu) withMenuEdges(q *ent.MenuQuery) *ent.MenuQuery {
 			menuspec.BySort(sql.OrderAsc()),
 			menuspec.ByID(sql.OrderAsc()),
 		)
+		sq.WithCategorySpec()
+		sq.WithSpecItem(func(iq *ent.SpecItemQuery) {
+			iq.WithSpecGroup()
+		})
 	})
 }

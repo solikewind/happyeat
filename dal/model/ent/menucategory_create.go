@@ -84,6 +84,20 @@ func (_c *MenuCategoryCreate) SetNillableDescription(v *string) *MenuCategoryCre
 	return _c
 }
 
+// SetSort sets the "sort" field.
+func (_c *MenuCategoryCreate) SetSort(v uint32) *MenuCategoryCreate {
+	_c.mutation.SetSort(v)
+	return _c
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_c *MenuCategoryCreate) SetNillableSort(v *uint32) *MenuCategoryCreate {
+	if v != nil {
+		_c.SetSort(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *MenuCategoryCreate) SetID(v uint64) *MenuCategoryCreate {
 	_c.mutation.SetID(v)
@@ -175,6 +189,10 @@ func (_c *MenuCategoryCreate) defaults() error {
 		v := menucategory.DefaultDeleteTs
 		_c.mutation.SetDeleteTs(v)
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		v := menucategory.DefaultSort
+		_c.mutation.SetSort(v)
+	}
 	return nil
 }
 
@@ -196,6 +214,9 @@ func (_c *MenuCategoryCreate) check() error {
 		if err := menucategory.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MenuCategory.name": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "MenuCategory.sort"`)}
 	}
 	return nil
 }
@@ -248,6 +269,10 @@ func (_c *MenuCategoryCreate) createSpec() (*MenuCategory, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(menucategory.FieldDescription, field.TypeString, value)
 		_node.Description = &value
+	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(menucategory.FieldSort, field.TypeUint32, value)
+		_node.Sort = value
 	}
 	if nodes := _c.mutation.MenusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

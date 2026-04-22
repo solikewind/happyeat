@@ -44,6 +44,7 @@ func (l *ListMenuLogic) ListMenu(req *types.ListMenuReq) (resp *types.ListMenuRe
 	list, total, err := l.svcCtx.Menu.List(l.ctx, menu.ListMenusFilter{
 		Name:         req.Name,
 		CategoryName: req.Category,
+		CategoryID:   req.CategoryId,
 		Offset:       offset,
 		Limit:        pageSize,
 	})
