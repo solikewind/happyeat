@@ -18,27 +18,51 @@ if [ ! -f docker-compose-prod.yml ]; then
   exit 1
 fi
 
+# 与 deploy.sh 一致：加载 .env，使 COMPOSE_PROJECT_NAME 等与「当时 up 库」时相同，否则 compose ps 会对不上工程
+if [ -f .env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . ./.env
+  set +a
+fi
+
+POSTGRES_CONTAINER_NAME="${POSTGRES_CONTAINER_NAME:-happyeat-postgres}"
+
 # 2. 检查数据库是否在线 (Migration 必须依赖运行中的 DB)
 # 优先看当前 compose 项目里的 postgres；若为空，再认固定容器名（避免用别的 yml/目录启动后 ps 对不上）
 postgres_container_id() {
   compose_cmd -f docker-compose-prod.yml ps -q postgres 2>/dev/null || true
 }
 
+migrate_postgres_fail() {
+  echo "❌ Error: postgres is not running (compose service postgres or container ${POSTGRES_CONTAINER_NAME})."
+  echo "   Start DB first, e.g.: docker compose -f docker-compose-prod.yml up -d postgres"
+  echo "   Wait until health is healthy, then run: ./migrate.sh"
+  echo ""
+  echo "── 诊断 (便于核对 Compose 工程名与容器名) ──"
+  echo "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-<未设置，默认使用当前目录名>}"
+  echo "docker compose ps -a:"
+  compose_cmd -f docker-compose-prod.yml ps -a 2>&1 || true
+  echo ""
+  echo "与本服务相关的容器:"
+  docker ps -a --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' 2>&1 | head -1
+  docker ps -a --format '{{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null | grep -E 'happyeat|postgres' || echo "(无匹配行)"
+  exit 1
+}
+
 if ! postgres_container_id | grep -q .; then
-  if ! docker ps -q -f name=happyeat-postgres -f status=running | grep -q .; then
-    echo "❌ Error: postgres is not running (compose service postgres or container happyeat-postgres)."
-    echo "   Start DB first, e.g.: docker compose -f docker-compose-prod.yml up -d postgres"
-    echo "   Wait until health is healthy, then run: ./migrate.sh"
-    exit 1
+  # 不设 status=running：与默认 docker ps 行为一致，避免个别环境下组合 filter 异常
+  if ! docker ps -q --filter "name=${POSTGRES_CONTAINER_NAME}" | grep -q .; then
+    migrate_postgres_fail
   fi
-  echo "ℹ️ Postgres container happyeat-postgres is running (not listed under this compose ps; continuing)."
+  echo "ℹ️ Postgres container ${POSTGRES_CONTAINER_NAME} is running (not listed under this compose ps; continuing)."
 fi
 
 # 刚启动时可能仍在 health: starting，避免 migrate 立刻连库失败
-if docker ps -q -f name=happyeat-postgres -f status=running | grep -q .; then
+if docker ps -q --filter "name=${POSTGRES_CONTAINER_NAME}" | grep -q .; then
   echo "⏳ Waiting for Postgres to accept connections..."
   for i in $(seq 1 30); do
-    if docker exec happyeat-postgres pg_isready -U "${DB_USER:-postgres}" -d "${DB_NAME:-happyeat}" >/dev/null 2>&1; then
+    if docker exec "${POSTGRES_CONTAINER_NAME}" pg_isready -U "${DB_USER:-postgres}" -d "${DB_NAME:-happyeat}" >/dev/null 2>&1; then
       echo "✅ Postgres is ready."
       break
     fi
