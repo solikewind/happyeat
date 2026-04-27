@@ -41,7 +41,7 @@ services:
       TZ: ${TZ:-Asia/Shanghai}
     volumes:
       # 2. 将宿主机的 etc 目录挂载到容器的 /run/config
-      - ./app/etc:/run/config:ro
+      - ./app/etc:/run/config
     depends_on:
       postgres:
         condition: service_healthy
