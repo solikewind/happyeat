@@ -2,6 +2,7 @@ package menu
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
@@ -37,6 +38,37 @@ type CreateMenuInput struct {
 	Specs       []SpecInput
 }
 
+func (m *Menu) validateSpecs(ctx context.Context, menuCategoryID uint64, specs []SpecInput) error {
+	for _, s := range specs {
+		hasItem := s.SpecItemID > 0
+		hasCat := s.CategorySpecID > 0
+		if !hasItem && !hasCat {
+			return errors.New("每条菜单规格至少需要指定 spec_item_id 或 category_spec_id")
+		}
+		if hasCat {
+			cs, err := m.c.CategorySpec.Get(ctx, s.CategorySpecID)
+			if err != nil {
+				if ent.IsNotFound(err) {
+					return errors.New("分类规格模板不存在")
+				}
+				return err
+			}
+			if cs.MenuCategoryID != menuCategoryID {
+				return errors.New("分类规格模板与菜单所属分类不一致")
+			}
+		}
+		if hasItem {
+			if _, err := m.c.SpecItem.Get(ctx, s.SpecItemID); err != nil {
+				if ent.IsNotFound(err) {
+					return errors.New("全局规格项不存在")
+				}
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error) {
 	tx, err := m.c.Tx(ctx)
 	if err != nil {
@@ -54,6 +86,11 @@ func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error
 	if in.Image != "" {
 		create = create.SetImage(in.Image)
 	}
+
+	if err := m.validateSpecs(ctx, in.CategoryID, in.Specs); err != nil {
+		return nil, err
+	}
+
 	entMenu, err := create.Save(ctx)
 	if err != nil {
 		return nil, err
@@ -192,7 +229,8 @@ type UpdateMenuInput struct {
 	Image       string
 	Price       int64
 	CategoryID  uint64
-	Specs       []SpecInput
+	// Specs 非 nil 时表示用新列表整体替换；nil 表示不修改现有规格（解决 JSON 省略 specs 时被清空的问题）
+	Specs *[]SpecInput
 }
 
 func (m *Menu) Update(ctx context.Context, id uint64, in UpdateMenuInput) error {
@@ -220,29 +258,33 @@ func (m *Menu) Update(ctx context.Context, id uint64, in UpdateMenuInput) error 
 		return err
 	}
 
-	_, err = tx.MenuSpec.Delete().Where(menuspec.HasMenuWith(entmenu.IDEQ(id))).Exec(ctx)
-	if err != nil {
-		return err
-	}
-
-	for i, spec := range in.Specs {
-		createSpec := tx.MenuSpec.Create().
-			SetMenuID(id).
-			SetPriceDelta(spec.PriceDelta)
-		if spec.SpecItemID > 0 {
-			createSpec = createSpec.SetSpecItemID(spec.SpecItemID)
+	if in.Specs != nil {
+		if err := m.validateSpecs(ctx, in.CategoryID, *in.Specs); err != nil {
+			return err
 		}
-		if spec.CategorySpecID > 0 {
-			createSpec = createSpec.SetCategorySpecID(spec.CategorySpecID)
-		}
-		if spec.Sort > 0 {
-			createSpec = createSpec.SetSort(spec.Sort)
-		} else {
-			createSpec = createSpec.SetSort(uint32(i))
-		}
-		_, err = createSpec.Save(ctx)
+		_, err = tx.MenuSpec.Delete().Where(menuspec.HasMenuWith(entmenu.IDEQ(id))).Exec(ctx)
 		if err != nil {
 			return err
+		}
+		for i, spec := range *in.Specs {
+			createSpec := tx.MenuSpec.Create().
+				SetMenuID(id).
+				SetPriceDelta(spec.PriceDelta)
+			if spec.SpecItemID > 0 {
+				createSpec = createSpec.SetSpecItemID(spec.SpecItemID)
+			}
+			if spec.CategorySpecID > 0 {
+				createSpec = createSpec.SetCategorySpecID(spec.CategorySpecID)
+			}
+			if spec.Sort > 0 {
+				createSpec = createSpec.SetSort(spec.Sort)
+			} else {
+				createSpec = createSpec.SetSort(uint32(i))
+			}
+			_, err = createSpec.Save(ctx)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

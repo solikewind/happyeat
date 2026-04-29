@@ -38,7 +38,24 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		return nil, errors.New("价格不能为负")
 	}
 
-	_, err := l.svcCtx.MenuType.GetByID(l.ctx, req.CategoryId)
+	existing, err := l.svcCtx.Menu.GetByID(l.ctx, req.Id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("菜单不存在")
+		}
+		return nil, err
+	}
+
+	categoryID := req.CategoryId
+	if categoryID == 0 {
+		cat, errCat := existing.Edges.CategoryOrErr()
+		if errCat != nil || cat == nil {
+			return nil, errors.New("请指定菜单分类")
+		}
+		categoryID = cat.ID
+	}
+
+	_, err = l.svcCtx.MenuType.GetByID(l.ctx, categoryID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errors.New("分类不存在")
@@ -46,9 +63,13 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		return nil, err
 	}
 
-	specs, err := resolveMenuSpecs(l.ctx, l.svcCtx, req.CategoryId, req.Specs)
-	if err != nil {
-		return nil, err
+	var specsPtr *[]menu.SpecInput
+	if req.Specs != nil {
+		specs, err := resolveMenuSpecs(l.ctx, l.svcCtx, categoryID, req.Specs)
+		if err != nil {
+			return nil, err
+		}
+		specsPtr = &specs
 	}
 
 	err = l.svcCtx.Menu.Update(l.ctx, req.Id, menu.UpdateMenuInput{
@@ -56,13 +77,10 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		Description: req.Description,
 		Image:       req.Image,
 		Price:       req.Price,
-		CategoryID:  req.CategoryId,
-		Specs:       specs,
+		CategoryID:  categoryID,
+		Specs:       specsPtr,
 	})
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, errors.New("菜单不存在")
-		}
 		return nil, err
 	}
 
