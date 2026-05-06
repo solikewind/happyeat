@@ -23,3 +23,7 @@ asr:
   Model: "paraformer-realtime-v2"
   TranscribePath: "/asr/transcribe"
   HotwordCreatePath: "/asr/hotwords"
+cos:
+  bucket_url: ""
+  secret_id: ""
+  secret_key: ""
