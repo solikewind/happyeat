@@ -19,6 +19,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
@@ -92,6 +93,7 @@ func checkColumn(t, c string) error {
 			menu.Table:          menu.ValidColumn,
 			menucategory.Table:  menucategory.ValidColumn,
 			menuspec.Table:      menuspec.ValidColumn,
+			object.Table:        object.ValidColumn,
 			order.Table:         order.ValidColumn,
 			orderitem.Table:     orderitem.ValidColumn,
 			specgroup.Table:     specgroup.ValidColumn,

@@ -54,7 +54,7 @@ func (l *ListMenuLogic) ListMenu(req *types.ListMenuReq) (resp *types.ListMenuRe
 
 	menus := make([]types.Menu, 0, len(list))
 	for _, e := range list {
-		menu := entMenuToType(e)
+		menu := entMenuToType(l.ctx, l.svcCtx, e)
 		if len(menu.Specs) > maxSpecsPerMenuInList {
 			menu.Specs = menu.Specs[:maxSpecsPerMenuInList]
 		}

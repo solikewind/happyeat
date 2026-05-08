@@ -48,6 +48,7 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 	items := make([]order.ItemInput, 0, len(req.Items))
 	for _, it := range req.Items {
 		items = append(items, order.ItemInput{
+			MenuID:    it.MenuId,
 			MenuName:  it.MenuName,
 			Quantity:  it.Quantity,
 			UnitPrice: it.UnitPrice,

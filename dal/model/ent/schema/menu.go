@@ -33,6 +33,10 @@ func (Menu) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("menu_category_id").
 			Comment("菜单分类ID"),
+		field.Uint64("object_id").
+			Optional().
+			Nillable().
+			Comment("封面图对象ID（objects 表），与 image URL 二选一或同时存在"),
 		field.String("name").
 			MaxLen(128).
 			Comment("菜名"),
@@ -57,6 +61,11 @@ func (Menu) Edges() []ent.Edge {
 			Field("menu_category_id").
 			Unique().
 			Required(),
+		edge.From("cover_object", Object.Type).
+			Ref("menu_covers").
+			Field("object_id").
+			Unique().
+			Comment("封面图对象"),
 		edge.To("menu_specs", MenuSpec.Type),
 		edge.To("order_items", OrderItem.Type).
 			Comment("被订单项引用，可选"),

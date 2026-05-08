@@ -12,6 +12,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/schema"
@@ -201,11 +202,11 @@ func init() {
 	// menu.DefaultDeleteTs holds the default value on creation for the delete_ts field.
 	menu.DefaultDeleteTs = menuDescDeleteTs.Default.(int64)
 	// menuDescName is the schema descriptor for name field.
-	menuDescName := menuFields[1].Descriptor()
+	menuDescName := menuFields[2].Descriptor()
 	// menu.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	menu.NameValidator = menuDescName.Validators[0].(func(string) error)
 	// menuDescImage is the schema descriptor for image field.
-	menuDescImage := menuFields[3].Descriptor()
+	menuDescImage := menuFields[4].Descriptor()
 	// menu.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	menu.ImageValidator = menuDescImage.Validators[0].(func(string) error)
 	menucategoryMixin := schema.MenuCategory{}.Mixin()
@@ -278,6 +279,61 @@ func init() {
 	menuspecDescSort := menuspecFields[4].Descriptor()
 	// menuspec.DefaultSort holds the default value on creation for the sort field.
 	menuspec.DefaultSort = menuspecDescSort.Default.(uint32)
+	objectMixin := schema.Object{}.Mixin()
+	objectMixinHooks0 := objectMixin[0].Hooks()
+	objectMixinHooks2 := objectMixin[2].Hooks()
+	object.Hooks[0] = objectMixinHooks0[0]
+	object.Hooks[1] = objectMixinHooks2[0]
+	objectMixinInters2 := objectMixin[2].Interceptors()
+	object.Interceptors[0] = objectMixinInters2[0]
+	objectMixinFields1 := objectMixin[1].Fields()
+	_ = objectMixinFields1
+	objectMixinFields2 := objectMixin[2].Fields()
+	_ = objectMixinFields2
+	objectFields := schema.Object{}.Fields()
+	_ = objectFields
+	// objectDescCreatedAt is the schema descriptor for created_at field.
+	objectDescCreatedAt := objectMixinFields1[0].Descriptor()
+	// object.DefaultCreatedAt holds the default value on creation for the created_at field.
+	object.DefaultCreatedAt = objectDescCreatedAt.Default.(func() time.Time)
+	// objectDescUpdatedAt is the schema descriptor for updated_at field.
+	objectDescUpdatedAt := objectMixinFields1[1].Descriptor()
+	// object.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	object.DefaultUpdatedAt = objectDescUpdatedAt.Default.(func() time.Time)
+	// object.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	object.UpdateDefaultUpdatedAt = objectDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// objectDescDeleteTs is the schema descriptor for delete_ts field.
+	objectDescDeleteTs := objectMixinFields2[0].Descriptor()
+	// object.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	object.DefaultDeleteTs = objectDescDeleteTs.Default.(int64)
+	// objectDescName is the schema descriptor for name field.
+	objectDescName := objectFields[0].Descriptor()
+	// object.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	object.NameValidator = objectDescName.Validators[0].(func(string) error)
+	// objectDescKey is the schema descriptor for key field.
+	objectDescKey := objectFields[1].Descriptor()
+	// object.KeyValidator is a validator for the "key" field. It is called by the builders before save.
+	object.KeyValidator = objectDescKey.Validators[0].(func(string) error)
+	// objectDescURL is the schema descriptor for url field.
+	objectDescURL := objectFields[2].Descriptor()
+	// object.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	object.URLValidator = objectDescURL.Validators[0].(func(string) error)
+	// objectDescContentType is the schema descriptor for content_type field.
+	objectDescContentType := objectFields[3].Descriptor()
+	// object.ContentTypeValidator is a validator for the "content_type" field. It is called by the builders before save.
+	object.ContentTypeValidator = objectDescContentType.Validators[0].(func(string) error)
+	// objectDescSuffix is the schema descriptor for suffix field.
+	objectDescSuffix := objectFields[4].Descriptor()
+	// object.SuffixValidator is a validator for the "suffix" field. It is called by the builders before save.
+	object.SuffixValidator = objectDescSuffix.Validators[0].(func(string) error)
+	// objectDescSize is the schema descriptor for size field.
+	objectDescSize := objectFields[5].Descriptor()
+	// object.DefaultSize holds the default value on creation for the size field.
+	object.DefaultSize = objectDescSize.Default.(int64)
+	// objectDescHash is the schema descriptor for hash field.
+	objectDescHash := objectFields[6].Descriptor()
+	// object.HashValidator is a validator for the "hash" field. It is called by the builders before save.
+	object.HashValidator = objectDescHash.Validators[0].(func(string) error)
 	orderMixin := schema.Order{}.Mixin()
 	orderMixinHooks0 := orderMixin[0].Hooks()
 	orderMixinHooks2 := orderMixin[2].Hooks()

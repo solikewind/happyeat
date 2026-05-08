@@ -68,6 +68,7 @@ type CreateMenuReply struct {
 type CreateMenuReq struct {
 	Name        string     `json:"name"`
 	Description string     `json:"description,optional"`
+	ObjectId    uint64     `json:"object_id,optional,string"`
 	Image       string     `json:"image,optional"`
 	Price       int64      `json:"price"` // 以分为单位，避免前端浮点数问题，展示/100
 	CategoryId  uint64     `json:"category_id,string"`
@@ -75,6 +76,7 @@ type CreateMenuReq struct {
 }
 
 type CreateOrderItemReq struct {
+	MenuId    uint64 `json:"menu_id,optional,string"`
 	MenuName  string `json:"menu_name"`
 	Quantity  int    `json:"quantity"`
 	UnitPrice int64  `json:"unit_price"`
@@ -166,6 +168,13 @@ type DeleteMenuReq struct {
 	Id uint64 `path:"id"`
 }
 
+type DeleteObjectReply struct {
+}
+
+type DeleteObjectReq struct {
+	Id uint64 `path:"id"`
+}
+
 type DeleteSpecGroupReply struct {
 }
 
@@ -239,6 +248,23 @@ type GetMenuReply struct {
 }
 
 type GetMenuReq struct {
+	Id uint64 `path:"id"`
+}
+
+type GetObjectReply struct {
+	Object Object `json:"object"`
+}
+
+type GetObjectReq struct {
+	Id uint64 `path:"id"`
+}
+
+type GetObjectURLReply struct {
+	Url       string `json:"url"`
+	ExpiredAt string `json:"expired_at"`
+}
+
+type GetObjectURLReq struct {
 	Id uint64 `path:"id"`
 }
 
@@ -450,15 +476,16 @@ type LoginReq struct {
 }
 
 type Menu struct {
-	Id          uint64     `json:"id,string"`            // 菜单id
-	Name        string     `json:"name"`                 // 菜单名称
-	Description string     `json:"description,optional"` // 菜单描述
-	Image       string     `json:"image,optional"`       // 菜单图片
-	Price       int64      `json:"price"`                // 菜单价格（分）
-	CategoryId  uint64     `json:"category_id,string"`   // 菜单分类id
-	Specs       []MenuSpec `json:"specs,optional"`       // 规格列表
-	CreatedAt   string     `json:"created_at"`           // 创建时间，RFC3339（UTC），列表与详情均返回
-	UpdatedAt   string     `json:"updated_at"`           // 更新时间，RFC3339（UTC），列表与详情均返回
+	Id          uint64     `json:"id,string"`                 // 菜单id
+	Name        string     `json:"name"`                      // 菜单名称
+	Description string     `json:"description,optional"`      // 菜单描述
+	ObjectId    uint64     `json:"object_id,optional,string"` // 封面图对象ID（上传接口返回的 object.id）
+	Image       string     `json:"image,optional"`            // 菜单图片
+	Price       int64      `json:"price"`                     // 菜单价格（分）
+	CategoryId  uint64     `json:"category_id,string"`        // 菜单分类id
+	Specs       []MenuSpec `json:"specs,optional"`            // 规格列表
+	CreatedAt   string     `json:"created_at"`                // 创建时间，RFC3339（UTC），列表与详情均返回
+	UpdatedAt   string     `json:"updated_at"`                // 更新时间，RFC3339（UTC），列表与详情均返回
 }
 
 type MenuCategory struct {
@@ -478,6 +505,19 @@ type MenuSpec struct {
 	SpecValue      string `json:"spec_value,optional"`              // 规格值，如微辣
 	PriceDelta     int64  `json:"price_delta"`                      // 加价
 	Sort           uint32 `json:"sort,optional"`                    // 排序（不传默认0）
+}
+
+type Object struct {
+	Id          uint64 `json:"id,string"`
+	Name        string `json:"name"`
+	Key         string `json:"key"`
+	Url         string `json:"url"`
+	ContentType string `json:"content_type,optional"`
+	Suffix      string `json:"suffix,optional"`
+	Size        int64  `json:"size"`
+	Hash        string `json:"hash"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
 }
 
 type Order struct {
@@ -622,10 +662,28 @@ type UpdateMenuReq struct {
 	Id          uint64     `path:"id"`
 	Name        string     `json:"name"`
 	Description string     `json:"description,optional"`
+	ObjectId    uint64     `json:"object_id,optional,string"`
 	Image       string     `json:"image,optional"`
 	Price       int64      `json:"price,optional"`
 	CategoryId  uint64     `json:"category_id,optional,string"`
 	Specs       []MenuSpec `json:"specs,optional"`
+}
+
+type UpdateOrderItemReq struct {
+	MenuId    uint64 `json:"menu_id,optional,string"`
+	MenuName  string `json:"menu_name,optional"`
+	UnitPrice int64  `json:"unit_price,optional"`
+	Quantity  int    `json:"quantity"`
+	SpecInfo  string `json:"spec_info,optional"`
+}
+
+type UpdateOrderReply struct {
+	Order Order `json:"order"`
+}
+
+type UpdateOrderReq struct {
+	Id    uint64               `path:"id"`
+	Items []UpdateOrderItemReq `json:"items"`
 }
 
 type UpdateOrderStatusReply struct {
@@ -687,4 +745,11 @@ type UpdateTableReq struct {
 	Capacity   uint32 `json:"capacity,optional"`
 	CategoryId uint64 `json:"category_id,string"`
 	QrCode     string `json:"qr_code,optional"`
+}
+
+type UploadObjectReply struct {
+	Object Object `json:"object"`
+}
+
+type UploadObjectReq struct {
 }

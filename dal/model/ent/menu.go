@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 )
 
 // 菜单项
@@ -27,6 +28,8 @@ type Menu struct {
 	DeleteTs int64 `json:"delete_ts,omitempty"`
 	// 菜单分类ID
 	MenuCategoryID uint64 `json:"menu_category_id,omitempty"`
+	// 封面图对象ID（objects 表），与 image URL 二选一或同时存在
+	ObjectID *uint64 `json:"object_id,omitempty"`
 	// 菜名
 	Name string `json:"name,omitempty"`
 	// 描述
@@ -45,13 +48,15 @@ type Menu struct {
 type MenuEdges struct {
 	// Category holds the value of the category edge.
 	Category *MenuCategory `json:"category,omitempty"`
+	// 封面图对象
+	CoverObject *Object `json:"cover_object,omitempty"`
 	// MenuSpecs holds the value of the menu_specs edge.
 	MenuSpecs []*MenuSpec `json:"menu_specs,omitempty"`
 	// 被订单项引用，可选
 	OrderItems []*OrderItem `json:"order_items,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -65,10 +70,21 @@ func (e MenuEdges) CategoryOrErr() (*MenuCategory, error) {
 	return nil, &NotLoadedError{edge: "category"}
 }
 
+// CoverObjectOrErr returns the CoverObject value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MenuEdges) CoverObjectOrErr() (*Object, error) {
+	if e.CoverObject != nil {
+		return e.CoverObject, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: object.Label}
+	}
+	return nil, &NotLoadedError{edge: "cover_object"}
+}
+
 // MenuSpecsOrErr returns the MenuSpecs value or an error if the edge
 // was not loaded in eager-loading.
 func (e MenuEdges) MenuSpecsOrErr() ([]*MenuSpec, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.MenuSpecs, nil
 	}
 	return nil, &NotLoadedError{edge: "menu_specs"}
@@ -77,7 +93,7 @@ func (e MenuEdges) MenuSpecsOrErr() ([]*MenuSpec, error) {
 // OrderItemsOrErr returns the OrderItems value or an error if the edge
 // was not loaded in eager-loading.
 func (e MenuEdges) OrderItemsOrErr() ([]*OrderItem, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.OrderItems, nil
 	}
 	return nil, &NotLoadedError{edge: "order_items"}
@@ -88,7 +104,7 @@ func (*Menu) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case menu.FieldID, menu.FieldDeleteTs, menu.FieldMenuCategoryID, menu.FieldPrice:
+		case menu.FieldID, menu.FieldDeleteTs, menu.FieldMenuCategoryID, menu.FieldObjectID, menu.FieldPrice:
 			values[i] = new(sql.NullInt64)
 		case menu.FieldName, menu.FieldDescription, menu.FieldImage:
 			values[i] = new(sql.NullString)
@@ -139,6 +155,13 @@ func (_m *Menu) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.MenuCategoryID = uint64(value.Int64)
 			}
+		case menu.FieldObjectID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field object_id", values[i])
+			} else if value.Valid {
+				_m.ObjectID = new(uint64)
+				*_m.ObjectID = uint64(value.Int64)
+			}
 		case menu.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -181,6 +204,11 @@ func (_m *Menu) Value(name string) (ent.Value, error) {
 // QueryCategory queries the "category" edge of the Menu entity.
 func (_m *Menu) QueryCategory() *MenuCategoryQuery {
 	return NewMenuClient(_m.config).QueryCategory(_m)
+}
+
+// QueryCoverObject queries the "cover_object" edge of the Menu entity.
+func (_m *Menu) QueryCoverObject() *ObjectQuery {
+	return NewMenuClient(_m.config).QueryCoverObject(_m)
 }
 
 // QueryMenuSpecs queries the "menu_specs" edge of the Menu entity.
@@ -227,6 +255,11 @@ func (_m *Menu) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("menu_category_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.MenuCategoryID))
+	builder.WriteString(", ")
+	if v := _m.ObjectID; v != nil {
+		builder.WriteString("object_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)

@@ -4,6 +4,7 @@ type Menu {
 	Id          uint64     `json:"id,string"`            // 菜单id
 	Name        string     `json:"name"`                 // 菜单名称
 	Description string     `json:"description,optional"` // 菜单描述
+	ObjectId    uint64     `json:"object_id,optional,string"` // 封面图对象ID（上传接口返回的 object.id）
 	Image       string     `json:"image,optional"`       // 菜单图片
 	Price       int64      `json:"price"`                // 菜单价格（分）
 	CategoryId  uint64     `json:"category_id,string"`   // 菜单分类id

@@ -24,6 +24,6 @@ asr:
   TranscribePath: "/asr/transcribe"
   HotwordCreatePath: "/asr/hotwords"
 cos:
-  bucket_url: ""
+  bucket_url: "https://happyeat-1326922879.cos.ap-beijing.myqcloud.com"
   secret_id: ""
   secret_key: ""

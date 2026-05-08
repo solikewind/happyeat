@@ -15,6 +15,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
@@ -269,6 +270,33 @@ func (f TraverseMenuSpec) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.MenuSpecQuery", q)
 }
 
+// The ObjectFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ObjectFunc func(context.Context, *ent.ObjectQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ObjectFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ObjectQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ObjectQuery", q)
+}
+
+// The TraverseObject type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseObject func(context.Context, *ent.ObjectQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseObject) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseObject) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ObjectQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ObjectQuery", q)
+}
+
 // The OrderFunc type is an adapter to allow the use of ordinary function as a Querier.
 type OrderFunc func(context.Context, *ent.OrderQuery) (ent.Value, error)
 
@@ -448,6 +476,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.MenuCategoryQuery, predicate.MenuCategory, menucategory.OrderOption]{typ: ent.TypeMenuCategory, tq: q}, nil
 	case *ent.MenuSpecQuery:
 		return &query[*ent.MenuSpecQuery, predicate.MenuSpec, menuspec.OrderOption]{typ: ent.TypeMenuSpec, tq: q}, nil
+	case *ent.ObjectQuery:
+		return &query[*ent.ObjectQuery, predicate.Object, object.OrderOption]{typ: ent.TypeObject, tq: q}, nil
 	case *ent.OrderQuery:
 		return &query[*ent.OrderQuery, predicate.Order, order.OrderOption]{typ: ent.TypeOrder, tq: q}, nil
 	case *ent.OrderItemQuery:

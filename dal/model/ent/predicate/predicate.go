@@ -27,6 +27,9 @@ type MenuCategory func(*sql.Selector)
 // MenuSpec is the predicate function for menuspec builders.
 type MenuSpec func(*sql.Selector)
 
+// Object is the predicate function for object builders.
+type Object func(*sql.Selector)
+
 // Order is the predicate function for order builders.
 type Order func(*sql.Selector)
 

@@ -75,6 +75,11 @@ func MenuCategoryID(v uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldMenuCategoryID, v))
 }
 
+// ObjectID applies equality check predicate on the "object_id" field. It's identical to ObjectIDEQ.
+func ObjectID(v uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldEQ(FieldObjectID, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Menu {
 	return predicate.Menu(sql.FieldEQ(FieldName, v))
@@ -233,6 +238,36 @@ func MenuCategoryIDIn(vs ...uint64) predicate.Menu {
 // MenuCategoryIDNotIn applies the NotIn predicate on the "menu_category_id" field.
 func MenuCategoryIDNotIn(vs ...uint64) predicate.Menu {
 	return predicate.Menu(sql.FieldNotIn(FieldMenuCategoryID, vs...))
+}
+
+// ObjectIDEQ applies the EQ predicate on the "object_id" field.
+func ObjectIDEQ(v uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldEQ(FieldObjectID, v))
+}
+
+// ObjectIDNEQ applies the NEQ predicate on the "object_id" field.
+func ObjectIDNEQ(v uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldNEQ(FieldObjectID, v))
+}
+
+// ObjectIDIn applies the In predicate on the "object_id" field.
+func ObjectIDIn(vs ...uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldIn(FieldObjectID, vs...))
+}
+
+// ObjectIDNotIn applies the NotIn predicate on the "object_id" field.
+func ObjectIDNotIn(vs ...uint64) predicate.Menu {
+	return predicate.Menu(sql.FieldNotIn(FieldObjectID, vs...))
+}
+
+// ObjectIDIsNil applies the IsNil predicate on the "object_id" field.
+func ObjectIDIsNil() predicate.Menu {
+	return predicate.Menu(sql.FieldIsNull(FieldObjectID))
+}
+
+// ObjectIDNotNil applies the NotNil predicate on the "object_id" field.
+func ObjectIDNotNil() predicate.Menu {
+	return predicate.Menu(sql.FieldNotNull(FieldObjectID))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -505,6 +540,29 @@ func HasCategory() predicate.Menu {
 func HasCategoryWith(preds ...predicate.MenuCategory) predicate.Menu {
 	return predicate.Menu(func(s *sql.Selector) {
 		step := newCategoryStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCoverObject applies the HasEdge predicate on the "cover_object" edge.
+func HasCoverObject() predicate.Menu {
+	return predicate.Menu(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CoverObjectTable, CoverObjectColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCoverObjectWith applies the HasEdge predicate on the "cover_object" edge with a given conditions (other predicates).
+func HasCoverObjectWith(preds ...predicate.Object) predicate.Menu {
+	return predicate.Menu(func(s *sql.Selector) {
+		step := newCoverObjectStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

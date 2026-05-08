@@ -14,6 +14,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
 )
@@ -69,6 +70,26 @@ func (_u *MenuUpdate) SetNillableMenuCategoryID(v *uint64) *MenuUpdate {
 	if v != nil {
 		_u.SetMenuCategoryID(*v)
 	}
+	return _u
+}
+
+// SetObjectID sets the "object_id" field.
+func (_u *MenuUpdate) SetObjectID(v uint64) *MenuUpdate {
+	_u.mutation.SetObjectID(v)
+	return _u
+}
+
+// SetNillableObjectID sets the "object_id" field if the given value is not nil.
+func (_u *MenuUpdate) SetNillableObjectID(v *uint64) *MenuUpdate {
+	if v != nil {
+		_u.SetObjectID(*v)
+	}
+	return _u
+}
+
+// ClearObjectID clears the value of the "object_id" field.
+func (_u *MenuUpdate) ClearObjectID() *MenuUpdate {
+	_u.mutation.ClearObjectID()
 	return _u
 }
 
@@ -158,6 +179,25 @@ func (_u *MenuUpdate) SetCategory(v *MenuCategory) *MenuUpdate {
 	return _u.SetCategoryID(v.ID)
 }
 
+// SetCoverObjectID sets the "cover_object" edge to the Object entity by ID.
+func (_u *MenuUpdate) SetCoverObjectID(id uint64) *MenuUpdate {
+	_u.mutation.SetCoverObjectID(id)
+	return _u
+}
+
+// SetNillableCoverObjectID sets the "cover_object" edge to the Object entity by ID if the given value is not nil.
+func (_u *MenuUpdate) SetNillableCoverObjectID(id *uint64) *MenuUpdate {
+	if id != nil {
+		_u = _u.SetCoverObjectID(*id)
+	}
+	return _u
+}
+
+// SetCoverObject sets the "cover_object" edge to the Object entity.
+func (_u *MenuUpdate) SetCoverObject(v *Object) *MenuUpdate {
+	return _u.SetCoverObjectID(v.ID)
+}
+
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
 func (_u *MenuUpdate) AddMenuSpecIDs(ids ...uint64) *MenuUpdate {
 	_u.mutation.AddMenuSpecIDs(ids...)
@@ -196,6 +236,12 @@ func (_u *MenuUpdate) Mutation() *MenuMutation {
 // ClearCategory clears the "category" edge to the MenuCategory entity.
 func (_u *MenuUpdate) ClearCategory() *MenuUpdate {
 	_u.mutation.ClearCategory()
+	return _u
+}
+
+// ClearCoverObject clears the "cover_object" edge to the Object entity.
+func (_u *MenuUpdate) ClearCoverObject() *MenuUpdate {
+	_u.mutation.ClearCoverObject()
 	return _u
 }
 
@@ -372,6 +418,35 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.CoverObjectCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   menu.CoverObjectTable,
+			Columns: []string{menu.CoverObjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(object.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CoverObjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   menu.CoverObjectTable,
+			Columns: []string{menu.CoverObjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(object.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.MenuSpecsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -523,6 +598,26 @@ func (_u *MenuUpdateOne) SetNillableMenuCategoryID(v *uint64) *MenuUpdateOne {
 	return _u
 }
 
+// SetObjectID sets the "object_id" field.
+func (_u *MenuUpdateOne) SetObjectID(v uint64) *MenuUpdateOne {
+	_u.mutation.SetObjectID(v)
+	return _u
+}
+
+// SetNillableObjectID sets the "object_id" field if the given value is not nil.
+func (_u *MenuUpdateOne) SetNillableObjectID(v *uint64) *MenuUpdateOne {
+	if v != nil {
+		_u.SetObjectID(*v)
+	}
+	return _u
+}
+
+// ClearObjectID clears the value of the "object_id" field.
+func (_u *MenuUpdateOne) ClearObjectID() *MenuUpdateOne {
+	_u.mutation.ClearObjectID()
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *MenuUpdateOne) SetName(v string) *MenuUpdateOne {
 	_u.mutation.SetName(v)
@@ -609,6 +704,25 @@ func (_u *MenuUpdateOne) SetCategory(v *MenuCategory) *MenuUpdateOne {
 	return _u.SetCategoryID(v.ID)
 }
 
+// SetCoverObjectID sets the "cover_object" edge to the Object entity by ID.
+func (_u *MenuUpdateOne) SetCoverObjectID(id uint64) *MenuUpdateOne {
+	_u.mutation.SetCoverObjectID(id)
+	return _u
+}
+
+// SetNillableCoverObjectID sets the "cover_object" edge to the Object entity by ID if the given value is not nil.
+func (_u *MenuUpdateOne) SetNillableCoverObjectID(id *uint64) *MenuUpdateOne {
+	if id != nil {
+		_u = _u.SetCoverObjectID(*id)
+	}
+	return _u
+}
+
+// SetCoverObject sets the "cover_object" edge to the Object entity.
+func (_u *MenuUpdateOne) SetCoverObject(v *Object) *MenuUpdateOne {
+	return _u.SetCoverObjectID(v.ID)
+}
+
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
 func (_u *MenuUpdateOne) AddMenuSpecIDs(ids ...uint64) *MenuUpdateOne {
 	_u.mutation.AddMenuSpecIDs(ids...)
@@ -647,6 +761,12 @@ func (_u *MenuUpdateOne) Mutation() *MenuMutation {
 // ClearCategory clears the "category" edge to the MenuCategory entity.
 func (_u *MenuUpdateOne) ClearCategory() *MenuUpdateOne {
 	_u.mutation.ClearCategory()
+	return _u
+}
+
+// ClearCoverObject clears the "cover_object" edge to the Object entity.
+func (_u *MenuUpdateOne) ClearCoverObject() *MenuUpdateOne {
+	_u.mutation.ClearCoverObject()
 	return _u
 }
 
@@ -846,6 +966,35 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(menucategory.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CoverObjectCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   menu.CoverObjectTable,
+			Columns: []string{menu.CoverObjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(object.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CoverObjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   menu.CoverObjectTable,
+			Columns: []string{menu.CoverObjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(object.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

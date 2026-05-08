@@ -18,6 +18,7 @@ import "workbenchtypes.api"
 import "authtypes.api"
 import "rbactypes.api"
 import "iamtypes.api"
+import "storagetypes.api"
 
 // 登录接口（无需 JWT），获取 token 后用于其他接口的 Authorization: Bearer <token>
 @server (
@@ -59,6 +60,22 @@ service HappyEatService {
 	@doc "删除菜单"
 	@handler DeleteMenu
 	delete /menu/:id (DeleteMenuReq) returns (DeleteMenuReply)
+
+	@doc "上传对象（用于菜单图片）"
+	@handler UploadObject
+	post /objects/upload (UploadObjectReq) returns (UploadObjectReply)
+
+	@doc "获取对象详情"
+	@handler GetObject
+	get /object/:id (GetObjectReq) returns (GetObjectReply)
+
+	@doc "获取对象临时访问地址（私有桶）"
+	@handler GetObjectURL
+	get /object/:id/url (GetObjectURLReq) returns (GetObjectURLReply)
+
+	@doc "删除对象"
+	@handler DeleteObject
+	delete /object/:id (DeleteObjectReq) returns (DeleteObjectReply)
 }
 
 @server (
@@ -245,6 +262,10 @@ service HappyEatService {
 	@doc "更新订单状态"
 	@handler UpdateOrderStatus
 	put /order/:id/status (UpdateOrderStatusReq) returns (UpdateOrderStatusReply)
+
+	@doc "更新订单（追加菜单项）"
+	@handler UpdateOrder
+	put /order/:id (UpdateOrderReq) returns (UpdateOrderReply)
 }
 
 @server (

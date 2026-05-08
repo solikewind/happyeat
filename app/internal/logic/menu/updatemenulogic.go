@@ -72,10 +72,60 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		specsPtr = &specs
 	}
 
+	image := req.Image
+	objectID := req.ObjectId
+
+	var existingObjectID uint64
+	if existing.ObjectID != nil {
+		existingObjectID = *existing.ObjectID
+	}
+
+	finalObjectID := objectID
+	if finalObjectID == 0 {
+		finalObjectID = existingObjectID
+	}
+
+	if objectID > 0 {
+		obj, err := l.svcCtx.Object.GetByID(l.ctx, objectID)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil, errors.New("对象不存在")
+			}
+			return nil, err
+		}
+		if req.Image != "" && req.Image != obj.URL {
+			return nil, errors.New("object_id 与 image 不一致")
+		}
+		if req.Image == "" {
+			image = obj.URL
+		}
+	} else if finalObjectID > 0 && req.Image != "" {
+		obj, err := l.svcCtx.Object.GetByID(l.ctx, finalObjectID)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil, errors.New("关联对象不存在")
+			}
+			return nil, err
+		}
+		if req.Image != obj.URL {
+			return nil, errors.New("已绑定 object_id 时，image 必须与对象 URL 一致，或改用 object_id 更新封面")
+		}
+	} else if finalObjectID > 0 && req.Image == "" {
+		obj, err := l.svcCtx.Object.GetByID(l.ctx, finalObjectID)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil, errors.New("关联对象不存在")
+			}
+			return nil, err
+		}
+		image = obj.URL
+	}
+
 	err = l.svcCtx.Menu.Update(l.ctx, req.Id, menu.UpdateMenuInput{
 		Name:        req.Name,
 		Description: req.Description,
-		Image:       req.Image,
+		Image:       image,
+		ObjectID:    finalObjectID,
 		Price:       req.Price,
 		CategoryID:  categoryID,
 		Specs:       specsPtr,

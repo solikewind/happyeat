@@ -12,9 +12,11 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/solikewind/happyeat/app/internal/config"
 	"github.com/solikewind/happyeat/app/internal/pkg/agent"
+	"github.com/solikewind/happyeat/app/internal/pkg/cos"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	_ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 	"github.com/solikewind/happyeat/dal/model/menu"
+	objmodel "github.com/solikewind/happyeat/dal/model/object"
 	"github.com/solikewind/happyeat/dal/model/order"
 	specmodel "github.com/solikewind/happyeat/dal/model/spec"
 	"github.com/solikewind/happyeat/dal/model/table"
@@ -30,6 +32,7 @@ type ServiceContext struct {
 	Agent            *blades.Agent // 智能体
 	LLM              *agent.LangChainService
 	ASR              *agent.BailianASRClient
+	Cos              *cos.Client
 
 	Menu         *menu.Menu              // 菜单 data 层
 	MenuType     *menu.MenuType          // 菜单分类 data 层
@@ -41,6 +44,7 @@ type ServiceContext struct {
 	TableType *table.TableType // 餐桌分类 data 层
 
 	Order *order.Order // 订单 data 层
+	Object *objmodel.Object
 
 }
 
@@ -77,7 +81,6 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 	if svc, err := agent.NewBailianASRClient(c.ASR); err == nil {
 		asrSvc = svc
 	}
-
 	rbacStore, err := NewRbacStore(client)
 	if err != nil {
 		return nil, err
@@ -91,6 +94,7 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		Agent:  bladesAgent.Agent,
 		LLM:    llmSvc,
 		ASR:    asrSvc,
+		Cos:    cos.NewClient(c.Cos),
 
 		Menu:         menu.NewMenu(client),
 		MenuType:     menu.NewMenuType(client),
@@ -100,6 +104,7 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		Table:        table.NewTable(client),
 		TableType:    table.NewTableType(client),
 		Order:        order.NewOrder(client),
+		Object:       objmodel.NewObject(client),
 	}
 	ctx.CasbinMiddleware = NewCasbinMiddleware(ctx)
 	if err := SyncRolePoliciesToCasbin(ctx.Rbac, ctx.Casbin); err != nil {
