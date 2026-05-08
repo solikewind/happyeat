@@ -33,6 +33,7 @@ type CreateMenuInput struct {
 	Name        string
 	Description string
 	Image       string
+	ObjectID    uint64
 	Price       int64
 	CategoryID  uint64
 	Specs       []SpecInput
@@ -80,6 +81,9 @@ func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error
 		SetName(in.Name).
 		SetPrice(in.Price).
 		SetCategoryID(in.CategoryID)
+	if in.ObjectID > 0 {
+		create = create.SetObjectID(in.ObjectID)
+	}
 	if in.Description != "" {
 		create = create.SetDescription(in.Description)
 	}
@@ -227,6 +231,7 @@ type UpdateMenuInput struct {
 	Name        string
 	Description string
 	Image       string
+	ObjectID    uint64
 	Price       int64
 	CategoryID  uint64
 	// Specs 非 nil 时表示用新列表整体替换；nil 表示不修改现有规格（解决 JSON 省略 specs 时被清空的问题）
@@ -248,6 +253,11 @@ func (m *Menu) Update(ctx context.Context, id uint64, in UpdateMenuInput) error 
 		upd = upd.SetDescription(in.Description)
 	} else {
 		upd = upd.ClearDescription()
+	}
+	if in.ObjectID > 0 {
+		upd = upd.SetObjectID(in.ObjectID)
+	} else {
+		upd = upd.ClearObjectID()
 	}
 	if in.Image != "" {
 		upd = upd.SetImage(in.Image)
@@ -310,7 +320,7 @@ func (m *Menu) Delete(ctx context.Context, id uint64) error {
 }
 
 func (m *Menu) withMenuEdges(q *ent.MenuQuery) *ent.MenuQuery {
-	return q.WithCategory().WithMenuSpecs(func(sq *ent.MenuSpecQuery) {
+	return q.WithCategory().WithCoverObject().WithMenuSpecs(func(sq *ent.MenuSpecQuery) {
 		sq.Order(
 			menuspec.BySort(sql.OrderAsc()),
 			menuspec.ByID(sql.OrderAsc()),

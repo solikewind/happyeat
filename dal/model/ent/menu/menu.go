@@ -23,6 +23,8 @@ const (
 	FieldDeleteTs = "delete_ts"
 	// FieldMenuCategoryID holds the string denoting the menu_category_id field in the database.
 	FieldMenuCategoryID = "menu_category_id"
+	// FieldObjectID holds the string denoting the object_id field in the database.
+	FieldObjectID = "object_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -33,6 +35,8 @@ const (
 	FieldPrice = "price"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
+	// EdgeCoverObject holds the string denoting the cover_object edge name in mutations.
+	EdgeCoverObject = "cover_object"
 	// EdgeMenuSpecs holds the string denoting the menu_specs edge name in mutations.
 	EdgeMenuSpecs = "menu_specs"
 	// EdgeOrderItems holds the string denoting the order_items edge name in mutations.
@@ -46,6 +50,13 @@ const (
 	CategoryInverseTable = "menu_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "menu_category_id"
+	// CoverObjectTable is the table that holds the cover_object relation/edge.
+	CoverObjectTable = "menus"
+	// CoverObjectInverseTable is the table name for the Object entity.
+	// It exists in this package in order to avoid circular dependency with the "object" package.
+	CoverObjectInverseTable = "objects"
+	// CoverObjectColumn is the table column denoting the cover_object relation/edge.
+	CoverObjectColumn = "object_id"
 	// MenuSpecsTable is the table that holds the menu_specs relation/edge.
 	MenuSpecsTable = "menu_specs"
 	// MenuSpecsInverseTable is the table name for the MenuSpec entity.
@@ -69,6 +80,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeleteTs,
 	FieldMenuCategoryID,
+	FieldObjectID,
 	FieldName,
 	FieldDescription,
 	FieldImage,
@@ -135,6 +147,11 @@ func ByMenuCategoryID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMenuCategoryID, opts...).ToFunc()
 }
 
+// ByObjectID orders the results by the object_id field.
+func ByObjectID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldObjectID, opts...).ToFunc()
+}
+
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
@@ -159,6 +176,13 @@ func ByPrice(opts ...sql.OrderTermOption) OrderOption {
 func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByCoverObjectField orders the results by cover_object field.
+func ByCoverObjectField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCoverObjectStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -194,6 +218,13 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+	)
+}
+func newCoverObjectStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CoverObjectInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CoverObjectTable, CoverObjectColumn),
 	)
 }
 func newMenuSpecsStep() *sqlgraph.Step {

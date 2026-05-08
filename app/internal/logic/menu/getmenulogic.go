@@ -35,10 +35,10 @@ func (l *GetMenuLogic) GetMenu(req *types.GetMenuReq) (*types.GetMenuReply, erro
 		return nil, err
 	}
 
-	return &types.GetMenuReply{Menu: entMenuToType(entMenu)}, nil
+	return &types.GetMenuReply{Menu: entMenuToType(l.ctx, l.svcCtx, entMenu)}, nil
 }
 
-func entMenuToType(e *ent.Menu) types.Menu {
+func entMenuToType(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Menu) types.Menu {
 	out := types.Menu{
 		Id:        uint64(e.ID),
 		Name:      e.Name,
@@ -50,8 +50,26 @@ func entMenuToType(e *ent.Menu) types.Menu {
 	if e.Description != nil {
 		out.Description = *e.Description
 	}
+	if e.ObjectID != nil && *e.ObjectID > 0 {
+		out.ObjectId = *e.ObjectID
+	}
+	coverObj, _ := e.Edges.CoverObjectOrErr()
+	imageFromField := ""
 	if e.Image != nil {
-		out.Image = *e.Image
+		imageFromField = *e.Image
+	}
+	if coverObj != nil {
+		preferURL := signedURLOrRaw(ctx, svcCtx, coverObj.Key, coverObj.URL)
+		if imageFromField != "" && imageFromField != coverObj.URL {
+			// 数据不一致时仍以对象 URL 为准（object_id 为权威来源）
+			out.Image = preferURL
+		} else if imageFromField == "" {
+			out.Image = preferURL
+		} else {
+			out.Image = signedURLOrRaw(ctx, svcCtx, coverObj.Key, imageFromField)
+		}
+	} else if imageFromField != "" {
+		out.Image = imageFromField
 	}
 
 	cat, _ := e.Edges.CategoryOrErr()

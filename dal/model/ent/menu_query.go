@@ -15,6 +15,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
 )
@@ -22,13 +23,14 @@ import (
 // MenuQuery is the builder for querying Menu entities.
 type MenuQuery struct {
 	config
-	ctx            *QueryContext
-	order          []menu.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Menu
-	withCategory   *MenuCategoryQuery
-	withMenuSpecs  *MenuSpecQuery
-	withOrderItems *OrderItemQuery
+	ctx             *QueryContext
+	order           []menu.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Menu
+	withCategory    *MenuCategoryQuery
+	withCoverObject *ObjectQuery
+	withMenuSpecs   *MenuSpecQuery
+	withOrderItems  *OrderItemQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -80,6 +82,28 @@ func (_q *MenuQuery) QueryCategory() *MenuCategoryQuery {
 			sqlgraph.From(menu.Table, menu.FieldID, selector),
 			sqlgraph.To(menucategory.Table, menucategory.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, menu.CategoryTable, menu.CategoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCoverObject chains the current query on the "cover_object" edge.
+func (_q *MenuQuery) QueryCoverObject() *ObjectQuery {
+	query := (&ObjectClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(menu.Table, menu.FieldID, selector),
+			sqlgraph.To(object.Table, object.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, menu.CoverObjectTable, menu.CoverObjectColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -318,14 +342,15 @@ func (_q *MenuQuery) Clone() *MenuQuery {
 		return nil
 	}
 	return &MenuQuery{
-		config:         _q.config,
-		ctx:            _q.ctx.Clone(),
-		order:          append([]menu.OrderOption{}, _q.order...),
-		inters:         append([]Interceptor{}, _q.inters...),
-		predicates:     append([]predicate.Menu{}, _q.predicates...),
-		withCategory:   _q.withCategory.Clone(),
-		withMenuSpecs:  _q.withMenuSpecs.Clone(),
-		withOrderItems: _q.withOrderItems.Clone(),
+		config:          _q.config,
+		ctx:             _q.ctx.Clone(),
+		order:           append([]menu.OrderOption{}, _q.order...),
+		inters:          append([]Interceptor{}, _q.inters...),
+		predicates:      append([]predicate.Menu{}, _q.predicates...),
+		withCategory:    _q.withCategory.Clone(),
+		withCoverObject: _q.withCoverObject.Clone(),
+		withMenuSpecs:   _q.withMenuSpecs.Clone(),
+		withOrderItems:  _q.withOrderItems.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -340,6 +365,17 @@ func (_q *MenuQuery) WithCategory(opts ...func(*MenuCategoryQuery)) *MenuQuery {
 		opt(query)
 	}
 	_q.withCategory = query
+	return _q
+}
+
+// WithCoverObject tells the query-builder to eager-load the nodes that are connected to
+// the "cover_object" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MenuQuery) WithCoverObject(opts ...func(*ObjectQuery)) *MenuQuery {
+	query := (&ObjectClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withCoverObject = query
 	return _q
 }
 
@@ -443,8 +479,9 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 	var (
 		nodes       = []*Menu{}
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withCategory != nil,
+			_q.withCoverObject != nil,
 			_q.withMenuSpecs != nil,
 			_q.withOrderItems != nil,
 		}
@@ -470,6 +507,12 @@ func (_q *MenuQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Menu, e
 	if query := _q.withCategory; query != nil {
 		if err := _q.loadCategory(ctx, query, nodes, nil,
 			func(n *Menu, e *MenuCategory) { n.Edges.Category = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withCoverObject; query != nil {
+		if err := _q.loadCoverObject(ctx, query, nodes, nil,
+			func(n *Menu, e *Object) { n.Edges.CoverObject = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -512,6 +555,38 @@ func (_q *MenuQuery) loadCategory(ctx context.Context, query *MenuCategoryQuery,
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "menu_category_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *MenuQuery) loadCoverObject(ctx context.Context, query *ObjectQuery, nodes []*Menu, init func(*Menu), assign func(*Menu, *Object)) error {
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*Menu)
+	for i := range nodes {
+		if nodes[i].ObjectID == nil {
+			continue
+		}
+		fk := *nodes[i].ObjectID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(object.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "object_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -610,6 +685,9 @@ func (_q *MenuQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withCategory != nil {
 			_spec.Node.AddColumnOnce(menu.FieldMenuCategoryID)
+		}
+		if _q.withCoverObject != nil {
+			_spec.Node.AddColumnOnce(menu.FieldObjectID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

@@ -165,6 +165,30 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/menus",
 					Handler: menu.CreateMenuHandler(serverCtx),
 				},
+				{
+					// 获取对象详情
+					Method:  http.MethodGet,
+					Path:    "/object/:id",
+					Handler: menu.GetObjectHandler(serverCtx),
+				},
+				{
+					// 获取对象临时访问地址（私有桶）
+					Method:  http.MethodGet,
+					Path:    "/object/:id/url",
+					Handler: menu.GetObjectURLHandler(serverCtx),
+				},
+				{
+					// 删除对象
+					Method:  http.MethodDelete,
+					Path:    "/object/:id",
+					Handler: menu.DeleteObjectHandler(serverCtx),
+				},
+				{
+					// 上传对象（用于菜单图片）
+					Method:  http.MethodPost,
+					Path:    "/objects/upload",
+					Handler: menu.UploadObjectHandler(serverCtx),
+				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
@@ -222,6 +246,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/order/:id",
 					Handler: order.GetOrderHandler(serverCtx),
+				},
+				{
+					// 更新订单（追加菜单项）
+					Method:  http.MethodPut,
+					Path:    "/order/:id",
+					Handler: order.UpdateOrderHandler(serverCtx),
 				},
 				{
 					// 更新订单状态

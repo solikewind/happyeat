@@ -12,6 +12,7 @@ type Config struct {
 	Casbin    Casbin
 	LLM       LLM
 	ASR       ASR
+	Cos       Cos
 }
 type SqlConfig struct {
 	DataSource string
@@ -37,4 +38,12 @@ type ASR struct {
 	Model             string // ASR 模型名
 	TranscribePath    string // 语音识别接口路径
 	HotwordCreatePath string // 热词创建接口路径
+}
+
+// Cos 对象存储（腾讯云 COS）。YAML 使用 snake_case（bucket_url 等），需 json 标签才能映射到字段。
+// optional：未配置或仅 migrate 时不强制填写。
+type Cos struct {
+	BucketUrl *string `json:"bucket_url,optional"`
+	SecretId  *string `json:"secret_id,optional"`
+	SecretKey *string `json:"secret_key,optional"`
 }

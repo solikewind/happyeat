@@ -12,6 +12,7 @@ import (
 	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	entorder "github.com/solikewind/happyeat/dal/model/ent/order"
+	entorderitem "github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	enttable "github.com/solikewind/happyeat/dal/model/ent/table"
 )
 
@@ -27,6 +28,7 @@ func NewOrder(c *ent.Client) *Order {
 
 // ItemInput 订单项入参（下单时从菜单快照）
 type ItemInput struct {
+	MenuID    uint64
 	MenuName  string
 	Quantity  int
 	UnitPrice int64
@@ -35,9 +37,9 @@ type ItemInput struct {
 
 // CreateOrderInput 创建订单入参。
 type CreateOrderInput struct {
-	OrderType    enum.OrderType   // dine_in | takeaway
-	TableID      *uint64          // 堂食时必填，外带为 nil
-	Items        []ItemInput      // 至少一项
+	OrderType    enum.OrderType // dine_in | takeaway
+	TableID      *uint64        // 堂食时必填，外带为 nil
+	Items        []ItemInput    // 至少一项
 	TotalAmount  int64
 	ActualAmount int64 // 实收（分）；未收可为 0
 	Remark       string
@@ -109,6 +111,9 @@ func (o *Order) Create(ctx context.Context, in CreateOrderInput) (*ent.Order, er
 			SetUnitPrice(item.UnitPrice).
 			SetAmount(item.UnitPrice * int64(item.Quantity)).
 			SetSort(uint32(i))
+		if item.MenuID > 0 {
+			itemCreate = itemCreate.SetMenuID(item.MenuID)
+		}
 		if item.SpecInfo != "" {
 			itemCreate = itemCreate.SetSpecInfo(item.SpecInfo)
 		}
@@ -184,4 +189,112 @@ func (o *Order) List(ctx context.Context, f ListOrdersFilter) ([]*ent.Order, int
 func (o *Order) UpdateStatus(ctx context.Context, id uint64, status enum.OrderStatus) error {
 	_, err := o.c.Order.UpdateOneID(id).SetStatus(normalizeOrderStatus(status)).Save(ctx)
 	return err
+}
+
+// AddItems 为订单追加菜单项，并重算 total_amount（actual_amount 仅在与 total_amount 相等时联动更新）。
+func (o *Order) AddItems(ctx context.Context, id uint64, items []ItemInput) (*ent.Order, error) {
+	if len(items) == 0 {
+		return nil, fmt.Errorf("items required")
+	}
+	tx, err := o.c.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	current, err := tx.Order.Query().Where(entorder.IDEQ(id)).WithItems().Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	existingItems, _ := current.Edges.ItemsOrErr()
+	sortBase := len(existingItems)
+	var appendAmount int64
+	for i, item := range items {
+		create := tx.OrderItem.Create().
+			SetOrderID(id).
+			SetMenuName(item.MenuName).
+			SetQuantity(item.Quantity).
+			SetUnitPrice(item.UnitPrice).
+			SetAmount(item.UnitPrice * int64(item.Quantity)).
+			SetSort(uint32(sortBase + i))
+		if item.MenuID > 0 {
+			create = create.SetMenuID(item.MenuID)
+		}
+		if item.SpecInfo != "" {
+			create = create.SetSpecInfo(item.SpecInfo)
+		}
+		if _, err = create.Save(ctx); err != nil {
+			return nil, err
+		}
+		appendAmount += item.UnitPrice * int64(item.Quantity)
+	}
+
+	newTotal := current.TotalAmount + appendAmount
+	update := tx.Order.UpdateOneID(id).SetTotalAmount(newTotal)
+	if current.ActualAmount == current.TotalAmount {
+		update = update.SetActualAmount(current.ActualAmount + appendAmount)
+	}
+	if _, err = update.Save(ctx); err != nil {
+		return nil, err
+	}
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
+	return o.GetByID(ctx, id)
+}
+
+// ReplaceItems 按提交列表整体替换订单明细，并重算 total_amount。
+func (o *Order) ReplaceItems(ctx context.Context, id uint64, items []ItemInput) (*ent.Order, error) {
+	if len(items) == 0 {
+		return nil, fmt.Errorf("items required")
+	}
+	tx, err := o.c.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	current, err := tx.Order.Query().Where(entorder.IDEQ(id)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 先删旧明细，再按提交内容重建，保证“删除”在编辑后真实生效。
+	if _, err = tx.OrderItem.Delete().Where(entorderitem.OrderIDEQ(id)).Exec(ctx); err != nil {
+		return nil, err
+	}
+
+	var newTotal int64
+	for i, item := range items {
+		lineAmount := item.UnitPrice * int64(item.Quantity)
+		create := tx.OrderItem.Create().
+			SetOrderID(id).
+			SetMenuName(item.MenuName).
+			SetQuantity(item.Quantity).
+			SetUnitPrice(item.UnitPrice).
+			SetAmount(lineAmount).
+			SetSort(uint32(i))
+		if item.MenuID > 0 {
+			create = create.SetMenuID(item.MenuID)
+		}
+		if item.SpecInfo != "" {
+			create = create.SetSpecInfo(item.SpecInfo)
+		}
+		if _, err = create.Save(ctx); err != nil {
+			return nil, err
+		}
+		newTotal += lineAmount
+	}
+
+	update := tx.Order.UpdateOneID(id).SetTotalAmount(newTotal)
+	if current.ActualAmount == current.TotalAmount {
+		update = update.SetActualAmount(newTotal)
+	}
+	if _, err = update.Save(ctx); err != nil {
+		return nil, err
+	}
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
+	return o.GetByID(ctx, id)
 }

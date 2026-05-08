@@ -51,10 +51,29 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 		return nil, err
 	}
 
+	image := req.Image
+	objectID := req.ObjectId
+	if objectID > 0 {
+		obj, err := l.svcCtx.Object.GetByID(l.ctx, objectID)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil, errors.New("对象不存在")
+			}
+			return nil, err
+		}
+		if req.Image != "" && req.Image != obj.URL {
+			return nil, errors.New("object_id 与 image 不一致")
+		}
+		if req.Image == "" {
+			image = obj.URL
+		}
+	}
+
 	_, err = l.svcCtx.Menu.Create(l.ctx, menu.CreateMenuInput{
 		Name:        req.Name,
 		Description: req.Description,
-		Image:       req.Image,
+		Image:       image,
+		ObjectID:    objectID,
 		Price:       req.Price,
 		CategoryID:  req.CategoryId,
 		Specs:       specs,

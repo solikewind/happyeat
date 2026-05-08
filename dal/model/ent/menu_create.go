@@ -13,6 +13,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 )
 
@@ -71,6 +72,20 @@ func (_c *MenuCreate) SetMenuCategoryID(v uint64) *MenuCreate {
 	return _c
 }
 
+// SetObjectID sets the "object_id" field.
+func (_c *MenuCreate) SetObjectID(v uint64) *MenuCreate {
+	_c.mutation.SetObjectID(v)
+	return _c
+}
+
+// SetNillableObjectID sets the "object_id" field if the given value is not nil.
+func (_c *MenuCreate) SetNillableObjectID(v *uint64) *MenuCreate {
+	if v != nil {
+		_c.SetObjectID(*v)
+	}
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *MenuCreate) SetName(v string) *MenuCreate {
 	_c.mutation.SetName(v)
@@ -126,6 +141,25 @@ func (_c *MenuCreate) SetCategoryID(id uint64) *MenuCreate {
 // SetCategory sets the "category" edge to the MenuCategory entity.
 func (_c *MenuCreate) SetCategory(v *MenuCategory) *MenuCreate {
 	return _c.SetCategoryID(v.ID)
+}
+
+// SetCoverObjectID sets the "cover_object" edge to the Object entity by ID.
+func (_c *MenuCreate) SetCoverObjectID(id uint64) *MenuCreate {
+	_c.mutation.SetCoverObjectID(id)
+	return _c
+}
+
+// SetNillableCoverObjectID sets the "cover_object" edge to the Object entity by ID if the given value is not nil.
+func (_c *MenuCreate) SetNillableCoverObjectID(id *uint64) *MenuCreate {
+	if id != nil {
+		_c = _c.SetCoverObjectID(*id)
+	}
+	return _c
+}
+
+// SetCoverObject sets the "cover_object" edge to the Object entity.
+func (_c *MenuCreate) SetCoverObject(v *Object) *MenuCreate {
+	return _c.SetCoverObjectID(v.ID)
 }
 
 // AddMenuSpecIDs adds the "menu_specs" edge to the MenuSpec entity by IDs.
@@ -324,6 +358,23 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.MenuCategoryID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CoverObjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   menu.CoverObjectTable,
+			Columns: []string{menu.CoverObjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(object.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ObjectID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.MenuSpecsIDs(); len(nodes) > 0 {

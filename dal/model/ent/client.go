@@ -22,6 +22,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/menu"
 	"github.com/solikewind/happyeat/dal/model/ent/menucategory"
 	"github.com/solikewind/happyeat/dal/model/ent/menuspec"
+	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
@@ -49,6 +50,8 @@ type Client struct {
 	MenuCategory *MenuCategoryClient
 	// MenuSpec is the client for interacting with the MenuSpec builders.
 	MenuSpec *MenuSpecClient
+	// Object is the client for interacting with the Object builders.
+	Object *ObjectClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
 	// OrderItem is the client for interacting with the OrderItem builders.
@@ -79,6 +82,7 @@ func (c *Client) init() {
 	c.Menu = NewMenuClient(c.config)
 	c.MenuCategory = NewMenuCategoryClient(c.config)
 	c.MenuSpec = NewMenuSpecClient(c.config)
+	c.Object = NewObjectClient(c.config)
 	c.Order = NewOrderClient(c.config)
 	c.OrderItem = NewOrderItemClient(c.config)
 	c.SpecGroup = NewSpecGroupClient(c.config)
@@ -184,6 +188,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Menu:          NewMenuClient(cfg),
 		MenuCategory:  NewMenuCategoryClient(cfg),
 		MenuSpec:      NewMenuSpecClient(cfg),
+		Object:        NewObjectClient(cfg),
 		Order:         NewOrderClient(cfg),
 		OrderItem:     NewOrderItemClient(cfg),
 		SpecGroup:     NewSpecGroupClient(cfg),
@@ -216,6 +221,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Menu:          NewMenuClient(cfg),
 		MenuCategory:  NewMenuCategoryClient(cfg),
 		MenuSpec:      NewMenuSpecClient(cfg),
+		Object:        NewObjectClient(cfg),
 		Order:         NewOrderClient(cfg),
 		OrderItem:     NewOrderItemClient(cfg),
 		SpecGroup:     NewSpecGroupClient(cfg),
@@ -252,7 +258,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.CategorySpec, c.IAMPermission, c.IAMRole, c.IAMUser, c.Menu, c.MenuCategory,
-		c.MenuSpec, c.Order, c.OrderItem, c.SpecGroup, c.SpecItem, c.Table,
+		c.MenuSpec, c.Object, c.Order, c.OrderItem, c.SpecGroup, c.SpecItem, c.Table,
 		c.TableCategory,
 	} {
 		n.Use(hooks...)
@@ -264,7 +270,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.CategorySpec, c.IAMPermission, c.IAMRole, c.IAMUser, c.Menu, c.MenuCategory,
-		c.MenuSpec, c.Order, c.OrderItem, c.SpecGroup, c.SpecItem, c.Table,
+		c.MenuSpec, c.Object, c.Order, c.OrderItem, c.SpecGroup, c.SpecItem, c.Table,
 		c.TableCategory,
 	} {
 		n.Intercept(interceptors...)
@@ -288,6 +294,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MenuCategory.mutate(ctx, m)
 	case *MenuSpecMutation:
 		return c.MenuSpec.mutate(ctx, m)
+	case *ObjectMutation:
+		return c.Object.mutate(ctx, m)
 	case *OrderMutation:
 		return c.Order.mutate(ctx, m)
 	case *OrderItemMutation:
@@ -1081,6 +1089,22 @@ func (c *MenuClient) QueryCategory(_m *Menu) *MenuCategoryQuery {
 	return query
 }
 
+// QueryCoverObject queries the cover_object edge of a Menu.
+func (c *MenuClient) QueryCoverObject(_m *Menu) *ObjectQuery {
+	query := (&ObjectClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(menu.Table, menu.FieldID, id),
+			sqlgraph.To(object.Table, object.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, menu.CoverObjectTable, menu.CoverObjectColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryMenuSpecs queries the menu_specs edge of a Menu.
 func (c *MenuClient) QueryMenuSpecs(_m *Menu) *MenuSpecQuery {
 	query := (&MenuSpecClient{config: c.config}).Query()
@@ -1487,6 +1511,157 @@ func (c *MenuSpecClient) mutate(ctx context.Context, m *MenuSpecMutation) (Value
 		return (&MenuSpecDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown MenuSpec mutation op: %q", m.Op())
+	}
+}
+
+// ObjectClient is a client for the Object schema.
+type ObjectClient struct {
+	config
+}
+
+// NewObjectClient returns a client for the Object from the given config.
+func NewObjectClient(c config) *ObjectClient {
+	return &ObjectClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `object.Hooks(f(g(h())))`.
+func (c *ObjectClient) Use(hooks ...Hook) {
+	c.hooks.Object = append(c.hooks.Object, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `object.Intercept(f(g(h())))`.
+func (c *ObjectClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Object = append(c.inters.Object, interceptors...)
+}
+
+// Create returns a builder for creating a Object entity.
+func (c *ObjectClient) Create() *ObjectCreate {
+	mutation := newObjectMutation(c.config, OpCreate)
+	return &ObjectCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Object entities.
+func (c *ObjectClient) CreateBulk(builders ...*ObjectCreate) *ObjectCreateBulk {
+	return &ObjectCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ObjectClient) MapCreateBulk(slice any, setFunc func(*ObjectCreate, int)) *ObjectCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ObjectCreateBulk{err: fmt.Errorf("calling to ObjectClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ObjectCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ObjectCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Object.
+func (c *ObjectClient) Update() *ObjectUpdate {
+	mutation := newObjectMutation(c.config, OpUpdate)
+	return &ObjectUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ObjectClient) UpdateOne(_m *Object) *ObjectUpdateOne {
+	mutation := newObjectMutation(c.config, OpUpdateOne, withObject(_m))
+	return &ObjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ObjectClient) UpdateOneID(id uint64) *ObjectUpdateOne {
+	mutation := newObjectMutation(c.config, OpUpdateOne, withObjectID(id))
+	return &ObjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Object.
+func (c *ObjectClient) Delete() *ObjectDelete {
+	mutation := newObjectMutation(c.config, OpDelete)
+	return &ObjectDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ObjectClient) DeleteOne(_m *Object) *ObjectDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ObjectClient) DeleteOneID(id uint64) *ObjectDeleteOne {
+	builder := c.Delete().Where(object.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ObjectDeleteOne{builder}
+}
+
+// Query returns a query builder for Object.
+func (c *ObjectClient) Query() *ObjectQuery {
+	return &ObjectQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeObject},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Object entity by its id.
+func (c *ObjectClient) Get(ctx context.Context, id uint64) (*Object, error) {
+	return c.Query().Where(object.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ObjectClient) GetX(ctx context.Context, id uint64) *Object {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMenuCovers queries the menu_covers edge of a Object.
+func (c *ObjectClient) QueryMenuCovers(_m *Object) *MenuQuery {
+	query := (&MenuClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(object.Table, object.FieldID, id),
+			sqlgraph.To(menu.Table, menu.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, object.MenuCoversTable, object.MenuCoversColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ObjectClient) Hooks() []Hook {
+	hooks := c.hooks.Object
+	return append(hooks[:len(hooks):len(hooks)], object.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ObjectClient) Interceptors() []Interceptor {
+	inters := c.inters.Object
+	return append(inters[:len(inters):len(inters)], object.Interceptors[:]...)
+}
+
+func (c *ObjectClient) mutate(ctx context.Context, m *ObjectMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ObjectCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ObjectUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ObjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ObjectDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Object mutation op: %q", m.Op())
 	}
 }
 
@@ -2480,10 +2655,11 @@ func (c *TableCategoryClient) mutate(ctx context.Context, m *TableCategoryMutati
 type (
 	hooks struct {
 		CategorySpec, IAMPermission, IAMRole, IAMUser, Menu, MenuCategory, MenuSpec,
-		Order, OrderItem, SpecGroup, SpecItem, Table, TableCategory []ent.Hook
+		Object, Order, OrderItem, SpecGroup, SpecItem, Table, TableCategory []ent.Hook
 	}
 	inters struct {
 		CategorySpec, IAMPermission, IAMRole, IAMUser, Menu, MenuCategory, MenuSpec,
-		Order, OrderItem, SpecGroup, SpecItem, Table, TableCategory []ent.Interceptor
+		Object, Order, OrderItem, SpecGroup, SpecItem, Table,
+		TableCategory []ent.Interceptor
 	}
 )

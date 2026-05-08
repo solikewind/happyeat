@@ -102,6 +102,7 @@ var (
 		{Name: "image", Type: field.TypeString, Nullable: true, Size: 512, Comment: "图片URL"},
 		{Name: "price", Type: field.TypeInt64, Comment: "价格"},
 		{Name: "menu_category_id", Type: field.TypeUint64, Comment: "菜单分类ID"},
+		{Name: "object_id", Type: field.TypeUint64, Nullable: true, Comment: "封面图对象ID（objects 表），与 image URL 二选一或同时存在"},
 	}
 	// MenusTable holds the schema information for the "menus" table.
 	MenusTable = &schema.Table{
@@ -115,6 +116,12 @@ var (
 				Columns:    []*schema.Column{MenusColumns[8]},
 				RefColumns: []*schema.Column{MenuCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "menus_objects_menu_covers",
+				Columns:    []*schema.Column{MenusColumns[9]},
+				RefColumns: []*schema.Column{ObjectsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -171,6 +178,34 @@ var (
 				Columns:    []*schema.Column{MenuSpecsColumns[8]},
 				RefColumns: []*schema.Column{SpecItemsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ObjectsColumns holds the columns for the "objects" table.
+	ObjectsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true, Comment: "ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "原始文件名"},
+		{Name: "key", Type: field.TypeString, Unique: true, Size: 512, Comment: "对象存储 key"},
+		{Name: "url", Type: field.TypeString, Size: 1024, Comment: "访问 URL"},
+		{Name: "content_type", Type: field.TypeString, Nullable: true, Size: 128, Comment: "内容类型"},
+		{Name: "suffix", Type: field.TypeString, Nullable: true, Size: 16, Comment: "文件后缀"},
+		{Name: "size", Type: field.TypeInt64, Comment: "文件大小（字节）", Default: 0},
+		{Name: "hash", Type: field.TypeString, Size: 64, Comment: "内容哈希（murmur3）"},
+	}
+	// ObjectsTable holds the schema information for the "objects" table.
+	ObjectsTable = &schema.Table{
+		Name:       "objects",
+		Comment:    "对象元数据表",
+		Columns:    ObjectsColumns,
+		PrimaryKey: []*schema.Column{ObjectsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "object_hash",
+				Unique:  false,
+				Columns: []*schema.Column{ObjectsColumns[10]},
 			},
 		},
 	}
@@ -382,6 +417,7 @@ var (
 		MenusTable,
 		MenuCategoriesTable,
 		MenuSpecsTable,
+		ObjectsTable,
 		OrdersTable,
 		OrderItemsTable,
 		SpecGroupsTable,
@@ -409,6 +445,7 @@ func init() {
 		Table: "iam_users",
 	}
 	MenusTable.ForeignKeys[0].RefTable = MenuCategoriesTable
+	MenusTable.ForeignKeys[1].RefTable = ObjectsTable
 	MenusTable.Annotation = &entsql.Annotation{
 		Table: "menus",
 	}
@@ -420,6 +457,9 @@ func init() {
 	MenuSpecsTable.ForeignKeys[2].RefTable = SpecItemsTable
 	MenuSpecsTable.Annotation = &entsql.Annotation{
 		Table: "menu_specs",
+	}
+	ObjectsTable.Annotation = &entsql.Annotation{
+		Table: "objects",
 	}
 	OrdersTable.ForeignKeys[0].RefTable = TablesTable
 	OrdersTable.Annotation = &entsql.Annotation{
