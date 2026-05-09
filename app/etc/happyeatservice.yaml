@@ -1,8 +1,8 @@
 Name: HappyEatService
 Host: 0.0.0.0
 Port: 8888
-# go-zero 请求体上限（字节），默认 1MB；放宽便于菜单图等上传
-MaxBytes: 5242880 # 5 MiB
+# go-zero 全局请求体上限（字节），默认 1MB；菜单图上传建议 ≥5242880
+MaxBytes: 5242880
 
 Auth:
   AccessSecret: "local-dev-secret-change-me"
