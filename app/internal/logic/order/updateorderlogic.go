@@ -89,5 +89,8 @@ func (l *UpdateOrderLogic) UpdateOrder(req *types.UpdateOrderReq) (*types.Update
 	if err != nil {
 		return nil, err
 	}
+
+	scheduleKitchenPrint(l.svcCtx, updated, "[改单重打]")
+
 	return &types.UpdateOrderReply{Order: EntOrderToType(updated)}, nil
 }
