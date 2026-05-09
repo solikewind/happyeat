@@ -39,8 +39,9 @@ type CreateTableReq {
 }
 type CreateTableReply {}
 
+// 更新餐桌：与 vega 的 UpdateWarehouseReq 一致——独立 Req，仅含 path id + 可改字段（不嵌整表、不含时间戳）
 type UpdateTableReq {
-	Id    uint64           `path:"id"`
+	Id         uint64 `path:"id"`
 	Code       string `json:"code"`
 	Status     string `json:"status"`
 	Capacity   uint32    `json:"capacity,optional"`

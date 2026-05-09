@@ -172,16 +172,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: menu.GetObjectHandler(serverCtx),
 				},
 				{
-					// 获取对象临时访问地址（私有桶）
-					Method:  http.MethodGet,
-					Path:    "/object/:id/url",
-					Handler: menu.GetObjectURLHandler(serverCtx),
-				},
-				{
 					// 删除对象
 					Method:  http.MethodDelete,
 					Path:    "/object/:id",
 					Handler: menu.DeleteObjectHandler(serverCtx),
+				},
+				{
+					// 获取对象临时访问地址（私有桶）
+					Method:  http.MethodGet,
+					Path:    "/object/:id/url",
+					Handler: menu.GetObjectURLHandler(serverCtx),
 				},
 				{
 					// 上传对象（用于菜单图片）
