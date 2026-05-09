@@ -172,16 +172,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: menu.GetObjectHandler(serverCtx),
 				},
 				{
-					// 获取对象临时访问地址（私有桶）
-					Method:  http.MethodGet,
-					Path:    "/object/:id/url",
-					Handler: menu.GetObjectURLHandler(serverCtx),
-				},
-				{
 					// 删除对象
 					Method:  http.MethodDelete,
 					Path:    "/object/:id",
 					Handler: menu.DeleteObjectHandler(serverCtx),
+				},
+				{
+					// 获取对象临时访问地址（私有桶）
+					Method:  http.MethodGet,
+					Path:    "/object/:id/url",
+					Handler: menu.GetObjectURLHandler(serverCtx),
 				},
 				{
 					// 上传对象（用于菜单图片）
@@ -248,6 +248,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: order.GetOrderHandler(serverCtx),
 				},
 				{
+					// 手动触发商鹏厨房小票打印
+					Method:  http.MethodPost,
+					Path:    "/order/:id/print",
+					Handler: order.PrintOrderKitchenHandler(serverCtx),
+				},
+				{
 					// 更新订单（追加菜单项）
 					Method:  http.MethodPut,
 					Path:    "/order/:id",
@@ -275,7 +281,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
-		rest.WithTimeout(5000*time.Millisecond),
+		rest.WithTimeout(15000*time.Millisecond),
 	)
 
 	server.AddRoutes(

@@ -150,7 +150,7 @@
                         "type": "string"
                       },
                       "id": {
-                        "type": "string"
+                        "type": "integer"
                       }
                     }
                   }
@@ -181,7 +181,7 @@
         "operationId": "iamGetIAMPermission",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -208,7 +208,7 @@
                       "type": "string"
                     },
                     "id": {
-                      "type": "string"
+                      "type": "integer"
                     }
                   }
                 }
@@ -289,7 +289,7 @@
                     ],
                     "properties": {
                       "id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "role_code": {
                         "type": "string"
@@ -353,7 +353,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": "integer"
                 }
               }
             }
@@ -378,7 +378,7 @@
         "operationId": "iamGetIAMRole",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -399,7 +399,7 @@
                   ],
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "role_code": {
                       "type": "string"
@@ -433,7 +433,7 @@
         "operationId": "iamUpdateIAMRole",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -483,7 +483,7 @@
         "operationId": "iamDeleteIAMRole",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -563,7 +563,7 @@
         "schemes": [
           "https"
         ],
-        "summary": "移除用户的某个角色；使用 query：?user_code=&role_code=",
+        "summary": "移除用户的某个角色；使用 query：?user_code=\u0026role_code=",
         "operationId": "iamRemoveIAMUserRole",
         "parameters": [
           {
@@ -685,7 +685,7 @@
                         "type": "string"
                       },
                       "id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "roles": {
                         "type": "array",
@@ -749,7 +749,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": "integer"
                 }
               }
             }
@@ -774,7 +774,7 @@
         "operationId": "iamGetIAMUser",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -799,7 +799,7 @@
                       "type": "string"
                     },
                     "id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "roles": {
                       "type": "array",
@@ -836,7 +836,7 @@
         "operationId": "iamUpdateIAMUser",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -886,7 +886,7 @@
         "operationId": "iamDeleteIAMUser",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -982,7 +982,7 @@
                       },
                       "id": {
                         "description": "分类id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "name": {
                         "description": "分类名称",
@@ -1076,7 +1076,7 @@
         "operationId": "menucategoryGetMenuCategory",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1106,7 +1106,7 @@
                     },
                     "id": {
                       "description": "分类id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "name": {
                       "description": "分类名称",
@@ -1145,7 +1145,7 @@
         "operationId": "menucategoryUpdateMenuCategory",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1203,7 +1203,7 @@
         "operationId": "menucategoryDeleteMenuCategory",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1236,7 +1236,7 @@
         "operationId": "menuGetMenu",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1261,7 +1261,7 @@
                   "properties": {
                     "category_id": {
                       "description": "菜单分类id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "created_at": {
                       "description": "创建时间，RFC3339（UTC），列表与详情均返回",
@@ -1273,7 +1273,7 @@
                     },
                     "id": {
                       "description": "菜单id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "image": {
                       "description": "菜单图片",
@@ -1282,6 +1282,10 @@
                     "name": {
                       "description": "菜单名称",
                       "type": "string"
+                    },
+                    "object_id": {
+                      "description": "封面图对象ID（上传接口返回的 object.id）",
+                      "type": "integer"
                     },
                     "price": {
                       "description": "菜单价格（分）",
@@ -1298,7 +1302,7 @@
                         "properties": {
                           "category_spec_id": {
                             "description": "分类规格项id",
-                            "type": "string"
+                            "type": "integer"
                           },
                           "price_delta": {
                             "description": "加价",
@@ -1314,7 +1318,7 @@
                           },
                           "spec_item_id": {
                             "description": "规格项id",
-                            "type": "string"
+                            "type": "integer"
                           },
                           "spec_type": {
                             "description": "规格类型，如辣度",
@@ -1357,7 +1361,7 @@
         "operationId": "menuUpdateMenu",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1373,7 +1377,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "description": {
                   "type": "string"
@@ -1383,6 +1387,9 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "object_id": {
+                  "type": "integer"
                 },
                 "price": {
                   "type": "integer"
@@ -1397,7 +1404,7 @@
                     "properties": {
                       "category_spec_id": {
                         "description": "分类规格项id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "price_delta": {
                         "description": "加价",
@@ -1413,7 +1420,7 @@
                       },
                       "spec_item_id": {
                         "description": "规格项id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "spec_type": {
                         "description": "规格类型，如辣度",
@@ -1458,7 +1465,7 @@
         "operationId": "menuDeleteMenu",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1509,7 +1516,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "string",
+            "type": "integer",
             "description": "按分类id筛选",
             "name": "category_id",
             "in": "query",
@@ -1535,7 +1542,7 @@
                 },
                 "category_id": {
                   "description": "按分类id筛选",
-                  "type": "string"
+                  "type": "integer"
                 },
                 "current": {
                   "type": "integer"
@@ -1571,7 +1578,7 @@
                     "properties": {
                       "category_id": {
                         "description": "菜单分类id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "created_at": {
                         "description": "创建时间，RFC3339（UTC），列表与详情均返回",
@@ -1583,7 +1590,7 @@
                       },
                       "id": {
                         "description": "菜单id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "image": {
                         "description": "菜单图片",
@@ -1592,6 +1599,10 @@
                       "name": {
                         "description": "菜单名称",
                         "type": "string"
+                      },
+                      "object_id": {
+                        "description": "封面图对象ID（上传接口返回的 object.id）",
+                        "type": "integer"
                       },
                       "price": {
                         "description": "菜单价格（分）",
@@ -1608,7 +1619,7 @@
                           "properties": {
                             "category_spec_id": {
                               "description": "分类规格项id",
-                              "type": "string"
+                              "type": "integer"
                             },
                             "price_delta": {
                               "description": "加价",
@@ -1624,7 +1635,7 @@
                             },
                             "spec_item_id": {
                               "description": "规格项id",
-                              "type": "string"
+                              "type": "integer"
                             },
                             "spec_type": {
                               "description": "规格类型，如辣度",
@@ -1683,7 +1694,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "description": {
                   "type": "string"
@@ -1693,6 +1704,9 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "object_id": {
+                  "type": "integer"
                 },
                 "price": {
                   "description": "以分为单位，避免前端浮点数问题，展示/100",
@@ -1708,7 +1722,7 @@
                     "properties": {
                       "category_spec_id": {
                         "description": "分类规格项id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "price_delta": {
                         "description": "加价",
@@ -1724,7 +1738,7 @@
                       },
                       "spec_item_id": {
                         "description": "规格项id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "spec_type": {
                         "description": "规格类型，如辣度",
@@ -1751,6 +1765,236 @@
         }
       }
     },
+    "/central/v1/object/{id}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取对象详情",
+        "operationId": "menuGetObject",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "object": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "name",
+                    "key",
+                    "url",
+                    "size",
+                    "hash",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "properties": {
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "hash": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "integer"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "suffix": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "删除对象",
+        "operationId": "menuDeleteObject",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/object/{id}/url": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "获取对象临时访问地址（私有桶）",
+        "operationId": "menuGetObjectURL",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "expired_at": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/central/v1/objects/upload": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "上传对象（用于菜单图片）",
+        "operationId": "menuUploadObject",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "object": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "name",
+                    "key",
+                    "url",
+                    "size",
+                    "hash",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "properties": {
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "hash": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "integer"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "suffix": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/central/v1/order/{id}": {
       "get": {
         "security": [
@@ -1768,7 +2012,7 @@
         "operationId": "orderGetOrder",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1788,17 +2032,22 @@
                     "order_type",
                     "status",
                     "total_amount",
+                    "actual_amount",
                     "created_at",
                     "updated_at"
                   ],
                   "properties": {
+                    "actual_amount": {
+                      "description": "实收金额（分）",
+                      "type": "integer"
+                    },
                     "created_at": {
                       "description": "创建时间",
                       "type": "string"
                     },
                     "id": {
                       "description": "订单id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "items": {
                       "description": "订单明细",
@@ -1848,7 +2097,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "description": "created/paid/preparing/completed/cancelled",
+                      "description": "CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）",
                       "type": "string"
                     },
                     "table_category": {
@@ -1861,10 +2110,183 @@
                     },
                     "table_id": {
                       "description": "堂食时关联餐桌id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "total_amount": {
-                      "description": "总金额",
+                      "description": "总金额（分，应收）",
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "description": "更新时间",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "summary": "更新订单（追加菜单项）",
+        "operationId": "orderUpdateOrder",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "items"
+              ],
+              "properties": {
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "quantity"
+                    ],
+                    "properties": {
+                      "menu_id": {
+                        "type": "integer"
+                      },
+                      "menu_name": {
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "type": "integer"
+                      },
+                      "spec_info": {
+                        "type": "string"
+                      },
+                      "unit_price": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "order_no",
+                    "order_type",
+                    "status",
+                    "total_amount",
+                    "actual_amount",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "properties": {
+                    "actual_amount": {
+                      "description": "实收金额（分）",
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "description": "创建时间",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "订单id",
+                      "type": "integer"
+                    },
+                    "items": {
+                      "description": "订单明细",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "menu_name",
+                          "quantity",
+                          "unit_price",
+                          "amount"
+                        ],
+                        "properties": {
+                          "amount": {
+                            "description": "小计",
+                            "type": "integer"
+                          },
+                          "menu_name": {
+                            "description": "菜品名称快照",
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "description": "数量",
+                            "type": "integer"
+                          },
+                          "spec_info": {
+                            "description": "规格描述快照",
+                            "type": "string"
+                          },
+                          "unit_price": {
+                            "description": "单价",
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "order_no": {
+                      "description": "订单号",
+                      "type": "string"
+                    },
+                    "order_type": {
+                      "description": "dine_in=堂食 takeaway=打包外带",
+                      "type": "string"
+                    },
+                    "remark": {
+                      "description": "备注",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）",
+                      "type": "string"
+                    },
+                    "table_category": {
+                      "description": "餐桌类别（如大厅、包间）",
+                      "type": "string"
+                    },
+                    "table_code": {
+                      "description": "桌号（堂食时显示，外带为空）",
+                      "type": "string"
+                    },
+                    "table_id": {
+                      "description": "堂食时关联餐桌id",
+                      "type": "integer"
+                    },
+                    "total_amount": {
+                      "description": "总金额（分，应收）",
                       "type": "integer"
                     },
                     "updated_at": {
@@ -1899,7 +2321,7 @@
         "operationId": "orderUpdateOrderStatus",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -1915,7 +2337,7 @@
               ],
               "properties": {
                 "status": {
-                  "description": "paid/preparing/completed/cancelled",
+                  "description": "目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）",
                   "type": "string"
                 }
               }
@@ -1974,7 +2396,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "string",
+            "type": "integer",
             "description": "按餐桌筛选",
             "name": "table_id",
             "in": "query",
@@ -2002,7 +2424,7 @@
                 },
                 "table_id": {
                   "description": "按餐桌筛选",
-                  "type": "string"
+                  "type": "integer"
                 }
               }
             }
@@ -2024,17 +2446,22 @@
                       "order_type",
                       "status",
                       "total_amount",
+                      "actual_amount",
                       "created_at",
                       "updated_at"
                     ],
                     "properties": {
+                      "actual_amount": {
+                        "description": "实收金额（分）",
+                        "type": "integer"
+                      },
                       "created_at": {
                         "description": "创建时间",
                         "type": "string"
                       },
                       "id": {
                         "description": "订单id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "items": {
                         "description": "订单明细",
@@ -2084,7 +2511,7 @@
                         "type": "string"
                       },
                       "status": {
-                        "description": "created/paid/preparing/completed/cancelled",
+                        "description": "CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）",
                         "type": "string"
                       },
                       "table_category": {
@@ -2097,10 +2524,10 @@
                       },
                       "table_id": {
                         "description": "堂食时关联餐桌id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "total_amount": {
-                        "description": "总金额",
+                        "description": "总金额（分，应收）",
                         "type": "integer"
                       },
                       "updated_at": {
@@ -2148,6 +2575,10 @@
                 "total_amount"
               ],
               "properties": {
+                "actual_amount": {
+                  "description": "实收（分）；不传默认 0",
+                  "type": "integer"
+                },
                 "items": {
                   "type": "array",
                   "items": {
@@ -2158,6 +2589,9 @@
                       "unit_price"
                     ],
                     "properties": {
+                      "menu_id": {
+                        "type": "integer"
+                      },
                       "menu_name": {
                         "type": "string"
                       },
@@ -2182,7 +2616,7 @@
                 },
                 "table_id": {
                   "description": "堂食必填",
-                  "type": "string"
+                  "type": "integer"
                 },
                 "total_amount": {
                   "type": "integer"
@@ -2205,17 +2639,22 @@
                     "order_type",
                     "status",
                     "total_amount",
+                    "actual_amount",
                     "created_at",
                     "updated_at"
                   ],
                   "properties": {
+                    "actual_amount": {
+                      "description": "实收金额（分）",
+                      "type": "integer"
+                    },
                     "created_at": {
                       "description": "创建时间",
                       "type": "string"
                     },
                     "id": {
                       "description": "订单id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "items": {
                       "description": "订单明细",
@@ -2265,7 +2704,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "description": "created/paid/preparing/completed/cancelled",
+                      "description": "CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）",
                       "type": "string"
                     },
                     "table_category": {
@@ -2278,10 +2717,10 @@
                     },
                     "table_id": {
                       "description": "堂食时关联餐桌id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "total_amount": {
-                      "description": "总金额",
+                      "description": "总金额（分，应收）",
                       "type": "integer"
                     },
                     "updated_at": {
@@ -2550,7 +2989,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "string",
+            "type": "integer",
             "name": "category_id",
             "in": "query",
             "allowEmptyValue": true
@@ -2569,7 +3008,7 @@
               "type": "object",
               "properties": {
                 "category_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "current": {
                   "type": "integer"
@@ -2605,13 +3044,13 @@
                     ],
                     "properties": {
                       "category_id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "created_at": {
                         "type": "string"
                       },
                       "id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "price_delta": {
                         "type": "integer"
@@ -2621,7 +3060,7 @@
                         "type": "integer"
                       },
                       "spec_item_id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "spec_type": {
                         "type": "string"
@@ -2674,7 +3113,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "price_delta": {
                   "type": "integer"
@@ -2683,7 +3122,7 @@
                   "type": "integer"
                 },
                 "spec_item_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "spec_type": {
                   "type": "string"
@@ -2722,7 +3161,7 @@
         "operationId": "specGetCategorySpec",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -2747,13 +3186,13 @@
                   ],
                   "properties": {
                     "category_id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "created_at": {
                       "type": "string"
                     },
                     "id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "price_delta": {
                       "type": "integer"
@@ -2763,7 +3202,7 @@
                       "type": "integer"
                     },
                     "spec_item_id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "spec_type": {
                       "type": "string"
@@ -2800,7 +3239,7 @@
         "operationId": "specUpdateCategorySpec",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -2818,7 +3257,7 @@
               ],
               "properties": {
                 "category_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "price_delta": {
                   "type": "integer"
@@ -2827,7 +3266,7 @@
                   "type": "integer"
                 },
                 "spec_item_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "spec_type": {
                   "type": "string"
@@ -2867,7 +3306,7 @@
         "operationId": "specDeleteCategorySpec",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -2949,7 +3388,7 @@
         "operationId": "specGetSpecGroup",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -2974,7 +3413,7 @@
                       "type": "string"
                     },
                     "id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "name": {
                       "type": "string"
@@ -3012,7 +3451,7 @@
         "operationId": "specUpdateSpecGroup",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3065,7 +3504,7 @@
         "operationId": "specDeleteSpecGroup",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3156,7 +3595,7 @@
                         "type": "string"
                       },
                       "id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "name": {
                         "type": "string"
@@ -3220,7 +3659,7 @@
                   "type": "integer"
                 },
                 "spec_group_id": {
-                  "type": "string"
+                  "type": "integer"
                 }
               }
             }
@@ -3253,7 +3692,7 @@
         "operationId": "specGetSpecItem",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3283,7 +3722,7 @@
                       "type": "integer"
                     },
                     "id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "name": {
                       "type": "string"
@@ -3292,7 +3731,7 @@
                       "type": "integer"
                     },
                     "spec_group_id": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "updated_at": {
                       "type": "string"
@@ -3323,7 +3762,7 @@
         "operationId": "specUpdateSpecItem",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3349,7 +3788,7 @@
                   "type": "integer"
                 },
                 "spec_group_id": {
-                  "type": "string"
+                  "type": "integer"
                 }
               }
             }
@@ -3383,7 +3822,7 @@
         "operationId": "specDeleteSpecItem",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3428,7 +3867,7 @@
             "allowEmptyValue": true
           },
           {
-            "type": "string",
+            "type": "integer",
             "name": "spec_group_id",
             "in": "query",
             "allowEmptyValue": true
@@ -3456,7 +3895,7 @@
                   "type": "integer"
                 },
                 "spec_group_id": {
-                  "type": "string"
+                  "type": "integer"
                 }
               }
             }
@@ -3488,7 +3927,7 @@
                         "type": "integer"
                       },
                       "id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "name": {
                         "type": "string"
@@ -3497,7 +3936,7 @@
                         "type": "integer"
                       },
                       "spec_group_id": {
-                        "type": "string"
+                        "type": "integer"
                       },
                       "updated_at": {
                         "type": "string"
@@ -3589,7 +4028,7 @@
                       },
                       "id": {
                         "description": "分类id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "name": {
                         "description": "分类名称",
@@ -3673,7 +4112,7 @@
         "operationId": "tablecategoryGetTableCategory",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3698,7 +4137,7 @@
                     },
                     "id": {
                       "description": "分类id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "name": {
                       "description": "分类名称",
@@ -3730,7 +4169,7 @@
         "operationId": "tablecategoryUpdateTableCategory",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3791,7 +4230,7 @@
         "operationId": "tablecategoryDeleteTableCategory",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3824,7 +4263,7 @@
         "operationId": "tableGetTable",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3853,19 +4292,19 @@
                     },
                     "category_id": {
                       "description": "餐桌分类id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "code": {
                       "description": "桌号",
                       "type": "string"
                     },
                     "created_at": {
-                      "description": "创建时间",
+                      "description": "创建时间（仅列表/详情返回）",
                       "type": "string"
                     },
                     "id": {
                       "description": "餐桌id",
-                      "type": "string"
+                      "type": "integer"
                     },
                     "qr_code": {
                       "description": "二维码",
@@ -3876,7 +4315,7 @@
                       "type": "string"
                     },
                     "updated_at": {
-                      "description": "更新时间",
+                      "description": "更新时间（仅列表/详情返回）",
                       "type": "string"
                     }
                   }
@@ -3905,7 +4344,7 @@
         "operationId": "tableUpdateTable",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -3926,7 +4365,7 @@
                   "type": "integer"
                 },
                 "category_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "code": {
                   "type": "string"
@@ -3969,7 +4408,7 @@
         "operationId": "tableDeleteTable",
         "parameters": [
           {
-            "type": "string",
+            "type": "integer",
             "name": "id",
             "in": "path",
             "required": true
@@ -4021,12 +4460,19 @@
           },
           {
             "type": "string",
-            "name": "status",
+            "description": "按桌号模糊搜索（与 code 字段一致，子串匹配）",
+            "name": "name",
             "in": "query",
             "allowEmptyValue": true
           },
           {
             "type": "string",
+            "name": "status",
+            "in": "query",
+            "allowEmptyValue": true
+          },
+          {
+            "type": "integer",
             "description": "按分类id筛选",
             "name": "category_id",
             "in": "query",
@@ -4052,13 +4498,17 @@
                 },
                 "category_id": {
                   "description": "按分类id筛选",
-                  "type": "string"
+                  "type": "integer"
                 },
                 "code": {
                   "type": "string"
                 },
                 "current": {
                   "type": "integer"
+                },
+                "name": {
+                  "description": "按桌号模糊搜索（与 code 字段一致，子串匹配）",
+                  "type": "string"
                 },
                 "pageSize": {
                   "type": "integer"
@@ -4095,19 +4545,19 @@
                       },
                       "category_id": {
                         "description": "餐桌分类id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "code": {
                         "description": "桌号",
                         "type": "string"
                       },
                       "created_at": {
-                        "description": "创建时间",
+                        "description": "创建时间（仅列表/详情返回）",
                         "type": "string"
                       },
                       "id": {
                         "description": "餐桌id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "qr_code": {
                         "description": "二维码",
@@ -4118,7 +4568,7 @@
                         "type": "string"
                       },
                       "updated_at": {
-                        "description": "更新时间",
+                        "description": "更新时间（仅列表/详情返回）",
                         "type": "string"
                       }
                     }
@@ -4166,7 +4616,7 @@
                   "type": "integer"
                 },
                 "category_id": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "code": {
                   "type": "string"
@@ -4221,7 +4671,7 @@
           },
           {
             "type": "string",
-            "description": "不传则默认查 created,paid,preparing",
+            "description": "不传则默认查 CREATED/PAID/PREPARING",
             "name": "status",
             "in": "query",
             "allowEmptyValue": true
@@ -4240,7 +4690,7 @@
                   "type": "integer"
                 },
                 "status": {
-                  "description": "不传则默认查 created,paid,preparing",
+                  "description": "不传则默认查 CREATED/PAID/PREPARING",
                   "type": "string"
                 }
               }
@@ -4263,17 +4713,22 @@
                       "order_type",
                       "status",
                       "total_amount",
+                      "actual_amount",
                       "created_at",
                       "updated_at"
                     ],
                     "properties": {
+                      "actual_amount": {
+                        "description": "实收金额（分）",
+                        "type": "integer"
+                      },
                       "created_at": {
                         "description": "创建时间",
                         "type": "string"
                       },
                       "id": {
                         "description": "订单id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "items": {
                         "description": "订单明细",
@@ -4323,7 +4778,7 @@
                         "type": "string"
                       },
                       "status": {
-                        "description": "created/paid/preparing/completed/cancelled",
+                        "description": "CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）",
                         "type": "string"
                       },
                       "table_category": {
@@ -4336,10 +4791,10 @@
                       },
                       "table_id": {
                         "description": "堂食时关联餐桌id",
-                        "type": "string"
+                        "type": "integer"
                       },
                       "total_amount": {
-                        "description": "总金额",
+                        "description": "总金额（分，应收）",
                         "type": "integer"
                       },
                       "updated_at": {
@@ -4366,7 +4821,7 @@
       "in": "header"
     }
   },
-  "x-date": "2026-04-19 08:34:45",
+  "x-date": "2026-05-09 17:22:47",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

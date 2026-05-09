@@ -76,5 +76,7 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderReq) (*types.Create
 		return nil, err
 	}
 
+	scheduleKitchenPrint(l.svcCtx, entOrder, "[新单]")
+
 	return &types.CreateOrderReply{Order: EntOrderToType(entOrder)}, nil
 }

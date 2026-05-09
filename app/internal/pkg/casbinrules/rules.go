@@ -17,6 +17,7 @@ var ValidPermissions = map[string]struct{}{
 	"orders:create":        {},
 	"orders:update":        {},
 	"orders:update_status": {},
+	"orders:print_kitchen": {},
 	"order_desk:view":      {},
 	"order_desk:create":    {},
 	"menu:view":            {},
@@ -42,6 +43,7 @@ var PermissionCatalog = []PermissionSpec{
 	{Code: "orders:create", Description: "创建订单"},
 	{Code: "orders:update", Description: "更新订单（追加菜单）"},
 	{Code: "orders:update_status", Description: "更新订单状态"},
+	{Code: "orders:print_kitchen", Description: "手动打印厨房小票（商鹏）"},
 	{Code: "order_desk:view", Description: "点餐台查看"},
 	{Code: "order_desk:create", Description: "点餐台创建订单"},
 	{Code: "menu:view", Description: "查看菜单"},
@@ -81,6 +83,7 @@ var PermissionRules = map[string][]PolicyRule{
 	"orders:create":        {{Obj: "/central/v1/orders", Act: "POST"}},
 	"orders:update":        {{Obj: "/central/v1/order/:id", Act: "PUT"}},
 	"orders:update_status": {{Obj: "/central/v1/order/:id/status", Act: "PUT"}},
+	"orders:print_kitchen": {{Obj: "/central/v1/order/:id/print", Act: "POST"}},
 	"order_desk:view": {
 		{Obj: "/central/v1/menu/categories", Act: "GET"},
 		{Obj: "/central/v1/menus", Act: "GET"},

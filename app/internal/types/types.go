@@ -276,6 +276,13 @@ type GetOrderReq struct {
 	Id uint64 `path:"id"`
 }
 
+type PrintOrderKitchenReply struct {
+}
+
+type PrintOrderKitchenReq struct {
+	Id uint64 `path:"id"`
+}
+
 type GetRolePermissionReply struct {
 	RolePermission RolePermission `json:"role_permission"`
 }
@@ -606,8 +613,8 @@ type Table struct {
 	Capacity   uint32 `json:"capacity,optional"`  // 可坐人数
 	CategoryId uint64 `json:"category_id,string"` // 餐桌分类id
 	QrCode     string `json:"qr_code,optional"`   // 二维码
-	CreatedAt  string `json:"created_at"`         // 创建时间
-	UpdatedAt  string `json:"updated_at"`         // 更新时间
+	CreatedAt  string `json:"created_at"`         // 创建时间（仅列表/详情返回）
+	UpdatedAt  string `json:"updated_at"`         // 更新时间（仅列表/详情返回）
 }
 
 type TableCategory struct {

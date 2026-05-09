@@ -244,7 +244,7 @@ service HappyEatService {
 	middleware: CasbinMiddleware
 	prefix:     /central/v1
 	group:      order
-	timeout:    5s
+	timeout:    15s
 )
 service HappyEatService {
 	@doc "列出订单"
@@ -258,6 +258,10 @@ service HappyEatService {
 	@doc "创建订单"
 	@handler CreateOrder
 	post /orders (CreateOrderReq) returns (CreateOrderReply)
+
+	@doc "手动触发商鹏厨房小票打印"
+	@handler PrintOrderKitchen
+	post /order/:id/print (PrintOrderKitchenReq) returns (PrintOrderKitchenReply)
 
 	@doc "更新订单状态"
 	@handler UpdateOrderStatus

@@ -67,3 +67,8 @@ type UpdateOrderReq {
 type UpdateOrderReply {
 	Order Order `json:"order"`
 }
+
+type PrintOrderKitchenReq {
+	Id uint64 `path:"id"`
+}
+type PrintOrderKitchenReply {}
