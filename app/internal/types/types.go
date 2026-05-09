@@ -276,6 +276,13 @@ type GetOrderReq struct {
 	Id uint64 `path:"id"`
 }
 
+type PrintOrderKitchenReply struct {
+}
+
+type PrintOrderKitchenReq struct {
+	Id uint64 `path:"id"`
+}
+
 type GetRolePermissionReply struct {
 	RolePermission RolePermission `json:"role_permission"`
 }

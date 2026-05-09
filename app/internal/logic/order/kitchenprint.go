@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -10,6 +11,19 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent"
 	"github.com/zeromicro/go-zero/core/logx"
 )
+
+// SyncPrintKitchen 同步调用商鹏厨房单；用于「手动打印」接口，失败将返回给调用方。
+func SyncPrintKitchen(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Order, banner string) error {
+	if svcCtx == nil || e == nil {
+		return errors.New("内部错误")
+	}
+	if svcCtx.Spyun == nil {
+		return errors.New("商鹏云打印未启用或未配置")
+	}
+	content := formatKitchenTicket(e, banner)
+	_, err := svcCtx.Spyun.PrintOrder(ctx, "", content, 1)
+	return err
+}
 
 // scheduleKitchenPrint 异步提交商鹏打印；nil 客户端或未启用时不做事。失败只记日志，不影响订单接口结果。
 func scheduleKitchenPrint(svcCtx *svc.ServiceContext, e *ent.Order, banner string) {
