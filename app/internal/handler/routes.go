@@ -194,8 +194,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
-		// 本组含 multipart 上传，显式放宽请求体（5MiB），避免仅改 yaml 未生效或网关前仍走默认 1MB 时 413
-		rest.WithMaxBytes(5242880),
+		// 本组含 multipart 上传；手机原图易超 5MiB，与全局 MaxBytes 对齐为 32MiB
+		rest.WithMaxBytes(32<<20),
 	)
 
 	server.AddRoutes(

@@ -5,7 +5,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -91,6 +90,8 @@ func main() {
 	})
 	handler.RegisterHandlers(server, ctx)
 
-	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+	// 生产排查 413：一眼看「是否新镜像 + 实际 MaxBytes + 读的哪份配置」。旧镜像只有上一行无本行。
+	log.Printf("happyeat-api listen %s:%d | -f %s | rest.MaxBytes=%d (若仍为1048576请检查挂载的 remote.yaml；无POST/upload日志多为 Nginx client_max_body_size)",
+		c.Host, c.Port, *configFile, c.MaxBytes)
 	server.Start()
 }
