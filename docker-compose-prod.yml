@@ -28,6 +28,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # API 读 app/etc/happyeatservice.remote.yaml（勿与本地 happyeatservice.yaml 混淆），需含 MaxBytes 等与上传相关的项
   happyeat-api:
     build:
       context: .
