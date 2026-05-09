@@ -1,5 +1,10 @@
 # Production override config for Docker deployment.
-# Copy this file to happyeatservice.remote.yaml and fill actual values.
+# Copy this file to app/etc/happyeatservice.remote.yaml（与 docker-compose-prod 中 -f 路径一致）并填写真实值。
+#
+# 请求体大小：生产 compose 使用本文件而非 happyeatservice.yaml；若此处不写 MaxBytes，go-zero 默认仅 1MB。
+# 前端经 Nginx /api 代理时，还须把 Nginx client_max_body_size 调到 ≥ 此处（见 happyeat-web deploy 工作流）。
+
+MaxBytes: 5242880
 
 Auth:
   AccessSecret: "replace-with-strong-jwt-secret"
