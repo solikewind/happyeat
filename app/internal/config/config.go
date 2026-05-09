@@ -13,6 +13,7 @@ type Config struct {
 	LLM       LLM
 	ASR       ASR
 	Cos       Cos
+	Spyun     Spyun `json:"spyun,optional"`
 }
 type SqlConfig struct {
 	DataSource string
@@ -46,4 +47,14 @@ type Cos struct {
 	BucketUrl *string `json:"bucket_url,optional"`
 	SecretId  *string `json:"secret_id,optional"`
 	SecretKey *string `json:"secret_key,optional"`
+}
+
+// Spyun 商鹏云打印（https://www.spyun.net.cn/open/index.html）。未启用或未配密钥时客户端为 nil。
+type Spyun struct {
+	Enabled     bool   `json:"enabled,optional"`
+	AppID       string `json:"app_id,optional"`
+	AppSecret   string `json:"app_secret,optional"`
+	BaseURL     string `json:"base_url,optional"`     // 默认 https://open.spyun.net
+	SN          string `json:"sn,optional"`             // 默认打印机编号
+	TimeoutSec  int    `json:"timeout_sec,optional"` // HTTP 超时秒数，默认 15
 }

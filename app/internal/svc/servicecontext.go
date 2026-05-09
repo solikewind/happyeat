@@ -13,6 +13,7 @@ import (
 	"github.com/solikewind/happyeat/app/internal/config"
 	"github.com/solikewind/happyeat/app/internal/pkg/agent"
 	"github.com/solikewind/happyeat/app/internal/pkg/cos"
+	"github.com/solikewind/happyeat/app/internal/pkg/spyun"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	_ "github.com/solikewind/happyeat/dal/model/ent/runtime"
 	"github.com/solikewind/happyeat/dal/model/menu"
@@ -33,6 +34,7 @@ type ServiceContext struct {
 	LLM              *agent.LangChainService
 	ASR              *agent.BailianASRClient
 	Cos              *cos.Client
+	Spyun            *spyun.Client
 
 	Menu         *menu.Menu              // 菜单 data 层
 	MenuType     *menu.MenuType          // 菜单分类 data 层
@@ -95,6 +97,7 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		LLM:    llmSvc,
 		ASR:    asrSvc,
 		Cos:    cos.NewClient(c.Cos),
+		Spyun:  spyun.NewClient(c.Spyun),
 
 		Menu:         menu.NewMenu(client),
 		MenuType:     menu.NewMenuType(client),
