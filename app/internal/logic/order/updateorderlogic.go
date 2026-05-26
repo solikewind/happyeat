@@ -42,6 +42,8 @@ func (l *UpdateOrderLogic) UpdateOrder(req *types.UpdateOrderReq) (*types.Update
 	if current.Status == enum.OrderStatusCompleted || current.Status == enum.OrderStatusCancelled {
 		return nil, errors.New("当前订单状态不允许追加菜单")
 	}
+	// 保留旧明细快照，用于打印时计算新增/减量/删除差异
+	oldItems, _ := current.Edges.ItemsOrErr()
 
 	items := make([]ordermodel.ItemInput, 0, len(req.Items))
 	for _, it := range req.Items {
@@ -90,7 +92,9 @@ func (l *UpdateOrderLogic) UpdateOrder(req *types.UpdateOrderReq) (*types.Update
 		return nil, err
 	}
 
-	scheduleKitchenPrint(l.svcCtx, updated, "[改单重打]")
+	newItems, _ := updated.Edges.ItemsOrErr()
+	diff := DiffOrderItems(oldItems, newItems)
+	scheduleKitchenPrintWithDiff(l.svcCtx, updated, "[改单重打]", diff)
 
 	return &types.UpdateOrderReply{Order: EntOrderToType(updated)}, nil
 }
