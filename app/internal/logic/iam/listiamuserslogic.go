@@ -49,6 +49,7 @@ func (l *ListIAMUsersLogic) ListIAMUsers(req *types.ListIAMUsersReq) (resp *type
 			roles = []string{}
 		}
 		items = append(items, types.IAMUserItem{
+			Id:          row.ID,
 			UserCode:    row.UserCode,
 			DisplayName: row.DisplayName,
 			Roles:       roles,

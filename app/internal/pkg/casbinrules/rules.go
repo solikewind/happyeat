@@ -57,6 +57,7 @@ var PermissionCatalog = []PermissionSpec{
 // PermissionRules 权限码 -> HTTP 资源点（与 Casbin 中间件 obj/act 一致）。
 var PermissionRules = map[string][]PolicyRule{
 	"permission:view": {
+		{Obj: "/central/v1/rbac/permission-catalog", Act: "GET"},
 		{Obj: "/central/v1/rbac/role-permissions", Act: "GET"},
 		{Obj: "/central/v1/rbac/role-permissions/:id", Act: "GET"},
 		{Obj: "/central/v1/rbac/role-permissions/:id", Act: "PUT"},
@@ -141,6 +142,44 @@ var PermissionRules = map[string][]PolicyRule{
 		{Obj: "/central/v1/spec/item/:id", Act: "PUT"},
 		{Obj: "/central/v1/spec/item/:id", Act: "DELETE"},
 	},
+}
+
+// PresetRoleCodes 启动时种子写入的预置角色（不可删除）。
+var PresetRoleCodes = map[string]struct{}{
+	"super_admin": {},
+	"manager":     {},
+	"cashier":     {},
+	"kitchen":     {},
+	"waiter":      {},
+}
+
+// IsPresetRole 是否为系统预置角色。
+func IsPresetRole(roleCode string) bool {
+	_, ok := PresetRoleCodes[roleCode]
+	return ok
+}
+
+// CatalogEntry 权限目录项（含映射的 HTTP 资源点）。
+type CatalogEntry struct {
+	Code        string
+	Description string
+	Endpoints   []PolicyRule
+}
+
+// ListCatalog 返回可分配的权限目录（与 iam_permissions / PermissionRules 一致）。
+func ListCatalog() []CatalogEntry {
+	out := make([]CatalogEntry, 0, len(PermissionCatalog))
+	for _, spec := range PermissionCatalog {
+		rules := PermissionRules[spec.Code]
+		eps := make([]PolicyRule, len(rules))
+		copy(eps, rules)
+		out = append(out, CatalogEntry{
+			Code:        spec.Code,
+			Description: spec.Description,
+			Endpoints:   eps,
+		})
+	}
+	return out
 }
 
 // AllPolicyKeys 返回所有 (canonicalObj, act) 用于与路由集合 diff。

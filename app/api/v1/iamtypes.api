@@ -75,8 +75,9 @@ type GetIAMPermissionReply {
 // ---------- 角色 CRUD ----------
 
 type CreateIAMRoleReq {
-	RoleCode string `json:"role_code"`
-	RoleName string `json:"role_name,optional"`
+	RoleCode    string   `json:"role_code"`
+	RoleName    string   `json:"role_name,optional"`
+	Permissions []string `json:"permissions,optional"` // 可选：创建后一次性绑定权限码
 }
 
 type CreateIAMRoleReply {

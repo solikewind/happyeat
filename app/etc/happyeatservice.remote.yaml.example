@@ -24,3 +24,11 @@ asr:
   Model: "paraformer-realtime-v2"
   TranscribePath: "/asr/transcribe"
   HotwordCreatePath: "/asr/hotwords"
+
+# 商鹏厨房小票（可选）：库内金额若为「分」可设 kitchen_ticket_amount_scale: cent
+# spyun:
+#   enabled: true
+#   app_id: ""
+#   app_secret: ""
+#   sn: ""
+#   kitchen_ticket_amount_scale: cent

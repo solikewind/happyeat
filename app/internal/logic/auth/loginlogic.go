@@ -6,6 +6,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -34,16 +35,33 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 	}
 }
 
+func loginUserCode(username string) string {
+	u := strings.TrimSpace(username)
+	if u == "" {
+		return ""
+	}
+	if strings.EqualFold(u, devUsername) {
+		return "dev-admin"
+	}
+	return strings.ToLower(u)
+}
+
 func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
-	if req.Username != devUsername || req.Password != devPassword {
+	if req.Password != devPassword {
 		return nil, errors.New("用户名或密码错误")
 	}
-	const subject = "dev-admin"
-	// 与 seedDefaultMappings 中 dev-admin 绑定的一致；前端 AuthContext 解析 JWT 的 role 做菜单/路由权限
-	const primaryRole = "super_admin"
-	if err := l.svcCtx.Rbac.EnsureUser(subject); err != nil {
-		return nil, err
+	userCode := loginUserCode(req.Username)
+	if userCode == "" {
+		return nil, errors.New("用户名不能为空")
 	}
+	roles, err := l.svcCtx.Rbac.GetUserRoleCodes(userCode)
+	if err != nil {
+		return nil, errors.New("用户名或密码错误")
+	}
+	if len(roles) == 0 {
+		return nil, errors.New("该用户未分配角色，请联系管理员")
+	}
+	primaryRole := roles[0]
 
 	secret := l.svcCtx.Config.Auth.AccessSecret
 	expire := l.svcCtx.Config.Auth.AccessExpire
@@ -57,9 +75,10 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
 	claims := jwt.MapClaims{
 		"exp":        exp,
 		"iat":        iat,
-		"sub":        subject,
-		"user_code": subject,
+		"sub":        userCode,
+		"user_code": userCode,
 		"role":       primaryRole,
+		"roles":      roles,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenStr, err := token.SignedString([]byte(secret))
@@ -70,5 +89,8 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginReply, error) {
 	return &types.LoginReply{
 		AccessToken: tokenStr,
 		Expire:      exp,
+		UserCode:    userCode,
+		Role:        primaryRole,
+		Roles:       roles,
 	}, nil
 }

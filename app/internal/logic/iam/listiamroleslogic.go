@@ -45,6 +45,7 @@ func (l *ListIAMRolesLogic) ListIAMRoles(req *types.ListIAMRolesReq) (resp *type
 	items := make([]types.IAMRoleItem, 0, len(rows))
 	for _, row := range rows {
 		items = append(items, types.IAMRoleItem{
+			Id:       row.ID,
 			RoleCode: row.RoleCode,
 			RoleName: row.RoleName,
 		})

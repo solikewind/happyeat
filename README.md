@@ -17,6 +17,7 @@
 ## 计划文档
 
 - 实施计划见：`docs/implementation-plan.md`
+- 厨房打印单格式设计：`docs/厨房打印单格式设计.md`
 
 ## 菜鸟杂谈
 

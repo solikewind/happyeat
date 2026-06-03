@@ -5,6 +5,7 @@ package iam
 
 import (
 	"context"
+	"strings"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -28,7 +29,20 @@ func NewCreateIAMRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Cre
 }
 
 func (l *CreateIAMRoleLogic) CreateIAMRole(req *types.CreateIAMRoleReq) (resp *types.CreateIAMRoleReply, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	roleCode := strings.TrimSpace(req.RoleCode)
+	roleName := strings.TrimSpace(req.RoleName)
+	id, err := l.svcCtx.Rbac.CreateRole(roleCode, roleName)
+	if err != nil {
+		return nil, errInvalid(err.Error())
+	}
+	roleCode = strings.ToLower(roleCode)
+	if len(req.Permissions) > 0 {
+		if err := l.svcCtx.Rbac.UpdateRole(roleCode, req.Permissions); err != nil {
+			return nil, errInvalid(err.Error())
+		}
+		if err := svc.SyncRolePoliciesToCasbin(l.svcCtx.Rbac, l.svcCtx.Casbin); err != nil {
+			return nil, errInvalid("同步 Casbin 策略失败")
+		}
+	}
+	return &types.CreateIAMRoleReply{Id: id}, nil
 }

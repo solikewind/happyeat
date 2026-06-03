@@ -57,4 +57,6 @@ type Spyun struct {
 	BaseURL     string `json:"base_url,optional"`     // 默认 https://open.spyun.net
 	SN          string `json:"sn,optional"`             // 默认打印机编号
 	TimeoutSec  int    `json:"timeout_sec,optional"` // HTTP 超时秒数，默认 15
+	// KitchenTicketAmountScale 厨房小票：空或 yuan=库内即元；cent/fen/cents=库内为分（打印时 /100）。
+	KitchenTicketAmountScale string `json:"kitchen_ticket_amount_scale,optional"`
 }

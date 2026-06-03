@@ -26,15 +26,15 @@ asr:
   TranscribePath: "/asr/transcribe"
   HotwordCreatePath: "/asr/hotwords"
 cos:
-  bucket_url: "https://happyeat-1326922879.cos.ap-beijing.myqcloud.com"
+  bucket_url: ""
   secret_id: ""
   secret_key: ""
 
 # 商鹏云打印 https://www.spyun.net.cn/open/index.html
 spyun:
-  enabled: false
+  enabled: true
   app_id: ""
   app_secret: ""
   base_url: "" # 可选，默认 https://open.spyun.net
-  sn: ""       # 默认设备编号；也可在调用 PrintOrder 时传入
+  sn: "1929190797"       # 默认设备编号；也可在调用 PrintOrder 时传入
   timeout_sec: 15

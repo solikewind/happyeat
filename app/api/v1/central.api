@@ -295,6 +295,10 @@ service HappyEatService {
 	timeout:    5s
 )
 service HappyEatService {
+	@doc "权限目录（权限码及对应 HTTP 接口，供前端勾选）"
+	@handler ListPermissionCatalog
+	get /rbac/permission-catalog returns (ListPermissionCatalogReply)
+
 	@doc "获取角色权限矩阵"
 	@handler ListRolePermission
 	get /rbac/role-permissions returns (ListRolePermissionReply)
