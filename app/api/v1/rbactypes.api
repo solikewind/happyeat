@@ -40,3 +40,18 @@ type SyncCasbinPoliciesReq {
 
 type SyncCasbinPoliciesReply {
 }
+
+type PermissionEndpoint {
+	Obj string `json:"obj"`
+	Act string `json:"act"`
+}
+
+type PermissionCatalogItem {
+	Code        string               `json:"code"`
+	Description string               `json:"description"`
+	Endpoints   []PermissionEndpoint `json:"endpoints"`
+}
+
+type ListPermissionCatalogReply {
+	Permissions []PermissionCatalogItem `json:"permissions"`
+}

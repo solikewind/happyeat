@@ -194,8 +194,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
-		// 本组含 multipart 上传；手机原图易超 5MiB，与全局 MaxBytes 对齐为 32MiB
-		rest.WithMaxBytes(32<<20),
 	)
 
 	server.AddRoutes(
@@ -250,16 +248,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: order.GetOrderHandler(serverCtx),
 				},
 				{
-					// 手动触发商鹏厨房小票打印
-					Method:  http.MethodPost,
-					Path:    "/order/:id/print",
-					Handler: order.PrintOrderKitchenHandler(serverCtx),
-				},
-				{
 					// 更新订单（追加菜单项）
 					Method:  http.MethodPut,
 					Path:    "/order/:id",
 					Handler: order.UpdateOrderHandler(serverCtx),
+				},
+				{
+					// 手动触发商鹏厨房小票打印
+					Method:  http.MethodPost,
+					Path:    "/order/:id/print",
+					Handler: order.PrintOrderKitchenHandler(serverCtx),
 				},
 				{
 					// 更新订单状态
@@ -295,6 +293,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/rbac/casbin/sync",
 					Handler: rbac.SyncCasbinPoliciesHandler(serverCtx),
+				},
+				{
+					// 权限目录（权限码及对应 HTTP 接口，供前端勾选）
+					Method:  http.MethodGet,
+					Path:    "/rbac/permission-catalog",
+					Handler: rbac.ListPermissionCatalogHandler(serverCtx),
 				},
 				{
 					// 获取角色权限矩阵

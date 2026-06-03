@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"errors"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -16,6 +17,8 @@ import (
 
 // RbacPolicyRule 与 Casbin 投影中的 (obj, act) 一致，定义见 casbinrules.PolicyRule。
 type RbacPolicyRule = casbinrules.PolicyRule
+
+var roleCodePattern = regexp.MustCompile(`^[a-z][a-z0-9_]{1,31}$`)
 
 type RbacStore struct {
 	mu     sync.RWMutex
@@ -244,6 +247,7 @@ func (s *RbacStore) ListIAMPermissionsPage(ctx context.Context, offset, limit in
 
 // IAMRoleListItem 分页列出角色。
 type IAMRoleListItem struct {
+	ID       uint64
 	RoleCode string
 	RoleName string
 }
@@ -268,6 +272,7 @@ func (s *RbacStore) ListIAMRolesPage(ctx context.Context, offset, limit int, key
 	out := make([]IAMRoleListItem, 0, len(rows))
 	for _, row := range rows {
 		out = append(out, IAMRoleListItem{
+			ID:       row.ID,
 			RoleCode: row.RoleCode,
 			RoleName: row.RoleName,
 		})
@@ -275,11 +280,118 @@ func (s *RbacStore) ListIAMRolesPage(ctx context.Context, offset, limit int, key
 	return out, int64(total), nil
 }
 
+// CreateRole 创建自定义角色（role_code 创建后不可改）。
+func (s *RbacStore) CreateRole(roleCode, roleName string) (uint64, error) {
+	roleCode = strings.TrimSpace(strings.ToLower(roleCode))
+	if !roleCodePattern.MatchString(roleCode) {
+		return 0, errors.New("role_code 须为小写字母、数字、下划线，且以字母开头，长度 2~32")
+	}
+	if roleName == "" {
+		roleName = roleCode
+	}
+	ctx := context.Background()
+	exists, err := s.client.IAMRole.Query().Where(iamrole.RoleCodeEQ(roleCode)).Exist(ctx)
+	if err != nil {
+		return 0, err
+	}
+	if exists {
+		return 0, errors.New("role_code 已存在")
+	}
+	row, err := s.client.IAMRole.Create().SetRoleCode(roleCode).SetRoleName(roleName).Save(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return row.ID, nil
+}
+
+// DeleteRoleByID 软删角色；预置角色不可删。
+func (s *RbacStore) DeleteRoleByID(id uint64) error {
+	ctx := context.Background()
+	row, err := s.client.IAMRole.Query().Where(iamrole.IDEQ(id)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return errors.New("角色不存在")
+		}
+		return err
+	}
+	if casbinrules.IsPresetRole(row.RoleCode) {
+		return errors.New("系统预置角色不可删除")
+	}
+	return s.client.IAMRole.DeleteOneID(id).Exec(ctx)
+}
+
 // IAMUserListItem 分页列出用户及其角色 code。
 type IAMUserListItem struct {
+	ID          uint64
 	UserCode    string
 	DisplayName string
 	Roles       []string
+}
+
+// GetUserRoleCodes 返回用户已绑定的角色编码（升序）。
+func (s *RbacStore) GetUserRoleCodes(userCode string) ([]string, error) {
+	userCode = strings.TrimSpace(userCode)
+	if userCode == "" {
+		return nil, errors.New("user_code 不能为空")
+	}
+	ctx := context.Background()
+	row, err := s.client.IAMUser.Query().
+		Where(iamuser.UserCodeEQ(userCode)).
+		WithRoles(func(rq *ent.IAMRoleQuery) {
+			rq.Order(ent.Asc(iamrole.FieldRoleCode))
+		}).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errors.New("用户不存在")
+		}
+		return nil, err
+	}
+	out := make([]string, 0, len(row.Edges.Roles))
+	for _, r := range row.Edges.Roles {
+		out = append(out, r.RoleCode)
+	}
+	return out, nil
+}
+
+// CreateUser 创建 IAM 用户主体（不含角色，需另行 AssignUserRole）。
+func (s *RbacStore) CreateUser(userCode, displayName string) (uint64, error) {
+	userCode = strings.TrimSpace(userCode)
+	if userCode == "" {
+		return 0, errors.New("user_code 不能为空")
+	}
+	if displayName == "" {
+		displayName = userCode
+	}
+	ctx := context.Background()
+	exists, err := s.client.IAMUser.Query().Where(iamuser.UserCodeEQ(userCode)).Exist(ctx)
+	if err != nil {
+		return 0, err
+	}
+	if exists {
+		return 0, errors.New("user_code 已存在")
+	}
+	row, err := s.client.IAMUser.Create().SetUserCode(userCode).SetDisplayName(displayName).Save(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return row.ID, nil
+}
+
+// DeleteUserByID 软删用户并清除角色关联。
+func (s *RbacStore) DeleteUserByID(id uint64) error {
+	ctx := context.Background()
+	row, err := s.client.IAMUser.Query().Where(iamuser.IDEQ(id)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return errors.New("用户不存在")
+		}
+		return err
+	}
+	if _, err = s.client.IAMUser.UpdateOneID(row.ID).ClearRoles().Save(ctx); err != nil {
+		return err
+	}
+	return s.client.IAMUser.DeleteOneID(id).Exec(ctx)
 }
 
 // ListIAMUsersPage 按 keyword 模糊匹配 user_code / display_name。
@@ -310,6 +422,7 @@ func (s *RbacStore) ListIAMUsersPage(ctx context.Context, offset, limit int, key
 			roleCodes = append(roleCodes, r.RoleCode)
 		}
 		out = append(out, IAMUserListItem{
+			ID:          row.ID,
 			UserCode:    row.UserCode,
 			DisplayName: row.DisplayName,
 			Roles:       roleCodes,
@@ -330,7 +443,7 @@ func (s *RbacStore) Reset(roleCode string) error {
 	}
 	permissions, ok := defaults[roleCode]
 	if !ok {
-		return errors.New("role not found")
+		return s.UpdateRole(roleCode, []string{})
 	}
 	return s.UpdateRole(roleCode, permissions)
 }
@@ -353,13 +466,24 @@ func (s *RbacStore) seedRolesAndPermissions(ctx context.Context) error {
 	}
 	defer tx.Rollback()
 
+	presetNames := map[string]string{
+		"super_admin": "超级管理员",
+		"manager":     "店长",
+		"cashier":     "收银",
+		"kitchen":     "后厨",
+		"waiter":      "服务员",
+	}
 	for roleCode := range defaults {
 		exists, err := tx.IAMRole.Query().Where(iamrole.RoleCodeEQ(roleCode)).Exist(ctx)
 		if err != nil {
 			return err
 		}
 		if !exists {
-			if _, err = tx.IAMRole.Create().SetRoleCode(roleCode).SetRoleName(roleCode).Save(ctx); err != nil {
+			name := presetNames[roleCode]
+			if name == "" {
+				name = roleCode
+			}
+			if _, err = tx.IAMRole.Create().SetRoleCode(roleCode).SetRoleName(name).Save(ctx); err != nil {
 				return err
 			}
 		}

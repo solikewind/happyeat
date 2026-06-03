@@ -28,7 +28,14 @@ func NewDeleteIAMUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Del
 }
 
 func (l *DeleteIAMUserLogic) DeleteIAMUser(req *types.DeleteIAMUserReq) (resp *types.DeleteIAMUserReply, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	if req.Id == 0 {
+		return nil, errInvalid("id 不能为空")
+	}
+	if err := l.svcCtx.Rbac.DeleteUserByID(req.Id); err != nil {
+		return nil, errInvalid(err.Error())
+	}
+	if err := svc.SyncRolePoliciesToCasbin(l.svcCtx.Rbac, l.svcCtx.Casbin); err != nil {
+		return nil, errInvalid("同步 Casbin 策略失败")
+	}
+	return &types.DeleteIAMUserReply{}, nil
 }

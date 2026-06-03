@@ -5,6 +5,7 @@ package iam
 
 import (
 	"context"
+	"strings"
 
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
@@ -28,7 +29,11 @@ func NewCreateIAMUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Cre
 }
 
 func (l *CreateIAMUserLogic) CreateIAMUser(req *types.CreateIAMUserReq) (resp *types.CreateIAMUserReply, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	userCode := strings.TrimSpace(strings.ToLower(req.UserCode))
+	displayName := strings.TrimSpace(req.DisplayName)
+	id, err := l.svcCtx.Rbac.CreateUser(userCode, displayName)
+	if err != nil {
+		return nil, errInvalid(err.Error())
+	}
+	return &types.CreateIAMUserReply{Id: id}, nil
 }

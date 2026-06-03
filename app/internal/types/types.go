@@ -40,8 +40,9 @@ type CreateIAMRoleReply struct {
 }
 
 type CreateIAMRoleReq struct {
-	RoleCode string `json:"role_code"`
-	RoleName string `json:"role_name,optional"`
+	RoleCode    string   `json:"role_code"`
+	RoleName    string   `json:"role_name,optional"`
+	Permissions []string `json:"permissions,optional"` // 可选：创建后一次性绑定权限码
 }
 
 type CreateIAMUserReply struct {
@@ -276,13 +277,6 @@ type GetOrderReq struct {
 	Id uint64 `path:"id"`
 }
 
-type PrintOrderKitchenReply struct {
-}
-
-type PrintOrderKitchenReq struct {
-	Id uint64 `path:"id"`
-}
-
 type GetRolePermissionReply struct {
 	RolePermission RolePermission `json:"role_permission"`
 }
@@ -411,6 +405,10 @@ type ListOrderReq struct {
 	TableId   uint64 `json:"table_id,optional,string" form:"table_id,optional"` // 按餐桌筛选
 }
 
+type ListPermissionCatalogReply struct {
+	Permissions []PermissionCatalogItem `json:"permissions"`
+}
+
 type ListRolePermissionReply struct {
 	Roles []RolePermission `json:"roles"`
 }
@@ -473,8 +471,11 @@ type ListWorkbenchOrderReq struct {
 }
 
 type LoginReply struct {
-	AccessToken string `json:"access_token"`
-	Expire      int64  `json:"expire"` // 过期时间戳（秒）
+	AccessToken string   `json:"access_token"`
+	Expire      int64    `json:"expire"` // 过期时间戳（秒）
+	UserCode    string   `json:"user_code"`
+	Role        string   `json:"role"`  // 前端菜单/按钮权限主角色
+	Roles       []string `json:"roles"` // IAM 绑定的全部角色
 }
 
 type LoginReq struct {
@@ -556,10 +557,28 @@ type PageInfo struct {
 	PageSize int64 `json:"pageSize,optional" form:"pageSize,optional"`
 }
 
+type PermissionCatalogItem struct {
+	Code        string               `json:"code"`
+	Description string               `json:"description"`
+	Endpoints   []PermissionEndpoint `json:"endpoints"`
+}
+
+type PermissionEndpoint struct {
+	Obj string `json:"obj"`
+	Act string `json:"act"`
+}
+
 type PermissionItem struct {
 	Id          uint64 `json:"id"`
 	Code        string `json:"code"`
 	Description string `json:"description"`
+}
+
+type PrintOrderKitchenReply struct {
+}
+
+type PrintOrderKitchenReq struct {
+	Id uint64 `path:"id"`
 }
 
 type RemoveIAMUserRoleReply struct {
