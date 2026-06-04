@@ -58,7 +58,8 @@ func ResolveTrigger(from, to string) (string, error) {
 	m := map[pair]string{
 		{OrderStatusCreated, OrderStatusPaid}:        TriggerPay,
 		{OrderStatusCreated, OrderStatusPreparing}:   TriggerPrepare,
-		{OrderStatusCreated, OrderStatusCancelled}:    TriggerCancel,
+		{OrderStatusCreated, OrderStatusCompleted}:   TriggerComplete,
+		{OrderStatusCreated, OrderStatusCancelled}:   TriggerCancel,
 		{OrderStatusPaid, OrderStatusPreparing}:      TriggerPrepare,
 		{OrderStatusPaid, OrderStatusCancelled}:      TriggerCancel,
 		{OrderStatusPreparing, OrderStatusCompleted}: TriggerComplete,
