@@ -42,6 +42,10 @@ func NewOrderStateMachine(currentStatus string, order ent.Order) *OrderStateMach
 		Permit(TriggerComplete, OrderStatusCompleted).
 		Permit(TriggerCancel, OrderStatusCancelled)
 
+	// 已完成 -> 已取消（门店删除已完成订单）
+	sm.Configure(OrderStatusCompleted).
+		Permit(TriggerCancel, OrderStatusCancelled)
+
 	return &OrderStateMachine{
 		sm: sm,
 	}
