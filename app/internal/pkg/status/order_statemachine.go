@@ -27,8 +27,9 @@ func NewOrderStateMachine(currentStatus string, order ent.Order) *OrderStateMach
 
 	// 已创建 -> 已支付 -> 商家接单 -> 完成
 	sm.Configure(OrderStatusCreated).
-		Permit(TriggerPay, OrderStatusPaid).          // 需要支付
-		Permit(TriggerPrepare, OrderStatusPreparing). // 无需支付，直接接单
+		Permit(TriggerPay, OrderStatusPaid).           // 需要支付
+		Permit(TriggerPrepare, OrderStatusPreparing).  // 无需支付，直接接单
+		Permit(TriggerComplete, OrderStatusCompleted). // 无需支付，直接完成
 		Permit(TriggerCancel, OrderStatusCancelled)
 
 	// 已支付 -> 准备中
