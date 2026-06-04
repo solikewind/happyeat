@@ -62,11 +62,12 @@ func scheduleKitchenPrintWithDiff(svcCtx *svc.ServiceContext, e *ent.Order, bann
 
 // 58mm 热敏一行约 32 半角列；汉字按 2 列计。
 const (
-	ticketLineWidth    = 32
-	ticketIndexWidth   = 3 // "1. " 序号宽度
-	ticketQtyMaxWidth  = 5 // " ×999" 数量列预留宽度
-	ticketHeavyRuleCh  = "="
-	ticketLightRuleCh  = "-"
+	ticketLineWidth   = 32
+	ticketIndexWidth  = 3  // "1. " 序号宽度
+	ticketQtyColW     = 4  // 数量列（右对齐）
+	ticketAmtColW     = 10 // 金额列（右对齐，含 ￥）
+	ticketHeavyRuleCh = "="
+	ticketLightRuleCh = "-"
 
 	// ticketCurrency 货币符号。
 	// 半角 ¥ (U+00A5) 在多数热敏机字体里笔画细、甚至缺字形，打印模糊。
@@ -90,21 +91,22 @@ func formatKitchenTicket(e *ent.Order, banner string, amountDivisor int64, diff 
 	// 订单号与时间（小字）
 	b.WriteString(renderMetaBlock(e))
 
-	// 当前菜品列表（带 [新加]/[改量] 标记）
+	// 菜品列表：表头（数量/金额右对齐）+ 分割线 + 明细
 	b.WriteString(heavyRuleLine())
+	b.WriteString(renderItemsTableHeader())
 	items, _ := e.Edges.ItemsOrErr()
-	totalQty := 0
+	courseCount := 0
 	for idx, it := range items {
 		if it == nil {
 			continue
 		}
+		courseCount++
 		b.WriteString(renderItemBlock(idx+1, it, amountDivisor, diff))
-		totalQty += it.Quantity
 	}
 	b.WriteString(heavyRuleLine())
 
-	// 汇总（道数/份数 + 合计/实收）
-	b.WriteString(renderTotalsBlock(len(items), totalQty, e, amountDivisor))
+	// 汇总（仅道数 + 合计/实收）
+	b.WriteString(renderTotalsBlock(courseCount, e, amountDivisor))
 
 	// 整单备注（加粗显眼）
 	if e.Remark != nil && strings.TrimSpace(*e.Remark) != "" {
@@ -208,18 +210,24 @@ func renderMetaBlock(e *ent.Order) string {
 
 // ─────────────────────────── 菜品块 ───────────────────────────
 
-// renderItemBlock 单个菜品的多行块。
-// 主行：序号. [新加]菜名              ×数量
-// 副行：   ￥单价 × 数量 = ￥金额
-// 改量：   ※ 改量: 原×3 → 现×1 ※
-// 规格：   规格: xxx
+// renderItemsTableHeader 数量/金额表头（靠右），下一行细线分隔明细。
+func renderItemsTableHeader() string {
+	right := ticketQtyAmtHeaderBlock()
+	leftSpaces := ticketLineWidth - ticketDisplayWidth(right)
+	if leftSpaces < 0 {
+		leftSpaces = 0
+	}
+	return strings.Repeat(" ", leftSpaces) + right + "<BR>" + lightRuleLine()
+}
+
+// renderItemBlock 单个菜品：
+// 第1行：序号. [新加]菜名（加粗倍高） + 右侧数量/金额列
+// 第2行：规格（若有）；改量提示在规格前单独一行
 func renderItemBlock(idx int, it *ent.OrderItem, div int64, diff *OrderItemDiff) string {
 	var b strings.Builder
 
-	indexStr := fmt.Sprintf("%d.", idx)
-	indexPad := padASCIIRight(indexStr, ticketIndexWidth)
+	indexPad := padASCIIRight(fmt.Sprintf("%d.", idx), ticketIndexWidth)
 
-	// 判定变更类型（仅 diff 非空时）
 	kind, oldQty := ItemDiffNone, 0
 	if diff != nil {
 		if d, ok := diff.ByKey[itemKey(it)]; ok {
@@ -228,20 +236,17 @@ func renderItemBlock(idx int, it *ent.OrderItem, div int64, diff *OrderItemDiff)
 		}
 	}
 
-	// 菜名前缀（新增标记），最显眼，加粗
 	var namePrefix string
 	switch kind {
 	case ItemDiffAdded:
 		namePrefix = "[新加] "
 	}
 
-	qtyStr := fmt.Sprintf("×%d", it.Quantity)
-	qtyWidth := ticketDisplayWidth(qtyStr)
-	if qtyWidth > ticketQtyMaxWidth {
-		qtyWidth = ticketQtyMaxWidth
-	}
+	amtRaw := orderLineStoredAmount(it)
+	right := ticketQtyAmtDataBlock(it.Quantity, amtRaw, div)
+	rightW := ticketDisplayWidth(right)
 
-	nameMax := ticketLineWidth - ticketIndexWidth - qtyWidth - 1
+	nameMax := ticketLineWidth - ticketIndexWidth - rightW
 	if nameMax < 4 {
 		nameMax = 4
 	}
@@ -250,37 +255,24 @@ func renderItemBlock(idx int, it *ent.OrderItem, div int64, diff *OrderItemDiff)
 		rawName = namePrefix + rawName
 	}
 	name := truncateTicketNameDisplay(rawName, nameMax)
-	leftPart := indexPad + padDisplayRight(name, ticketLineWidth-ticketIndexWidth-qtyWidth)
 
-	b.WriteString(leftPart)
-	b.WriteString("<B>")
-	b.WriteString(qtyStr)
-	b.WriteString("</B><BR>")
+	b.WriteString(indexPad)
+	b.WriteString("<B><H>")
+	b.WriteString(name)
+	b.WriteString("</H></B>")
+	if pad := nameMax - ticketDisplayWidth(name); pad > 0 {
+		b.WriteString(strings.Repeat(" ", pad))
+	}
+	b.WriteString(right)
+	b.WriteString("<BR>")
 
-	// 数量变化：单独一行警示，加粗
 	if kind == ItemDiffQtyChanged {
 		b.WriteString("   <B>※ 改量: 原×")
 		b.WriteString(fmt.Sprintf("%d → 现×%d ※</B><BR>", oldQty, it.Quantity))
 	}
 
-	// 副行：价格细节
-	amtRaw := orderLineStoredAmount(it)
-	priceLine := fmt.Sprintf("   %s%s × %d = %s%s",
-		ticketCurrency, fmtTicketMoney(it.UnitPrice, div),
-		it.Quantity,
-		ticketCurrency, fmtTicketMoney(amtRaw, div),
-	)
-	b.WriteString(escapeSpyunText(priceLine))
-	b.WriteString("<BR>")
-
-	// 规格
-	if it.SpecInfo != nil {
-		spec := strings.TrimSpace(*it.SpecInfo)
-		if spec != "" {
-			b.WriteString("   规格: ")
-			b.WriteString(escapeSpyunText(spec))
-			b.WriteString("<BR>")
-		}
+	if line := renderSpecLine(it.SpecInfo); line != "" {
+		b.WriteString(line)
 	}
 	return b.String()
 }
@@ -321,52 +313,34 @@ func renderRemovedBlock(removed []*ent.OrderItem, div int64) string {
 func renderRemovedItemBlock(it *ent.OrderItem, div int64) string {
 	var b strings.Builder
 
+	amtRaw := orderLineStoredAmount(it)
+	right := ticketQtyAmtDataBlock(it.Quantity, amtRaw, div)
+	rightW := ticketDisplayWidth(right)
+
 	prefix := "[删] "
-	qtyStr := fmt.Sprintf("×%d", it.Quantity)
-	qtyWidth := ticketDisplayWidth(qtyStr)
-	if qtyWidth > ticketQtyMaxWidth {
-		qtyWidth = ticketQtyMaxWidth
-	}
-	nameMax := ticketLineWidth - qtyWidth - 1
 	rawName := prefix + escapeSpyunText(it.MenuName)
+	nameMax := ticketLineWidth - rightW
+	if nameMax < 4 {
+		nameMax = 4
+	}
 	name := truncateTicketNameDisplay(rawName, nameMax)
 
 	if strikeStyle == "unicode" {
-		// 字符后插 U+0336 组合长横线，整体仍按显示宽度对齐
 		struck := applyUnicodeStrike(name)
-		leftPart := padDisplayRight(struck, ticketLineWidth-qtyWidth)
-		b.WriteString(leftPart)
-		b.WriteString(qtyStr)
+		b.WriteString(padDisplayRight(struck, nameMax))
+		b.WriteString(right)
 		b.WriteString("<BR>")
 	} else {
-		// underline：菜名正常一行，下方紧贴一行 ━ 模拟划掉
-		leftPart := padDisplayRight(name, ticketLineWidth-qtyWidth)
-		b.WriteString(leftPart)
-		b.WriteString(qtyStr)
+		b.WriteString(padDisplayRight(name, nameMax))
+		b.WriteString(right)
 		b.WriteString("<BR>")
-		// 下方横线，长度按菜名显示宽度
 		underline := strings.Repeat("━", (ticketDisplayWidth(name)+1)/2)
 		b.WriteString(underline)
 		b.WriteString("<BR>")
 	}
 
-	// 副行：原价格
-	amtRaw := orderLineStoredAmount(it)
-	priceLine := fmt.Sprintf("     原: %s%s × %d = %s%s",
-		ticketCurrency, fmtTicketMoney(it.UnitPrice, div),
-		it.Quantity,
-		ticketCurrency, fmtTicketMoney(amtRaw, div),
-	)
-	b.WriteString(escapeSpyunText(priceLine))
-	b.WriteString("<BR>")
-
-	if it.SpecInfo != nil {
-		spec := strings.TrimSpace(*it.SpecInfo)
-		if spec != "" {
-			b.WriteString("     规格: ")
-			b.WriteString(escapeSpyunText(spec))
-			b.WriteString("<BR>")
-		}
+	if line := renderSpecLineIndent(it.SpecInfo, "     "); line != "" {
+		b.WriteString(line)
 	}
 	return b.String()
 }
@@ -384,9 +358,9 @@ func applyUnicodeStrike(s string) string {
 
 // ─────────────────────────── 汇总块 ───────────────────────────
 
-func renderTotalsBlock(courses, totalQty int, e *ent.Order, div int64) string {
+func renderTotalsBlock(courses int, e *ent.Order, div int64) string {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("共 %d 道 / %d 份<BR>", courses, totalQty))
+	b.WriteString(fmt.Sprintf("共计 %d 道<BR>", courses))
 	b.WriteString(fmt.Sprintf("合计: %s%s    实收: %s%s<BR>",
 		ticketCurrency, fmtTicketMoney(e.TotalAmount, div),
 		ticketCurrency, fmtTicketMoney(e.ActualAmount, div),
@@ -444,6 +418,24 @@ func padDisplayRight(s string, target int) string {
 	return s
 }
 
+// padDisplayLeft 左侧补空格，使显示列数达到 target（右对齐）。
+func padDisplayLeft(s string, target int) string {
+	for ticketDisplayWidth(s) < target {
+		s = " " + s
+	}
+	return s
+}
+
+func ticketQtyAmtHeaderBlock() string {
+	return padDisplayLeft("数量", ticketQtyColW) + padDisplayLeft("金额", ticketAmtColW)
+}
+
+func ticketQtyAmtDataBlock(qty int, amtRaw int64, div int64) string {
+	qtyStr := fmt.Sprintf("×%d", qty)
+	amtStr := ticketCurrency + fmtTicketMoney(amtRaw, div)
+	return padDisplayLeft(qtyStr, ticketQtyColW) + padDisplayLeft(amtStr, ticketAmtColW)
+}
+
 // padASCIIRight 仅按 ASCII 长度右侧补齐。
 func padASCIIRight(s string, width int) string {
 	for len(s) < width {
@@ -479,6 +471,50 @@ func truncateTicketNameDisplay(s string, maxDisplay int) string {
 		return ell
 	}
 	return out + ell
+}
+
+// ─────────────────────────── 规格展示 ───────────────────────────
+
+func renderSpecLine(specInfo *string) string {
+	return renderSpecLineIndent(specInfo, "   ")
+}
+
+// renderSpecLineIndent 规格行；快照多为「辣度:微辣 大小:大」，厨房只打 value。
+func renderSpecLineIndent(specInfo *string, indent string) string {
+	if specInfo == nil {
+		return ""
+	}
+	values := specInfoValuesOnly(strings.TrimSpace(*specInfo))
+	if values == "" {
+		return ""
+	}
+	return indent + "规格: " + escapeSpyunText(values) + "<BR>"
+}
+
+// specInfoValuesOnly 从 spec_info 快照提取规格值（去掉 type/key）。
+// 点餐台落库格式为「spec_type:spec_value」空格拼接；无冒号片段原样保留（手工备注）。
+func specInfoValuesOnly(spec string) string {
+	spec = strings.TrimSpace(spec)
+	if spec == "" {
+		return ""
+	}
+	parts := strings.Fields(spec)
+	values := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+		if i := strings.Index(p, ":"); i >= 0 {
+			v := strings.TrimSpace(p[i+1:])
+			if v != "" {
+				values = append(values, v)
+			}
+		} else {
+			values = append(values, p)
+		}
+	}
+	return strings.Join(values, " ")
 }
 
 // ─────────────────────────── 金额工具 ───────────────────────────

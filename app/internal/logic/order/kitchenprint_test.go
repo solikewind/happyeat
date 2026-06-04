@@ -3,6 +3,8 @@ package order
 import (
 	"strings"
 	"testing"
+
+	"github.com/solikewind/happyeat/dal/model/ent"
 )
 
 func TestKitchenTicketAmountDivisor(t *testing.T) {
@@ -120,6 +122,66 @@ func TestApplyUnicodeStrike(t *testing.T) {
 	got := applyUnicodeStrike("AB")
 	if got != "A\u0336B\u0336" {
 		t.Fatalf("strike: %q", got)
+	}
+}
+
+func TestRenderItemsTableHeader(t *testing.T) {
+	got := renderItemsTableHeader()
+	if !strings.Contains(got, "数量") || !strings.Contains(got, "金额") {
+		t.Fatalf("header: %q", got)
+	}
+	if !strings.Contains(got, strings.Repeat("-", ticketLineWidth)) {
+		t.Fatalf("expect light rule after header: %q", got)
+	}
+}
+
+func TestRenderItemBlock_layout(t *testing.T) {
+	it := &ent.OrderItem{
+		MenuName:  "炒鸡",
+		Quantity:  1,
+		UnitPrice: 68,
+		Amount:    68,
+	}
+	spec := "大小:大份 辣度:微辣"
+	it.SpecInfo = &spec
+	got := renderItemBlock(1, it, 1, nil)
+	for _, want := range []string{
+		"<B><H>炒鸡</H></B>",
+		"×1",
+		"￥68.00",
+		"规格: 大份 微辣",
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in:\n%s", want, got)
+		}
+	}
+	if strings.Contains(got, "× 1 =") {
+		t.Fatalf("should not have old price detail line: %q", got)
+	}
+	if strings.Index(got, "炒鸡") > strings.Index(got, "规格:") {
+		t.Fatalf("spec should be after name line: %q", got)
+	}
+	if strings.Contains(got, "大小:") || strings.Contains(got, "辣度:") {
+		t.Fatalf("should not print spec keys: %q", got)
+	}
+}
+
+func TestSpecInfoValuesOnly(t *testing.T) {
+	if got := specInfoValuesOnly("大小:大 辣度:微辣"); got != "大 微辣" {
+		t.Fatalf("got %q", got)
+	}
+	if got := specInfoValuesOnly("不要香菜"); got != "不要香菜" {
+		t.Fatalf("free text: got %q", got)
+	}
+}
+
+func TestRenderTotalsBlock_coursesOnly(t *testing.T) {
+	got := renderTotalsBlock(3, &ent.Order{TotalAmount: 100, ActualAmount: 100}, 1)
+	if !strings.Contains(got, "共计 3 道") {
+		t.Fatalf("missing courses: %q", got)
+	}
+	if strings.Contains(got, "份") {
+		t.Fatalf("should not show portions: %q", got)
 	}
 }
 
