@@ -64,6 +64,7 @@ func ResolveTrigger(from, to string) (string, error) {
 		{OrderStatusPaid, OrderStatusCancelled}:      TriggerCancel,
 		{OrderStatusPreparing, OrderStatusCompleted}: TriggerComplete,
 		{OrderStatusPreparing, OrderStatusCancelled}: TriggerCancel,
+		{OrderStatusCompleted, OrderStatusCancelled}: TriggerCancel,
 	}
 	tr, ok := m[pair{from, to}]
 	if !ok {
