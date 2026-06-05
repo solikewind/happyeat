@@ -93,12 +93,10 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 			}
 			return nil, err
 		}
-		if req.Image != "" && req.Image != obj.URL {
+		if req.Image != "" && !sameObjectImageURL(req.Image, obj.URL) {
 			return nil, errors.New("object_id 与 image 不一致")
 		}
-		if req.Image == "" {
-			image = obj.URL
-		}
+		image = obj.URL
 	} else if finalObjectID > 0 && req.Image != "" {
 		obj, err := l.svcCtx.Object.GetByID(l.ctx, finalObjectID)
 		if err != nil {
@@ -107,9 +105,10 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 			}
 			return nil, err
 		}
-		if req.Image != obj.URL {
+		if !sameObjectImageURL(req.Image, obj.URL) {
 			return nil, errors.New("已绑定 object_id 时，image 必须与对象 URL 一致，或改用 object_id 更新封面")
 		}
+		image = obj.URL
 	} else if finalObjectID > 0 && req.Image == "" {
 		obj, err := l.svcCtx.Object.GetByID(l.ctx, finalObjectID)
 		if err != nil {
