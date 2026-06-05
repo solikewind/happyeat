@@ -61,12 +61,10 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 			}
 			return nil, err
 		}
-		if req.Image != "" && req.Image != obj.URL {
+		if req.Image != "" && !sameObjectImageURL(req.Image, obj.URL) {
 			return nil, errors.New("object_id 与 image 不一致")
 		}
-		if req.Image == "" {
-			image = obj.URL
-		}
+		image = obj.URL
 	}
 
 	_, err = l.svcCtx.Menu.Create(l.ctx, menu.CreateMenuInput{
