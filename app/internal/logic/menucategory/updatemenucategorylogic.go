@@ -30,7 +30,7 @@ func NewUpdateMenuCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *UpdateMenuCategoryLogic) UpdateMenuCategory(req *types.UpdateMenuCategoryReq) (resp *types.UpdateMenuCategoryReply, err error) {
-	_, err = l.svcCtx.MenuType.GetByID(l.ctx, req.Id)
+	existing, err := l.svcCtx.MenuType.GetByID(l.ctx, req.Id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errors.New("菜单分类不存在")
@@ -40,7 +40,11 @@ func (l *UpdateMenuCategoryLogic) UpdateMenuCategory(req *types.UpdateMenuCatego
 	if req.Name == "" {
 		return nil, errors.New("分类名称不能为空")
 	}
-	err = l.svcCtx.MenuType.Update(l.ctx, req.Id, req.Name, req.Description, req.Sort)
+	kind := req.Kind
+	if kind == "" {
+		kind = existing.Kind
+	}
+	err = l.svcCtx.MenuType.Update(l.ctx, req.Id, req.Name, req.Description, req.Sort, kind)
 	if err != nil {
 		return nil, err
 	}

@@ -209,6 +209,10 @@ func init() {
 	menuDescImage := menuFields[4].Descriptor()
 	// menu.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	menu.ImageValidator = menuDescImage.Validators[0].(func(string) error)
+	// menuDescSort is the schema descriptor for sort field.
+	menuDescSort := menuFields[6].Descriptor()
+	// menu.DefaultSort holds the default value on creation for the sort field.
+	menu.DefaultSort = menuDescSort.Default.(uint32)
 	menucategoryMixin := schema.MenuCategory{}.Mixin()
 	menucategoryMixinHooks0 := menucategoryMixin[0].Hooks()
 	menucategoryMixinHooks2 := menucategoryMixin[2].Hooks()
@@ -244,6 +248,12 @@ func init() {
 	menucategoryDescSort := menucategoryFields[2].Descriptor()
 	// menucategory.DefaultSort holds the default value on creation for the sort field.
 	menucategory.DefaultSort = menucategoryDescSort.Default.(uint32)
+	// menucategoryDescKind is the schema descriptor for kind field.
+	menucategoryDescKind := menucategoryFields[3].Descriptor()
+	// menucategory.DefaultKind holds the default value on creation for the kind field.
+	menucategory.DefaultKind = menucategoryDescKind.Default.(string)
+	// menucategory.KindValidator is a validator for the "kind" field. It is called by the builders before save.
+	menucategory.KindValidator = menucategoryDescKind.Validators[0].(func(string) error)
 	menuspecMixin := schema.MenuSpec{}.Mixin()
 	menuspecMixinHooks0 := menuspecMixin[0].Hooks()
 	menuspecMixinHooks2 := menuspecMixin[2].Hooks()
@@ -537,6 +547,10 @@ func init() {
 	tableDescQrCode := tableFields[4].Descriptor()
 	// table.QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
 	table.QrCodeValidator = tableDescQrCode.Validators[0].(func(string) error)
+	// tableDescSort is the schema descriptor for sort field.
+	tableDescSort := tableFields[5].Descriptor()
+	// table.DefaultSort holds the default value on creation for the sort field.
+	table.DefaultSort = tableDescSort.Default.(uint32)
 	tablecategoryMixin := schema.TableCategory{}.Mixin()
 	tablecategoryMixinHooks0 := tablecategoryMixin[0].Hooks()
 	tablecategoryMixinHooks2 := tablecategoryMixin[2].Hooks()
@@ -568,6 +582,10 @@ func init() {
 	tablecategoryDescName := tablecategoryFields[0].Descriptor()
 	// tablecategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	tablecategory.NameValidator = tablecategoryDescName.Validators[0].(func(string) error)
+	// tablecategoryDescSort is the schema descriptor for sort field.
+	tablecategoryDescSort := tablecategoryFields[2].Descriptor()
+	// tablecategory.DefaultSort holds the default value on creation for the sort field.
+	tablecategory.DefaultSort = tablecategoryDescSort.Default.(uint32)
 }
 
 const (

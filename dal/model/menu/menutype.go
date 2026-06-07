@@ -3,6 +3,7 @@ package menu
 
 import (
 	"context"
+	"strings"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/dal/model/ent"
@@ -20,16 +21,59 @@ func NewMenuType(c *ent.Client) *MenuType {
 	return &MenuType{c: c}
 }
 
+const (
+	MenuCategoryKindDish  = "dish"
+	MenuCategoryKindDrink = "drink"
+)
+
+// NormalizeMenuCategoryKind 归一化分类类型，未知值按菜品处理。
+func NormalizeMenuCategoryKind(kind string) string {
+	switch kind {
+	case MenuCategoryKindDrink:
+		return MenuCategoryKindDrink
+	default:
+		return MenuCategoryKindDish
+	}
+}
+
+// CategoryKindRank 订单展示/打印排序：菜品=0 靠前，酒水饮料=1 靠后。
+func CategoryKindRank(kind string, categoryName string) int {
+	if NormalizeMenuCategoryKind(kind) == MenuCategoryKindDrink {
+		return 1
+	}
+	if inferDrinkCategoryName(categoryName) {
+		return 1
+	}
+	return 0
+}
+
+func inferDrinkCategoryName(name string) bool {
+	n := strings.TrimSpace(name)
+	if n == "" {
+		return false
+	}
+	for _, kw := range []string{"酒水", "饮料", "饮品", "酒水饮料", "啤酒", "红酒", "白酒"} {
+		if strings.Contains(n, kw) {
+			return true
+		}
+	}
+	return false
+}
+
 // CreateMenuCategoryInput 创建分类入参。
 type CreateMenuCategoryInput struct {
 	Name        string
 	Description string
 	Sort        uint32
+	Kind        string
 }
 
 // Create 创建菜单分类。
 func (mt *MenuType) Create(ctx context.Context, in CreateMenuCategoryInput) (*ent.MenuCategory, error) {
-	create := mt.c.MenuCategory.Create().SetName(in.Name).SetSort(in.Sort)
+	create := mt.c.MenuCategory.Create().
+		SetName(in.Name).
+		SetSort(in.Sort).
+		SetKind(NormalizeMenuCategoryKind(in.Kind))
 	if in.Description != "" {
 		create = create.SetDescription(in.Description)
 	}
@@ -85,8 +129,11 @@ func (mt *MenuType) List(ctx context.Context, f ListMenuCategoriesFilter) ([]*en
 }
 
 // Update 更新分类（全量字段）。description 为空串时清空数据库中的描述。
-func (mt *MenuType) Update(ctx context.Context, id uint64, name, description string, sort uint32) error {
-	upd := mt.c.MenuCategory.UpdateOneID(id).SetName(name).SetSort(sort)
+func (mt *MenuType) Update(ctx context.Context, id uint64, name, description string, sort uint32, kind string) error {
+	upd := mt.c.MenuCategory.UpdateOneID(id).
+		SetName(name).
+		SetSort(sort).
+		SetKind(NormalizeMenuCategoryKind(kind))
 	if description != "" {
 		upd = upd.SetDescription(description)
 	} else {

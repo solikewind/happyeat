@@ -63,7 +63,7 @@ func (l *ListWorkbenchOrderLogic) ListWorkbenchOrder(req *types.ListWorkbenchOrd
 
 	orders := make([]types.Order, 0, len(list))
 	for _, e := range list {
-		orders = append(orders, orderlogic.EntOrderToType(e))
+		orders = append(orders, orderlogic.EntOrderToTypeForDisplay(l.ctx, l.svcCtx, e))
 	}
 
 	return &types.ListWorkbenchOrderReply{Orders: orders, Total: total}, nil

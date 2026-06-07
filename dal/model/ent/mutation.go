@@ -3269,6 +3269,8 @@ type MenuMutation struct {
 	image               *string
 	price               *int64
 	addprice            *int64
+	sort                *uint32
+	addsort             *int32
 	clearedFields       map[string]struct{}
 	category            *uint64
 	clearedcategory     bool
@@ -3792,6 +3794,62 @@ func (m *MenuMutation) ResetPrice() {
 	m.addprice = nil
 }
 
+// SetSort sets the "sort" field.
+func (m *MenuMutation) SetSort(u uint32) {
+	m.sort = &u
+	m.addsort = nil
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *MenuMutation) Sort() (r uint32, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the Menu entity.
+// If the Menu object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuMutation) OldSort(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// AddSort adds u to the "sort" field.
+func (m *MenuMutation) AddSort(u int32) {
+	if m.addsort != nil {
+		*m.addsort += u
+	} else {
+		m.addsort = &u
+	}
+}
+
+// AddedSort returns the value that was added to the "sort" field in this mutation.
+func (m *MenuMutation) AddedSort() (r int32, exists bool) {
+	v := m.addsort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *MenuMutation) ResetSort() {
+	m.sort = nil
+	m.addsort = nil
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by id.
 func (m *MenuMutation) SetCategoryID(id uint64) {
 	m.category = &id
@@ -4014,7 +4072,7 @@ func (m *MenuMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, menu.FieldCreatedAt)
 	}
@@ -4042,6 +4100,9 @@ func (m *MenuMutation) Fields() []string {
 	if m.price != nil {
 		fields = append(fields, menu.FieldPrice)
 	}
+	if m.sort != nil {
+		fields = append(fields, menu.FieldSort)
+	}
 	return fields
 }
 
@@ -4068,6 +4129,8 @@ func (m *MenuMutation) Field(name string) (ent.Value, bool) {
 		return m.Image()
 	case menu.FieldPrice:
 		return m.Price()
+	case menu.FieldSort:
+		return m.Sort()
 	}
 	return nil, false
 }
@@ -4095,6 +4158,8 @@ func (m *MenuMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldImage(ctx)
 	case menu.FieldPrice:
 		return m.OldPrice(ctx)
+	case menu.FieldSort:
+		return m.OldSort(ctx)
 	}
 	return nil, fmt.Errorf("unknown Menu field %s", name)
 }
@@ -4167,6 +4232,13 @@ func (m *MenuMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPrice(v)
 		return nil
+	case menu.FieldSort:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Menu field %s", name)
 }
@@ -4181,6 +4253,9 @@ func (m *MenuMutation) AddedFields() []string {
 	if m.addprice != nil {
 		fields = append(fields, menu.FieldPrice)
 	}
+	if m.addsort != nil {
+		fields = append(fields, menu.FieldSort)
+	}
 	return fields
 }
 
@@ -4193,6 +4268,8 @@ func (m *MenuMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedDeleteTs()
 	case menu.FieldPrice:
 		return m.AddedPrice()
+	case menu.FieldSort:
+		return m.AddedSort()
 	}
 	return nil, false
 }
@@ -4215,6 +4292,13 @@ func (m *MenuMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddPrice(v)
+		return nil
+	case menu.FieldSort:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSort(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Menu numeric field %s", name)
@@ -4290,6 +4374,9 @@ func (m *MenuMutation) ResetField(name string) error {
 		return nil
 	case menu.FieldPrice:
 		m.ResetPrice()
+		return nil
+	case menu.FieldSort:
+		m.ResetSort()
 		return nil
 	}
 	return fmt.Errorf("unknown Menu field %s", name)
@@ -4455,6 +4542,7 @@ type MenuCategoryMutation struct {
 	description           *string
 	sort                  *uint32
 	addsort               *int32
+	kind                  *string
 	clearedFields         map[string]struct{}
 	menus                 map[uint64]struct{}
 	removedmenus          map[uint64]struct{}
@@ -4840,6 +4928,42 @@ func (m *MenuCategoryMutation) ResetSort() {
 	m.addsort = nil
 }
 
+// SetKind sets the "kind" field.
+func (m *MenuCategoryMutation) SetKind(s string) {
+	m.kind = &s
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *MenuCategoryMutation) Kind() (r string, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the MenuCategory entity.
+// If the MenuCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MenuCategoryMutation) OldKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *MenuCategoryMutation) ResetKind() {
+	m.kind = nil
+}
+
 // AddMenuIDs adds the "menus" edge to the Menu entity by ids.
 func (m *MenuCategoryMutation) AddMenuIDs(ids ...uint64) {
 	if m.menus == nil {
@@ -4982,7 +5106,7 @@ func (m *MenuCategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MenuCategoryMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, menucategory.FieldCreatedAt)
 	}
@@ -5000,6 +5124,9 @@ func (m *MenuCategoryMutation) Fields() []string {
 	}
 	if m.sort != nil {
 		fields = append(fields, menucategory.FieldSort)
+	}
+	if m.kind != nil {
+		fields = append(fields, menucategory.FieldKind)
 	}
 	return fields
 }
@@ -5021,6 +5148,8 @@ func (m *MenuCategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case menucategory.FieldSort:
 		return m.Sort()
+	case menucategory.FieldKind:
+		return m.Kind()
 	}
 	return nil, false
 }
@@ -5042,6 +5171,8 @@ func (m *MenuCategoryMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldDescription(ctx)
 	case menucategory.FieldSort:
 		return m.OldSort(ctx)
+	case menucategory.FieldKind:
+		return m.OldKind(ctx)
 	}
 	return nil, fmt.Errorf("unknown MenuCategory field %s", name)
 }
@@ -5092,6 +5223,13 @@ func (m *MenuCategoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSort(v)
+		return nil
+	case menucategory.FieldKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory field %s", name)
@@ -5195,6 +5333,9 @@ func (m *MenuCategoryMutation) ResetField(name string) error {
 		return nil
 	case menucategory.FieldSort:
 		m.ResetSort()
+		return nil
+	case menucategory.FieldKind:
+		m.ResetKind()
 		return nil
 	}
 	return fmt.Errorf("unknown MenuCategory field %s", name)
@@ -11316,6 +11457,8 @@ type TableMutation struct {
 	capacity        *uint32
 	addcapacity     *int32
 	qr_code         *string
+	sort            *uint32
+	addsort         *int32
 	clearedFields   map[string]struct{}
 	category        *uint64
 	clearedcategory bool
@@ -11772,6 +11915,62 @@ func (m *TableMutation) ResetQrCode() {
 	delete(m.clearedFields, table.FieldQrCode)
 }
 
+// SetSort sets the "sort" field.
+func (m *TableMutation) SetSort(u uint32) {
+	m.sort = &u
+	m.addsort = nil
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *TableMutation) Sort() (r uint32, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the Table entity.
+// If the Table object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableMutation) OldSort(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// AddSort adds u to the "sort" field.
+func (m *TableMutation) AddSort(u int32) {
+	if m.addsort != nil {
+		*m.addsort += u
+	} else {
+		m.addsort = &u
+	}
+}
+
+// AddedSort returns the value that was added to the "sort" field in this mutation.
+func (m *TableMutation) AddedSort() (r int32, exists bool) {
+	v := m.addsort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *TableMutation) ResetSort() {
+	m.sort = nil
+	m.addsort = nil
+}
+
 // SetCategoryID sets the "category" edge to the TableCategory entity by id.
 func (m *TableMutation) SetCategoryID(id uint64) {
 	m.category = &id
@@ -11900,7 +12099,7 @@ func (m *TableMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TableMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, table.FieldCreatedAt)
 	}
@@ -11924,6 +12123,9 @@ func (m *TableMutation) Fields() []string {
 	}
 	if m.qr_code != nil {
 		fields = append(fields, table.FieldQrCode)
+	}
+	if m.sort != nil {
+		fields = append(fields, table.FieldSort)
 	}
 	return fields
 }
@@ -11949,6 +12151,8 @@ func (m *TableMutation) Field(name string) (ent.Value, bool) {
 		return m.Capacity()
 	case table.FieldQrCode:
 		return m.QrCode()
+	case table.FieldSort:
+		return m.Sort()
 	}
 	return nil, false
 }
@@ -11974,6 +12178,8 @@ func (m *TableMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldCapacity(ctx)
 	case table.FieldQrCode:
 		return m.OldQrCode(ctx)
+	case table.FieldSort:
+		return m.OldSort(ctx)
 	}
 	return nil, fmt.Errorf("unknown Table field %s", name)
 }
@@ -12039,6 +12245,13 @@ func (m *TableMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetQrCode(v)
 		return nil
+	case table.FieldSort:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Table field %s", name)
 }
@@ -12053,6 +12266,9 @@ func (m *TableMutation) AddedFields() []string {
 	if m.addcapacity != nil {
 		fields = append(fields, table.FieldCapacity)
 	}
+	if m.addsort != nil {
+		fields = append(fields, table.FieldSort)
+	}
 	return fields
 }
 
@@ -12065,6 +12281,8 @@ func (m *TableMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedDeleteTs()
 	case table.FieldCapacity:
 		return m.AddedCapacity()
+	case table.FieldSort:
+		return m.AddedSort()
 	}
 	return nil, false
 }
@@ -12087,6 +12305,13 @@ func (m *TableMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddCapacity(v)
+		return nil
+	case table.FieldSort:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSort(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Table numeric field %s", name)
@@ -12147,6 +12372,9 @@ func (m *TableMutation) ResetField(name string) error {
 		return nil
 	case table.FieldQrCode:
 		m.ResetQrCode()
+		return nil
+	case table.FieldSort:
+		m.ResetSort()
 		return nil
 	}
 	return fmt.Errorf("unknown Table field %s", name)
@@ -12266,6 +12494,8 @@ type TableCategoryMutation struct {
 	adddelete_ts  *int64
 	name          *string
 	description   *string
+	sort          *uint32
+	addsort       *int32
 	clearedFields map[string]struct{}
 	tables        map[uint64]struct{}
 	removedtables map[uint64]struct{}
@@ -12592,6 +12822,62 @@ func (m *TableCategoryMutation) ResetDescription() {
 	delete(m.clearedFields, tablecategory.FieldDescription)
 }
 
+// SetSort sets the "sort" field.
+func (m *TableCategoryMutation) SetSort(u uint32) {
+	m.sort = &u
+	m.addsort = nil
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *TableCategoryMutation) Sort() (r uint32, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the TableCategory entity.
+// If the TableCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TableCategoryMutation) OldSort(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// AddSort adds u to the "sort" field.
+func (m *TableCategoryMutation) AddSort(u int32) {
+	if m.addsort != nil {
+		*m.addsort += u
+	} else {
+		m.addsort = &u
+	}
+}
+
+// AddedSort returns the value that was added to the "sort" field in this mutation.
+func (m *TableCategoryMutation) AddedSort() (r int32, exists bool) {
+	v := m.addsort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *TableCategoryMutation) ResetSort() {
+	m.sort = nil
+	m.addsort = nil
+}
+
 // AddTableIDs adds the "tables" edge to the Table entity by ids.
 func (m *TableCategoryMutation) AddTableIDs(ids ...uint64) {
 	if m.tables == nil {
@@ -12680,7 +12966,7 @@ func (m *TableCategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TableCategoryMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, tablecategory.FieldCreatedAt)
 	}
@@ -12695,6 +12981,9 @@ func (m *TableCategoryMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, tablecategory.FieldDescription)
+	}
+	if m.sort != nil {
+		fields = append(fields, tablecategory.FieldSort)
 	}
 	return fields
 }
@@ -12714,6 +13003,8 @@ func (m *TableCategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case tablecategory.FieldDescription:
 		return m.Description()
+	case tablecategory.FieldSort:
+		return m.Sort()
 	}
 	return nil, false
 }
@@ -12733,6 +13024,8 @@ func (m *TableCategoryMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldName(ctx)
 	case tablecategory.FieldDescription:
 		return m.OldDescription(ctx)
+	case tablecategory.FieldSort:
+		return m.OldSort(ctx)
 	}
 	return nil, fmt.Errorf("unknown TableCategory field %s", name)
 }
@@ -12777,6 +13070,13 @@ func (m *TableCategoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case tablecategory.FieldSort:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
+		return nil
 	}
 	return fmt.Errorf("unknown TableCategory field %s", name)
 }
@@ -12788,6 +13088,9 @@ func (m *TableCategoryMutation) AddedFields() []string {
 	if m.adddelete_ts != nil {
 		fields = append(fields, tablecategory.FieldDeleteTs)
 	}
+	if m.addsort != nil {
+		fields = append(fields, tablecategory.FieldSort)
+	}
 	return fields
 }
 
@@ -12798,6 +13101,8 @@ func (m *TableCategoryMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case tablecategory.FieldDeleteTs:
 		return m.AddedDeleteTs()
+	case tablecategory.FieldSort:
+		return m.AddedSort()
 	}
 	return nil, false
 }
@@ -12813,6 +13118,13 @@ func (m *TableCategoryMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDeleteTs(v)
+		return nil
+	case tablecategory.FieldSort:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSort(v)
 		return nil
 	}
 	return fmt.Errorf("unknown TableCategory numeric field %s", name)
@@ -12864,6 +13176,9 @@ func (m *TableCategoryMutation) ResetField(name string) error {
 		return nil
 	case tablecategory.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case tablecategory.FieldSort:
+		m.ResetSort()
 		return nil
 	}
 	return fmt.Errorf("unknown TableCategory field %s", name)

@@ -50,6 +50,9 @@ func (Table) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("二维码"),
+		field.Uint32("sort").
+			Default(0).
+			Comment("排序，越小越靠前（同分类内）"),
 	}
 }
 

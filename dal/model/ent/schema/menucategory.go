@@ -41,6 +41,10 @@ func (MenuCategory) Fields() []ent.Field {
 		field.Uint32("sort").
 			Default(0).
 			Comment("排序，越小越靠前"),
+		field.String("kind").
+			Default("dish").
+			MaxLen(16).
+			Comment("分类类型：dish=菜品（订单/打印靠前） drink=酒水饮料等（靠后）"),
 	}
 }
 

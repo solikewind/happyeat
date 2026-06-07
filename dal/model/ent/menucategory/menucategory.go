@@ -27,6 +27,8 @@ const (
 	FieldDescription = "description"
 	// FieldSort holds the string denoting the sort field in the database.
 	FieldSort = "sort"
+	// FieldKind holds the string denoting the kind field in the database.
+	FieldKind = "kind"
 	// EdgeMenus holds the string denoting the menus edge name in mutations.
 	EdgeMenus = "menus"
 	// EdgeCategorySpecs holds the string denoting the category_specs edge name in mutations.
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldName,
 	FieldDescription,
 	FieldSort,
+	FieldKind,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -90,6 +93,10 @@ var (
 	NameValidator func(string) error
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort uint32
+	// DefaultKind holds the default value on creation for the "kind" field.
+	DefaultKind string
+	// KindValidator is a validator for the "kind" field. It is called by the builders before save.
+	KindValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the MenuCategory queries.
@@ -128,6 +135,11 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 // BySort orders the results by the sort field.
 func BySort(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSort, opts...).ToFunc()
+}
+
+// ByKind orders the results by the kind field.
+func ByKind(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldKind, opts...).ToFunc()
 }
 
 // ByMenusCount orders the results by menus count.

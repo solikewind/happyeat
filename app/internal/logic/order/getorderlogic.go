@@ -35,7 +35,7 @@ func (l *GetOrderLogic) GetOrder(req *types.GetOrderReq) (*types.GetOrderReply, 
 		return nil, err
 	}
 
-	return &types.GetOrderReply{Order: EntOrderToType(entOrder)}, nil
+	return &types.GetOrderReply{Order: EntOrderToTypeForDisplay(l.ctx, l.svcCtx, entOrder)}, nil
 }
 
 // EntOrderToType 将 ent 订单转为 API 类型，供 order 与 workbench 等复用。
@@ -72,6 +72,9 @@ func EntOrderToType(e *ent.Order) types.Order {
 			Quantity:  it.Quantity,
 			UnitPrice: it.UnitPrice,
 			Amount:    it.Amount,
+		}
+		if it.MenuID != nil && *it.MenuID > 0 {
+			oi.MenuId = *it.MenuID
 		}
 		if it.SpecInfo != nil {
 			oi.SpecInfo = *it.SpecInfo

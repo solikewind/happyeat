@@ -31,6 +31,8 @@ const (
 	FieldCapacity = "capacity"
 	// FieldQrCode holds the string denoting the qr_code field in the database.
 	FieldQrCode = "qr_code"
+	// FieldSort holds the string denoting the sort field in the database.
+	FieldSort = "sort"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeOrders holds the string denoting the orders edge name in mutations.
@@ -64,6 +66,7 @@ var Columns = []string{
 	FieldStatus,
 	FieldCapacity,
 	FieldQrCode,
+	FieldSort,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -104,6 +107,8 @@ var (
 	CapacityValidator func(uint32) error
 	// QrCodeValidator is a validator for the "qr_code" field. It is called by the builders before save.
 	QrCodeValidator func(string) error
+	// DefaultSort holds the default value on creation for the "sort" field.
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the Table queries.
@@ -152,6 +157,11 @@ func ByCapacity(opts ...sql.OrderTermOption) OrderOption {
 // ByQrCode orders the results by the qr_code field.
 func ByQrCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQrCode, opts...).ToFunc()
+}
+
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
 }
 
 // ByCategoryField orders the results by category field.

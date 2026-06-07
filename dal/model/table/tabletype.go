@@ -24,11 +24,12 @@ func NewTableType(c *ent.Client) *TableType {
 type CreateTableCategoryInput struct {
 	Name        string
 	Description string
+	Sort        uint32
 }
 
 // Create 创建餐桌分类。
 func (tt *TableType) Create(ctx context.Context, in CreateTableCategoryInput) (*ent.TableCategory, error) {
-	create := tt.c.TableCategory.Create().SetName(in.Name)
+	create := tt.c.TableCategory.Create().SetName(in.Name).SetSort(in.Sort)
 	if in.Description != "" {
 		create = create.SetDescription(in.Description)
 	}
@@ -63,7 +64,7 @@ func (tt *TableType) List(ctx context.Context, f ListTableCategoriesFilter) ([]*
 		f.Limit = 10
 	}
 
-	list, err := q.Order(tablecategory.ByID(sql.OrderDesc())).Limit(int(f.Limit)).Offset(int(f.Offset)).All(ctx)
+	list, err := q.Order(tablecategory.BySort(sql.OrderAsc()), tablecategory.ByID(sql.OrderAsc())).Limit(int(f.Limit)).Offset(int(f.Offset)).All(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -72,8 +73,8 @@ func (tt *TableType) List(ctx context.Context, f ListTableCategoriesFilter) ([]*
 }
 
 // Update 更新分类。
-func (tt *TableType) Update(ctx context.Context, id uint64, name, description string) error {
-	upd := tt.c.TableCategory.UpdateOneID(id).SetName(name)
+func (tt *TableType) Update(ctx context.Context, id uint64, name, description string, sort uint32) error {
+	upd := tt.c.TableCategory.UpdateOneID(id).SetName(name).SetSort(sort)
 	if description != "" {
 		upd = upd.SetDescription(description)
 	} else {

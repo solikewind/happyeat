@@ -80,6 +80,11 @@ func Description(v string) predicate.TableCategory {
 	return predicate.TableCategory(sql.FieldEQ(FieldDescription, v))
 }
 
+// Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
+func Sort(v uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldEQ(FieldSort, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.TableCategory {
 	return predicate.TableCategory(sql.FieldEQ(FieldCreatedAt, v))
@@ -338,6 +343,46 @@ func DescriptionEqualFold(v string) predicate.TableCategory {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.TableCategory {
 	return predicate.TableCategory(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// SortEQ applies the EQ predicate on the "sort" field.
+func SortEQ(v uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldEQ(FieldSort, v))
+}
+
+// SortNEQ applies the NEQ predicate on the "sort" field.
+func SortNEQ(v uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldNEQ(FieldSort, v))
+}
+
+// SortIn applies the In predicate on the "sort" field.
+func SortIn(vs ...uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldIn(FieldSort, vs...))
+}
+
+// SortNotIn applies the NotIn predicate on the "sort" field.
+func SortNotIn(vs ...uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldNotIn(FieldSort, vs...))
+}
+
+// SortGT applies the GT predicate on the "sort" field.
+func SortGT(v uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldGT(FieldSort, v))
+}
+
+// SortGTE applies the GTE predicate on the "sort" field.
+func SortGTE(v uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldGTE(FieldSort, v))
+}
+
+// SortLT applies the LT predicate on the "sort" field.
+func SortLT(v uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldLT(FieldSort, v))
+}
+
+// SortLTE applies the LTE predicate on the "sort" field.
+func SortLTE(v uint32) predicate.TableCategory {
+	return predicate.TableCategory(sql.FieldLTE(FieldSort, v))
 }
 
 // HasTables applies the HasEdge predicate on the "tables" edge.

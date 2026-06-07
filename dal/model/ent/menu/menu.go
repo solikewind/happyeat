@@ -33,6 +33,8 @@ const (
 	FieldImage = "image"
 	// FieldPrice holds the string denoting the price field in the database.
 	FieldPrice = "price"
+	// FieldSort holds the string denoting the sort field in the database.
+	FieldSort = "sort"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeCoverObject holds the string denoting the cover_object edge name in mutations.
@@ -85,6 +87,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldImage,
 	FieldPrice,
+	FieldSort,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -117,6 +120,8 @@ var (
 	NameValidator func(string) error
 	// ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	ImageValidator func(string) error
+	// DefaultSort holds the default value on creation for the "sort" field.
+	DefaultSort uint32
 )
 
 // OrderOption defines the ordering options for the Menu queries.
@@ -170,6 +175,11 @@ func ByImage(opts ...sql.OrderTermOption) OrderOption {
 // ByPrice orders the results by the price field.
 func ByPrice(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPrice, opts...).ToFunc()
+}
+
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
 }
 
 // ByCategoryField orders the results by category field.

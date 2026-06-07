@@ -127,6 +127,7 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		ObjectID:    finalObjectID,
 		Price:       req.Price,
 		CategoryID:  categoryID,
+		Sort:        req.Sort,
 		Specs:       specsPtr,
 	})
 	if err != nil {

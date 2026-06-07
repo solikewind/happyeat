@@ -1,6 +1,7 @@
 syntax = "v1"
 
 type OrderItem {
+	MenuId    uint64 `json:"menu_id,optional,string"` // 菜单id（用于展示排序）
 	MenuName  string `json:"menu_name"`            // 菜品名称快照
 	Quantity  int    `json:"quantity"`             // 数量
 	UnitPrice int64  `json:"unit_price"`           // 单价

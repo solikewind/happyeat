@@ -118,6 +118,20 @@ func (_c *TableCreate) SetNillableQrCode(v *string) *TableCreate {
 	return _c
 }
 
+// SetSort sets the "sort" field.
+func (_c *TableCreate) SetSort(v uint32) *TableCreate {
+	_c.mutation.SetSort(v)
+	return _c
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_c *TableCreate) SetNillableSort(v *uint32) *TableCreate {
+	if v != nil {
+		_c.SetSort(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *TableCreate) SetID(v uint64) *TableCreate {
 	_c.mutation.SetID(v)
@@ -213,6 +227,10 @@ func (_c *TableCreate) defaults() error {
 		v := table.DefaultCapacity
 		_c.mutation.SetCapacity(v)
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		v := table.DefaultSort
+		_c.mutation.SetSort(v)
+	}
 	return nil
 }
 
@@ -258,6 +276,9 @@ func (_c *TableCreate) check() error {
 		if err := table.QrCodeValidator(v); err != nil {
 			return &ValidationError{Name: "qr_code", err: fmt.Errorf(`ent: validator failed for field "Table.qr_code": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "Table.sort"`)}
 	}
 	if len(_c.mutation.CategoryIDs()) == 0 {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required edge "Table.category"`)}
@@ -321,6 +342,10 @@ func (_c *TableCreate) createSpec() (*Table, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.QrCode(); ok {
 		_spec.SetField(table.FieldQrCode, field.TypeString, value)
 		_node.QrCode = &value
+	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(table.FieldSort, field.TypeUint32, value)
+		_node.Sort = value
 	}
 	if nodes := _c.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

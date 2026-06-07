@@ -37,6 +37,7 @@ func (l *CreateMenuCategoryLogic) CreateMenuCategory(req *types.CreateMenuCatego
 		Name:        req.Name,
 		Description: req.Description,
 		Sort:        req.Sort,
+		Kind:        req.Kind,
 	})
 	if err != nil {
 		return nil, err

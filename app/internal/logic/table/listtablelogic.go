@@ -65,6 +65,7 @@ func (l *ListTableLogic) ListTable(req *types.ListTableReq) (resp *types.ListTab
 			Status:     e.Status,
 			Capacity:   e.Capacity,
 			CategoryId: categoryID,
+			Sort:       e.Sort,
 			QrCode:     ptrToStr(e.QrCode),
 			CreatedAt:  timeutil.TimeToString(e.CreatedAt),
 			UpdatedAt:  timeutil.TimeToString(e.UpdatedAt),

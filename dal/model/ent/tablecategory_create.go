@@ -83,6 +83,20 @@ func (_c *TableCategoryCreate) SetNillableDescription(v *string) *TableCategoryC
 	return _c
 }
 
+// SetSort sets the "sort" field.
+func (_c *TableCategoryCreate) SetSort(v uint32) *TableCategoryCreate {
+	_c.mutation.SetSort(v)
+	return _c
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_c *TableCategoryCreate) SetNillableSort(v *uint32) *TableCategoryCreate {
+	if v != nil {
+		_c.SetSort(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *TableCategoryCreate) SetID(v uint64) *TableCategoryCreate {
 	_c.mutation.SetID(v)
@@ -159,6 +173,10 @@ func (_c *TableCategoryCreate) defaults() error {
 		v := tablecategory.DefaultDeleteTs
 		_c.mutation.SetDeleteTs(v)
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		v := tablecategory.DefaultSort
+		_c.mutation.SetSort(v)
+	}
 	return nil
 }
 
@@ -180,6 +198,9 @@ func (_c *TableCategoryCreate) check() error {
 		if err := tablecategory.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "TableCategory.name": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "TableCategory.sort"`)}
 	}
 	return nil
 }
@@ -232,6 +253,10 @@ func (_c *TableCategoryCreate) createSpec() (*TableCategory, *sqlgraph.CreateSpe
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(tablecategory.FieldDescription, field.TypeString, value)
 		_node.Description = &value
+	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(tablecategory.FieldSort, field.TypeUint32, value)
+		_node.Sort = value
 	}
 	if nodes := _c.mutation.TablesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

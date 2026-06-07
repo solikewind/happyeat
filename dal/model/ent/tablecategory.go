@@ -28,6 +28,8 @@ type TableCategory struct {
 	Name string `json:"name,omitempty"`
 	// 描述
 	Description *string `json:"description,omitempty"`
+	// 排序，越小越靠前
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TableCategoryQuery when eager-loading is set.
 	Edges        TableCategoryEdges `json:"edges"`
@@ -57,7 +59,7 @@ func (*TableCategory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tablecategory.FieldID, tablecategory.FieldDeleteTs:
+		case tablecategory.FieldID, tablecategory.FieldDeleteTs, tablecategory.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case tablecategory.FieldName, tablecategory.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -114,6 +116,12 @@ func (_m *TableCategory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Description = new(string)
 				*_m.Description = value.String
+			}
+		case tablecategory.FieldSort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				_m.Sort = uint32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -172,6 +180,9 @@ func (_m *TableCategory) String() string {
 		builder.WriteString("description=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteByte(')')
 	return builder.String()
 }

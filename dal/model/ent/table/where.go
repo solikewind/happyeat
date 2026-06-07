@@ -95,6 +95,11 @@ func QrCode(v string) predicate.Table {
 	return predicate.Table(sql.FieldEQ(FieldQrCode, v))
 }
 
+// Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
+func Sort(v uint32) predicate.Table {
+	return predicate.Table(sql.FieldEQ(FieldSort, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Table {
 	return predicate.Table(sql.FieldEQ(FieldCreatedAt, v))
@@ -478,6 +483,46 @@ func QrCodeEqualFold(v string) predicate.Table {
 // QrCodeContainsFold applies the ContainsFold predicate on the "qr_code" field.
 func QrCodeContainsFold(v string) predicate.Table {
 	return predicate.Table(sql.FieldContainsFold(FieldQrCode, v))
+}
+
+// SortEQ applies the EQ predicate on the "sort" field.
+func SortEQ(v uint32) predicate.Table {
+	return predicate.Table(sql.FieldEQ(FieldSort, v))
+}
+
+// SortNEQ applies the NEQ predicate on the "sort" field.
+func SortNEQ(v uint32) predicate.Table {
+	return predicate.Table(sql.FieldNEQ(FieldSort, v))
+}
+
+// SortIn applies the In predicate on the "sort" field.
+func SortIn(vs ...uint32) predicate.Table {
+	return predicate.Table(sql.FieldIn(FieldSort, vs...))
+}
+
+// SortNotIn applies the NotIn predicate on the "sort" field.
+func SortNotIn(vs ...uint32) predicate.Table {
+	return predicate.Table(sql.FieldNotIn(FieldSort, vs...))
+}
+
+// SortGT applies the GT predicate on the "sort" field.
+func SortGT(v uint32) predicate.Table {
+	return predicate.Table(sql.FieldGT(FieldSort, v))
+}
+
+// SortGTE applies the GTE predicate on the "sort" field.
+func SortGTE(v uint32) predicate.Table {
+	return predicate.Table(sql.FieldGTE(FieldSort, v))
+}
+
+// SortLT applies the LT predicate on the "sort" field.
+func SortLT(v uint32) predicate.Table {
+	return predicate.Table(sql.FieldLT(FieldSort, v))
+}
+
+// SortLTE applies the LTE predicate on the "sort" field.
+func SortLTE(v uint32) predicate.Table {
+	return predicate.Table(sql.FieldLTE(FieldSort, v))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.

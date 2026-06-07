@@ -26,6 +26,7 @@ type CreateTableInput struct {
 	Status     string
 	Capacity   uint32
 	CategoryID uint64
+	Sort       uint32
 	QRCode     string
 }
 
@@ -33,7 +34,8 @@ type CreateTableInput struct {
 func (t *Table) Create(ctx context.Context, in CreateTableInput) (*ent.Table, error) {
 	create := t.c.Table.Create().
 		SetCode(in.Code).
-		SetCategoryID(in.CategoryID)
+		SetCategoryID(in.CategoryID).
+		SetSort(in.Sort)
 	if in.Status != "" {
 		create = create.SetStatus(in.Status)
 	} else {
@@ -91,7 +93,7 @@ func (t *Table) List(ctx context.Context, f ListTablesFilter) ([]*ent.Table, int
 		f.Limit = 10
 	}
 
-	list, err := q.Order(enttable.ByID(sql.OrderDesc())).Limit(f.Limit).Offset(f.Offset).All(ctx)
+	list, err := q.Order(enttable.BySort(sql.OrderAsc()), enttable.ByID(sql.OrderAsc())).Limit(f.Limit).Offset(f.Offset).All(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -105,6 +107,7 @@ type UpdateTableInput struct {
 	Status     string
 	Capacity   uint32
 	CategoryID uint64
+	Sort       uint32
 	QRCode     string
 }
 
@@ -114,7 +117,8 @@ func (t *Table) Update(ctx context.Context, id uint64, in UpdateTableInput) erro
 		SetCode(in.Code).
 		SetStatus(in.Status).
 		SetCapacity(in.Capacity).
-		SetCategoryID(in.CategoryID)
+		SetCategoryID(in.CategoryID).
+		SetSort(in.Sort)
 	if in.QRCode != "" {
 		upd = upd.SetQrCode(in.QRCode)
 	} else {

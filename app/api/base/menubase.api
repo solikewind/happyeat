@@ -8,6 +8,7 @@ type Menu {
 	Image       string     `json:"image,optional"`       // 菜单图片
 	Price       int64      `json:"price"`                // 菜单价格（分）
 	CategoryId  uint64     `json:"category_id,string"`   // 菜单分类id
+	Sort        uint32     `json:"sort,optional"`        // 排序，越小越靠前（同分类内）
 	Specs       []MenuSpec `json:"specs,optional"`       // 规格列表
 	CreatedAt   string     `json:"created_at"`           // 创建时间，RFC3339（UTC），列表与详情均返回
 	UpdatedAt   string     `json:"updated_at"`           // 更新时间，RFC3339（UTC），列表与详情均返回
@@ -18,6 +19,7 @@ type MenuCategory {
 	Name        string `json:"name"`                 // 分类名称
 	Description string `json:"description,optional"` // 描述
 	Sort        uint32 `json:"sort,optional"`        // 排序，越小越靠前
+	Kind        string `json:"kind,optional"`        // dish=菜品 drink=酒水饮料（订单展示/打印时靠后）
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }

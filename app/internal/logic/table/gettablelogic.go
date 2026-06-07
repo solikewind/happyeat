@@ -49,6 +49,7 @@ func (l *GetTableLogic) GetTable(req *types.GetTableReq) (resp *types.GetTableRe
 			Status:     e.Status,
 			Capacity:   e.Capacity,
 			CategoryId: categoryID,
+			Sort:       e.Sort,
 			QrCode:     qrCode,
 			CreatedAt:  timeutil.TimeToString(e.CreatedAt),
 			UpdatedAt:  timeutil.TimeToString(e.UpdatedAt),

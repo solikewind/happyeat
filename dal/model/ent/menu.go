@@ -38,6 +38,8 @@ type Menu struct {
 	Image *string `json:"image,omitempty"`
 	// 价格
 	Price int64 `json:"price,omitempty"`
+	// 排序，越小越靠前（同分类内）
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuQuery when eager-loading is set.
 	Edges        MenuEdges `json:"edges"`
@@ -104,7 +106,7 @@ func (*Menu) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case menu.FieldID, menu.FieldDeleteTs, menu.FieldMenuCategoryID, menu.FieldObjectID, menu.FieldPrice:
+		case menu.FieldID, menu.FieldDeleteTs, menu.FieldMenuCategoryID, menu.FieldObjectID, menu.FieldPrice, menu.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case menu.FieldName, menu.FieldDescription, menu.FieldImage:
 			values[i] = new(sql.NullString)
@@ -187,6 +189,12 @@ func (_m *Menu) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field price", values[i])
 			} else if value.Valid {
 				_m.Price = value.Int64
+			}
+		case menu.FieldSort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				_m.Sort = uint32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -276,6 +284,9 @@ func (_m *Menu) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Price))
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteByte(')')
 	return builder.String()
 }
