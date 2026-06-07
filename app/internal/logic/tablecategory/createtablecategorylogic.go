@@ -37,6 +37,7 @@ func (l *CreateTableCategoryLogic) CreateTableCategory(req *types.CreateTableCat
 	_, err := l.svcCtx.TableType.Create(l.ctx, table.CreateTableCategoryInput{
 		Name:        req.Name,
 		Description: req.Description,
+		Sort:        req.Sort,
 	})
 	if err != nil {
 		return nil, err

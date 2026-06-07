@@ -58,6 +58,7 @@ func (l *UpdateTableLogic) UpdateTable(req *types.UpdateTableReq) (resp *types.U
 		Status:     req.Status,
 		Capacity:   req.Capacity,
 		CategoryID: req.CategoryId,
+		Sort:       req.Sort,
 		QRCode:     req.QrCode,
 	})
 	if err != nil {

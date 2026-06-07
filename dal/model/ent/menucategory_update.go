@@ -112,6 +112,20 @@ func (_u *MenuCategoryUpdate) AddSort(v int32) *MenuCategoryUpdate {
 	return _u
 }
 
+// SetKind sets the "kind" field.
+func (_u *MenuCategoryUpdate) SetKind(v string) *MenuCategoryUpdate {
+	_u.mutation.SetKind(v)
+	return _u
+}
+
+// SetNillableKind sets the "kind" field if the given value is not nil.
+func (_u *MenuCategoryUpdate) SetNillableKind(v *string) *MenuCategoryUpdate {
+	if v != nil {
+		_u.SetKind(*v)
+	}
+	return _u
+}
+
 // AddMenuIDs adds the "menus" edge to the Menu entity by IDs.
 func (_u *MenuCategoryUpdate) AddMenuIDs(ids ...uint64) *MenuCategoryUpdate {
 	_u.mutation.AddMenuIDs(ids...)
@@ -238,6 +252,11 @@ func (_u *MenuCategoryUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MenuCategory.name": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Kind(); ok {
+		if err := menucategory.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "MenuCategory.kind": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -276,6 +295,9 @@ func (_u *MenuCategoryUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(menucategory.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.Kind(); ok {
+		_spec.SetField(menucategory.FieldKind, field.TypeString, value)
 	}
 	if _u.mutation.MenusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -469,6 +491,20 @@ func (_u *MenuCategoryUpdateOne) AddSort(v int32) *MenuCategoryUpdateOne {
 	return _u
 }
 
+// SetKind sets the "kind" field.
+func (_u *MenuCategoryUpdateOne) SetKind(v string) *MenuCategoryUpdateOne {
+	_u.mutation.SetKind(v)
+	return _u
+}
+
+// SetNillableKind sets the "kind" field if the given value is not nil.
+func (_u *MenuCategoryUpdateOne) SetNillableKind(v *string) *MenuCategoryUpdateOne {
+	if v != nil {
+		_u.SetKind(*v)
+	}
+	return _u
+}
+
 // AddMenuIDs adds the "menus" edge to the Menu entity by IDs.
 func (_u *MenuCategoryUpdateOne) AddMenuIDs(ids ...uint64) *MenuCategoryUpdateOne {
 	_u.mutation.AddMenuIDs(ids...)
@@ -608,6 +644,11 @@ func (_u *MenuCategoryUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MenuCategory.name": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Kind(); ok {
+		if err := menucategory.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "MenuCategory.kind": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -663,6 +704,9 @@ func (_u *MenuCategoryUpdateOne) sqlSave(ctx context.Context) (_node *MenuCatego
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(menucategory.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.Kind(); ok {
+		_spec.SetField(menucategory.FieldKind, field.TypeString, value)
 	}
 	if _u.mutation.MenusCleared() {
 		edge := &sqlgraph.EdgeSpec{

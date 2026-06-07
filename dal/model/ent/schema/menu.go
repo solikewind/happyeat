@@ -51,6 +51,9 @@ func (Menu) Fields() []ent.Field {
 			Comment("图片URL"),
 		field.Int64("price").
 			Comment("价格"),
+		field.Uint32("sort").
+			Default(0).
+			Comment("排序，越小越靠前（同分类内）"),
 	}
 }
 

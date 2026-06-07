@@ -35,6 +35,8 @@ type Table struct {
 	Capacity uint32 `json:"capacity,omitempty"`
 	// 二维码
 	QrCode *string `json:"qr_code,omitempty"`
+	// 排序，越小越靠前（同分类内）
+	Sort uint32 `json:"sort,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TableQuery when eager-loading is set.
 	Edges        TableEdges `json:"edges"`
@@ -77,7 +79,7 @@ func (*Table) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case table.FieldID, table.FieldDeleteTs, table.FieldTableCategoryID, table.FieldCapacity:
+		case table.FieldID, table.FieldDeleteTs, table.FieldTableCategoryID, table.FieldCapacity, table.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case table.FieldCode, table.FieldStatus, table.FieldQrCode:
 			values[i] = new(sql.NullString)
@@ -153,6 +155,12 @@ func (_m *Table) assignValues(columns []string, values []any) error {
 				_m.QrCode = new(string)
 				*_m.QrCode = value.String
 			}
+		case table.FieldSort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				_m.Sort = uint32(value.Int64)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -224,6 +232,9 @@ func (_m *Table) String() string {
 		builder.WriteString("qr_code=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteByte(')')
 	return builder.String()
 }

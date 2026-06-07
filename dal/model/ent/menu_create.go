@@ -126,6 +126,20 @@ func (_c *MenuCreate) SetPrice(v int64) *MenuCreate {
 	return _c
 }
 
+// SetSort sets the "sort" field.
+func (_c *MenuCreate) SetSort(v uint32) *MenuCreate {
+	_c.mutation.SetSort(v)
+	return _c
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_c *MenuCreate) SetNillableSort(v *uint32) *MenuCreate {
+	if v != nil {
+		_c.SetSort(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *MenuCreate) SetID(v uint64) *MenuCreate {
 	_c.mutation.SetID(v)
@@ -247,6 +261,10 @@ func (_c *MenuCreate) defaults() error {
 		v := menu.DefaultDeleteTs
 		_c.mutation.SetDeleteTs(v)
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		v := menu.DefaultSort
+		_c.mutation.SetSort(v)
+	}
 	return nil
 }
 
@@ -279,6 +297,9 @@ func (_c *MenuCreate) check() error {
 	}
 	if _, ok := _c.mutation.Price(); !ok {
 		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Menu.price"`)}
+	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "Menu.sort"`)}
 	}
 	if len(_c.mutation.CategoryIDs()) == 0 {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required edge "Menu.category"`)}
@@ -342,6 +363,10 @@ func (_c *MenuCreate) createSpec() (*Menu, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Price(); ok {
 		_spec.SetField(menu.FieldPrice, field.TypeInt64, value)
 		_node.Price = value
+	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(menu.FieldSort, field.TypeUint32, value)
+		_node.Sort = value
 	}
 	if nodes := _c.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

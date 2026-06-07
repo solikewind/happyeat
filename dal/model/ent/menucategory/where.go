@@ -85,6 +85,11 @@ func Sort(v uint32) predicate.MenuCategory {
 	return predicate.MenuCategory(sql.FieldEQ(FieldSort, v))
 }
 
+// Kind applies equality check predicate on the "kind" field. It's identical to KindEQ.
+func Kind(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldEQ(FieldKind, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.MenuCategory {
 	return predicate.MenuCategory(sql.FieldEQ(FieldCreatedAt, v))
@@ -383,6 +388,71 @@ func SortLT(v uint32) predicate.MenuCategory {
 // SortLTE applies the LTE predicate on the "sort" field.
 func SortLTE(v uint32) predicate.MenuCategory {
 	return predicate.MenuCategory(sql.FieldLTE(FieldSort, v))
+}
+
+// KindEQ applies the EQ predicate on the "kind" field.
+func KindEQ(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldEQ(FieldKind, v))
+}
+
+// KindNEQ applies the NEQ predicate on the "kind" field.
+func KindNEQ(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldNEQ(FieldKind, v))
+}
+
+// KindIn applies the In predicate on the "kind" field.
+func KindIn(vs ...string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldIn(FieldKind, vs...))
+}
+
+// KindNotIn applies the NotIn predicate on the "kind" field.
+func KindNotIn(vs ...string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldNotIn(FieldKind, vs...))
+}
+
+// KindGT applies the GT predicate on the "kind" field.
+func KindGT(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldGT(FieldKind, v))
+}
+
+// KindGTE applies the GTE predicate on the "kind" field.
+func KindGTE(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldGTE(FieldKind, v))
+}
+
+// KindLT applies the LT predicate on the "kind" field.
+func KindLT(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldLT(FieldKind, v))
+}
+
+// KindLTE applies the LTE predicate on the "kind" field.
+func KindLTE(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldLTE(FieldKind, v))
+}
+
+// KindContains applies the Contains predicate on the "kind" field.
+func KindContains(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldContains(FieldKind, v))
+}
+
+// KindHasPrefix applies the HasPrefix predicate on the "kind" field.
+func KindHasPrefix(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldHasPrefix(FieldKind, v))
+}
+
+// KindHasSuffix applies the HasSuffix predicate on the "kind" field.
+func KindHasSuffix(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldHasSuffix(FieldKind, v))
+}
+
+// KindEqualFold applies the EqualFold predicate on the "kind" field.
+func KindEqualFold(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldEqualFold(FieldKind, v))
+}
+
+// KindContainsFold applies the ContainsFold predicate on the "kind" field.
+func KindContainsFold(v string) predicate.MenuCategory {
+	return predicate.MenuCategory(sql.FieldContainsFold(FieldKind, v))
 }
 
 // HasMenus applies the HasEdge predicate on the "menus" edge.

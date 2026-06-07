@@ -6,6 +6,7 @@ type Table {
 	Status     string `json:"status"`             // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
 	Capacity   uint32 `json:"capacity,optional"`  // 可坐人数
 	CategoryId uint64 `json:"category_id,string"` // 餐桌分类id
+	Sort       uint32 `json:"sort,optional"`      // 排序，越小越靠前（同分类内）
 	QrCode     string `json:"qr_code,optional"`   // 二维码
 	CreatedAt  string `json:"created_at"`       // 创建时间（仅列表/详情返回）
 	UpdatedAt  string `json:"updated_at"`       // 更新时间（仅列表/详情返回）
@@ -15,4 +16,5 @@ type TableCategory {
 	Id          uint64 `json:"id,string"`          // 分类id
 	Name        string `json:"name"`               // 分类名称
 	Description string `json:"description,optional"` // 描述
+	Sort        uint32 `json:"sort,optional"`      // 排序，越小越靠前
 }

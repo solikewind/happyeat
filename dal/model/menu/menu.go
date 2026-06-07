@@ -36,6 +36,7 @@ type CreateMenuInput struct {
 	ObjectID    uint64
 	Price       int64
 	CategoryID  uint64
+	Sort        uint32
 	Specs       []SpecInput
 }
 
@@ -80,7 +81,8 @@ func (m *Menu) Create(ctx context.Context, in CreateMenuInput) (*ent.Menu, error
 	create := tx.Menu.Create().
 		SetName(in.Name).
 		SetPrice(in.Price).
-		SetCategoryID(in.CategoryID)
+		SetCategoryID(in.CategoryID).
+		SetSort(in.Sort)
 	if in.ObjectID > 0 {
 		create = create.SetObjectID(in.ObjectID)
 	}
@@ -172,7 +174,7 @@ func (m *Menu) List(ctx context.Context, f ListMenusFilter) ([]*ent.Menu, int64,
 			return nil, 0, err
 		}
 		list, err := m.withMenuEdges(newBaseQuery()).
-			Order(entmenu.ByID(sql.OrderDesc())).
+			Order(entmenu.BySort(sql.OrderAsc()), entmenu.ByID(sql.OrderAsc())).
 			Offset(f.Offset).
 			Limit(f.Limit).
 			All(ctx)
@@ -190,7 +192,7 @@ func (m *Menu) List(ctx context.Context, f ListMenusFilter) ([]*ent.Menu, int64,
 	if total > 0 {
 		list, err := m.withMenuEdges(newBaseQuery().
 			Where(entmenu.NameContainsFold(name))).
-			Order(entmenu.ByID(sql.OrderDesc())).
+			Order(entmenu.BySort(sql.OrderAsc()), entmenu.ByID(sql.OrderAsc())).
 			Offset(f.Offset).
 			Limit(f.Limit).
 			All(ctx)
@@ -202,7 +204,7 @@ func (m *Menu) List(ctx context.Context, f ListMenusFilter) ([]*ent.Menu, int64,
 
 	// Fallback for pinyin keyword search; cap scan size to avoid expensive full-table scans.
 	allList, err := m.withMenuEdges(newBaseQuery()).
-		Order(entmenu.ByID(sql.OrderDesc())).
+		Order(entmenu.BySort(sql.OrderAsc()), entmenu.ByID(sql.OrderAsc())).
 		Limit(maxPinyinScanRows).
 		All(ctx)
 	if err != nil {
@@ -234,6 +236,7 @@ type UpdateMenuInput struct {
 	ObjectID    uint64
 	Price       int64
 	CategoryID  uint64
+	Sort        uint32
 	// Specs 非 nil 时表示用新列表整体替换；nil 表示不修改现有规格（解决 JSON 省略 specs 时被清空的问题）
 	Specs *[]SpecInput
 }
@@ -248,7 +251,8 @@ func (m *Menu) Update(ctx context.Context, id uint64, in UpdateMenuInput) error 
 	upd := tx.Menu.UpdateOneID(id).
 		SetName(in.Name).
 		SetPrice(in.Price).
-		SetCategoryID(in.CategoryID)
+		SetCategoryID(in.CategoryID).
+		SetSort(in.Sort)
 	if in.Description != "" {
 		upd = upd.SetDescription(in.Description)
 	} else {
@@ -330,4 +334,53 @@ func (m *Menu) withMenuEdges(q *ent.MenuQuery) *ent.MenuQuery {
 			iq.WithSpecGroup()
 		})
 	})
+}
+
+// ItemDisplayRank 订单明细展示排序权重。
+type ItemDisplayRank struct {
+	KindRank     int
+	CategorySort uint32
+	MenuSort     uint32
+}
+
+// ItemDisplayRanksByMenuIDs 批量查询菜单在订单展示时的排序权重。
+func (m *Menu) ItemDisplayRanksByMenuIDs(ctx context.Context, menuIDs []uint64) (map[uint64]ItemDisplayRank, error) {
+	if len(menuIDs) == 0 {
+		return map[uint64]ItemDisplayRank{}, nil
+	}
+	uniq := make([]uint64, 0, len(menuIDs))
+	seen := make(map[uint64]struct{}, len(menuIDs))
+	for _, id := range menuIDs {
+		if id == 0 {
+			continue
+		}
+		if _, ok := seen[id]; ok {
+			continue
+		}
+		seen[id] = struct{}{}
+		uniq = append(uniq, id)
+	}
+	if len(uniq) == 0 {
+		return map[uint64]ItemDisplayRank{}, nil
+	}
+
+	menus, err := m.c.Menu.Query().
+		Where(entmenu.IDIn(uniq...)).
+		WithCategory().
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	out := make(map[uint64]ItemDisplayRank, len(menus))
+	for _, item := range menus {
+		r := ItemDisplayRank{MenuSort: item.Sort}
+		cat, _ := item.Edges.CategoryOrErr()
+		if cat != nil {
+			r.CategorySort = cat.Sort
+			r.KindRank = CategoryKindRank(cat.Kind, cat.Name)
+		}
+		out[uint64(item.ID)] = r
+	}
+	return out, nil
 }

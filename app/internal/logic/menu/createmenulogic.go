@@ -74,6 +74,7 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 		ObjectID:    objectID,
 		Price:       req.Price,
 		CategoryID:  req.CategoryId,
+		Sort:        req.Sort,
 		Specs:       specs,
 	})
 	if err != nil {

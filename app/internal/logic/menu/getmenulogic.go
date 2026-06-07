@@ -43,6 +43,7 @@ func entMenuToType(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Menu)
 		Id:        uint64(e.ID),
 		Name:      e.Name,
 		Price:     e.Price,
+		Sort:      e.Sort,
 		CreatedAt: timeutil.TimeToString(e.CreatedAt),
 		UpdatedAt: timeutil.TimeToString(e.UpdatedAt),
 	}

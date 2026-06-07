@@ -18,6 +18,7 @@ type CreateMenuReq {
 	Image       string     `json:"image,optional"`
 	Price       int64    `json:"price"`	// 以分为单位，避免前端浮点数问题，展示/100
 	CategoryId  uint64     `json:"category_id,string"`
+	Sort        uint32     `json:"sort,optional"`
 	Specs       []MenuSpec `json:"specs,optional"`
 }
 type CreateMenuReply {}
@@ -50,6 +51,7 @@ type ListMenuReq {
 	Image       string     `json:"image,optional"`
 	Price       int64	    `json:"price,optional"`
 	CategoryId  uint64     `json:"category_id,optional,string"`
+	Sort        uint32     `json:"sort,optional"`
 	Specs       []MenuSpec `json:"specs,optional"`
  }
  type UpdateMenuReply {}
@@ -65,6 +67,7 @@ type CreateMenuCategoryReq {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
 	Sort        uint32 `json:"sort,optional"`
+	Kind        string `json:"kind,optional"` // dish | drink，默认 dish
 }
 type CreateMenuCategoryReply {}
 
@@ -91,6 +94,7 @@ type ListMenuCategoryReq {
     Name        string `json:"name"`
 	Description string `json:"description"`
 	Sort        uint32 `json:"sort"`
+	Kind        string `json:"kind,optional"` // dish | drink
  }
  type UpdateMenuCategoryReply {}
 

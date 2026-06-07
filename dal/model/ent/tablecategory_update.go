@@ -90,6 +90,27 @@ func (_u *TableCategoryUpdate) ClearDescription() *TableCategoryUpdate {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *TableCategoryUpdate) SetSort(v uint32) *TableCategoryUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *TableCategoryUpdate) SetNillableSort(v *uint32) *TableCategoryUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *TableCategoryUpdate) AddSort(v int32) *TableCategoryUpdate {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // AddTableIDs adds the "tables" edge to the Table entity by IDs.
 func (_u *TableCategoryUpdate) AddTableIDs(ids ...uint64) *TableCategoryUpdate {
 	_u.mutation.AddTableIDs(ids...)
@@ -212,6 +233,12 @@ func (_u *TableCategoryUpdate) sqlSave(ctx context.Context) (_node int, err erro
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(tablecategory.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(tablecategory.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(tablecategory.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.TablesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -336,6 +363,27 @@ func (_u *TableCategoryUpdateOne) SetNillableDescription(v *string) *TableCatego
 // ClearDescription clears the value of the "description" field.
 func (_u *TableCategoryUpdateOne) ClearDescription() *TableCategoryUpdateOne {
 	_u.mutation.ClearDescription()
+	return _u
+}
+
+// SetSort sets the "sort" field.
+func (_u *TableCategoryUpdateOne) SetSort(v uint32) *TableCategoryUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *TableCategoryUpdateOne) SetNillableSort(v *uint32) *TableCategoryUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *TableCategoryUpdateOne) AddSort(v int32) *TableCategoryUpdateOne {
+	_u.mutation.AddSort(v)
 	return _u
 }
 
@@ -491,6 +539,12 @@ func (_u *TableCategoryUpdateOne) sqlSave(ctx context.Context) (_node *TableCate
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(tablecategory.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(tablecategory.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(tablecategory.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.TablesCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -61,6 +61,7 @@ type CreateMenuCategoryReq struct {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
 	Sort        uint32 `json:"sort,optional"`
+	Kind        string `json:"kind,optional"`
 }
 
 type CreateMenuReply struct {
@@ -73,6 +74,7 @@ type CreateMenuReq struct {
 	Image       string     `json:"image,optional"`
 	Price       int64      `json:"price"` // 以分为单位，避免前端浮点数问题，展示/100
 	CategoryId  uint64     `json:"category_id,string"`
+	Sort        uint32     `json:"sort,optional"`
 	Specs       []MenuSpec `json:"specs,optional"`
 }
 
@@ -121,6 +123,7 @@ type CreateTableCategoryReply struct {
 type CreateTableCategoryReq struct {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
+	Sort        uint32 `json:"sort,optional"`
 }
 
 type CreateTableReply struct {
@@ -131,6 +134,7 @@ type CreateTableReq struct {
 	Status     string `json:"status"`
 	Capacity   uint32 `json:"capacity,optional"`
 	CategoryId uint64 `json:"category_id,string"`
+	Sort       uint32 `json:"sort,optional"`
 	QrCode     string `json:"qr_code,optional"`
 }
 
@@ -491,6 +495,7 @@ type Menu struct {
 	Image       string     `json:"image,optional"`            // 菜单图片
 	Price       int64      `json:"price"`                     // 菜单价格（分）
 	CategoryId  uint64     `json:"category_id,string"`        // 菜单分类id
+	Sort        uint32     `json:"sort,optional"`             // 排序，越小越靠前（同分类内）
 	Specs       []MenuSpec `json:"specs,optional"`            // 规格列表
 	CreatedAt   string     `json:"created_at"`                // 创建时间，RFC3339（UTC），列表与详情均返回
 	UpdatedAt   string     `json:"updated_at"`                // 更新时间，RFC3339（UTC），列表与详情均返回
@@ -501,6 +506,7 @@ type MenuCategory struct {
 	Name        string `json:"name"`                 // 分类名称
 	Description string `json:"description,optional"` // 描述
 	Sort        uint32 `json:"sort,optional"`        // 排序，越小越靠前
+	Kind        string `json:"kind,optional"`        // dish=菜品 drink=酒水饮料
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }
@@ -545,6 +551,7 @@ type Order struct {
 }
 
 type OrderItem struct {
+	MenuId    uint64 `json:"menu_id,optional,string"` // 菜单id（用于展示排序）
 	MenuName  string `json:"menu_name"`          // 菜品名称快照
 	Quantity  int    `json:"quantity"`           // 数量
 	UnitPrice int64  `json:"unit_price"`         // 单价
@@ -631,6 +638,7 @@ type Table struct {
 	Status     string `json:"status"`             // idle=空闲 using=使用中 reserved=预留 cleaning=清洁中
 	Capacity   uint32 `json:"capacity,optional"`  // 可坐人数
 	CategoryId uint64 `json:"category_id,string"` // 餐桌分类id
+	Sort       uint32 `json:"sort,optional"`      // 排序，越小越靠前（同分类内）
 	QrCode     string `json:"qr_code,optional"`   // 二维码
 	CreatedAt  string `json:"created_at"`         // 创建时间（仅列表/详情返回）
 	UpdatedAt  string `json:"updated_at"`         // 更新时间（仅列表/详情返回）
@@ -640,6 +648,7 @@ type TableCategory struct {
 	Id          uint64 `json:"id,string"`            // 分类id
 	Name        string `json:"name"`                 // 分类名称
 	Description string `json:"description,optional"` // 描述
+	Sort        uint32 `json:"sort,optional"`        // 排序，越小越靠前
 }
 
 type UpdateCategorySpecReply struct {
@@ -679,6 +688,7 @@ type UpdateMenuCategoryReq struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Sort        uint32 `json:"sort"`
+	Kind        string `json:"kind,optional"`
 }
 
 type UpdateMenuReply struct {
@@ -692,6 +702,7 @@ type UpdateMenuReq struct {
 	Image       string     `json:"image,optional"`
 	Price       int64      `json:"price,optional"`
 	CategoryId  uint64     `json:"category_id,optional,string"`
+	Sort        uint32     `json:"sort,optional"`
 	Specs       []MenuSpec `json:"specs,optional"`
 }
 
@@ -751,6 +762,7 @@ type UpdateSpecItemReq struct {
 type UpdateTableCategoryInput struct {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
+	Sort        uint32 `json:"sort,optional"`
 }
 
 type UpdateTableCategoryReply struct {
@@ -770,6 +782,7 @@ type UpdateTableReq struct {
 	Status     string `json:"status"`
 	Capacity   uint32 `json:"capacity,optional"`
 	CategoryId uint64 `json:"category_id,string"`
+	Sort       uint32 `json:"sort,optional"`
 	QrCode     string `json:"qr_code,optional"`
 }
 

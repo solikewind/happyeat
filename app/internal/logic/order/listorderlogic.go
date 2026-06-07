@@ -58,7 +58,7 @@ func (l *ListOrderLogic) ListOrder(req *types.ListOrderReq) (resp *types.ListOrd
 
 	orders := make([]types.Order, 0, len(list))
 	for _, e := range list {
-		orders = append(orders, EntOrderToType(e))
+		orders = append(orders, EntOrderToTypeForDisplay(l.ctx, l.svcCtx, e))
 	}
 
 	return &types.ListOrderReply{Orders: orders, Total: total}, nil

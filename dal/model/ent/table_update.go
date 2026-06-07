@@ -140,6 +140,27 @@ func (_u *TableUpdate) ClearQrCode() *TableUpdate {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *TableUpdate) SetSort(v uint32) *TableUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *TableUpdate) SetNillableSort(v *uint32) *TableUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *TableUpdate) AddSort(v int32) *TableUpdate {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetCategoryID sets the "category" edge to the TableCategory entity by ID.
 func (_u *TableUpdate) SetCategoryID(id uint64) *TableUpdate {
 	_u.mutation.SetCategoryID(id)
@@ -306,6 +327,12 @@ func (_u *TableUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.QrCodeCleared() {
 		_spec.ClearField(table.FieldQrCode, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(table.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(table.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -511,6 +538,27 @@ func (_u *TableUpdateOne) ClearQrCode() *TableUpdateOne {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *TableUpdateOne) SetSort(v uint32) *TableUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *TableUpdateOne) SetNillableSort(v *uint32) *TableUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *TableUpdateOne) AddSort(v int32) *TableUpdateOne {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetCategoryID sets the "category" edge to the TableCategory entity by ID.
 func (_u *TableUpdateOne) SetCategoryID(id uint64) *TableUpdateOne {
 	_u.mutation.SetCategoryID(id)
@@ -707,6 +755,12 @@ func (_u *TableUpdateOne) sqlSave(ctx context.Context) (_node *Table, err error)
 	}
 	if _u.mutation.QrCodeCleared() {
 		_spec.ClearField(table.FieldQrCode, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(table.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(table.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

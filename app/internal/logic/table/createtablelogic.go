@@ -57,6 +57,7 @@ func (l *CreateTableLogic) CreateTable(req *types.CreateTableReq) (resp *types.C
 		Status:     req.Status,
 		Capacity:   req.Capacity,
 		CategoryID: req.CategoryId,
+		Sort:       req.Sort,
 		QRCode:     req.QrCode,
 	})
 	if err != nil {

@@ -101,6 +101,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 		{Name: "image", Type: field.TypeString, Nullable: true, Size: 512, Comment: "图片URL"},
 		{Name: "price", Type: field.TypeInt64, Comment: "价格"},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序，越小越靠前（同分类内）", Default: 0},
 		{Name: "menu_category_id", Type: field.TypeUint64, Comment: "菜单分类ID"},
 		{Name: "object_id", Type: field.TypeUint64, Nullable: true, Comment: "封面图对象ID（objects 表），与 image URL 二选一或同时存在"},
 	}
@@ -113,13 +114,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "menus_menu_categories_menus",
-				Columns:    []*schema.Column{MenusColumns[8]},
+				Columns:    []*schema.Column{MenusColumns[9]},
 				RefColumns: []*schema.Column{MenuCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "menus_objects_menu_covers",
-				Columns:    []*schema.Column{MenusColumns[9]},
+				Columns:    []*schema.Column{MenusColumns[10]},
 				RefColumns: []*schema.Column{ObjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -134,6 +135,7 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "分类名称"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
 		{Name: "sort", Type: field.TypeUint32, Comment: "排序，越小越靠前", Default: 0},
+		{Name: "kind", Type: field.TypeString, Size: 16, Comment: "分类类型：dish=菜品（订单/打印靠前） drink=酒水饮料等（靠后）", Default: "dish"},
 	}
 	// MenuCategoriesTable holds the schema information for the "menu_categories" table.
 	MenuCategoriesTable = &schema.Table{
@@ -325,6 +327,7 @@ var (
 		{Name: "status", Type: field.TypeString, Size: 32, Comment: "idle=空闲 using=使用中 reserved=预留 cleaning=清洁中", Default: "idle"},
 		{Name: "capacity", Type: field.TypeUint32, Comment: "可坐人数", Default: 1},
 		{Name: "qr_code", Type: field.TypeString, Nullable: true, Size: 256, Comment: "二维码"},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序，越小越靠前（同分类内）", Default: 0},
 		{Name: "table_category_id", Type: field.TypeUint64, Comment: "餐桌分类ID"},
 	}
 	// TablesTable holds the schema information for the "tables" table.
@@ -336,7 +339,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tables_table_categories_tables",
-				Columns:    []*schema.Column{TablesColumns[8]},
+				Columns:    []*schema.Column{TablesColumns[9]},
 				RefColumns: []*schema.Column{TableCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -350,6 +353,7 @@ var (
 		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 64, Comment: "类别名称"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述"},
+		{Name: "sort", Type: field.TypeUint32, Comment: "排序，越小越靠前", Default: 0},
 	}
 	// TableCategoriesTable holds the schema information for the "table_categories" table.
 	TableCategoriesTable = &schema.Table{

@@ -66,7 +66,7 @@ func (l *UpdateOrderLogic) UpdateOrder(req *types.UpdateOrderReq) (*types.Update
 				MenuID:    it.MenuId,
 				MenuName:  menuEnt.Name,
 				Quantity:  it.Quantity,
-				UnitPrice: menuEnt.Price,
+				UnitPrice: resolveMenuUnitPrice(menuEnt, it.SpecInfo, it.UnitPrice),
 				SpecInfo:  it.SpecInfo,
 			})
 			continue
@@ -94,7 +94,8 @@ func (l *UpdateOrderLogic) UpdateOrder(req *types.UpdateOrderReq) (*types.Update
 
 	newItems, _ := updated.Edges.ItemsOrErr()
 	diff := DiffOrderItems(oldItems, newItems)
+	ApplyOrderItemsDisplaySort(l.ctx, l.svcCtx, updated)
 	scheduleKitchenPrintWithDiff(l.svcCtx, updated, "[改单重打]", diff)
 
-	return &types.UpdateOrderReply{Order: EntOrderToType(updated)}, nil
+	return &types.UpdateOrderReply{Order: EntOrderToTypeForDisplay(l.ctx, l.svcCtx, updated)}, nil
 }

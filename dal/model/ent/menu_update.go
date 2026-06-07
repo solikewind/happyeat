@@ -168,6 +168,27 @@ func (_u *MenuUpdate) AddPrice(v int64) *MenuUpdate {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *MenuUpdate) SetSort(v uint32) *MenuUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *MenuUpdate) SetNillableSort(v *uint32) *MenuUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *MenuUpdate) AddSort(v int32) *MenuUpdate {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
 func (_u *MenuUpdate) SetCategoryID(id uint64) *MenuUpdate {
 	_u.mutation.SetCategoryID(id)
@@ -388,6 +409,12 @@ func (_u *MenuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(menu.FieldPrice, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(menu.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(menu.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -693,6 +720,27 @@ func (_u *MenuUpdateOne) AddPrice(v int64) *MenuUpdateOne {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *MenuUpdateOne) SetSort(v uint32) *MenuUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *MenuUpdateOne) SetNillableSort(v *uint32) *MenuUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *MenuUpdateOne) AddSort(v int32) *MenuUpdateOne {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetCategoryID sets the "category" edge to the MenuCategory entity by ID.
 func (_u *MenuUpdateOne) SetCategoryID(id uint64) *MenuUpdateOne {
 	_u.mutation.SetCategoryID(id)
@@ -943,6 +991,12 @@ func (_u *MenuUpdateOne) sqlSave(ctx context.Context) (_node *Menu, err error) {
 	}
 	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(menu.FieldPrice, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(menu.FieldSort, field.TypeUint32, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(menu.FieldSort, field.TypeUint32, value)
 	}
 	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -25,6 +25,7 @@ func SyncPrintKitchenWithDiff(ctx context.Context, svcCtx *svc.ServiceContext, e
 	if svcCtx.Spyun == nil {
 		return errors.New("商鹏云打印未启用或未配置")
 	}
+	ApplyOrderItemsDisplaySort(ctx, svcCtx, e)
 	div := kitchenTicketAmountDivisor(svcCtx.Config.Spyun.KitchenTicketAmountScale)
 	content := formatKitchenTicket(e, banner, div, diff)
 	_, err := svcCtx.Spyun.PrintOrder(ctx, "", content, 1)
