@@ -47,7 +47,6 @@ type ServiceContext struct {
 
 	Order *order.Order // 订单 data 层
 	Object *objmodel.Object
-
 }
 
 func NewServiceContext(c config.Config) (*ServiceContext, error) {

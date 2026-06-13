@@ -1,0 +1,50 @@
+syntax = "v1"
+
+info (
+	title:   "HappyEat经营统计APITypes"
+	author:  "Goxny"
+	version: "v1.0.0"
+)
+
+type ListDailyStatsReq {
+	StartDate string `json:"start_date,optional" form:"start_date,optional"` // YYYY-MM-DD，缺省为今天
+	EndDate   string `json:"end_date,optional" form:"end_date,optional"` // YYYY-MM-DD，缺省等于 start_date
+}
+
+type DailyStatsPoint {
+	Date          string `json:"date"` // YYYY-MM-DD
+	OrderCount    int    `json:"order_count"`
+	Revenue       int64  `json:"revenue"` // 分
+	ItemCount     int    `json:"item_count"`
+	DineInCount   int    `json:"dine_in_count,optional"`
+	TakeawayCount int    `json:"takeaway_count,optional"`
+}
+
+type DailyStatsSummary {
+	OrderCount    int   `json:"order_count"`
+	Revenue       int64 `json:"revenue"`
+	ItemCount     int   `json:"item_count"`
+	DineInCount   int   `json:"dine_in_count,optional"`
+	TakeawayCount int   `json:"takeaway_count,optional"`
+}
+
+type ListDailyStatsReply {
+	Daily   []DailyStatsPoint `json:"daily"`
+	Summary DailyStatsSummary `json:"summary"`
+}
+
+type ListMenuStatsReq {
+	StartDate string `json:"start_date,optional" form:"start_date,optional"`
+	EndDate   string `json:"end_date,optional" form:"end_date,optional"`
+}
+
+type MenuStatsRow {
+	MenuName string `json:"menu_name"`
+	SpecInfo string `json:"spec_info,optional"`
+	Quantity int    `json:"quantity"`
+	Amount   int64  `json:"amount"` // 分
+}
+
+type ListMenuStatsReply {
+	Rows []MenuStatsRow `json:"rows"`
+}
