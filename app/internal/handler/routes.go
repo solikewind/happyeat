@@ -14,6 +14,7 @@ import (
 	order "github.com/solikewind/happyeat/app/internal/handler/order"
 	rbac "github.com/solikewind/happyeat/app/internal/handler/rbac"
 	spec "github.com/solikewind/happyeat/app/internal/handler/spec"
+	stats "github.com/solikewind/happyeat/app/internal/handler/stats"
 	table "github.com/solikewind/happyeat/app/internal/handler/table"
 	tablecategory "github.com/solikewind/happyeat/app/internal/handler/tablecategory"
 	workbench "github.com/solikewind/happyeat/app/internal/handler/workbench"
@@ -424,6 +425,35 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/spec/items",
 					Handler: spec.ListSpecItemHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 按日期区间查询日汇总（start_date/end_date 格式 YYYY-MM-DD；均可缺省为今天；可查近3/7/30天等）
+					Method:  http.MethodGet,
+					Path:    "/stats/daily",
+					Handler: stats.ListDailyStatsHandler(serverCtx),
+				},
+				{
+					// 今日经营概览（等价于 start_date=end_date=今天）
+					Method:  http.MethodGet,
+					Path:    "/stats/daily/overview",
+					Handler: stats.GetDailyStatsOverviewHandler(serverCtx),
+				},
+				{
+					// 按日期区间查询菜品销量明细（聚合多日后按菜品+规格汇总）
+					Method:  http.MethodGet,
+					Path:    "/stats/menus",
+					Handler: stats.ListMenuStatsHandler(serverCtx),
 				},
 			}...,
 		),
