@@ -43,6 +43,7 @@ func (l *ListOrderLogic) ListOrder(req *types.ListOrderReq) (resp *types.ListOrd
 	filter := order.ListOrdersFilter{
 		Status:    enum.OrderStatus(req.Status),
 		OrderType: enum.OrderType(req.OrderType),
+		OrderNo:   req.OrderNo,
 		Offset:    offset,
 		Limit:     pageSize,
 	}
