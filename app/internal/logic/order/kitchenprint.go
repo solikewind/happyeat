@@ -69,6 +69,8 @@ const (
 	ticketAmtColW     = 10 // 金额列（右对齐，含 ￥）
 	ticketHeavyRuleCh = "="
 	ticketLightRuleCh = "-"
+	ticketDateLayout  = "2006/01/02" // 如 2026/06/15（月日补零）
+	ticketTimeLayout  = "15:04"
 
 	// ticketCurrency 货币符号。
 	// 半角 ¥ (U+00A5) 在多数热敏机字体里笔画细、甚至缺字形，打印模糊。
@@ -199,9 +201,11 @@ func renderHeadlineBlock(e *ent.Order) string {
 
 func renderMetaBlock(e *ent.Order) string {
 	var b strings.Builder
-	// 下单/打印时间：厨师只关心今天的时辰，只显示 HH:MM
-	createdAt := e.CreatedAt.Format("15:04")
-	printedAt := time.Now().Format("15:04")
+	orderDate := e.CreatedAt.Format(ticketDateLayout)
+	createdAt := e.CreatedAt.Format(ticketTimeLayout)
+	printedAt := time.Now().Format(ticketTimeLayout)
+	b.WriteString(orderDate)
+	b.WriteString("<BR>")
 	b.WriteString(fmt.Sprintf("下单: %s    打印: %s<BR>", createdAt, printedAt))
 	b.WriteString("订单: ")
 	b.WriteString(escapeSpyunText(e.OrderNo))

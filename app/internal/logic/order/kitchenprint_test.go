@@ -3,6 +3,7 @@ package order
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/solikewind/happyeat/dal/model/ent"
 )
@@ -122,6 +123,23 @@ func TestApplyUnicodeStrike(t *testing.T) {
 	got := applyUnicodeStrike("AB")
 	if got != "A\u0336B\u0336" {
 		t.Fatalf("strike: %q", got)
+	}
+}
+
+func TestRenderMetaBlock_includesDate(t *testing.T) {
+	created := time.Date(2026, 6, 15, 14, 30, 0, 0, time.Local)
+	got := renderMetaBlock(&ent.Order{
+		OrderNo:   "ORD202606151430001",
+		CreatedAt: created,
+	})
+	if !strings.Contains(got, "2026/06/15") {
+		t.Fatalf("missing date line: %q", got)
+	}
+	if !strings.Contains(got, "下单: 14:30") {
+		t.Fatalf("missing order time: %q", got)
+	}
+	if !strings.Contains(got, "订单: ORD202606151430001") {
+		t.Fatalf("missing order no: %q", got)
 	}
 }
 
