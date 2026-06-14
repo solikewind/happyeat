@@ -20,6 +20,7 @@ type Order {
 	TableCode     string      `json:"table_code,optional"`   // 桌号（堂食时显示，外带为空）
 	TableCategory string      `json:"table_category,optional"` // 餐桌类别（如大厅、包间）
 	Remark        string      `json:"remark,optional"`       // 备注
+	SettlementId  uint64      `json:"settlement_id,optional,string"` // 所属结账单
 	Items         []OrderItem `json:"items,optional"`        // 订单明细
 	CreatedAt     string      `json:"created_at"`            // 创建时间
 	UpdatedAt     string      `json:"updated_at"`            // 更新时间

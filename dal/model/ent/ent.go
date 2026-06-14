@@ -22,6 +22,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/object"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
 	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
@@ -96,6 +97,7 @@ func checkColumn(t, c string) error {
 			object.Table:        object.ValidColumn,
 			order.Table:         order.ValidColumn,
 			orderitem.Table:     orderitem.ValidColumn,
+			settlement.Table:    settlement.ValidColumn,
 			specgroup.Table:     specgroup.ValidColumn,
 			specitem.Table:      specitem.ValidColumn,
 			table.Table:         table.ValidColumn,

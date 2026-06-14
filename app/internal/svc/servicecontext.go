@@ -19,6 +19,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/menu"
 	objmodel "github.com/solikewind/happyeat/dal/model/object"
 	"github.com/solikewind/happyeat/dal/model/order"
+	"github.com/solikewind/happyeat/dal/model/settlement"
 	specmodel "github.com/solikewind/happyeat/dal/model/spec"
 	"github.com/solikewind/happyeat/dal/model/table"
 	"github.com/zeromicro/go-zero/rest"
@@ -47,6 +48,7 @@ type ServiceContext struct {
 
 	Order *order.Order // 订单 data 层
 	Object *objmodel.Object
+	Settlement *settlement.Settlement // 结账单 data 层
 }
 
 func NewServiceContext(c config.Config) (*ServiceContext, error) {
@@ -107,6 +109,7 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		TableType:    table.NewTableType(client),
 		Order:        order.NewOrder(client),
 		Object:       objmodel.NewObject(client),
+		Settlement:   settlement.NewSettlement(client),
 	}
 	ctx.CasbinMiddleware = NewCasbinMiddleware(ctx)
 	if err := SyncRolePoliciesToCasbin(ctx.Rbac, ctx.Casbin); err != nil {

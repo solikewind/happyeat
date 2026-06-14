@@ -13,6 +13,7 @@ import (
 	menucategory "github.com/solikewind/happyeat/app/internal/handler/menucategory"
 	order "github.com/solikewind/happyeat/app/internal/handler/order"
 	rbac "github.com/solikewind/happyeat/app/internal/handler/rbac"
+	settlement "github.com/solikewind/happyeat/app/internal/handler/settlement"
 	spec "github.com/solikewind/happyeat/app/internal/handler/spec"
 	stats "github.com/solikewind/happyeat/app/internal/handler/stats"
 	table "github.com/solikewind/happyeat/app/internal/handler/table"
@@ -330,6 +331,53 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/central/v1"),
 		rest.WithTimeout(5000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CasbinMiddleware},
+			[]rest.Route{
+				{
+					// 获取结账单详情（含关联订单）
+					Method:  http.MethodGet,
+					Path:    "/settlement/:id",
+					Handler: settlement.GetSettlementHandler(serverCtx),
+				},
+				{
+					// 将订单加入结账单（任意订单状态，已取消除外）
+					Method:  http.MethodPost,
+					Path:    "/settlement/:id/orders",
+					Handler: settlement.AddSettlementOrderHandler(serverCtx),
+				},
+				{
+					// 从结账单移除订单（仅未结账）
+					Method:  http.MethodDelete,
+					Path:    "/settlement/:id/orders/:order_id",
+					Handler: settlement.RemoveSettlementOrderHandler(serverCtx),
+				},
+				{
+					// 结账单结账（未结账 → 已结账）
+					Method:  http.MethodPost,
+					Path:    "/settlement/:id/settle",
+					Handler: settlement.SettleSettlementHandler(serverCtx),
+				},
+				{
+					// 列出结账单
+					Method:  http.MethodGet,
+					Path:    "/settlements",
+					Handler: settlement.ListSettlementHandler(serverCtx),
+				},
+				{
+					// 创建结账单（同一客户仅允许一张未结账）
+					Method:  http.MethodPost,
+					Path:    "/settlements",
+					Handler: settlement.CreateSettlementHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/central/v1"),
+		rest.WithTimeout(10000*time.Millisecond),
 	)
 
 	server.AddRoutes(

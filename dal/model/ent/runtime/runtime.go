@@ -16,6 +16,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/schema"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
 	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
@@ -430,6 +431,49 @@ func init() {
 	orderitemDescSort := orderitemFields[7].Descriptor()
 	// orderitem.DefaultSort holds the default value on creation for the sort field.
 	orderitem.DefaultSort = orderitemDescSort.Default.(uint32)
+	settlementMixin := schema.Settlement{}.Mixin()
+	settlementMixinHooks0 := settlementMixin[0].Hooks()
+	settlementMixinHooks2 := settlementMixin[2].Hooks()
+	settlement.Hooks[0] = settlementMixinHooks0[0]
+	settlement.Hooks[1] = settlementMixinHooks2[0]
+	settlementMixinInters2 := settlementMixin[2].Interceptors()
+	settlement.Interceptors[0] = settlementMixinInters2[0]
+	settlementMixinFields1 := settlementMixin[1].Fields()
+	_ = settlementMixinFields1
+	settlementMixinFields2 := settlementMixin[2].Fields()
+	_ = settlementMixinFields2
+	settlementFields := schema.Settlement{}.Fields()
+	_ = settlementFields
+	// settlementDescCreatedAt is the schema descriptor for created_at field.
+	settlementDescCreatedAt := settlementMixinFields1[0].Descriptor()
+	// settlement.DefaultCreatedAt holds the default value on creation for the created_at field.
+	settlement.DefaultCreatedAt = settlementDescCreatedAt.Default.(func() time.Time)
+	// settlementDescUpdatedAt is the schema descriptor for updated_at field.
+	settlementDescUpdatedAt := settlementMixinFields1[1].Descriptor()
+	// settlement.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	settlement.DefaultUpdatedAt = settlementDescUpdatedAt.Default.(func() time.Time)
+	// settlement.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	settlement.UpdateDefaultUpdatedAt = settlementDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// settlementDescDeleteTs is the schema descriptor for delete_ts field.
+	settlementDescDeleteTs := settlementMixinFields2[0].Descriptor()
+	// settlement.DefaultDeleteTs holds the default value on creation for the delete_ts field.
+	settlement.DefaultDeleteTs = settlementDescDeleteTs.Default.(int64)
+	// settlementDescCustomerName is the schema descriptor for customer_name field.
+	settlementDescCustomerName := settlementFields[0].Descriptor()
+	// settlement.CustomerNameValidator is a validator for the "customer_name" field. It is called by the builders before save.
+	settlement.CustomerNameValidator = settlementDescCustomerName.Validators[0].(func(string) error)
+	// settlementDescTotalAmount is the schema descriptor for total_amount field.
+	settlementDescTotalAmount := settlementFields[2].Descriptor()
+	// settlement.DefaultTotalAmount holds the default value on creation for the total_amount field.
+	settlement.DefaultTotalAmount = settlementDescTotalAmount.Default.(int64)
+	// settlementDescActualAmount is the schema descriptor for actual_amount field.
+	settlementDescActualAmount := settlementFields[3].Descriptor()
+	// settlement.DefaultActualAmount holds the default value on creation for the actual_amount field.
+	settlement.DefaultActualAmount = settlementDescActualAmount.Default.(int64)
+	// settlementDescRemark is the schema descriptor for remark field.
+	settlementDescRemark := settlementFields[4].Descriptor()
+	// settlement.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	settlement.RemarkValidator = settlementDescRemark.Validators[0].(func(string) error)
 	specgroupMixin := schema.SpecGroup{}.Mixin()
 	specgroupMixinHooks0 := specgroupMixin[0].Hooks()
 	specgroupMixinHooks2 := specgroupMixin[2].Hooks()

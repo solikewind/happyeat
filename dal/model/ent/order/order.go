@@ -37,8 +37,12 @@ const (
 	FieldActualAmount = "actual_amount"
 	// FieldRemark holds the string denoting the remark field in the database.
 	FieldRemark = "remark"
+	// FieldSettlementID holds the string denoting the settlement_id field in the database.
+	FieldSettlementID = "settlement_id"
 	// EdgeTable holds the string denoting the table edge name in mutations.
 	EdgeTable = "table"
+	// EdgeSettlement holds the string denoting the settlement edge name in mutations.
+	EdgeSettlement = "settlement"
 	// EdgeItems holds the string denoting the items edge name in mutations.
 	EdgeItems = "items"
 	// Table holds the table name of the order in the database.
@@ -50,6 +54,13 @@ const (
 	TableInverseTable = "tables"
 	// TableColumn is the table column denoting the table relation/edge.
 	TableColumn = "table_id"
+	// SettlementTable is the table that holds the settlement relation/edge.
+	SettlementTable = "orders"
+	// SettlementInverseTable is the table name for the Settlement entity.
+	// It exists in this package in order to avoid circular dependency with the "settlement" package.
+	SettlementInverseTable = "settlements"
+	// SettlementColumn is the table column denoting the settlement relation/edge.
+	SettlementColumn = "settlement_id"
 	// ItemsTable is the table that holds the items relation/edge.
 	ItemsTable = "order_items"
 	// ItemsInverseTable is the table name for the OrderItem entity.
@@ -72,6 +83,7 @@ var Columns = []string{
 	FieldTotalAmount,
 	FieldActualAmount,
 	FieldRemark,
+	FieldSettlementID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -188,10 +200,22 @@ func ByRemark(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRemark, opts...).ToFunc()
 }
 
+// BySettlementID orders the results by the settlement_id field.
+func BySettlementID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSettlementID, opts...).ToFunc()
+}
+
 // ByTableField orders the results by table field.
 func ByTableField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newTableStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// BySettlementField orders the results by settlement field.
+func BySettlementField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSettlementStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -213,6 +237,13 @@ func newTableStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TableInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, TableTable, TableColumn),
+	)
+}
+func newSettlementStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SettlementInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SettlementTable, SettlementColumn),
 	)
 }
 func newItemsStep() *sqlgraph.Step {

@@ -223,6 +223,7 @@ var (
 		{Name: "total_amount", Type: field.TypeInt64, Comment: "订单总金额", Default: 0},
 		{Name: "actual_amount", Type: field.TypeInt64, Comment: "实收金额（分），可与总金额不同（抹零、优惠等）；未收款时可为 0", Default: 0},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注"},
+		{Name: "settlement_id", Type: field.TypeUint64, Nullable: true, Comment: "结账单ID"},
 		{Name: "table_id", Type: field.TypeUint64, Nullable: true, Comment: "餐桌ID"},
 	}
 	// OrdersTable holds the schema information for the "orders" table.
@@ -233,8 +234,14 @@ var (
 		PrimaryKey: []*schema.Column{OrdersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "orders_tables_orders",
+				Symbol:     "orders_settlements_orders",
 				Columns:    []*schema.Column{OrdersColumns[10]},
+				RefColumns: []*schema.Column{SettlementsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "orders_tables_orders",
+				Columns:    []*schema.Column{OrdersColumns[11]},
 				RefColumns: []*schema.Column{TablesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -275,6 +282,26 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 		},
+	}
+	// SettlementsColumns holds the columns for the "settlements" table.
+	SettlementsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true, Comment: "ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间", SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "delete_ts", Type: field.TypeInt64, Comment: "删除时间戳", Default: 0},
+		{Name: "customer_name", Type: field.TypeString, Size: 64, Comment: "客户名"},
+		{Name: "status", Type: field.TypeEnum, Comment: "unsettled=未结账 settled=已结账", Enums: []string{"UNSETTLED", "SETTLED"}, Default: "UNSETTLED"},
+		{Name: "total_amount", Type: field.TypeInt64, Comment: "应收合计（分，关联订单 total_amount 之和）", Default: 0},
+		{Name: "actual_amount", Type: field.TypeInt64, Comment: "实收合计（分，结账时录入）", Default: 0},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注"},
+		{Name: "settled_at", Type: field.TypeTime, Nullable: true, Comment: "结账时间"},
+	}
+	// SettlementsTable holds the schema information for the "settlements" table.
+	SettlementsTable = &schema.Table{
+		Name:       "settlements",
+		Comment:    "结账单",
+		Columns:    SettlementsColumns,
+		PrimaryKey: []*schema.Column{SettlementsColumns[0]},
 	}
 	// SpecGroupsColumns holds the columns for the "spec_groups" table.
 	SpecGroupsColumns = []*schema.Column{
@@ -424,6 +451,7 @@ var (
 		ObjectsTable,
 		OrdersTable,
 		OrderItemsTable,
+		SettlementsTable,
 		SpecGroupsTable,
 		SpecItemsTable,
 		TablesTable,
@@ -465,7 +493,8 @@ func init() {
 	ObjectsTable.Annotation = &entsql.Annotation{
 		Table: "objects",
 	}
-	OrdersTable.ForeignKeys[0].RefTable = TablesTable
+	OrdersTable.ForeignKeys[0].RefTable = SettlementsTable
+	OrdersTable.ForeignKeys[1].RefTable = TablesTable
 	OrdersTable.Annotation = &entsql.Annotation{
 		Table: "orders",
 	}
@@ -473,6 +502,9 @@ func init() {
 	OrderItemsTable.ForeignKeys[1].RefTable = OrdersTable
 	OrderItemsTable.Annotation = &entsql.Annotation{
 		Table: "order_items",
+	}
+	SettlementsTable.Annotation = &entsql.Annotation{
+		Table: "settlements",
 	}
 	SpecGroupsTable.Annotation = &entsql.Annotation{
 		Table: "spec_groups",

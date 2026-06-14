@@ -13,6 +13,7 @@ import (
 	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 )
 
@@ -139,6 +140,20 @@ func (_c *OrderCreate) SetNillableRemark(v *string) *OrderCreate {
 	return _c
 }
 
+// SetSettlementID sets the "settlement_id" field.
+func (_c *OrderCreate) SetSettlementID(v uint64) *OrderCreate {
+	_c.mutation.SetSettlementID(v)
+	return _c
+}
+
+// SetNillableSettlementID sets the "settlement_id" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableSettlementID(v *uint64) *OrderCreate {
+	if v != nil {
+		_c.SetSettlementID(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *OrderCreate) SetID(v uint64) *OrderCreate {
 	_c.mutation.SetID(v)
@@ -148,6 +163,11 @@ func (_c *OrderCreate) SetID(v uint64) *OrderCreate {
 // SetTable sets the "table" edge to the Table entity.
 func (_c *OrderCreate) SetTable(v *Table) *OrderCreate {
 	return _c.SetTableID(v.ID)
+}
+
+// SetSettlement sets the "settlement" edge to the Settlement entity.
+func (_c *OrderCreate) SetSettlement(v *Settlement) *OrderCreate {
+	return _c.SetSettlementID(v.ID)
 }
 
 // AddItemIDs adds the "items" edge to the OrderItem entity by IDs.
@@ -360,6 +380,23 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.TableID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SettlementIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SettlementTable,
+			Columns: []string{order.SettlementColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(settlement.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.SettlementID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.ItemsIDs(); len(nodes) > 0 {

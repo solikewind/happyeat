@@ -15,6 +15,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 )
 
@@ -182,9 +183,34 @@ func (_u *OrderUpdate) ClearRemark() *OrderUpdate {
 	return _u
 }
 
+// SetSettlementID sets the "settlement_id" field.
+func (_u *OrderUpdate) SetSettlementID(v uint64) *OrderUpdate {
+	_u.mutation.SetSettlementID(v)
+	return _u
+}
+
+// SetNillableSettlementID sets the "settlement_id" field if the given value is not nil.
+func (_u *OrderUpdate) SetNillableSettlementID(v *uint64) *OrderUpdate {
+	if v != nil {
+		_u.SetSettlementID(*v)
+	}
+	return _u
+}
+
+// ClearSettlementID clears the value of the "settlement_id" field.
+func (_u *OrderUpdate) ClearSettlementID() *OrderUpdate {
+	_u.mutation.ClearSettlementID()
+	return _u
+}
+
 // SetTable sets the "table" edge to the Table entity.
 func (_u *OrderUpdate) SetTable(v *Table) *OrderUpdate {
 	return _u.SetTableID(v.ID)
+}
+
+// SetSettlement sets the "settlement" edge to the Settlement entity.
+func (_u *OrderUpdate) SetSettlement(v *Settlement) *OrderUpdate {
+	return _u.SetSettlementID(v.ID)
 }
 
 // AddItemIDs adds the "items" edge to the OrderItem entity by IDs.
@@ -210,6 +236,12 @@ func (_u *OrderUpdate) Mutation() *OrderMutation {
 // ClearTable clears the "table" edge to the Table entity.
 func (_u *OrderUpdate) ClearTable() *OrderUpdate {
 	_u.mutation.ClearTable()
+	return _u
+}
+
+// ClearSettlement clears the "settlement" edge to the Settlement entity.
+func (_u *OrderUpdate) ClearSettlement() *OrderUpdate {
+	_u.mutation.ClearSettlement()
 	return _u
 }
 
@@ -371,6 +403,35 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SettlementCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SettlementTable,
+			Columns: []string{order.SettlementColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(settlement.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SettlementIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SettlementTable,
+			Columns: []string{order.SettlementColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(settlement.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -594,9 +655,34 @@ func (_u *OrderUpdateOne) ClearRemark() *OrderUpdateOne {
 	return _u
 }
 
+// SetSettlementID sets the "settlement_id" field.
+func (_u *OrderUpdateOne) SetSettlementID(v uint64) *OrderUpdateOne {
+	_u.mutation.SetSettlementID(v)
+	return _u
+}
+
+// SetNillableSettlementID sets the "settlement_id" field if the given value is not nil.
+func (_u *OrderUpdateOne) SetNillableSettlementID(v *uint64) *OrderUpdateOne {
+	if v != nil {
+		_u.SetSettlementID(*v)
+	}
+	return _u
+}
+
+// ClearSettlementID clears the value of the "settlement_id" field.
+func (_u *OrderUpdateOne) ClearSettlementID() *OrderUpdateOne {
+	_u.mutation.ClearSettlementID()
+	return _u
+}
+
 // SetTable sets the "table" edge to the Table entity.
 func (_u *OrderUpdateOne) SetTable(v *Table) *OrderUpdateOne {
 	return _u.SetTableID(v.ID)
+}
+
+// SetSettlement sets the "settlement" edge to the Settlement entity.
+func (_u *OrderUpdateOne) SetSettlement(v *Settlement) *OrderUpdateOne {
+	return _u.SetSettlementID(v.ID)
 }
 
 // AddItemIDs adds the "items" edge to the OrderItem entity by IDs.
@@ -622,6 +708,12 @@ func (_u *OrderUpdateOne) Mutation() *OrderMutation {
 // ClearTable clears the "table" edge to the Table entity.
 func (_u *OrderUpdateOne) ClearTable() *OrderUpdateOne {
 	_u.mutation.ClearTable()
+	return _u
+}
+
+// ClearSettlement clears the "settlement" edge to the Settlement entity.
+func (_u *OrderUpdateOne) ClearSettlement() *OrderUpdateOne {
+	_u.mutation.ClearSettlement()
 	return _u
 }
 
@@ -813,6 +905,35 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(table.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SettlementCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SettlementTable,
+			Columns: []string{order.SettlementColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(settlement.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SettlementIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SettlementTable,
+			Columns: []string{order.SettlementColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(settlement.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

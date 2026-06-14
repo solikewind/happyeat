@@ -23,6 +23,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
 	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
@@ -48,6 +49,7 @@ const (
 	TypeObject        = "Object"
 	TypeOrder         = "Order"
 	TypeOrderItem     = "OrderItem"
+	TypeSettlement    = "Settlement"
 	TypeSpecGroup     = "SpecGroup"
 	TypeSpecItem      = "SpecItem"
 	TypeTable         = "Table"
@@ -7474,30 +7476,32 @@ func (m *ObjectMutation) ResetEdge(name string) error {
 // OrderMutation represents an operation that mutates the Order nodes in the graph.
 type OrderMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *uint64
-	created_at       *time.Time
-	updated_at       *time.Time
-	delete_ts        *int64
-	adddelete_ts     *int64
-	order_no         *string
-	order_type       *enum.OrderType
-	status           *enum.OrderStatus
-	total_amount     *int64
-	addtotal_amount  *int64
-	actual_amount    *int64
-	addactual_amount *int64
-	remark           *string
-	clearedFields    map[string]struct{}
-	table            *uint64
-	clearedtable     bool
-	items            map[uint64]struct{}
-	removeditems     map[uint64]struct{}
-	cleareditems     bool
-	done             bool
-	oldValue         func(context.Context) (*Order, error)
-	predicates       []predicate.Order
+	op                Op
+	typ               string
+	id                *uint64
+	created_at        *time.Time
+	updated_at        *time.Time
+	delete_ts         *int64
+	adddelete_ts      *int64
+	order_no          *string
+	order_type        *enum.OrderType
+	status            *enum.OrderStatus
+	total_amount      *int64
+	addtotal_amount   *int64
+	actual_amount     *int64
+	addactual_amount  *int64
+	remark            *string
+	clearedFields     map[string]struct{}
+	table             *uint64
+	clearedtable      bool
+	settlement        *uint64
+	clearedsettlement bool
+	items             map[uint64]struct{}
+	removeditems      map[uint64]struct{}
+	cleareditems      bool
+	done              bool
+	oldValue          func(context.Context) (*Order, error)
+	predicates        []predicate.Order
 }
 
 var _ ent.Mutation = (*OrderMutation)(nil)
@@ -8050,6 +8054,55 @@ func (m *OrderMutation) ResetRemark() {
 	delete(m.clearedFields, order.FieldRemark)
 }
 
+// SetSettlementID sets the "settlement_id" field.
+func (m *OrderMutation) SetSettlementID(u uint64) {
+	m.settlement = &u
+}
+
+// SettlementID returns the value of the "settlement_id" field in the mutation.
+func (m *OrderMutation) SettlementID() (r uint64, exists bool) {
+	v := m.settlement
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSettlementID returns the old "settlement_id" field's value of the Order entity.
+// If the Order object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderMutation) OldSettlementID(ctx context.Context) (v *uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSettlementID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSettlementID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSettlementID: %w", err)
+	}
+	return oldValue.SettlementID, nil
+}
+
+// ClearSettlementID clears the value of the "settlement_id" field.
+func (m *OrderMutation) ClearSettlementID() {
+	m.settlement = nil
+	m.clearedFields[order.FieldSettlementID] = struct{}{}
+}
+
+// SettlementIDCleared returns if the "settlement_id" field was cleared in this mutation.
+func (m *OrderMutation) SettlementIDCleared() bool {
+	_, ok := m.clearedFields[order.FieldSettlementID]
+	return ok
+}
+
+// ResetSettlementID resets all changes to the "settlement_id" field.
+func (m *OrderMutation) ResetSettlementID() {
+	m.settlement = nil
+	delete(m.clearedFields, order.FieldSettlementID)
+}
+
 // ClearTable clears the "table" edge to the Table entity.
 func (m *OrderMutation) ClearTable() {
 	m.clearedtable = true
@@ -8075,6 +8128,33 @@ func (m *OrderMutation) TableIDs() (ids []uint64) {
 func (m *OrderMutation) ResetTable() {
 	m.table = nil
 	m.clearedtable = false
+}
+
+// ClearSettlement clears the "settlement" edge to the Settlement entity.
+func (m *OrderMutation) ClearSettlement() {
+	m.clearedsettlement = true
+	m.clearedFields[order.FieldSettlementID] = struct{}{}
+}
+
+// SettlementCleared reports if the "settlement" edge to the Settlement entity was cleared.
+func (m *OrderMutation) SettlementCleared() bool {
+	return m.SettlementIDCleared() || m.clearedsettlement
+}
+
+// SettlementIDs returns the "settlement" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SettlementID instead. It exists only for internal usage by the builders.
+func (m *OrderMutation) SettlementIDs() (ids []uint64) {
+	if id := m.settlement; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSettlement resets all changes to the "settlement" edge.
+func (m *OrderMutation) ResetSettlement() {
+	m.settlement = nil
+	m.clearedsettlement = false
 }
 
 // AddItemIDs adds the "items" edge to the OrderItem entity by ids.
@@ -8165,7 +8245,7 @@ func (m *OrderMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, order.FieldCreatedAt)
 	}
@@ -8196,6 +8276,9 @@ func (m *OrderMutation) Fields() []string {
 	if m.remark != nil {
 		fields = append(fields, order.FieldRemark)
 	}
+	if m.settlement != nil {
+		fields = append(fields, order.FieldSettlementID)
+	}
 	return fields
 }
 
@@ -8224,6 +8307,8 @@ func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 		return m.ActualAmount()
 	case order.FieldRemark:
 		return m.Remark()
+	case order.FieldSettlementID:
+		return m.SettlementID()
 	}
 	return nil, false
 }
@@ -8253,6 +8338,8 @@ func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldActualAmount(ctx)
 	case order.FieldRemark:
 		return m.OldRemark(ctx)
+	case order.FieldSettlementID:
+		return m.OldSettlementID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Order field %s", name)
 }
@@ -8332,6 +8419,13 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRemark(v)
 		return nil
+	case order.FieldSettlementID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSettlementID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Order field %s", name)
 }
@@ -8407,6 +8501,9 @@ func (m *OrderMutation) ClearedFields() []string {
 	if m.FieldCleared(order.FieldRemark) {
 		fields = append(fields, order.FieldRemark)
 	}
+	if m.FieldCleared(order.FieldSettlementID) {
+		fields = append(fields, order.FieldSettlementID)
+	}
 	return fields
 }
 
@@ -8426,6 +8523,9 @@ func (m *OrderMutation) ClearField(name string) error {
 		return nil
 	case order.FieldRemark:
 		m.ClearRemark()
+		return nil
+	case order.FieldSettlementID:
+		m.ClearSettlementID()
 		return nil
 	}
 	return fmt.Errorf("unknown Order nullable field %s", name)
@@ -8465,15 +8565,21 @@ func (m *OrderMutation) ResetField(name string) error {
 	case order.FieldRemark:
 		m.ResetRemark()
 		return nil
+	case order.FieldSettlementID:
+		m.ResetSettlementID()
+		return nil
 	}
 	return fmt.Errorf("unknown Order field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *OrderMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.table != nil {
 		edges = append(edges, order.EdgeTable)
+	}
+	if m.settlement != nil {
+		edges = append(edges, order.EdgeSettlement)
 	}
 	if m.items != nil {
 		edges = append(edges, order.EdgeItems)
@@ -8489,6 +8595,10 @@ func (m *OrderMutation) AddedIDs(name string) []ent.Value {
 		if id := m.table; id != nil {
 			return []ent.Value{*id}
 		}
+	case order.EdgeSettlement:
+		if id := m.settlement; id != nil {
+			return []ent.Value{*id}
+		}
 	case order.EdgeItems:
 		ids := make([]ent.Value, 0, len(m.items))
 		for id := range m.items {
@@ -8501,7 +8611,7 @@ func (m *OrderMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *OrderMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removeditems != nil {
 		edges = append(edges, order.EdgeItems)
 	}
@@ -8524,9 +8634,12 @@ func (m *OrderMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *OrderMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedtable {
 		edges = append(edges, order.EdgeTable)
+	}
+	if m.clearedsettlement {
+		edges = append(edges, order.EdgeSettlement)
 	}
 	if m.cleareditems {
 		edges = append(edges, order.EdgeItems)
@@ -8540,6 +8653,8 @@ func (m *OrderMutation) EdgeCleared(name string) bool {
 	switch name {
 	case order.EdgeTable:
 		return m.clearedtable
+	case order.EdgeSettlement:
+		return m.clearedsettlement
 	case order.EdgeItems:
 		return m.cleareditems
 	}
@@ -8553,6 +8668,9 @@ func (m *OrderMutation) ClearEdge(name string) error {
 	case order.EdgeTable:
 		m.ClearTable()
 		return nil
+	case order.EdgeSettlement:
+		m.ClearSettlement()
+		return nil
 	}
 	return fmt.Errorf("unknown Order unique edge %s", name)
 }
@@ -8563,6 +8681,9 @@ func (m *OrderMutation) ResetEdge(name string) error {
 	switch name {
 	case order.EdgeTable:
 		m.ResetTable()
+		return nil
+	case order.EdgeSettlement:
+		m.ResetSettlement()
 		return nil
 	case order.EdgeItems:
 		m.ResetItems()
@@ -9750,6 +9871,1006 @@ func (m *OrderItemMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown OrderItem edge %s", name)
+}
+
+// SettlementMutation represents an operation that mutates the Settlement nodes in the graph.
+type SettlementMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *uint64
+	created_at       *time.Time
+	updated_at       *time.Time
+	delete_ts        *int64
+	adddelete_ts     *int64
+	customer_name    *string
+	status           *enum.SettlementStatus
+	total_amount     *int64
+	addtotal_amount  *int64
+	actual_amount    *int64
+	addactual_amount *int64
+	remark           *string
+	settled_at       *time.Time
+	clearedFields    map[string]struct{}
+	orders           map[uint64]struct{}
+	removedorders    map[uint64]struct{}
+	clearedorders    bool
+	done             bool
+	oldValue         func(context.Context) (*Settlement, error)
+	predicates       []predicate.Settlement
+}
+
+var _ ent.Mutation = (*SettlementMutation)(nil)
+
+// settlementOption allows management of the mutation configuration using functional options.
+type settlementOption func(*SettlementMutation)
+
+// newSettlementMutation creates new mutation for the Settlement entity.
+func newSettlementMutation(c config, op Op, opts ...settlementOption) *SettlementMutation {
+	m := &SettlementMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSettlement,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSettlementID sets the ID field of the mutation.
+func withSettlementID(id uint64) settlementOption {
+	return func(m *SettlementMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Settlement
+		)
+		m.oldValue = func(ctx context.Context) (*Settlement, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Settlement.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSettlement sets the old Settlement of the mutation.
+func withSettlement(node *Settlement) settlementOption {
+	return func(m *SettlementMutation) {
+		m.oldValue = func(context.Context) (*Settlement, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SettlementMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SettlementMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Settlement entities.
+func (m *SettlementMutation) SetID(id uint64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SettlementMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SettlementMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Settlement.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *SettlementMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *SettlementMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *SettlementMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *SettlementMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *SettlementMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *SettlementMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeleteTs sets the "delete_ts" field.
+func (m *SettlementMutation) SetDeleteTs(i int64) {
+	m.delete_ts = &i
+	m.adddelete_ts = nil
+}
+
+// DeleteTs returns the value of the "delete_ts" field in the mutation.
+func (m *SettlementMutation) DeleteTs() (r int64, exists bool) {
+	v := m.delete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTs returns the old "delete_ts" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldDeleteTs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTs: %w", err)
+	}
+	return oldValue.DeleteTs, nil
+}
+
+// AddDeleteTs adds i to the "delete_ts" field.
+func (m *SettlementMutation) AddDeleteTs(i int64) {
+	if m.adddelete_ts != nil {
+		*m.adddelete_ts += i
+	} else {
+		m.adddelete_ts = &i
+	}
+}
+
+// AddedDeleteTs returns the value that was added to the "delete_ts" field in this mutation.
+func (m *SettlementMutation) AddedDeleteTs() (r int64, exists bool) {
+	v := m.adddelete_ts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeleteTs resets all changes to the "delete_ts" field.
+func (m *SettlementMutation) ResetDeleteTs() {
+	m.delete_ts = nil
+	m.adddelete_ts = nil
+}
+
+// SetCustomerName sets the "customer_name" field.
+func (m *SettlementMutation) SetCustomerName(s string) {
+	m.customer_name = &s
+}
+
+// CustomerName returns the value of the "customer_name" field in the mutation.
+func (m *SettlementMutation) CustomerName() (r string, exists bool) {
+	v := m.customer_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCustomerName returns the old "customer_name" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldCustomerName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCustomerName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCustomerName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCustomerName: %w", err)
+	}
+	return oldValue.CustomerName, nil
+}
+
+// ResetCustomerName resets all changes to the "customer_name" field.
+func (m *SettlementMutation) ResetCustomerName() {
+	m.customer_name = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *SettlementMutation) SetStatus(es enum.SettlementStatus) {
+	m.status = &es
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *SettlementMutation) Status() (r enum.SettlementStatus, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldStatus(ctx context.Context) (v enum.SettlementStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *SettlementMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetTotalAmount sets the "total_amount" field.
+func (m *SettlementMutation) SetTotalAmount(i int64) {
+	m.total_amount = &i
+	m.addtotal_amount = nil
+}
+
+// TotalAmount returns the value of the "total_amount" field in the mutation.
+func (m *SettlementMutation) TotalAmount() (r int64, exists bool) {
+	v := m.total_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalAmount returns the old "total_amount" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldTotalAmount(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalAmount: %w", err)
+	}
+	return oldValue.TotalAmount, nil
+}
+
+// AddTotalAmount adds i to the "total_amount" field.
+func (m *SettlementMutation) AddTotalAmount(i int64) {
+	if m.addtotal_amount != nil {
+		*m.addtotal_amount += i
+	} else {
+		m.addtotal_amount = &i
+	}
+}
+
+// AddedTotalAmount returns the value that was added to the "total_amount" field in this mutation.
+func (m *SettlementMutation) AddedTotalAmount() (r int64, exists bool) {
+	v := m.addtotal_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalAmount resets all changes to the "total_amount" field.
+func (m *SettlementMutation) ResetTotalAmount() {
+	m.total_amount = nil
+	m.addtotal_amount = nil
+}
+
+// SetActualAmount sets the "actual_amount" field.
+func (m *SettlementMutation) SetActualAmount(i int64) {
+	m.actual_amount = &i
+	m.addactual_amount = nil
+}
+
+// ActualAmount returns the value of the "actual_amount" field in the mutation.
+func (m *SettlementMutation) ActualAmount() (r int64, exists bool) {
+	v := m.actual_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActualAmount returns the old "actual_amount" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldActualAmount(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActualAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActualAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActualAmount: %w", err)
+	}
+	return oldValue.ActualAmount, nil
+}
+
+// AddActualAmount adds i to the "actual_amount" field.
+func (m *SettlementMutation) AddActualAmount(i int64) {
+	if m.addactual_amount != nil {
+		*m.addactual_amount += i
+	} else {
+		m.addactual_amount = &i
+	}
+}
+
+// AddedActualAmount returns the value that was added to the "actual_amount" field in this mutation.
+func (m *SettlementMutation) AddedActualAmount() (r int64, exists bool) {
+	v := m.addactual_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetActualAmount resets all changes to the "actual_amount" field.
+func (m *SettlementMutation) ResetActualAmount() {
+	m.actual_amount = nil
+	m.addactual_amount = nil
+}
+
+// SetRemark sets the "remark" field.
+func (m *SettlementMutation) SetRemark(s string) {
+	m.remark = &s
+}
+
+// Remark returns the value of the "remark" field in the mutation.
+func (m *SettlementMutation) Remark() (r string, exists bool) {
+	v := m.remark
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemark returns the old "remark" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldRemark(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemark is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemark requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemark: %w", err)
+	}
+	return oldValue.Remark, nil
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (m *SettlementMutation) ClearRemark() {
+	m.remark = nil
+	m.clearedFields[settlement.FieldRemark] = struct{}{}
+}
+
+// RemarkCleared returns if the "remark" field was cleared in this mutation.
+func (m *SettlementMutation) RemarkCleared() bool {
+	_, ok := m.clearedFields[settlement.FieldRemark]
+	return ok
+}
+
+// ResetRemark resets all changes to the "remark" field.
+func (m *SettlementMutation) ResetRemark() {
+	m.remark = nil
+	delete(m.clearedFields, settlement.FieldRemark)
+}
+
+// SetSettledAt sets the "settled_at" field.
+func (m *SettlementMutation) SetSettledAt(t time.Time) {
+	m.settled_at = &t
+}
+
+// SettledAt returns the value of the "settled_at" field in the mutation.
+func (m *SettlementMutation) SettledAt() (r time.Time, exists bool) {
+	v := m.settled_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSettledAt returns the old "settled_at" field's value of the Settlement entity.
+// If the Settlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettlementMutation) OldSettledAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSettledAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSettledAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSettledAt: %w", err)
+	}
+	return oldValue.SettledAt, nil
+}
+
+// ClearSettledAt clears the value of the "settled_at" field.
+func (m *SettlementMutation) ClearSettledAt() {
+	m.settled_at = nil
+	m.clearedFields[settlement.FieldSettledAt] = struct{}{}
+}
+
+// SettledAtCleared returns if the "settled_at" field was cleared in this mutation.
+func (m *SettlementMutation) SettledAtCleared() bool {
+	_, ok := m.clearedFields[settlement.FieldSettledAt]
+	return ok
+}
+
+// ResetSettledAt resets all changes to the "settled_at" field.
+func (m *SettlementMutation) ResetSettledAt() {
+	m.settled_at = nil
+	delete(m.clearedFields, settlement.FieldSettledAt)
+}
+
+// AddOrderIDs adds the "orders" edge to the Order entity by ids.
+func (m *SettlementMutation) AddOrderIDs(ids ...uint64) {
+	if m.orders == nil {
+		m.orders = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.orders[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOrders clears the "orders" edge to the Order entity.
+func (m *SettlementMutation) ClearOrders() {
+	m.clearedorders = true
+}
+
+// OrdersCleared reports if the "orders" edge to the Order entity was cleared.
+func (m *SettlementMutation) OrdersCleared() bool {
+	return m.clearedorders
+}
+
+// RemoveOrderIDs removes the "orders" edge to the Order entity by IDs.
+func (m *SettlementMutation) RemoveOrderIDs(ids ...uint64) {
+	if m.removedorders == nil {
+		m.removedorders = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.orders, ids[i])
+		m.removedorders[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOrders returns the removed IDs of the "orders" edge to the Order entity.
+func (m *SettlementMutation) RemovedOrdersIDs() (ids []uint64) {
+	for id := range m.removedorders {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OrdersIDs returns the "orders" edge IDs in the mutation.
+func (m *SettlementMutation) OrdersIDs() (ids []uint64) {
+	for id := range m.orders {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOrders resets all changes to the "orders" edge.
+func (m *SettlementMutation) ResetOrders() {
+	m.orders = nil
+	m.clearedorders = false
+	m.removedorders = nil
+}
+
+// Where appends a list predicates to the SettlementMutation builder.
+func (m *SettlementMutation) Where(ps ...predicate.Settlement) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SettlementMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SettlementMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Settlement, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SettlementMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SettlementMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Settlement).
+func (m *SettlementMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SettlementMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.created_at != nil {
+		fields = append(fields, settlement.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, settlement.FieldUpdatedAt)
+	}
+	if m.delete_ts != nil {
+		fields = append(fields, settlement.FieldDeleteTs)
+	}
+	if m.customer_name != nil {
+		fields = append(fields, settlement.FieldCustomerName)
+	}
+	if m.status != nil {
+		fields = append(fields, settlement.FieldStatus)
+	}
+	if m.total_amount != nil {
+		fields = append(fields, settlement.FieldTotalAmount)
+	}
+	if m.actual_amount != nil {
+		fields = append(fields, settlement.FieldActualAmount)
+	}
+	if m.remark != nil {
+		fields = append(fields, settlement.FieldRemark)
+	}
+	if m.settled_at != nil {
+		fields = append(fields, settlement.FieldSettledAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SettlementMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case settlement.FieldCreatedAt:
+		return m.CreatedAt()
+	case settlement.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case settlement.FieldDeleteTs:
+		return m.DeleteTs()
+	case settlement.FieldCustomerName:
+		return m.CustomerName()
+	case settlement.FieldStatus:
+		return m.Status()
+	case settlement.FieldTotalAmount:
+		return m.TotalAmount()
+	case settlement.FieldActualAmount:
+		return m.ActualAmount()
+	case settlement.FieldRemark:
+		return m.Remark()
+	case settlement.FieldSettledAt:
+		return m.SettledAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SettlementMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case settlement.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case settlement.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case settlement.FieldDeleteTs:
+		return m.OldDeleteTs(ctx)
+	case settlement.FieldCustomerName:
+		return m.OldCustomerName(ctx)
+	case settlement.FieldStatus:
+		return m.OldStatus(ctx)
+	case settlement.FieldTotalAmount:
+		return m.OldTotalAmount(ctx)
+	case settlement.FieldActualAmount:
+		return m.OldActualAmount(ctx)
+	case settlement.FieldRemark:
+		return m.OldRemark(ctx)
+	case settlement.FieldSettledAt:
+		return m.OldSettledAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Settlement field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SettlementMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case settlement.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case settlement.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case settlement.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTs(v)
+		return nil
+	case settlement.FieldCustomerName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCustomerName(v)
+		return nil
+	case settlement.FieldStatus:
+		v, ok := value.(enum.SettlementStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case settlement.FieldTotalAmount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalAmount(v)
+		return nil
+	case settlement.FieldActualAmount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActualAmount(v)
+		return nil
+	case settlement.FieldRemark:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemark(v)
+		return nil
+	case settlement.FieldSettledAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSettledAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Settlement field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SettlementMutation) AddedFields() []string {
+	var fields []string
+	if m.adddelete_ts != nil {
+		fields = append(fields, settlement.FieldDeleteTs)
+	}
+	if m.addtotal_amount != nil {
+		fields = append(fields, settlement.FieldTotalAmount)
+	}
+	if m.addactual_amount != nil {
+		fields = append(fields, settlement.FieldActualAmount)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SettlementMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case settlement.FieldDeleteTs:
+		return m.AddedDeleteTs()
+	case settlement.FieldTotalAmount:
+		return m.AddedTotalAmount()
+	case settlement.FieldActualAmount:
+		return m.AddedActualAmount()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SettlementMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case settlement.FieldDeleteTs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeleteTs(v)
+		return nil
+	case settlement.FieldTotalAmount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalAmount(v)
+		return nil
+	case settlement.FieldActualAmount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddActualAmount(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Settlement numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SettlementMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(settlement.FieldRemark) {
+		fields = append(fields, settlement.FieldRemark)
+	}
+	if m.FieldCleared(settlement.FieldSettledAt) {
+		fields = append(fields, settlement.FieldSettledAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SettlementMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SettlementMutation) ClearField(name string) error {
+	switch name {
+	case settlement.FieldRemark:
+		m.ClearRemark()
+		return nil
+	case settlement.FieldSettledAt:
+		m.ClearSettledAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Settlement nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SettlementMutation) ResetField(name string) error {
+	switch name {
+	case settlement.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case settlement.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case settlement.FieldDeleteTs:
+		m.ResetDeleteTs()
+		return nil
+	case settlement.FieldCustomerName:
+		m.ResetCustomerName()
+		return nil
+	case settlement.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case settlement.FieldTotalAmount:
+		m.ResetTotalAmount()
+		return nil
+	case settlement.FieldActualAmount:
+		m.ResetActualAmount()
+		return nil
+	case settlement.FieldRemark:
+		m.ResetRemark()
+		return nil
+	case settlement.FieldSettledAt:
+		m.ResetSettledAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Settlement field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SettlementMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.orders != nil {
+		edges = append(edges, settlement.EdgeOrders)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SettlementMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case settlement.EdgeOrders:
+		ids := make([]ent.Value, 0, len(m.orders))
+		for id := range m.orders {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SettlementMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedorders != nil {
+		edges = append(edges, settlement.EdgeOrders)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SettlementMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case settlement.EdgeOrders:
+		ids := make([]ent.Value, 0, len(m.removedorders))
+		for id := range m.removedorders {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SettlementMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedorders {
+		edges = append(edges, settlement.EdgeOrders)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SettlementMutation) EdgeCleared(name string) bool {
+	switch name {
+	case settlement.EdgeOrders:
+		return m.clearedorders
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SettlementMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Settlement unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SettlementMutation) ResetEdge(name string) error {
+	switch name {
+	case settlement.EdgeOrders:
+		m.ResetOrders()
+		return nil
+	}
+	return fmt.Errorf("unknown Settlement edge %s", name)
 }
 
 // SpecGroupMutation represents an operation that mutates the SpecGroup nodes in the graph.

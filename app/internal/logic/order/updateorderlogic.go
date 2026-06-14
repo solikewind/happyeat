@@ -96,6 +96,7 @@ func (l *UpdateOrderLogic) UpdateOrder(req *types.UpdateOrderReq) (*types.Update
 	diff := DiffOrderItems(oldItems, newItems)
 	ApplyOrderItemsDisplaySort(l.ctx, l.svcCtx, updated)
 	scheduleKitchenPrintWithDiff(l.svcCtx, updated, "[改单重打]", diff)
+	_ = l.svcCtx.Settlement.RecalcTotalForOrder(l.ctx, req.Id)
 
 	return &types.UpdateOrderReply{Order: EntOrderToTypeForDisplay(l.ctx, l.svcCtx, updated)}, nil
 }

@@ -27,6 +27,9 @@ var ValidPermissions = map[string]struct{}{
 	"spec:view":            {},
 	"spec:edit":            {},
 	"stats:view":           {},
+	"settlements:view":     {},
+	"settlements:edit":     {},
+	"settlements:settle":   {},
 }
 
 // PermissionCatalog IAM 权限点种子（描述入库）。
@@ -54,6 +57,9 @@ var PermissionCatalog = []PermissionSpec{
 	{Code: "spec:view", Description: "查看规格模板"},
 	{Code: "spec:edit", Description: "编辑规格模板"},
 	{Code: "stats:view", Description: "查看经营统计"},
+	{Code: "settlements:view", Description: "查看结账单"},
+	{Code: "settlements:edit", Description: "创建结账单及管理订单"},
+	{Code: "settlements:settle", Description: "结账单结账"},
 }
 
 // PermissionRules 权限码 -> HTTP 资源点（与 Casbin 中间件 obj/act 一致）。
@@ -148,6 +154,18 @@ var PermissionRules = map[string][]PolicyRule{
 		{Obj: "/central/v1/stats/daily", Act: "GET"},
 		{Obj: "/central/v1/stats/daily/overview", Act: "GET"},
 		{Obj: "/central/v1/stats/menus", Act: "GET"},
+	},
+	"settlements:view": {
+		{Obj: "/central/v1/settlements", Act: "GET"},
+		{Obj: "/central/v1/settlement/:id", Act: "GET"},
+	},
+	"settlements:edit": {
+		{Obj: "/central/v1/settlements", Act: "POST"},
+		{Obj: "/central/v1/settlement/:id/orders", Act: "POST"},
+		{Obj: "/central/v1/settlement/:id/orders/:order_id", Act: "DELETE"},
+	},
+	"settlements:settle": {
+		{Obj: "/central/v1/settlement/:id/settle", Act: "POST"},
 	},
 }
 
