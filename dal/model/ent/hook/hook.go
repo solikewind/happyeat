@@ -129,6 +129,18 @@ func (f OrderItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderItemMutation", m)
 }
 
+// The SettlementFunc type is an adapter to allow the use of ordinary
+// function as Settlement mutator.
+type SettlementFunc func(context.Context, *ent.SettlementMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SettlementFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SettlementMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SettlementMutation", m)
+}
+
 // The SpecGroupFunc type is an adapter to allow the use of ordinary
 // function as SpecGroup mutator.
 type SpecGroupFunc func(context.Context, *ent.SpecGroupMutation) (ent.Value, error)

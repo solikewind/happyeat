@@ -3,6 +3,15 @@
 
 package types
 
+type AddSettlementOrderReply struct {
+	Settlement Settlement `json:"settlement"`
+}
+
+type AddSettlementOrderReq struct {
+	Id      uint64 `path:"id"`
+	OrderId uint64 `json:"order_id,string"`
+}
+
 type AssignIAMUserRoleReply struct {
 }
 
@@ -97,6 +106,15 @@ type CreateOrderReq struct {
 	TotalAmount  int64                `json:"total_amount"`
 	ActualAmount int64                `json:"actual_amount,optional"` // 实收（分）；不传默认 0
 	Remark       string               `json:"remark,optional"`
+}
+
+type CreateSettlementReply struct {
+	Settlement Settlement `json:"settlement"`
+}
+
+type CreateSettlementReq struct {
+	CustomerName string `json:"customer_name"`
+	Remark       string `json:"remark,optional"`
 }
 
 type CreateSpecGroupReply struct {
@@ -306,6 +324,14 @@ type GetRolePermissionReq struct {
 	Role string `path:"role"`
 }
 
+type GetSettlementReply struct {
+	Settlement Settlement `json:"settlement"`
+}
+
+type GetSettlementReq struct {
+	Id uint64 `path:"id"`
+}
+
 type GetSpecGroupReply struct {
 	Group SpecGroup `json:"group"`
 }
@@ -453,6 +479,17 @@ type ListRolePermissionReply struct {
 	Roles []RolePermission `json:"roles"`
 }
 
+type ListSettlementReply struct {
+	Settlements []Settlement `json:"settlements"`
+	Total       int64        `json:"total"`
+}
+
+type ListSettlementReq struct {
+	PageInfo
+	Status       string `json:"status,optional" form:"status,optional"` // UNSETTLED | SETTLED
+	CustomerName string `json:"customer_name,optional" form:"customer_name,optional"`
+}
+
 type ListSpecGroupReply struct {
 	Groups []SpecGroup `json:"groups"`
 	Total  int64       `json:"total"`
@@ -578,19 +615,20 @@ type Object struct {
 }
 
 type Order struct {
-	Id            uint64      `json:"id,string"`                // 订单id
-	OrderNo       string      `json:"order_no"`                 // 订单号
-	OrderType     string      `json:"order_type"`               // dine_in=堂食 takeaway=打包外带
-	Status        string      `json:"status"`                   // CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）
-	TotalAmount   int64       `json:"total_amount"`             // 总金额（分，应收）
-	ActualAmount  int64       `json:"actual_amount"`            // 实收金额（分）
-	TableId       uint64      `json:"table_id,optional,string"` // 堂食时关联餐桌id
-	TableCode     string      `json:"table_code,optional"`      // 桌号（堂食时显示，外带为空）
-	TableCategory string      `json:"table_category,optional"`  // 餐桌类别（如大厅、包间）
-	Remark        string      `json:"remark,optional"`          // 备注
-	Items         []OrderItem `json:"items,optional"`           // 订单明细
-	CreatedAt     string      `json:"created_at"`               // 创建时间
-	UpdatedAt     string      `json:"updated_at"`               // 更新时间
+	Id            uint64      `json:"id,string"`                     // 订单id
+	OrderNo       string      `json:"order_no"`                      // 订单号
+	OrderType     string      `json:"order_type"`                    // dine_in=堂食 takeaway=打包外带
+	Status        string      `json:"status"`                        // CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）
+	TotalAmount   int64       `json:"total_amount"`                  // 总金额（分，应收）
+	ActualAmount  int64       `json:"actual_amount"`                 // 实收金额（分）
+	TableId       uint64      `json:"table_id,optional,string"`      // 堂食时关联餐桌id
+	TableCode     string      `json:"table_code,optional"`           // 桌号（堂食时显示，外带为空）
+	TableCategory string      `json:"table_category,optional"`       // 餐桌类别（如大厅、包间）
+	Remark        string      `json:"remark,optional"`               // 备注
+	SettlementId  *uint64     `json:"settlement_id,omitempty,string"` // 所属结账单
+	Items         []OrderItem `json:"items,optional"`                // 订单明细
+	CreatedAt     string      `json:"created_at"`                    // 创建时间
+	UpdatedAt     string      `json:"updated_at"`                    // 更新时间
 }
 
 type OrderItem struct {
@@ -639,6 +677,15 @@ type RemoveIAMUserRoleReq struct {
 	RoleCode string `json:"role_code,optional" form:"role_code"`
 }
 
+type RemoveSettlementOrderReply struct {
+	Settlement Settlement `json:"settlement"`
+}
+
+type RemoveSettlementOrderReq struct {
+	Id      uint64 `path:"id"`
+	OrderId uint64 `path:"order_id"`
+}
+
 type ResetRolePermissionsReply struct {
 }
 
@@ -649,6 +696,30 @@ type ResetRolePermissionsReq struct {
 type RolePermission struct {
 	Role        string   `json:"role"`
 	Permissions []string `json:"permissions"`
+}
+
+type SettleSettlementReply struct {
+	Settlement Settlement `json:"settlement"`
+}
+
+type SettleSettlementReq struct {
+	Id           uint64 `path:"id"`
+	ActualAmount int64  `json:"actual_amount"` // 实收合计（分）
+	Remark       string `json:"remark,optional"`
+}
+
+type Settlement struct {
+	Id           uint64  `json:"id,string"`
+	CustomerName string  `json:"customer_name"` // 客户名
+	Status       string  `json:"status"`        // UNSETTLED=未结账 SETTLED=已结账
+	TotalAmount  int64   `json:"total_amount"`  // 应收合计（分）
+	ActualAmount int64   `json:"actual_amount"` // 实收合计（分，结账后有效）
+	Remark       string  `json:"remark,optional"`
+	OrderCount   int     `json:"order_count,optional"`
+	SettledAt    string  `json:"settled_at,optional"`
+	CreatedAt    string  `json:"created_at"`
+	UpdatedAt    string  `json:"updated_at"`
+	Orders       []Order `json:"orders,optional"`
 }
 
 type SpecGroup struct {

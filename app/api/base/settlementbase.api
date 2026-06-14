@@ -1,0 +1,15 @@
+syntax = "v1"
+
+type Settlement {
+	Id            uint64  `json:"id,string"`
+	CustomerName  string  `json:"customer_name"`  // 客户名
+	Status        string  `json:"status"`         // UNSETTLED=未结账 SETTLED=已结账
+	TotalAmount   int64   `json:"total_amount"`   // 应收合计（分）
+	ActualAmount  int64   `json:"actual_amount"`  // 实收合计（分，结账后有效）
+	Remark        string  `json:"remark,optional"`
+	OrderCount    int     `json:"order_count,optional"`
+	SettledAt     string  `json:"settled_at,optional"`
+	CreatedAt     string  `json:"created_at"`
+	UpdatedAt     string  `json:"updated_at"`
+	Orders        []Order `json:"orders,optional"`
+}

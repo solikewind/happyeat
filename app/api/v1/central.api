@@ -20,6 +20,7 @@ import "rbactypes.api"
 import "iamtypes.api"
 import "storagetypes.api"
 import "statstypes.api"
+import "settlementtypes.api"
 
 // 登录接口（无需 JWT），获取 token 后用于其他接口的 Authorization: Bearer <token>
 @server (
@@ -408,5 +409,39 @@ service HappyEatService {
 	@doc "按日期区间查询菜品销量明细（聚合多日后按菜品+规格汇总）"
 	@handler ListMenuStats
 	get /stats/menus (ListMenuStatsReq) returns (ListMenuStatsReply)
+}
+
+@server (
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      settlement
+	timeout:    10s
+)
+service HappyEatService {
+	@doc "列出结账单"
+	@handler ListSettlement
+	get /settlements (ListSettlementReq) returns (ListSettlementReply)
+
+	@doc "获取结账单详情（含关联订单）"
+	@handler GetSettlement
+	get /settlement/:id (GetSettlementReq) returns (GetSettlementReply)
+
+	@doc "创建结账单（同一客户仅允许一张未结账）"
+	@handler CreateSettlement
+	post /settlements (CreateSettlementReq) returns (CreateSettlementReply)
+
+	@doc "将订单加入结账单（任意订单状态，已取消除外）"
+	@handler AddSettlementOrder
+	post /settlement/:id/orders (AddSettlementOrderReq) returns (AddSettlementOrderReply)
+
+	@doc "从结账单移除订单（仅未结账）"
+	@handler RemoveSettlementOrder
+	delete /settlement/:id/orders/:order_id (RemoveSettlementOrderReq) returns (RemoveSettlementOrderReply)
+
+	@doc "结账单结账（未结账 → 已结账）"
+	@handler SettleSettlement
+	post /settlement/:id/settle (SettleSettlementReq) returns (SettleSettlementReply)
 }
 

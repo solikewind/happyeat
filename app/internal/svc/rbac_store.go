@@ -580,7 +580,7 @@ func defaultRolePermissions() map[string][]string {
 	return map[string][]string{
 		"super_admin": append([]string{}, all...),
 		"manager":     append([]string{}, all...),
-		"cashier":     {"home:view", "orders:view", "orders:create", "orders:print_kitchen", "order_desk:view", "order_desk:create", "stats:view", "spec:view"},
+		"cashier":     {"home:view", "orders:view", "orders:create", "orders:print_kitchen", "order_desk:view", "order_desk:create", "stats:view", "spec:view", "settlements:view", "settlements:edit", "settlements:settle"},
 		"kitchen":     {"home:view", "workbench:view", "workbench:complete", "orders:view", "orders:print_kitchen", "spec:view"},
 		"waiter":      {"home:view", "orders:view", "orders:print_kitchen", "order_desk:view", "order_desk:create", "table:view", "spec:view"},
 		"unknown":     {},

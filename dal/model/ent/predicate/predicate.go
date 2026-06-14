@@ -36,6 +36,9 @@ type Order func(*sql.Selector)
 // OrderItem is the predicate function for orderitem builders.
 type OrderItem func(*sql.Selector)
 
+// Settlement is the predicate function for settlement builders.
+type Settlement func(*sql.Selector)
+
 // SpecGroup is the predicate function for specgroup builders.
 type SpecGroup func(*sql.Selector)
 

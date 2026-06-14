@@ -32,6 +32,8 @@ type Tx struct {
 	Order *OrderClient
 	// OrderItem is the client for interacting with the OrderItem builders.
 	OrderItem *OrderItemClient
+	// Settlement is the client for interacting with the Settlement builders.
+	Settlement *SettlementClient
 	// SpecGroup is the client for interacting with the SpecGroup builders.
 	SpecGroup *SpecGroupClient
 	// SpecItem is the client for interacting with the SpecItem builders.
@@ -181,6 +183,7 @@ func (tx *Tx) init() {
 	tx.Object = NewObjectClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
 	tx.OrderItem = NewOrderItemClient(tx.config)
+	tx.Settlement = NewSettlementClient(tx.config)
 	tx.SpecGroup = NewSpecGroupClient(tx.config)
 	tx.SpecItem = NewSpecItemClient(tx.config)
 	tx.Table = NewTableClient(tx.config)

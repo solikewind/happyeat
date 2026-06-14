@@ -15,18 +15,20 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 )
 
 // OrderQuery is the builder for querying Order entities.
 type OrderQuery struct {
 	config
-	ctx        *QueryContext
-	order      []order.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Order
-	withTable  *TableQuery
-	withItems  *OrderItemQuery
+	ctx            *QueryContext
+	order          []order.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Order
+	withTable      *TableQuery
+	withSettlement *SettlementQuery
+	withItems      *OrderItemQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,6 +80,28 @@ func (_q *OrderQuery) QueryTable() *TableQuery {
 			sqlgraph.From(order.Table, order.FieldID, selector),
 			sqlgraph.To(table.Table, table.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, order.TableTable, order.TableColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySettlement chains the current query on the "settlement" edge.
+func (_q *OrderQuery) QuerySettlement() *SettlementQuery {
+	query := (&SettlementClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(order.Table, order.FieldID, selector),
+			sqlgraph.To(settlement.Table, settlement.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, order.SettlementTable, order.SettlementColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -294,13 +318,14 @@ func (_q *OrderQuery) Clone() *OrderQuery {
 		return nil
 	}
 	return &OrderQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]order.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.Order{}, _q.predicates...),
-		withTable:  _q.withTable.Clone(),
-		withItems:  _q.withItems.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]order.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.Order{}, _q.predicates...),
+		withTable:      _q.withTable.Clone(),
+		withSettlement: _q.withSettlement.Clone(),
+		withItems:      _q.withItems.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -315,6 +340,17 @@ func (_q *OrderQuery) WithTable(opts ...func(*TableQuery)) *OrderQuery {
 		opt(query)
 	}
 	_q.withTable = query
+	return _q
+}
+
+// WithSettlement tells the query-builder to eager-load the nodes that are connected to
+// the "settlement" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *OrderQuery) WithSettlement(opts ...func(*SettlementQuery)) *OrderQuery {
+	query := (&SettlementClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSettlement = query
 	return _q
 }
 
@@ -407,8 +443,9 @@ func (_q *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	var (
 		nodes       = []*Order{}
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withTable != nil,
+			_q.withSettlement != nil,
 			_q.withItems != nil,
 		}
 	)
@@ -433,6 +470,12 @@ func (_q *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	if query := _q.withTable; query != nil {
 		if err := _q.loadTable(ctx, query, nodes, nil,
 			func(n *Order, e *Table) { n.Edges.Table = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withSettlement; query != nil {
+		if err := _q.loadSettlement(ctx, query, nodes, nil,
+			func(n *Order, e *Settlement) { n.Edges.Settlement = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -471,6 +514,38 @@ func (_q *OrderQuery) loadTable(ctx context.Context, query *TableQuery, nodes []
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "table_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *OrderQuery) loadSettlement(ctx context.Context, query *SettlementQuery, nodes []*Order, init func(*Order), assign func(*Order, *Settlement)) error {
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*Order)
+	for i := range nodes {
+		if nodes[i].SettlementID == nil {
+			continue
+		}
+		fk := *nodes[i].SettlementID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(settlement.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "settlement_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -536,6 +611,9 @@ func (_q *OrderQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withTable != nil {
 			_spec.Node.AddColumnOnce(order.FieldTableID)
+		}
+		if _q.withSettlement != nil {
+			_spec.Node.AddColumnOnce(order.FieldSettlementID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

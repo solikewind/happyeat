@@ -54,6 +54,10 @@ func EntOrderToType(e *ent.Order) types.Order {
 	if e.Remark != nil {
 		out.Remark = *e.Remark
 	}
+	if e.SettlementID != nil && *e.SettlementID > 0 {
+		sid := *e.SettlementID
+		out.SettlementId = &sid
+	}
 
 	tbl, _ := e.Edges.TableOrErr()
 	if tbl != nil {

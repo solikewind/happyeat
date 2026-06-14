@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent/order"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
 )
 
@@ -40,6 +41,8 @@ type Order struct {
 	ActualAmount int64 `json:"actual_amount,omitempty"`
 	// 备注
 	Remark *string `json:"remark,omitempty"`
+	// 结账单ID
+	SettlementID *uint64 `json:"settlement_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderQuery when eager-loading is set.
 	Edges        OrderEdges `json:"edges"`
@@ -50,11 +53,13 @@ type Order struct {
 type OrderEdges struct {
 	// 堂食时关联餐桌，外带为空
 	Table *Table `json:"table,omitempty"`
+	// 所属结账单，可空
+	Settlement *Settlement `json:"settlement,omitempty"`
 	// Items holds the value of the items edge.
 	Items []*OrderItem `json:"items,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // TableOrErr returns the Table value or an error if the edge
@@ -68,10 +73,21 @@ func (e OrderEdges) TableOrErr() (*Table, error) {
 	return nil, &NotLoadedError{edge: "table"}
 }
 
+// SettlementOrErr returns the Settlement value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e OrderEdges) SettlementOrErr() (*Settlement, error) {
+	if e.Settlement != nil {
+		return e.Settlement, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: settlement.Label}
+	}
+	return nil, &NotLoadedError{edge: "settlement"}
+}
+
 // ItemsOrErr returns the Items value or an error if the edge
 // was not loaded in eager-loading.
 func (e OrderEdges) ItemsOrErr() ([]*OrderItem, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Items, nil
 	}
 	return nil, &NotLoadedError{edge: "items"}
@@ -86,7 +102,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 			values[i] = new(enum.OrderStatus)
 		case order.FieldOrderType:
 			values[i] = new(enum.OrderType)
-		case order.FieldID, order.FieldDeleteTs, order.FieldTableID, order.FieldTotalAmount, order.FieldActualAmount:
+		case order.FieldID, order.FieldDeleteTs, order.FieldTableID, order.FieldTotalAmount, order.FieldActualAmount, order.FieldSettlementID:
 			values[i] = new(sql.NullInt64)
 		case order.FieldOrderNo, order.FieldRemark:
 			values[i] = new(sql.NullString)
@@ -175,6 +191,13 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 				_m.Remark = new(string)
 				*_m.Remark = value.String
 			}
+		case order.FieldSettlementID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field settlement_id", values[i])
+			} else if value.Valid {
+				_m.SettlementID = new(uint64)
+				*_m.SettlementID = uint64(value.Int64)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -191,6 +214,11 @@ func (_m *Order) Value(name string) (ent.Value, error) {
 // QueryTable queries the "table" edge of the Order entity.
 func (_m *Order) QueryTable() *TableQuery {
 	return NewOrderClient(_m.config).QueryTable(_m)
+}
+
+// QuerySettlement queries the "settlement" edge of the Order entity.
+func (_m *Order) QuerySettlement() *SettlementQuery {
+	return NewOrderClient(_m.config).QuerySettlement(_m)
 }
 
 // QueryItems queries the "items" edge of the Order entity.
@@ -253,6 +281,11 @@ func (_m *Order) String() string {
 	if v := _m.Remark; v != nil {
 		builder.WriteString("remark=")
 		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.SettlementID; v != nil {
+		builder.WriteString("settlement_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteByte(')')
 	return builder.String()

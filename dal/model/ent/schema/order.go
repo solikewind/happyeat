@@ -63,6 +63,10 @@ func (Order) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("备注"),
+		field.Uint64("settlement_id").
+			Optional().
+			Nillable().
+			Comment("结账单ID"),
 	}
 }
 
@@ -73,6 +77,11 @@ func (Order) Edges() []ent.Edge {
 			Field("table_id").
 			Unique().
 			Comment("堂食时关联餐桌，外带为空"),
+		edge.From("settlement", Settlement.Type).
+			Ref("orders").
+			Field("settlement_id").
+			Unique().
+			Comment("所属结账单，可空"),
 		edge.To("items", OrderItem.Type),
 	}
 }

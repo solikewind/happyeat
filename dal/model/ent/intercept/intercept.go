@@ -19,6 +19,7 @@ import (
 	"github.com/solikewind/happyeat/dal/model/ent/order"
 	"github.com/solikewind/happyeat/dal/model/ent/orderitem"
 	"github.com/solikewind/happyeat/dal/model/ent/predicate"
+	"github.com/solikewind/happyeat/dal/model/ent/settlement"
 	"github.com/solikewind/happyeat/dal/model/ent/specgroup"
 	"github.com/solikewind/happyeat/dal/model/ent/specitem"
 	"github.com/solikewind/happyeat/dal/model/ent/table"
@@ -351,6 +352,33 @@ func (f TraverseOrderItem) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.OrderItemQuery", q)
 }
 
+// The SettlementFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SettlementFunc func(context.Context, *ent.SettlementQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SettlementFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SettlementQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SettlementQuery", q)
+}
+
+// The TraverseSettlement type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSettlement func(context.Context, *ent.SettlementQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSettlement) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSettlement) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SettlementQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SettlementQuery", q)
+}
+
 // The SpecGroupFunc type is an adapter to allow the use of ordinary function as a Querier.
 type SpecGroupFunc func(context.Context, *ent.SpecGroupQuery) (ent.Value, error)
 
@@ -482,6 +510,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.OrderQuery, predicate.Order, order.OrderOption]{typ: ent.TypeOrder, tq: q}, nil
 	case *ent.OrderItemQuery:
 		return &query[*ent.OrderItemQuery, predicate.OrderItem, orderitem.OrderOption]{typ: ent.TypeOrderItem, tq: q}, nil
+	case *ent.SettlementQuery:
+		return &query[*ent.SettlementQuery, predicate.Settlement, settlement.OrderOption]{typ: ent.TypeSettlement, tq: q}, nil
 	case *ent.SpecGroupQuery:
 		return &query[*ent.SpecGroupQuery, predicate.SpecGroup, specgroup.OrderOption]{typ: ent.TypeSpecGroup, tq: q}, nil
 	case *ent.SpecItemQuery:

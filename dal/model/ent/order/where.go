@@ -96,6 +96,11 @@ func Remark(v string) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldRemark, v))
 }
 
+// SettlementID applies equality check predicate on the "settlement_id" field. It's identical to SettlementIDEQ.
+func SettlementID(v uint64) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldSettlementID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldCreatedAt, v))
@@ -506,6 +511,36 @@ func RemarkContainsFold(v string) predicate.Order {
 	return predicate.Order(sql.FieldContainsFold(FieldRemark, v))
 }
 
+// SettlementIDEQ applies the EQ predicate on the "settlement_id" field.
+func SettlementIDEQ(v uint64) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldSettlementID, v))
+}
+
+// SettlementIDNEQ applies the NEQ predicate on the "settlement_id" field.
+func SettlementIDNEQ(v uint64) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldSettlementID, v))
+}
+
+// SettlementIDIn applies the In predicate on the "settlement_id" field.
+func SettlementIDIn(vs ...uint64) predicate.Order {
+	return predicate.Order(sql.FieldIn(FieldSettlementID, vs...))
+}
+
+// SettlementIDNotIn applies the NotIn predicate on the "settlement_id" field.
+func SettlementIDNotIn(vs ...uint64) predicate.Order {
+	return predicate.Order(sql.FieldNotIn(FieldSettlementID, vs...))
+}
+
+// SettlementIDIsNil applies the IsNil predicate on the "settlement_id" field.
+func SettlementIDIsNil() predicate.Order {
+	return predicate.Order(sql.FieldIsNull(FieldSettlementID))
+}
+
+// SettlementIDNotNil applies the NotNil predicate on the "settlement_id" field.
+func SettlementIDNotNil() predicate.Order {
+	return predicate.Order(sql.FieldNotNull(FieldSettlementID))
+}
+
 // HasTable applies the HasEdge predicate on the "table" edge.
 func HasTable() predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
@@ -521,6 +556,29 @@ func HasTable() predicate.Order {
 func HasTableWith(preds ...predicate.Table) predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {
 		step := newTableStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSettlement applies the HasEdge predicate on the "settlement" edge.
+func HasSettlement() predicate.Order {
+	return predicate.Order(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SettlementTable, SettlementColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSettlementWith applies the HasEdge predicate on the "settlement" edge with a given conditions (other predicates).
+func HasSettlementWith(preds ...predicate.Settlement) predicate.Order {
+	return predicate.Order(func(s *sql.Selector) {
+		step := newSettlementStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
