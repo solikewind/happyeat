@@ -26,6 +26,7 @@ var ValidPermissions = map[string]struct{}{
 	"table:edit":           {},
 	"spec:view":            {},
 	"spec:edit":            {},
+	"stats:view":           {},
 }
 
 // PermissionCatalog IAM 权限点种子（描述入库）。
@@ -52,6 +53,7 @@ var PermissionCatalog = []PermissionSpec{
 	{Code: "table:edit", Description: "编辑餐桌"},
 	{Code: "spec:view", Description: "查看规格模板"},
 	{Code: "spec:edit", Description: "编辑规格模板"},
+	{Code: "stats:view", Description: "查看经营统计"},
 }
 
 // PermissionRules 权限码 -> HTTP 资源点（与 Casbin 中间件 obj/act 一致）。
@@ -141,6 +143,11 @@ var PermissionRules = map[string][]PolicyRule{
 		{Obj: "/central/v1/spec/item", Act: "POST"},
 		{Obj: "/central/v1/spec/item/:id", Act: "PUT"},
 		{Obj: "/central/v1/spec/item/:id", Act: "DELETE"},
+	},
+	"stats:view": {
+		{Obj: "/central/v1/stats/daily", Act: "GET"},
+		{Obj: "/central/v1/stats/daily/overview", Act: "GET"},
+		{Obj: "/central/v1/stats/menus", Act: "GET"},
 	},
 }
 

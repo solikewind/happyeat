@@ -61,7 +61,7 @@ type CreateMenuCategoryReq struct {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
 	Sort        uint32 `json:"sort,optional"`
-	Kind        string `json:"kind,optional"`
+	Kind        string `json:"kind,optional"` // dish | drink，默认 dish
 }
 
 type CreateMenuReply struct {
@@ -136,6 +136,23 @@ type CreateTableReq struct {
 	CategoryId uint64 `json:"category_id,string"`
 	Sort       uint32 `json:"sort,optional"`
 	QrCode     string `json:"qr_code,optional"`
+}
+
+type DailyStatsPoint struct {
+	Date          string `json:"date"` // YYYY-MM-DD
+	OrderCount    int    `json:"order_count"`
+	Revenue       int64  `json:"revenue"` // 分
+	ItemCount     int    `json:"item_count"`
+	DineInCount   int    `json:"dine_in_count,optional"`
+	TakeawayCount int    `json:"takeaway_count,optional"`
+}
+
+type DailyStatsSummary struct {
+	OrderCount    int   `json:"order_count"`
+	Revenue       int64 `json:"revenue"`
+	ItemCount     int   `json:"item_count"`
+	DineInCount   int   `json:"dine_in_count,optional"`
+	TakeawayCount int   `json:"takeaway_count,optional"`
 }
 
 type DeleteCategorySpecReply struct {
@@ -345,6 +362,16 @@ type ListCategorySpecReq struct {
 	SpecType   string `json:"spec_type,optional" form:"spec_type,optional"`
 }
 
+type ListDailyStatsReply struct {
+	Daily   []DailyStatsPoint `json:"daily"`
+	Summary DailyStatsSummary `json:"summary"`
+}
+
+type ListDailyStatsReq struct {
+	StartDate string `json:"start_date,optional" form:"start_date,optional"` // YYYY-MM-DD，缺省为今天
+	EndDate   string `json:"end_date,optional" form:"end_date,optional"`     // YYYY-MM-DD，缺省等于 start_date
+}
+
 type ListIAMPermissionsReply struct {
 	Permissions []PermissionItem `json:"permissions"`
 	Total       int64            `json:"total"`
@@ -395,6 +422,15 @@ type ListMenuReq struct {
 	Name       string `json:"name,optional" form:"name,optional"`
 	CategoryId uint64 `json:"category_id,optional,string" form:"category_id,optional"` // 按分类id筛选
 	Category   string `json:"category,optional" form:"category,optional"`              // 按分类名字筛选
+}
+
+type ListMenuStatsReply struct {
+	Rows []MenuStatsRow `json:"rows"`
+}
+
+type ListMenuStatsReq struct {
+	StartDate string `json:"start_date,optional" form:"start_date,optional"`
+	EndDate   string `json:"end_date,optional" form:"end_date,optional"`
 }
 
 type ListOrderReply struct {
@@ -506,7 +542,7 @@ type MenuCategory struct {
 	Name        string `json:"name"`                 // 分类名称
 	Description string `json:"description,optional"` // 描述
 	Sort        uint32 `json:"sort,optional"`        // 排序，越小越靠前
-	Kind        string `json:"kind,optional"`        // dish=菜品 drink=酒水饮料
+	Kind        string `json:"kind,optional"`        // dish=菜品 drink=酒水饮料（订单展示/打印时靠后）
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }
@@ -519,6 +555,13 @@ type MenuSpec struct {
 	SpecValue      string `json:"spec_value,optional"`              // 规格值，如微辣
 	PriceDelta     int64  `json:"price_delta"`                      // 加价
 	Sort           uint32 `json:"sort,optional"`                    // 排序（不传默认0）
+}
+
+type MenuStatsRow struct {
+	MenuName string `json:"menu_name"`
+	SpecInfo string `json:"spec_info,optional"`
+	Quantity int    `json:"quantity"`
+	Amount   int64  `json:"amount"` // 分
 }
 
 type Object struct {
@@ -552,11 +595,11 @@ type Order struct {
 
 type OrderItem struct {
 	MenuId    uint64 `json:"menu_id,optional,string"` // 菜单id（用于展示排序）
-	MenuName  string `json:"menu_name"`          // 菜品名称快照
-	Quantity  int    `json:"quantity"`           // 数量
-	UnitPrice int64  `json:"unit_price"`         // 单价
-	Amount    int64  `json:"amount"`             // 小计
-	SpecInfo  string `json:"spec_info,optional"` // 规格描述快照
+	MenuName  string `json:"menu_name"`               // 菜品名称快照
+	Quantity  int    `json:"quantity"`                // 数量
+	UnitPrice int64  `json:"unit_price"`              // 单价
+	Amount    int64  `json:"amount"`                  // 小计
+	SpecInfo  string `json:"spec_info,optional"`      // 规格描述快照
 }
 
 type PageInfo struct {
@@ -688,7 +731,7 @@ type UpdateMenuCategoryReq struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Sort        uint32 `json:"sort"`
-	Kind        string `json:"kind,optional"`
+	Kind        string `json:"kind,optional"` // dish | drink
 }
 
 type UpdateMenuReply struct {

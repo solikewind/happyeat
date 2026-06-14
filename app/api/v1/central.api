@@ -19,6 +19,7 @@ import "authtypes.api"
 import "rbactypes.api"
 import "iamtypes.api"
 import "storagetypes.api"
+import "statstypes.api"
 
 // 登录接口（无需 JWT），获取 token 后用于其他接口的 Authorization: Bearer <token>
 @server (
@@ -385,5 +386,27 @@ service HappyEatService {
 	@doc "移除用户的某个角色；使用 query：?user_code=&role_code="
 	@handler RemoveIAMUserRole
 	delete /iam/user-roles (RemoveIAMUserRoleReq) returns (RemoveIAMUserRoleReply)
+}
+
+@server (
+	jwt:        Auth
+	authType:   Bearer
+	middleware: CasbinMiddleware
+	prefix:     /central/v1
+	group:      stats
+	timeout:    5s
+)
+service HappyEatService {
+	@doc "按日期区间查询日汇总（start_date/end_date 格式 YYYY-MM-DD；均可缺省为今天；可查近3/7/30天等）"
+	@handler ListDailyStats
+	get /stats/daily (ListDailyStatsReq) returns (ListDailyStatsReply)
+
+	@doc "今日经营概览（等价于 start_date=end_date=今天）"
+	@handler GetDailyStatsOverview
+	get /stats/daily/overview returns (ListDailyStatsReply)
+
+	@doc "按日期区间查询菜品销量明细（聚合多日后按菜品+规格汇总）"
+	@handler ListMenuStats
+	get /stats/menus (ListMenuStatsReq) returns (ListMenuStatsReply)
 }
 
