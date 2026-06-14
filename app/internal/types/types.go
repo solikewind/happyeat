@@ -469,6 +469,7 @@ type ListOrderReq struct {
 	Status    string `json:"status,optional" form:"status,optional"`
 	OrderType string `json:"order_type,optional" form:"order_type,optional"`    // dine_in | takeaway
 	TableId   uint64 `json:"table_id,optional,string" form:"table_id,optional"` // 按餐桌筛选
+	OrderNo   string `json:"order_no,optional" form:"order_no,optional"`        // 订单号模糊搜索
 }
 
 type ListPermissionCatalogReply struct {

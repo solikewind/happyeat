@@ -148,6 +148,7 @@ type ListOrdersFilter struct {
 	Statuses  []enum.OrderStatus // 多状态（与 Status 二选一，Statuses 优先）
 	OrderType enum.OrderType
 	TableID   *uint64
+	OrderNo   string // 订单号模糊搜索
 	Offset    int
 	Limit     int
 }
@@ -167,6 +168,9 @@ func (o *Order) List(ctx context.Context, f ListOrdersFilter) ([]*ent.Order, int
 	}
 	if f.TableID != nil && *f.TableID > 0 {
 		q = q.Where(entorder.HasTableWith(enttable.IDEQ(*f.TableID)))
+	}
+	if f.OrderNo != "" {
+		q = q.Where(entorder.OrderNoContainsFold(f.OrderNo))
 	}
 
 	total, err := q.Clone().Count(ctx)
