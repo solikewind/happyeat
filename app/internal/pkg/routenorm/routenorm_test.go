@@ -12,6 +12,7 @@ func TestEnforceObj(t *testing.T) {
 		{"/central/v1/order/42/status", "/central/v1/order/:id/status"},
 		{"/central/v1/order/42", "/central/v1/order/:id"},
 		{"/central/v1/menu/550e8400-e29b-41d4-a716-446655440000", "/central/v1/menu/:id"},
+		{"/central/v1/settlement/624158364003205378/orders/622363521614610696", "/central/v1/settlement/:id/orders/:id"},
 		{"/central/v1/iam/permissions", "/central/v1/iam/permissions"},
 	}
 	for _, tt := range tests {

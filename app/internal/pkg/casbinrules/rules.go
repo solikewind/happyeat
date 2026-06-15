@@ -161,8 +161,9 @@ var PermissionRules = map[string][]PolicyRule{
 	},
 	"settlements:edit": {
 		{Obj: "/central/v1/settlements", Act: "POST"},
+		{Obj: "/central/v1/settlement/:id", Act: "DELETE"},
 		{Obj: "/central/v1/settlement/:id/orders", Act: "POST"},
-		{Obj: "/central/v1/settlement/:id/orders/:order_id", Act: "DELETE"},
+		{Obj: "/central/v1/settlement/:id/orders/:id", Act: "DELETE"},
 	},
 	"settlements:settle": {
 		{Obj: "/central/v1/settlement/:id/settle", Act: "POST"},
