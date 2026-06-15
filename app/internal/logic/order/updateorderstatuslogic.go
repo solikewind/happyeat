@@ -10,6 +10,7 @@ import (
 	"github.com/solikewind/happyeat/app/internal/pkg/status"
 	"github.com/solikewind/happyeat/app/internal/svc"
 	"github.com/solikewind/happyeat/app/internal/types"
+	"github.com/solikewind/happyeat/common/consts/enum"
 	"github.com/solikewind/happyeat/dal/model/ent"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -64,7 +65,13 @@ func (l *UpdateOrderStatusLogic) UpdateOrderStatus(req *types.UpdateOrderStatusR
 		return nil, err
 	}
 
-	if err := l.svcCtx.Order.UpdateStatus(l.ctx, req.Id, nextEnum); err != nil {
+	var actualPtr *int64
+	if nextEnum == enum.OrderStatusCompleted && req.ActualAmount > 0 {
+		actual := req.ActualAmount
+		actualPtr = &actual
+	}
+
+	if err := l.svcCtx.Order.UpdateStatus(l.ctx, req.Id, nextEnum, actualPtr); err != nil {
 		return nil, err
 	}
 

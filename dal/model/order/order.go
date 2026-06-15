@@ -189,9 +189,16 @@ func (o *Order) List(ctx context.Context, f ListOrdersFilter) ([]*ent.Order, int
 	return list, int64(total), nil
 }
 
-// UpdateStatus 更新订单状态。
-func (o *Order) UpdateStatus(ctx context.Context, id uint64, status enum.OrderStatus) error {
-	_, err := o.c.Order.UpdateOneID(id).SetStatus(normalizeOrderStatus(status)).Save(ctx)
+// UpdateStatus 更新订单状态；actualAmount 非 nil 时同时更新实收（分）。
+func (o *Order) UpdateStatus(ctx context.Context, id uint64, status enum.OrderStatus, actualAmount *int64) error {
+	update := o.c.Order.UpdateOneID(id).SetStatus(normalizeOrderStatus(status))
+	if actualAmount != nil {
+		if *actualAmount < 0 {
+			return fmt.Errorf("actual_amount must be >= 0")
+		}
+		update = update.SetActualAmount(*actualAmount)
+	}
+	_, err := update.Save(ctx)
 	return err
 }
 

@@ -849,8 +849,9 @@ type UpdateOrderStatusReply struct {
 }
 
 type UpdateOrderStatusReq struct {
-	Id     uint64 `path:"id"`
-	Status string `json:"status"` // 目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）
+	Id           uint64 `path:"id"`
+	Status       string `json:"status"` // 目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）
+	ActualAmount int64  `json:"actual_amount,optional"` // 完成时可填实收（分）；不传则不修改
 }
 
 type UpdateRolePermissionsReply struct {
