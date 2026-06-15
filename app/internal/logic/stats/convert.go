@@ -14,6 +14,8 @@ func buildDailyStatsReply(daily []ordermodel.DailyStatsPoint, summary ordermodel
 			Date:          p.Date.Format(dateLayout),
 			OrderCount:    p.OrderCount,
 			Revenue:       p.Revenue,
+			Receivable:    p.Receivable,
+			ActualRevenue: p.ActualRevenue,
 			ItemCount:     p.ItemCount,
 			DineInCount:   p.DineInCount,
 			TakeawayCount: p.TakeawayCount,
@@ -29,6 +31,8 @@ func toSummaryType(s ordermodel.StatsSummary) types.DailyStatsSummary {
 	return types.DailyStatsSummary{
 		OrderCount:    s.OrderCount,
 		Revenue:       s.Revenue,
+		Receivable:    s.Receivable,
+		ActualRevenue: s.ActualRevenue,
 		ItemCount:     s.ItemCount,
 		DineInCount:   s.DineInCount,
 		TakeawayCount: s.TakeawayCount,
