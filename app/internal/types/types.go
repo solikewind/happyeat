@@ -159,7 +159,9 @@ type CreateTableReq struct {
 type DailyStatsPoint struct {
 	Date          string `json:"date"` // YYYY-MM-DD
 	OrderCount    int    `json:"order_count"`
-	Revenue       int64  `json:"revenue"` // 分
+	Revenue       int64  `json:"revenue"` // 实收合计（分）
+	Receivable    int64  `json:"receivable"` // 应收合计（分）
+	ActualRevenue int64  `json:"actual_revenue"` // 实收合计（分）
 	ItemCount     int    `json:"item_count"`
 	DineInCount   int    `json:"dine_in_count,optional"`
 	TakeawayCount int    `json:"takeaway_count,optional"`
@@ -168,6 +170,8 @@ type DailyStatsPoint struct {
 type DailyStatsSummary struct {
 	OrderCount    int   `json:"order_count"`
 	Revenue       int64 `json:"revenue"`
+	Receivable    int64 `json:"receivable"`
+	ActualRevenue int64 `json:"actual_revenue"`
 	ItemCount     int   `json:"item_count"`
 	DineInCount   int   `json:"dine_in_count,optional"`
 	TakeawayCount int   `json:"takeaway_count,optional"`

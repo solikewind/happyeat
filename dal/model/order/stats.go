@@ -24,6 +24,8 @@ type DailyStatsPoint struct {
 	Date          time.Time
 	OrderCount    int
 	Revenue       int64
+	Receivable    int64
+	ActualRevenue int64
 	ItemCount     int
 	DineInCount   int
 	TakeawayCount int
@@ -33,6 +35,8 @@ type DailyStatsPoint struct {
 type StatsSummary struct {
 	OrderCount    int
 	Revenue       int64
+	Receivable    int64
+	ActualRevenue int64
 	ItemCount     int
 	DineInCount   int
 	TakeawayCount int
@@ -135,7 +139,10 @@ func (o *Order) AggregateSummary(ctx context.Context, r StatsDateRange) (StatsSu
 	var sum StatsSummary
 	for _, ord := range orders {
 		sum.OrderCount++
-		sum.Revenue += orderRevenue(ord)
+		rev := orderRevenue(ord)
+		sum.Revenue += rev
+		sum.Receivable += ord.TotalAmount
+		sum.ActualRevenue += rev
 		if ord.OrderType == enum.OrderTypeDineIn {
 			sum.DineInCount++
 		} else {
@@ -164,7 +171,10 @@ func (o *Order) AggregateDaily(ctx context.Context, r StatsDateRange) ([]DailySt
 			byDay[day] = p
 		}
 		p.OrderCount++
-		p.Revenue += orderRevenue(ord)
+		rev := orderRevenue(ord)
+		p.Revenue += rev
+		p.Receivable += ord.TotalAmount
+		p.ActualRevenue += rev
 		if ord.OrderType == enum.OrderTypeDineIn {
 			p.DineInCount++
 		} else {
