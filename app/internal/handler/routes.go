@@ -362,6 +362,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: settlement.SettleSettlementHandler(serverCtx),
 				},
 				{
+					// 删除结账单（仅未结账）
+					Method:  http.MethodDelete,
+					Path:    "/settlement/:id",
+					Handler: settlement.DeleteSettlementHandler(serverCtx),
+				},
+				{
 					// 列出结账单
 					Method:  http.MethodGet,
 					Path:    "/settlements",

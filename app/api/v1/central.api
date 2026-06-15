@@ -443,5 +443,9 @@ service HappyEatService {
 	@doc "结账单结账（未结账 → 已结账）"
 	@handler SettleSettlement
 	post /settlement/:id/settle (SettleSettlementReq) returns (SettleSettlementReply)
+
+	@doc "删除结账单（仅未结账；关联订单自动解绑）"
+	@handler DeleteSettlement
+	delete /settlement/:id (DeleteSettlementReq) returns (DeleteSettlementReply)
 }
 

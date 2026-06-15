@@ -319,6 +319,41 @@ func (s *Settlement) RecalcTotalForOrder(ctx context.Context, orderID uint64) er
 	return tx.Commit()
 }
 
+func (s *Settlement) Delete(ctx context.Context, id uint64) error {
+	tx, err := s.c.Tx(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	st, err := tx.Settlement.Query().Where(entsettlement.IDEQ(id)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return fmt.Errorf("结账单不存在")
+		}
+		return err
+	}
+	if st.Status != enum.SettlementStatusUnsettled {
+		return fmt.Errorf("仅未结账的结账单可删除")
+	}
+
+	orders, err := tx.Order.Query().
+		Where(entorder.SettlementIDEQ(id)).
+		All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, ord := range orders {
+		if _, err = tx.Order.UpdateOneID(ord.ID).ClearSettlementID().Save(ctx); err != nil {
+			return err
+		}
+	}
+	if err = tx.Settlement.DeleteOneID(id).Exec(ctx); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
 func trimCustomerName(name string) string {
 	return strings.TrimSpace(name)
 }

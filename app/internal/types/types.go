@@ -678,6 +678,13 @@ type RemoveIAMUserRoleReq struct {
 	RoleCode string `json:"role_code,optional" form:"role_code"`
 }
 
+type DeleteSettlementReply struct {
+}
+
+type DeleteSettlementReq struct {
+	Id uint64 `path:"id"`
+}
+
 type RemoveSettlementOrderReply struct {
 	Settlement Settlement `json:"settlement"`
 }

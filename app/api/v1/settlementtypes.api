@@ -55,6 +55,13 @@ type RemoveSettlementOrderReply {
 	Settlement Settlement `json:"settlement"`
 }
 
+type DeleteSettlementReq {
+	Id uint64 `path:"id"`
+}
+
+type DeleteSettlementReply {
+}
+
 type SettleSettlementReq {
 	Id           uint64 `path:"id"`
 	ActualAmount int64  `json:"actual_amount"` // 实收合计（分）
