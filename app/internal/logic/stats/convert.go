@@ -1,8 +1,8 @@
 package stats
 
 import (
-	ordermodel "github.com/solikewind/happyeat/dal/model/order"
 	"github.com/solikewind/happyeat/app/internal/types"
+	ordermodel "github.com/solikewind/happyeat/dal/model/order"
 )
 
 const dateLayout = "2006-01-02"
@@ -43,6 +43,7 @@ func buildMenuStatsReply(rows []ordermodel.MenuSalesRow) *types.ListMenuStatsRep
 	out := make([]types.MenuStatsRow, 0, len(rows))
 	for _, r := range rows {
 		out = append(out, types.MenuStatsRow{
+			MenuId:   r.MenuID,
 			MenuName: r.MenuName,
 			SpecInfo: r.SpecInfo,
 			Quantity: r.Quantity,

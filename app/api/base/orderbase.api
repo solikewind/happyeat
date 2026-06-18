@@ -22,6 +22,7 @@ type Order {
 	Remark        string      `json:"remark,optional"`       // 备注
 	SettlementId  uint64      `json:"settlement_id,optional,string"` // 所属结账单
 	Items         []OrderItem `json:"items,optional"`        // 订单明细
+	DailySequence int         `json:"daily_sequence,optional"` // 创建日内的顺序号（从 1 开始）
 	CreatedAt     string      `json:"created_at"`            // 创建时间
 	UpdatedAt     string      `json:"updated_at"`            // 更新时间
 }

@@ -103,6 +103,29 @@ func TestRenderBannerBlock(t *testing.T) {
 	}
 }
 
+func TestRenderDailySequenceBlock(t *testing.T) {
+	if got := renderDailySequenceBlock(0); got != "" {
+		t.Fatalf("zero sequence should be empty: %q", got)
+	}
+	want := "<R><B><W><H>第12单</H></W></B></R><BR>"
+	if got := renderDailySequenceBlock(12); got != want {
+		t.Fatalf("daily sequence block: want %q got %q", want, got)
+	}
+}
+
+func TestFormatKitchenTicket_dailySequenceAtTopRight(t *testing.T) {
+	e := &ent.Order{
+		OrderNo:     "ORD202606151430001",
+		OrderType:   "takeaway",
+		CreatedAt:   time.Date(2026, 6, 15, 14, 30, 0, 0, time.Local),
+		TotalAmount: 68,
+	}
+	got := formatKitchenTicket(e, "[新单]", 1, nil, 7)
+	if !strings.HasPrefix(got, "<R><B><W><H>第7单</H></W></B></R><BR>") {
+		t.Fatalf("daily sequence should be first line: %q", got)
+	}
+}
+
 func TestHeavyAndLightRule(t *testing.T) {
 	if got := heavyRuleLine(); !strings.HasPrefix(got, strings.Repeat("=", ticketLineWidth)) {
 		t.Fatalf("heavy rule: %q", got)
@@ -184,6 +207,27 @@ func TestRenderItemBlock_layout(t *testing.T) {
 	}
 }
 
+func TestRenderItemBlock_addedMarkerIsSmall(t *testing.T) {
+	it := &ent.OrderItem{
+		MenuName:  "炒鸡",
+		Quantity:  1,
+		UnitPrice: 68,
+		Amount:    68,
+	}
+	diff := &OrderItemDiff{
+		ByKey: map[string]ItemDiff{
+			itemKey(it): {Kind: ItemDiffAdded},
+		},
+	}
+	got := renderItemBlock(1, it, 1, diff)
+	if !strings.Contains(got, "[新] <B><H>炒鸡</H></B>") {
+		t.Fatalf("added marker should be small and outside enlarged name: %q", got)
+	}
+	if strings.Contains(got, "新加") {
+		t.Fatalf("should not print old added marker text: %q", got)
+	}
+}
+
 func TestSpecInfoValuesOnly(t *testing.T) {
 	if got := specInfoValuesOnly("大小:大 辣度:微辣"); got != "大 微辣" {
 		t.Fatalf("got %q", got)
@@ -213,4 +257,3 @@ func TestTicketCurrencyIsFullwidth(t *testing.T) {
 		t.Fatalf("currency must not be halfwidth ¥ (U+00A5)")
 	}
 }
-

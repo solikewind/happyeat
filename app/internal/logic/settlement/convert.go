@@ -29,9 +29,7 @@ func EntToType(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Settlemen
 	if withOrders {
 		orders, _ := e.Edges.OrdersOrErr()
 		out.OrderCount = len(orders)
-		for _, ord := range orders {
-			out.Orders = append(out.Orders, orderlogic.EntOrderToTypeForDisplay(ctx, svcCtx, ord))
-		}
+		out.Orders = orderlogic.EntOrdersToTypesForDisplay(ctx, svcCtx, orders)
 	}
 	return out
 }

@@ -39,16 +39,17 @@ func (l *GetOrderLogic) GetOrder(req *types.GetOrderReq) (*types.GetOrderReply, 
 }
 
 // EntOrderToType 将 ent 订单转为 API 类型，供 order 与 workbench 等复用。
-func EntOrderToType(e *ent.Order) types.Order {
+func EntOrderToType(e *ent.Order, dailySequence int) types.Order {
 	out := types.Order{
-		Id:           uint64(e.ID),
-		OrderNo:      e.OrderNo,
-		OrderType:    string(e.OrderType),
-		Status:       string(e.Status),
-		TotalAmount:  e.TotalAmount,
-		ActualAmount: e.ActualAmount,
-		CreatedAt:    timeutil.TimeToString(e.CreatedAt),
-		UpdatedAt:    timeutil.TimeToString(e.UpdatedAt),
+		Id:            uint64(e.ID),
+		OrderNo:       e.OrderNo,
+		OrderType:     string(e.OrderType),
+		Status:        string(e.Status),
+		TotalAmount:   e.TotalAmount,
+		ActualAmount:  e.ActualAmount,
+		DailySequence: dailySequence,
+		CreatedAt:     timeutil.TimeToString(e.CreatedAt),
+		UpdatedAt:     timeutil.TimeToString(e.UpdatedAt),
 	}
 
 	if e.Remark != nil {
