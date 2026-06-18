@@ -119,7 +119,7 @@ func TestRenderDailySequenceBlock(t *testing.T) {
 	if got := renderDailySequenceBlock(0); got != "" {
 		t.Fatalf("zero sequence should be empty: %q", got)
 	}
-	want := "<R><B><W><H>第12单</H></W></B></R><BR>"
+	want := "<R><B><W><H>12</H></W></B></R><BR>"
 	if got := renderDailySequenceBlock(12); got != want {
 		t.Fatalf("daily sequence block: want %q got %q", want, got)
 	}
@@ -133,7 +133,7 @@ func TestFormatKitchenTicket_dailySequenceAtTopRight(t *testing.T) {
 		TotalAmount: 68,
 	}
 	got := formatKitchenTicket(e, "[新单]", 1, nil, 7)
-	if !strings.HasPrefix(got, "<R><B><W><H>第7单</H></W></B></R><BR>") {
+	if !strings.HasPrefix(got, "<R><B><W><H>7</H></W></B></R><BR>") {
 		t.Fatalf("daily sequence should be first line: %q", got)
 	}
 }
@@ -151,7 +151,7 @@ func TestFormatKitchenTicket_addOnlyIncremental(t *testing.T) {
 	diff := DiffOrderItems([]*ent.OrderItem{oldItem}, []*ent.OrderItem{oldItem, newItem})
 
 	got := formatKitchenTicket(e, "[改单重打]", 1, diff, 12)
-	if strings.Contains(got, "<R><B><W><H>第12单</H></W></B></R>") {
+	if strings.Contains(got, "<R><B><W><H>12</H></W></B></R>") {
 		t.Fatalf("add-only should not use large daily sequence: %q", got)
 	}
 	if !strings.Contains(got, "关联: 第12单") {

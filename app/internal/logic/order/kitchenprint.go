@@ -184,7 +184,7 @@ func renderDailySequenceBlock(seq int) string {
 	if seq <= 0 {
 		return ""
 	}
-	return fmt.Sprintf("<R><B><W><H>第%d单</H></W></B></R><BR>", seq)
+	return fmt.Sprintf("<R><B><W><H>%d</H></W></B></R><BR>", seq)
 }
 
 func renderDailySequenceRefBlock(seq int) string {
