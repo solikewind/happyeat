@@ -90,3 +90,46 @@ func DiffOrderItems(oldItems, newItems []*ent.OrderItem) *OrderItemDiff {
 
 	return out
 }
+
+// IsAddOnly 是否仅为新增菜品（无删菜、无改量）。
+func (d *OrderItemDiff) IsAddOnly() bool {
+	if d == nil || len(d.Removed) > 0 || len(d.ByKey) == 0 {
+		return false
+	}
+	for _, item := range d.ByKey {
+		if item.Kind != ItemDiffAdded {
+			return false
+		}
+	}
+	return true
+}
+
+// DeltaCourses 变更涉及的菜道数（新增/改量 + 删除）。
+func (d *OrderItemDiff) DeltaCourses() int {
+	if d == nil {
+		return 0
+	}
+	return len(d.ByKey) + len(d.Removed)
+}
+
+// DeltaItems 返回当前单中需要出现在增量小票上的明细（新增或改量）。
+func (d *OrderItemDiff) DeltaItems(allItems []*ent.OrderItem, addOnly bool) []*ent.OrderItem {
+	if d == nil {
+		return nil
+	}
+	out := make([]*ent.OrderItem, 0, len(d.ByKey))
+	for _, it := range allItems {
+		if it == nil {
+			continue
+		}
+		diff, ok := d.ByKey[itemKey(it)]
+		if !ok {
+			continue
+		}
+		if addOnly && diff.Kind != ItemDiffAdded {
+			continue
+		}
+		out = append(out, it)
+	}
+	return out
+}

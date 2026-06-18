@@ -83,21 +83,23 @@ const (
 
 // formatKitchenTicket 渲染厨房单完整内容。diff 为 nil 时按普通新单格式打印（无新增/删除标记）。
 func formatKitchenTicket(e *ent.Order, banner string, amountDivisor int64, diff *OrderItemDiff, dailySequence int) string {
+	mode := resolveKitchenTicketMode(banner, diff)
+	switch mode {
+	case KitchenTicketModeAddOnly, KitchenTicketModeChange:
+		return formatKitchenTicketIncremental(e, banner, amountDivisor, diff, dailySequence, mode)
+	default:
+		return formatKitchenTicketFull(e, banner, amountDivisor, diff, dailySequence)
+	}
+}
+
+func formatKitchenTicketFull(e *ent.Order, banner string, amountDivisor int64, diff *OrderItemDiff, dailySequence int) string {
 	var b strings.Builder
 
-	// 当天订单顺序号，置顶右对齐，便于后厨按下单先后处理。
 	b.WriteString(renderDailySequenceBlock(dailySequence))
-
-	// 顶部 banner（新单 / 加菜 / 补打）
-	b.WriteString(renderBannerBlock(banner))
-
-	// 桌台 / 外带（大字醒目）
+	b.WriteString(renderBannerBlock(banner, KitchenTicketModeFull))
 	b.WriteString(renderHeadlineBlock(e))
-
-	// 订单号与时间（小字）
 	b.WriteString(renderMetaBlock(e))
 
-	// 菜品列表：表头（数量/金额右对齐）+ 分割线 + 明细
 	b.WriteString(heavyRuleLine())
 	b.WriteString(renderItemsTableHeader())
 	items, _ := e.Edges.ItemsOrErr()
@@ -119,13 +121,51 @@ func formatKitchenTicket(e *ent.Order, banner string, amountDivisor int64, diff 
 		b.WriteString(renderRemarkBlock(strings.TrimSpace(*e.Remark)))
 	}
 
-	// 已删除菜（带删除线，单独成区）
 	if diff != nil && len(diff.Removed) > 0 {
 		b.WriteString(renderRemovedBlock(diff.Removed, amountDivisor))
 	}
 
 	b.WriteString("<CUT>")
 	return b.String()
+}
+
+// formatKitchenTicketIncremental 加菜/变更增量单：仅列变动项，不打整单合计。
+func formatKitchenTicketIncremental(e *ent.Order, banner string, amountDivisor int64, diff *OrderItemDiff, dailySequence int, mode KitchenTicketMode) string {
+	var b strings.Builder
+
+	addOnly := mode == KitchenTicketModeAddOnly
+	b.WriteString(renderBannerBlock(banner, mode))
+	b.WriteString(renderHeadlineBlock(e))
+	b.WriteString(renderDailySequenceRefBlock(dailySequence))
+	b.WriteString(renderMetaBlock(e))
+
+	b.WriteString(heavyRuleLine())
+	b.WriteString(renderItemsTableHeader())
+	deltaItems := diff.DeltaItems(mustOrderItems(e), addOnly)
+	for idx, it := range deltaItems {
+		b.WriteString(renderItemBlock(idx+1, it, amountDivisor, diff))
+	}
+	b.WriteString(heavyRuleLine())
+
+	if addOnly {
+		b.WriteString(renderAddOnlyTotalsBlock(len(deltaItems)))
+	} else {
+		b.WriteString(renderChangeTotalsBlock(diff.DeltaCourses()))
+		if len(diff.Removed) > 0 {
+			b.WriteString(renderRemovedBlock(diff.Removed, amountDivisor))
+		}
+	}
+
+	b.WriteString("<CUT>")
+	return b.String()
+}
+
+func mustOrderItems(e *ent.Order) []*ent.OrderItem {
+	items, err := e.Edges.ItemsOrErr()
+	if err == nil {
+		return items
+	}
+	return e.Edges.Items
 }
 
 func resolveKitchenDailySequence(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Order) int {
@@ -144,22 +184,25 @@ func renderDailySequenceBlock(seq int) string {
 	if seq <= 0 {
 		return ""
 	}
-	return fmt.Sprintf("<R><B><W><H>第%d单</H></W></B></R><BR>", seq)
+	return fmt.Sprintf("<R><B><W><H>%d</H></W></B></R><BR>", seq)
+}
+
+func renderDailySequenceRefBlock(seq int) string {
+	if seq <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("关联: 第%d单<BR>", seq)
 }
 
 // ─────────────────────────── 顶部 banner ───────────────────────────
 
 // renderBannerBlock 按 banner 含义渲染醒目横幅；空 banner 时不输出。
-// 已识别语义：[新单] / [改单重打] / [手动打印]，其他原样显示。
-//
-// 排版：加粗居中 + 倍宽（不倍高，不加上下分隔线），避免占用双行高度与额外空行。
-// 倍宽 <W> 让字横向放大、纵向仍是 1 行；醒目度足够区分新单/加菜/补打。
-func renderBannerBlock(banner string) string {
+func renderBannerBlock(banner string, mode KitchenTicketMode) string {
 	banner = strings.TrimSpace(banner)
 	if banner == "" {
 		return ""
 	}
-	title, warn := bannerTitleAndWarning(banner)
+	title, warn := bannerTitleAndWarning(banner, mode)
 
 	var b strings.Builder
 	b.WriteString("<C><B><W>")
@@ -173,15 +216,17 @@ func renderBannerBlock(banner string) string {
 	return b.String()
 }
 
-func bannerTitleAndWarning(banner string) (title, warn string) {
+func bannerTitleAndWarning(banner string, mode KitchenTicketMode) (title, warn string) {
 	// 去掉首尾的方括号，便于匹配中文
 	trimmed := strings.Trim(banner, "[]【】 ")
 	switch trimmed {
 	case "新单":
 		return "★ 新  单 ★", ""
 	case "改单重打":
-		// 现行实现是 ReplaceItems，整单重打。提醒厨房核对已制作。
-		return "★ 加  菜 ★", "※ 全单重打 请核对已做 ※"
+		if mode == KitchenTicketModeAddOnly {
+			return "★ 加  菜 ★", ""
+		}
+		return "★ 变  更 ★", "※ 请核对已做 ※"
 	case "手动打印":
 		return "★ 补  打 ★", ""
 	default:
@@ -391,6 +436,20 @@ func renderTotalsBlock(courses int, e *ent.Order, div int64) string {
 		ticketCurrency, fmtTicketMoney(e.ActualAmount, div),
 	))
 	return b.String()
+}
+
+func renderAddOnlyTotalsBlock(courses int) string {
+	if courses <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("本次 +%d 道<BR>", courses)
+}
+
+func renderChangeTotalsBlock(changes int) string {
+	if changes <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("变更 %d 处<BR>", changes)
 }
 
 // ─────────────────────────── 备注块 ───────────────────────────

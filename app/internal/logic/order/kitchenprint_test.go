@@ -60,17 +60,19 @@ func TestTruncateTicketNameDisplay(t *testing.T) {
 func TestBannerTitleAndWarning(t *testing.T) {
 	cases := []struct {
 		in        string
+		mode      KitchenTicketMode
 		wantTitle string
 		wantWarn  bool
 	}{
-		{"[新单]", "★ 新  单 ★", false},
-		{"【新单】", "★ 新  单 ★", false},
-		{"[改单重打]", "★ 加  菜 ★", true},
-		{"[手动打印]", "★ 补  打 ★", false},
-		{"[未识别]", "[未识别]", false},
+		{"[新单]", KitchenTicketModeFull, "★ 新  单 ★", false},
+		{"【新单】", KitchenTicketModeFull, "★ 新  单 ★", false},
+		{"[改单重打]", KitchenTicketModeAddOnly, "★ 加  菜 ★", false},
+		{"[改单重打]", KitchenTicketModeChange, "★ 变  更 ★", true},
+		{"[手动打印]", KitchenTicketModeFull, "★ 补  打 ★", false},
+		{"[未识别]", KitchenTicketModeFull, "[未识别]", false},
 	}
 	for _, c := range cases {
-		gotTitle, gotWarn := bannerTitleAndWarning(c.in)
+		gotTitle, gotWarn := bannerTitleAndWarning(c.in, c.mode)
 		if gotTitle != c.wantTitle {
 			t.Errorf("title for %q: want %q got %q", c.in, c.wantTitle, gotTitle)
 		}
@@ -81,19 +83,29 @@ func TestBannerTitleAndWarning(t *testing.T) {
 }
 
 func TestRenderBannerBlock(t *testing.T) {
-	if got := renderBannerBlock(""); got != "" {
+	if got := renderBannerBlock("", KitchenTicketModeFull); got != "" {
 		t.Fatalf("empty banner should be empty: %q", got)
 	}
-	got := renderBannerBlock("[改单重打]")
+	got := renderBannerBlock("[改单重打]", KitchenTicketModeChange)
 	for _, want := range []string{
 		"<C><B><W>",
-		"★ 加  菜 ★",
-		"全单重打",
+		"★ 变  更 ★",
+		"请核对已做",
 		"</W></B></C>",
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("missing %q in %q", want, got)
 		}
+	}
+	if strings.Contains(got, "全单重打") {
+		t.Errorf("change banner should not mention full reprint: %q", got)
+	}
+	addOnly := renderBannerBlock("[改单重打]", KitchenTicketModeAddOnly)
+	if !strings.Contains(addOnly, "★ 加  菜 ★") {
+		t.Errorf("add-only banner: %q", addOnly)
+	}
+	if strings.Contains(addOnly, "请核对已做") {
+		t.Errorf("add-only should not warn: %q", addOnly)
 	}
 	if strings.Contains(got, "<H>") || strings.Contains(got, "</H>") {
 		t.Errorf("banner should not double height anymore: %q", got)
@@ -107,7 +119,7 @@ func TestRenderDailySequenceBlock(t *testing.T) {
 	if got := renderDailySequenceBlock(0); got != "" {
 		t.Fatalf("zero sequence should be empty: %q", got)
 	}
-	want := "<R><B><W><H>第12单</H></W></B></R><BR>"
+	want := "<R><B><W><H>12</H></W></B></R><BR>"
 	if got := renderDailySequenceBlock(12); got != want {
 		t.Fatalf("daily sequence block: want %q got %q", want, got)
 	}
@@ -121,8 +133,81 @@ func TestFormatKitchenTicket_dailySequenceAtTopRight(t *testing.T) {
 		TotalAmount: 68,
 	}
 	got := formatKitchenTicket(e, "[新单]", 1, nil, 7)
-	if !strings.HasPrefix(got, "<R><B><W><H>第7单</H></W></B></R><BR>") {
+	if !strings.HasPrefix(got, "<R><B><W><H>7</H></W></B></R><BR>") {
 		t.Fatalf("daily sequence should be first line: %q", got)
+	}
+}
+
+func TestFormatKitchenTicket_addOnlyIncremental(t *testing.T) {
+	oldItem := mkItem(1, "炒鸡", 1, "")
+	newItem := mkItem(2, "凉拌黄瓜", 1, "")
+	e := &ent.Order{
+		OrderNo:     "ORD001",
+		OrderType:   "takeaway",
+		CreatedAt:   time.Date(2026, 6, 18, 19, 0, 0, 0, time.Local),
+		TotalAmount: 86,
+	}
+	e.Edges.Items = []*ent.OrderItem{oldItem, newItem}
+	diff := DiffOrderItems([]*ent.OrderItem{oldItem}, []*ent.OrderItem{oldItem, newItem})
+
+	got := formatKitchenTicket(e, "[改单重打]", 1, diff, 12)
+	if strings.Contains(got, "<R><B><W><H>12</H></W></B></R>") {
+		t.Fatalf("add-only should not use large daily sequence: %q", got)
+	}
+	if !strings.Contains(got, "关联: 第12单") {
+		t.Fatalf("add-only should reference order sequence: %q", got)
+	}
+	if !strings.Contains(got, "★ 加  菜 ★") {
+		t.Fatalf("add-only banner: %q", got)
+	}
+	if !strings.Contains(got, "凉拌黄瓜") {
+		t.Fatalf("should list added item: %q", got)
+	}
+	if strings.Contains(got, "炒鸡") {
+		t.Fatalf("should not list unchanged item: %q", got)
+	}
+	if !strings.Contains(got, "本次 +1 道") {
+		t.Fatalf("add-only totals: %q", got)
+	}
+	if strings.Contains(got, "合计:") {
+		t.Fatalf("add-only should not print full total: %q", got)
+	}
+}
+
+func TestFormatKitchenTicket_changeIncremental(t *testing.T) {
+	changed := mkItem(1, "炒鸡", 1, "")
+	removed := mkItem(3, "西红柿炒蛋", 1, "")
+	e := &ent.Order{
+		OrderNo:     "ORD002",
+		OrderType:   "takeaway",
+		CreatedAt:   time.Date(2026, 6, 18, 19, 0, 0, 0, time.Local),
+		TotalAmount: 68,
+	}
+	e.Edges.Items = []*ent.OrderItem{changed}
+	old := []*ent.OrderItem{
+		mkItem(1, "炒鸡", 2, ""),
+		removed,
+	}
+	diff := DiffOrderItems(old, e.Edges.Items)
+
+	got := formatKitchenTicket(e, "[改单重打]", 1, diff, 5)
+	if !strings.Contains(got, "★ 变  更 ★") {
+		t.Fatalf("change banner: %q", got)
+	}
+	if !strings.Contains(got, "请核对已做") {
+		t.Fatalf("change warning: %q", got)
+	}
+	if !strings.Contains(got, "改量: 原×2 → 现×1") {
+		t.Fatalf("qty change line: %q", got)
+	}
+	if !strings.Contains(got, "[删] 西红柿炒蛋") {
+		t.Fatalf("removed item: %q", got)
+	}
+	if !strings.Contains(got, "变更 2 处") {
+		t.Fatalf("change totals: %q", got)
+	}
+	if strings.Contains(got, "合计:") {
+		t.Fatalf("change slip should not print full total: %q", got)
 	}
 }
 
