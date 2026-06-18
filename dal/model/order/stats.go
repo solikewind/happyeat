@@ -44,6 +44,7 @@ type StatsSummary struct {
 
 // MenuSalesRow 菜品销量行。
 type MenuSalesRow struct {
+	MenuID   uint64
 	MenuName string
 	SpecInfo string
 	Quantity int
@@ -203,8 +204,9 @@ func (o *Order) AggregateMenuSales(ctx context.Context, r StatsDateRange) ([]Men
 		return nil, err
 	}
 	type key struct {
-		name string
-		spec string
+		menuID uint64
+		name   string
+		spec   string
 	}
 	agg := make(map[key]*MenuSalesRow)
 	for _, ord := range orders {
@@ -215,9 +217,16 @@ func (o *Order) AggregateMenuSales(ctx context.Context, r StatsDateRange) ([]Men
 				spec = strings.TrimSpace(*it.SpecInfo)
 			}
 			k := key{name: it.MenuName, spec: spec}
+			if it.MenuID != nil && *it.MenuID > 0 {
+				k.menuID = *it.MenuID
+			}
 			row, ok := agg[k]
 			if !ok {
-				row = &MenuSalesRow{MenuName: it.MenuName, SpecInfo: spec}
+				row = &MenuSalesRow{
+					MenuID:   k.menuID,
+					MenuName: it.MenuName,
+					SpecInfo: spec,
+				}
 				agg[k] = row
 			}
 			row.Quantity += it.Quantity

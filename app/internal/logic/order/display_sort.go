@@ -8,6 +8,8 @@ import (
 	"github.com/solikewind/happyeat/app/internal/types"
 	"github.com/solikewind/happyeat/dal/model/ent"
 	"github.com/solikewind/happyeat/dal/model/menu"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type orderItemSortKey struct {
@@ -37,8 +39,35 @@ func ApplyOrderItemsDisplaySort(ctx context.Context, svcCtx *svc.ServiceContext,
 
 // EntOrderToTypeForDisplay 先按分类排序再转为 API 类型。
 func EntOrderToTypeForDisplay(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Order) types.Order {
-	ApplyOrderItemsDisplaySort(ctx, svcCtx, e)
-	return EntOrderToType(e)
+	return EntOrdersToTypesForDisplay(ctx, svcCtx, []*ent.Order{e})[0]
+}
+
+// EntOrdersToTypesForDisplay 批量转换订单并填充单日序号。
+func EntOrdersToTypesForDisplay(ctx context.Context, svcCtx *svc.ServiceContext, list []*ent.Order) []types.Order {
+	if len(list) == 0 {
+		return nil
+	}
+	for _, e := range list {
+		ApplyOrderItemsDisplaySort(ctx, svcCtx, e)
+	}
+	seqMap := resolveDailySequences(ctx, svcCtx, list)
+	orders := make([]types.Order, 0, len(list))
+	for _, e := range list {
+		orders = append(orders, EntOrderToType(e, seqMap[uint64(e.ID)]))
+	}
+	return orders
+}
+
+func resolveDailySequences(ctx context.Context, svcCtx *svc.ServiceContext, list []*ent.Order) map[uint64]int {
+	if svcCtx == nil || svcCtx.Order == nil {
+		return map[uint64]int{}
+	}
+	seqMap, err := svcCtx.Order.DailySequences(ctx, list)
+	if err != nil {
+		logx.WithContext(ctx).Errorf("批量查询单日序号失败: %v", err)
+		return map[uint64]int{}
+	}
+	return seqMap
 }
 
 func collectMenuIDsFromItems(items []*ent.OrderItem) []uint64 {

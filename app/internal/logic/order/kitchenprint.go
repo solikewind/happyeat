@@ -27,7 +27,7 @@ func SyncPrintKitchenWithDiff(ctx context.Context, svcCtx *svc.ServiceContext, e
 	}
 	ApplyOrderItemsDisplaySort(ctx, svcCtx, e)
 	div := kitchenTicketAmountDivisor(svcCtx.Config.Spyun.KitchenTicketAmountScale)
-	content := formatKitchenTicket(e, banner, div, diff)
+	content := formatKitchenTicket(e, banner, div, diff, resolveKitchenDailySequence(ctx, svcCtx, e))
 	_, err := svcCtx.Spyun.PrintOrder(ctx, "", content, 1)
 	return err
 }
@@ -42,12 +42,12 @@ func scheduleKitchenPrintWithDiff(svcCtx *svc.ServiceContext, e *ent.Order, bann
 	if svcCtx == nil || svcCtx.Spyun == nil || e == nil {
 		return
 	}
-	div := kitchenTicketAmountDivisor(svcCtx.Config.Spyun.KitchenTicketAmountScale)
-	content := formatKitchenTicket(e, banner, div, diff)
 	orderNo := e.OrderNo
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
 		defer cancel()
+		div := kitchenTicketAmountDivisor(svcCtx.Config.Spyun.KitchenTicketAmountScale)
+		content := formatKitchenTicket(e, banner, div, diff, resolveKitchenDailySequence(ctx, svcCtx, e))
 		reply, err := svcCtx.Spyun.PrintOrder(ctx, "", content, 1)
 		if err != nil {
 			logx.WithContext(ctx).Errorf("商鹏厨房单打印失败 order_no=%s: %v", orderNo, err)
@@ -82,8 +82,11 @@ const (
 // ─────────────────────────── 主流程 ───────────────────────────
 
 // formatKitchenTicket 渲染厨房单完整内容。diff 为 nil 时按普通新单格式打印（无新增/删除标记）。
-func formatKitchenTicket(e *ent.Order, banner string, amountDivisor int64, diff *OrderItemDiff) string {
+func formatKitchenTicket(e *ent.Order, banner string, amountDivisor int64, diff *OrderItemDiff, dailySequence int) string {
 	var b strings.Builder
+
+	// 当天订单顺序号，置顶右对齐，便于后厨按下单先后处理。
+	b.WriteString(renderDailySequenceBlock(dailySequence))
 
 	// 顶部 banner（新单 / 加菜 / 补打）
 	b.WriteString(renderBannerBlock(banner))
@@ -123,6 +126,25 @@ func formatKitchenTicket(e *ent.Order, banner string, amountDivisor int64, diff 
 
 	b.WriteString("<CUT>")
 	return b.String()
+}
+
+func resolveKitchenDailySequence(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Order) int {
+	if svcCtx == nil || svcCtx.Order == nil || e == nil {
+		return 0
+	}
+	seq, err := svcCtx.Order.DailySequence(ctx, e)
+	if err != nil {
+		logx.WithContext(ctx).Errorf("查询厨房单日序号失败 order_no=%s: %v", e.OrderNo, err)
+		return 0
+	}
+	return seq
+}
+
+func renderDailySequenceBlock(seq int) string {
+	if seq <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("<R><B><W><H>第%d单</H></W></B></R><BR>", seq)
 }
 
 // ─────────────────────────── 顶部 banner ───────────────────────────
@@ -226,7 +248,7 @@ func renderItemsTableHeader() string {
 }
 
 // renderItemBlock 单个菜品：
-// 第1行：序号. [新加]菜名（加粗倍高） + 右侧数量/金额列
+// 第1行：序号. [新]菜名（仅菜名加粗倍高） + 右侧数量/金额列
 // 第2行：规格（若有）；改量提示在规格前单独一行
 func renderItemBlock(idx int, it *ent.OrderItem, div int64, diff *OrderItemDiff) string {
 	var b strings.Builder
@@ -241,27 +263,25 @@ func renderItemBlock(idx int, it *ent.OrderItem, div int64, diff *OrderItemDiff)
 		}
 	}
 
-	var namePrefix string
+	var marker string
 	switch kind {
 	case ItemDiffAdded:
-		namePrefix = "[新加] "
+		marker = "[新] "
 	}
 
 	amtRaw := orderLineStoredAmount(it)
 	right := ticketQtyAmtDataBlock(it.Quantity, amtRaw, div)
 	rightW := ticketDisplayWidth(right)
 
-	nameMax := ticketLineWidth - ticketIndexWidth - rightW
+	nameMax := ticketLineWidth - ticketIndexWidth - ticketDisplayWidth(marker) - rightW
 	if nameMax < 4 {
 		nameMax = 4
 	}
 	rawName := escapeSpyunText(it.MenuName)
-	if namePrefix != "" {
-		rawName = namePrefix + rawName
-	}
 	name := truncateTicketNameDisplay(rawName, nameMax)
 
 	b.WriteString(indexPad)
+	b.WriteString(marker)
 	b.WriteString("<B><H>")
 	b.WriteString(name)
 	b.WriteString("</H></B>")

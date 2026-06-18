@@ -159,8 +159,8 @@ type CreateTableReq struct {
 type DailyStatsPoint struct {
 	Date          string `json:"date"` // YYYY-MM-DD
 	OrderCount    int    `json:"order_count"`
-	Revenue       int64  `json:"revenue"` // 实收合计（分）
-	Receivable    int64  `json:"receivable"` // 应收合计（分）
+	Revenue       int64  `json:"revenue"`        // 实收合计（分）
+	Receivable    int64  `json:"receivable"`     // 应收合计（分）
 	ActualRevenue int64  `json:"actual_revenue"` // 实收合计（分）
 	ItemCount     int    `json:"item_count"`
 	DineInCount   int    `json:"dine_in_count,optional"`
@@ -600,6 +600,7 @@ type MenuSpec struct {
 }
 
 type MenuStatsRow struct {
+	MenuId   uint64 `json:"menu_id,optional,string"`
 	MenuName string `json:"menu_name"`
 	SpecInfo string `json:"spec_info,optional"`
 	Quantity int    `json:"quantity"`
@@ -620,20 +621,21 @@ type Object struct {
 }
 
 type Order struct {
-	Id            uint64      `json:"id,string"`                     // 订单id
-	OrderNo       string      `json:"order_no"`                      // 订单号
-	OrderType     string      `json:"order_type"`                    // dine_in=堂食 takeaway=打包外带
-	Status        string      `json:"status"`                        // CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）
-	TotalAmount   int64       `json:"total_amount"`                  // 总金额（分，应收）
-	ActualAmount  int64       `json:"actual_amount"`                 // 实收金额（分）
-	TableId       uint64      `json:"table_id,optional,string"`      // 堂食时关联餐桌id
-	TableCode     string      `json:"table_code,optional"`           // 桌号（堂食时显示，外带为空）
-	TableCategory string      `json:"table_category,optional"`       // 餐桌类别（如大厅、包间）
-	Remark        string      `json:"remark,optional"`               // 备注
+	Id            uint64      `json:"id,string"`                      // 订单id
+	OrderNo       string      `json:"order_no"`                       // 订单号
+	OrderType     string      `json:"order_type"`                     // dine_in=堂食 takeaway=打包外带
+	Status        string      `json:"status"`                         // CREATED/PAID/PREPARING/COMPLETED/CANCELLED（与存库一致）
+	TotalAmount   int64       `json:"total_amount"`                   // 总金额（分，应收）
+	ActualAmount  int64       `json:"actual_amount"`                  // 实收金额（分）
+	TableId       uint64      `json:"table_id,optional,string"`       // 堂食时关联餐桌id
+	TableCode     string      `json:"table_code,optional"`            // 桌号（堂食时显示，外带为空）
+	TableCategory string      `json:"table_category,optional"`        // 餐桌类别（如大厅、包间）
+	Remark        string      `json:"remark,optional"`                // 备注
 	SettlementId  *uint64     `json:"settlement_id,omitempty,string"` // 所属结账单
-	Items         []OrderItem `json:"items,optional"`                // 订单明细
-	CreatedAt     string      `json:"created_at"`                    // 创建时间
-	UpdatedAt     string      `json:"updated_at"`                    // 更新时间
+	Items         []OrderItem `json:"items,optional"`                 // 订单明细
+	DailySequence int         `json:"daily_sequence,optional"`        // 创建日内的顺序号（从 1 开始）
+	CreatedAt     string      `json:"created_at"`                     // 创建时间
+	UpdatedAt     string      `json:"updated_at"`                     // 更新时间
 }
 
 type OrderItem struct {
@@ -854,7 +856,7 @@ type UpdateOrderStatusReply struct {
 
 type UpdateOrderStatusReq struct {
 	Id           uint64 `path:"id"`
-	Status       string `json:"status"` // 目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）
+	Status       string `json:"status"`                 // 目标状态：PAID/PREPARING/COMPLETED/CANCELLED（ParseAPIStatus 仍兼容小写）
 	ActualAmount int64  `json:"actual_amount,optional"` // 完成时可填实收（分）；不传则不修改
 }
 

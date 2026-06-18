@@ -43,6 +43,7 @@ type ListMenuStatsReq {
 }
 
 type MenuStatsRow {
+	MenuId   uint64 `json:"menu_id,optional,string"`
 	MenuName string `json:"menu_name"`
 	SpecInfo string `json:"spec_info,optional"`
 	Quantity int    `json:"quantity"`

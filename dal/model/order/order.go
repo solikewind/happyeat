@@ -51,6 +51,52 @@ func genOrderNo() string {
 	return fmt.Sprintf("ORD%d%03d", time.Now().UnixMilli(), rand.Intn(1000))
 }
 
+// DailySequence 返回订单在其创建日内的顺序号（从 1 开始，按订单 ID 顺序）。
+func (o *Order) DailySequence(ctx context.Context, e *ent.Order) (int, error) {
+	if e == nil || e.ID == 0 || e.CreatedAt.IsZero() {
+		return 0, nil
+	}
+	m, err := o.DailySequences(ctx, []*ent.Order{e})
+	if err != nil {
+		return 0, err
+	}
+	return m[e.ID], nil
+}
+
+// DailySequences 批量计算订单在其创建日内的顺序号。
+func (o *Order) DailySequences(ctx context.Context, orders []*ent.Order) (map[uint64]int, error) {
+	out := make(map[uint64]int)
+	if len(orders) == 0 {
+		return out, nil
+	}
+
+	dayStarts := make(map[time.Time]struct{})
+	for _, ord := range orders {
+		if ord == nil || ord.ID == 0 || ord.CreatedAt.IsZero() {
+			continue
+		}
+		dayStarts[dateOnlyCST(ord.CreatedAt)] = struct{}{}
+	}
+
+	for day := range dayStarts {
+		end := day.AddDate(0, 0, 1)
+		ids, err := o.c.Order.Query().
+			Where(
+				entorder.CreatedAtGTE(day),
+				entorder.CreatedAtLT(end),
+			).
+			Order(entorder.ByID(sql.OrderAsc())).
+			IDs(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for i, id := range ids {
+			out[id] = i + 1
+		}
+	}
+	return out, nil
+}
+
 // normalizeOrderStatus 统一为 ent 枚举大写（兼容历史/错误路径传入的 created 等小写）。
 func normalizeOrderStatus(s enum.OrderStatus) enum.OrderStatus {
 	u := strings.ToUpper(strings.TrimSpace(string(s)))
