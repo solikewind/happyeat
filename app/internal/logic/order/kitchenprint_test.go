@@ -141,6 +141,8 @@ func TestFormatKitchenTicket_dailySequenceAtTopRight(t *testing.T) {
 func TestFormatKitchenTicket_addOnlyIncremental(t *testing.T) {
 	oldItem := mkItem(1, "炒鸡", 1, "")
 	newItem := mkItem(2, "凉拌黄瓜", 1, "")
+	newItem.UnitPrice = 18
+	newItem.Amount = 18
 	e := &ent.Order{
 		OrderNo:     "ORD001",
 		OrderType:   "takeaway",
@@ -169,8 +171,11 @@ func TestFormatKitchenTicket_addOnlyIncremental(t *testing.T) {
 	if !strings.Contains(got, "本次 +1 道") {
 		t.Fatalf("add-only totals: %q", got)
 	}
-	if strings.Contains(got, "合计:") {
-		t.Fatalf("add-only should not print full total: %q", got)
+	if !strings.Contains(got, "订单合计: ￥86.00") {
+		t.Fatalf("add-only should print current order total: %q", got)
+	}
+	if strings.Contains(got, "实收:") {
+		t.Fatalf("add-only should not print full total/actual block: %q", got)
 	}
 }
 

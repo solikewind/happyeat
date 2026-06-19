@@ -129,7 +129,7 @@ func formatKitchenTicketFull(e *ent.Order, banner string, amountDivisor int64, d
 	return b.String()
 }
 
-// formatKitchenTicketIncremental 加菜/变更增量单：仅列变动项，不打整单合计。
+// formatKitchenTicketIncremental 加菜/变更增量单：仅列变动项；加菜单显示当前订单总价。
 func formatKitchenTicketIncremental(e *ent.Order, banner string, amountDivisor int64, diff *OrderItemDiff, dailySequence int, mode KitchenTicketMode) string {
 	var b strings.Builder
 
@@ -148,7 +148,7 @@ func formatKitchenTicketIncremental(e *ent.Order, banner string, amountDivisor i
 	b.WriteString(heavyRuleLine())
 
 	if addOnly {
-		b.WriteString(renderAddOnlyTotalsBlock(len(deltaItems)))
+		b.WriteString(renderAddOnlyTotalsBlock(len(deltaItems), e, amountDivisor))
 	} else {
 		b.WriteString(renderChangeTotalsBlock(diff.DeltaCourses()))
 		if len(diff.Removed) > 0 {
@@ -438,11 +438,30 @@ func renderTotalsBlock(courses int, e *ent.Order, div int64) string {
 	return b.String()
 }
 
-func renderAddOnlyTotalsBlock(courses int) string {
+func renderAddOnlyTotalsBlock(courses int, e *ent.Order, div int64) string {
 	if courses <= 0 {
 		return ""
 	}
-	return fmt.Sprintf("本次 +%d 道<BR>", courses)
+	total := currentOrderItemsTotal(e)
+	return fmt.Sprintf("本次 +%d 道<BR>订单合计: %s%s<BR>",
+		courses,
+		ticketCurrency, fmtTicketMoney(total, div),
+	)
+}
+
+func currentOrderItemsTotal(e *ent.Order) int64 {
+	if e == nil {
+		return 0
+	}
+	items := mustOrderItems(e)
+	if len(items) == 0 {
+		return e.TotalAmount
+	}
+	var total int64
+	for _, it := range items {
+		total += orderLineStoredAmount(it)
+	}
+	return total
 }
 
 func renderChangeTotalsBlock(changes int) string {
