@@ -329,7 +329,11 @@ func (m *Menu) withMenuEdges(q *ent.MenuQuery) *ent.MenuQuery {
 			menuspec.BySort(sql.OrderAsc()),
 			menuspec.ByID(sql.OrderAsc()),
 		)
-		sq.WithCategorySpec()
+		sq.WithCategorySpec(func(cq *ent.CategorySpecQuery) {
+			cq.WithSpecItem(func(iq *ent.SpecItemQuery) {
+				iq.WithSpecGroup()
+			})
+		})
 		sq.WithSpecItem(func(iq *ent.SpecItemQuery) {
 			iq.WithSpecGroup()
 		})

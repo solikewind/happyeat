@@ -52,12 +52,28 @@ func specPriceDelta(menuEnt *ent.Menu, specInfo string) int64 {
 
 func menuSpecPriceDelta(s *ent.MenuSpec) int64 {
 	if categorySpec, err := s.Edges.CategorySpecOrErr(); err == nil && categorySpec != nil {
-		return categorySpec.PriceDelta
+		return categorySpecCurrentPriceDelta(categorySpec)
 	}
 	if s.Edges.CategorySpec != nil {
-		return s.Edges.CategorySpec.PriceDelta
+		return categorySpecCurrentPriceDelta(s.Edges.CategorySpec)
+	}
+	if specItem, err := s.Edges.SpecItemOrErr(); err == nil && specItem != nil {
+		return specItem.DefaultPrice
+	}
+	if s.Edges.SpecItem != nil {
+		return s.Edges.SpecItem.DefaultPrice
 	}
 	return s.PriceDelta
+}
+
+func categorySpecCurrentPriceDelta(categorySpec *ent.CategorySpec) int64 {
+	if specItem, err := categorySpec.Edges.SpecItemOrErr(); err == nil && specItem != nil {
+		return specItem.DefaultPrice
+	}
+	if categorySpec.Edges.SpecItem != nil {
+		return categorySpec.Edges.SpecItem.DefaultPrice
+	}
+	return categorySpec.PriceDelta
 }
 
 func menuSpecList(menuEnt *ent.Menu) []*ent.MenuSpec {
