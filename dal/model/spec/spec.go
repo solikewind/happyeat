@@ -132,6 +132,13 @@ func (r *CategorySpec) Update(ctx context.Context, id uint64, in CreateCategoryS
 		upd = upd.ClearSpecItem()
 	}
 	_, err := upd.Save(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = r.c.MenuSpec.Update().
+		Where(menuspec.CategorySpecIDEQ(id)).
+		SetPriceDelta(in.PriceDelta).
+		Save(ctx)
 	return err
 }
 
