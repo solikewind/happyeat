@@ -99,6 +99,7 @@ func entMenuToType(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Menu)
 		if specItem, err := s.Edges.SpecItemOrErr(); err == nil && specItem != nil {
 			if spec.Source == "" {
 				spec.Source = "library"
+				spec.PriceDelta = specItem.DefaultPrice
 			}
 			if spec.SpecValue == "" {
 				spec.SpecValue = specItem.Name
