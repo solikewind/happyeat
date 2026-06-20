@@ -94,6 +94,7 @@ func entMenuToType(ctx context.Context, svcCtx *svc.ServiceContext, e *ent.Menu)
 		if categorySpec, err := s.Edges.CategorySpecOrErr(); err == nil && categorySpec != nil {
 			spec.SpecType = categorySpec.SpecType
 			spec.SpecValue = categorySpec.SpecValue
+			spec.PriceDelta = categorySpec.PriceDelta
 		}
 		if specItem, err := s.Edges.SpecItemOrErr(); err == nil && specItem != nil {
 			if spec.Source == "" {

@@ -36,7 +36,7 @@ func specPriceDelta(menuEnt *ent.Menu, specInfo string) int64 {
 		if typ == "" || val == "" {
 			continue
 		}
-		lookup[menuSpecKey{typ: typ, val: val}] += s.PriceDelta
+		lookup[menuSpecKey{typ: typ, val: val}] += menuSpecPriceDelta(s)
 	}
 
 	var delta int64
@@ -48,6 +48,16 @@ func specPriceDelta(menuEnt *ent.Menu, specInfo string) int64 {
 		delta += lookup[menuSpecKey{typ: typ, val: val}]
 	}
 	return delta
+}
+
+func menuSpecPriceDelta(s *ent.MenuSpec) int64 {
+	if categorySpec, err := s.Edges.CategorySpecOrErr(); err == nil && categorySpec != nil {
+		return categorySpec.PriceDelta
+	}
+	if s.Edges.CategorySpec != nil {
+		return s.Edges.CategorySpec.PriceDelta
+	}
+	return s.PriceDelta
 }
 
 func menuSpecList(menuEnt *ent.Menu) []*ent.MenuSpec {

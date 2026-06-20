@@ -25,8 +25,9 @@ func TestResolveMenuUnitPrice_WithSpecDelta(t *testing.T) {
 					PriceDelta: 1,
 					Edges: ent.MenuSpecEdges{
 						CategorySpec: &ent.CategorySpec{
-							SpecType:  "辣度",
-							SpecValue: "微辣",
+							SpecType:   "辣度",
+							SpecValue:  "微辣",
+							PriceDelta: 1,
 						},
 					},
 				},
@@ -46,13 +47,13 @@ func TestSpecPriceDelta_MultipleSpecs(t *testing.T) {
 				{
 					PriceDelta: 1,
 					Edges: ent.MenuSpecEdges{
-						CategorySpec: &ent.CategorySpec{SpecType: "辣度", SpecValue: "重辣"},
+						CategorySpec: &ent.CategorySpec{SpecType: "辣度", SpecValue: "重辣", PriceDelta: 1},
 					},
 				},
 				{
 					PriceDelta: 2,
 					Edges: ent.MenuSpecEdges{
-						CategorySpec: &ent.CategorySpec{SpecType: "份量", SpecValue: "大份"},
+						CategorySpec: &ent.CategorySpec{SpecType: "份量", SpecValue: "大份", PriceDelta: 2},
 					},
 				},
 			},
@@ -61,6 +62,25 @@ func TestSpecPriceDelta_MultipleSpecs(t *testing.T) {
 	delta := specPriceDelta(menu, "辣度:重辣 份量:大份")
 	if delta != 3 {
 		t.Fatalf("delta = %d, want 3", delta)
+	}
+}
+
+func TestSpecPriceDelta_UsesCategorySpecCurrentPrice(t *testing.T) {
+	menu := &ent.Menu{
+		Edges: ent.MenuEdges{
+			MenuSpecs: []*ent.MenuSpec{
+				{
+					PriceDelta: 1,
+					Edges: ent.MenuSpecEdges{
+						CategorySpec: &ent.CategorySpec{SpecType: "份量", SpecValue: "大份", PriceDelta: 2},
+					},
+				},
+			},
+		},
+	}
+	delta := specPriceDelta(menu, "份量:大份")
+	if delta != 2 {
+		t.Fatalf("delta = %d, want 2", delta)
 	}
 }
 
