@@ -84,6 +84,32 @@ func TestSpecPriceDelta_UsesCategorySpecCurrentPrice(t *testing.T) {
 	}
 }
 
+func TestSpecPriceDelta_UsesSpecItemDefaultPriceThroughCategorySpec(t *testing.T) {
+	menu := &ent.Menu{
+		Edges: ent.MenuEdges{
+			MenuSpecs: []*ent.MenuSpec{
+				{
+					PriceDelta: 1,
+					Edges: ent.MenuSpecEdges{
+						CategorySpec: &ent.CategorySpec{
+							SpecType:   "份量",
+							SpecValue:  "大份",
+							PriceDelta: 1,
+							Edges: ent.CategorySpecEdges{
+								SpecItem: &ent.SpecItem{DefaultPrice: 2},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	delta := specPriceDelta(menu, "份量:大份")
+	if delta != 2 {
+		t.Fatalf("delta = %d, want 2", delta)
+	}
+}
+
 func TestMenuSpecTypeValue_FromSpecItem(t *testing.T) {
 	s := &ent.MenuSpec{
 		PriceDelta: 1,

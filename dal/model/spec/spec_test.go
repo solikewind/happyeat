@@ -69,3 +69,66 @@ func TestCategorySpecUpdateSyncsLinkedMenuSpecPriceDelta(t *testing.T) {
 		t.Fatalf("menu spec price_delta = %d, want 2", updated.PriceDelta)
 	}
 }
+
+func TestSpecItemUpdateSyncsLinkedSpecPrices(t *testing.T) {
+	ctx := context.Background()
+	client := newTestClient(t)
+	defer client.Close()
+
+	group := client.SpecGroup.Create().
+		SetName("份量").
+		SaveX(ctx)
+	item := client.SpecItem.Create().
+		SetSpecGroupID(group.ID).
+		SetName("大份").
+		SetDefaultPrice(1).
+		SaveX(ctx)
+	category := client.MenuCategory.Create().
+		SetName("本店特色").
+		SaveX(ctx)
+	categorySpec := client.CategorySpec.Create().
+		SetMenuCategoryID(category.ID).
+		SetSpecItemID(item.ID).
+		SetSpecType("份量").
+		SetSpecValue("大份").
+		SetPriceDelta(1).
+		SaveX(ctx)
+	menu := client.Menu.Create().
+		SetMenuCategoryID(category.ID).
+		SetName("炒鸡").
+		SetPrice(68).
+		SaveX(ctx)
+	directMenuSpec := client.MenuSpec.Create().
+		SetMenuID(menu.ID).
+		SetSpecItemID(item.ID).
+		SetPriceDelta(1).
+		SaveX(ctx)
+	categoryMenuSpec := client.MenuSpec.Create().
+		SetMenuID(menu.ID).
+		SetCategorySpecID(categorySpec.ID).
+		SetPriceDelta(1).
+		SaveX(ctx)
+
+	err := NewSpecItem(client).Update(ctx, item.ID, CreateSpecItemInput{
+		SpecGroupID:  group.ID,
+		Name:         "大份",
+		DefaultPrice: 2,
+		Sort:         item.Sort,
+	})
+	if err != nil {
+		t.Fatalf("update spec item: %v", err)
+	}
+
+	updatedCategorySpec := client.CategorySpec.GetX(ctx, categorySpec.ID)
+	if updatedCategorySpec.PriceDelta != 2 {
+		t.Fatalf("category spec price_delta = %d, want 2", updatedCategorySpec.PriceDelta)
+	}
+	updatedDirectMenuSpec := client.MenuSpec.GetX(ctx, directMenuSpec.ID)
+	if updatedDirectMenuSpec.PriceDelta != 2 {
+		t.Fatalf("direct menu spec price_delta = %d, want 2", updatedDirectMenuSpec.PriceDelta)
+	}
+	updatedCategoryMenuSpec := client.MenuSpec.GetX(ctx, categoryMenuSpec.ID)
+	if updatedCategoryMenuSpec.PriceDelta != 2 {
+		t.Fatalf("category menu spec price_delta = %d, want 2", updatedCategoryMenuSpec.PriceDelta)
+	}
+}

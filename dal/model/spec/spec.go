@@ -345,6 +345,27 @@ func (r *SpecItem) Update(ctx context.Context, id uint64, in CreateSpecItemInput
 		SetDefaultPrice(in.DefaultPrice).
 		SetSort(in.Sort).
 		Save(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = r.c.CategorySpec.Update().
+		Where(categoryspec.SpecItemIDEQ(id)).
+		SetPriceDelta(in.DefaultPrice).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = r.c.MenuSpec.Update().
+		Where(menuspec.SpecItemIDEQ(id)).
+		SetPriceDelta(in.DefaultPrice).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = r.c.MenuSpec.Update().
+		Where(menuspec.HasCategorySpecWith(categoryspec.SpecItemIDEQ(id))).
+		SetPriceDelta(in.DefaultPrice).
+		Save(ctx)
 	return err
 }
 
